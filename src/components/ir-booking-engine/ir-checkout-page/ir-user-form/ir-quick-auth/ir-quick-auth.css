@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+.quick-auth-container {
+  display: flex;
+  /* flex-direction: column; */
+  width: 100%;
+  gap: 0.5rem;
+  padding: 1rem 0;
+}
+.auth-instruction {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  flex: 1 1 0%;
+}
+.booking-reminder,
+.social-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  justify-content: center;
+}

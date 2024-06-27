@@ -1,0 +1,6 @@
+:host {
+  display: block;
+}
+ul li {
+  list-style: none !important;
+}

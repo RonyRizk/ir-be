@@ -1,0 +1,119 @@
+:host {
+  display: block;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.backdrop {
+  opacity: 0;
+  background: rgba(0, 0, 0, 0.2);
+  position: fixed;
+  inset: 0;
+  z-index: 99999998;
+}
+.backdrop[data-state='opened'] {
+  animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.backdrop[data-state='closed'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-container {
+  box-sizing: border-box;
+  margin: 0;
+  background-color: white;
+  box-shadow:
+    hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+    hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  min-height: 40vh;
+  width: 100%;
+  max-height: 95vh;
+  /* padding: 15px; */
+  z-index: 99999999;
+  animation: contentShow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 12px 12px 0px 0;
+  overflow-y: auto;
+}
+
+.modal-footer ::slotted(*) {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 8px;
+  margin-top: 16px;
+}
+.modal-footer {
+  --ir-btn-width: 100%;
+}
+.modal-title ::slotted(*) {
+  font-size: 18px;
+  font-weight: 600;
+  color: #101828;
+  margin-bottom: 8px;
+}
+.modal-body ::slotted(*) {
+  font-size: 14px;
+  font-weight: 400;
+  color: #475467;
+  padding: 0;
+  margin: 0;
+}
+
+@keyframes overlayShow {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes contentShow {
+  from {
+    opacity: 0;
+    transform: translate(0, 120%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+@keyframes contentShowMd {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* md */
+
+@media only screen and (min-width: 768px) {
+  .modal-container {
+    top: 50%;
+    left: 50%;
+    background: white;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    min-height: fit-content;
+    height: fit-content;
+    max-width: var(--ir-dialog-max-width, 40rem);
+    max-height: 85vh;
+    border-radius: min(var(--radius, 0.5rem), 0.5rem);
+    padding: 0;
+    animation: contentShowMd 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .modal-footer ::slotted(*) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: end;
+    gap: 8px;
+    --ir-btn-width: inherit;
+  }
+}

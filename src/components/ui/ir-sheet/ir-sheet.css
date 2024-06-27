@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+.backdrop {
+  opacity: 0;
+  background: rgba(0, 0, 0, 0.2);
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+}
+.backdrop[data-state='opened'] {
+  animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.backdrop[data-state='closed'] {
+  opacity: 0;
+  pointer-events: none;
+}
+@keyframes overlayShow {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

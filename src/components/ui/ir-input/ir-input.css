@@ -1,0 +1,98 @@
+:host([data-state='error']) .input-container {
+  border-color: red;
+}
+.input-container {
+  border-radius: 8px;
+  border: 1px solid var(--gray-300, #d0d5dd);
+  transition: all 0.3s ease-in-out;
+  width: 100%;
+  position: relative;
+  background: hsl(0, 0%, 100%);
+  display: flex;
+  align-items: center;
+  padding: 0 !important;
+}
+.placeholder {
+  position: absolute;
+  pointer-events: none;
+  transition: all 0.3s ease-in-out;
+  color: var(--gray-500, #667085);
+  margin: 0;
+  padding: 0;
+}
+input {
+  width: 100%;
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  font-size: 1rem;
+  outline: none;
+}
+
+:host([placeholder]) .placeholder,
+input:focus + .placeholder,
+.input-container.has-value .placeholder {
+  transform: translateY(-1.4rem);
+  background: linear-gradient(180deg, var(--label-background, #ffffff) 0%, #ffffff 100%);
+  padding-inline: 0.3rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  pointer-events: all;
+}
+.input-container:focus-within {
+  outline: none;
+  border-color: black;
+}
+.input-container:focus-within .placeholder {
+  color: black;
+}
+:host([data-state='error']) .input-container,
+.error {
+  border-color: var(--error-500, #f04438);
+}
+:host([data-state='error']) .placeholder,
+.error .placeholder {
+  color: var(--error-500, #f04438);
+}
+.disabled,
+.disabled input {
+  background: var(--gray-50, #f9fafb);
+  color: var(--gray-300, #d0d5dd);
+  pointer-events: none;
+}
+
+label {
+  position: absolute;
+  pointer-events: none;
+  height: 100%;
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-600, #475467);
+}
+.right-icon:dir(ltr),
+.placeholder:dir(rtl),
+.left-icon:dir(rtl) {
+  right: calc(0.875rem - 0.3rem);
+}
+.placeholder:dir(ltr),
+.left-icon:dir(ltr),
+.right-icon:dir(rtl) {
+  left: calc(0.875rem - 0.3rem);
+}
+
+.input-container[data-context='icon']:dir(ltr) input {
+  padding-left: 2.3rem;
+}
+.input-container[data-context='icon']:dir(ltr) .placeholder {
+  left: 2rem;
+}
+.input-container[data-context='icon']:dir(rtl) input {
+  padding-right: 2.3rem;
+}
+.input-container[data-context='icon']:dir(rtl) .placeholder {
+  right: 2rem;
+}
+:host[mode='default'] .placeholder {
+  display: none;
+}

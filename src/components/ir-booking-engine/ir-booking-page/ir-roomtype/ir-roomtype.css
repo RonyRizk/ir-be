@@ -1,0 +1,18 @@
+:host {
+  display: block;
+}
+.room-type-container {
+  border-radius: min(var(--radius, 8px), 12px);
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 1rem;
+  background-color: hsl(220, 14%, 96%);
+  padding: 1rem;
+}
+@media (min-width: 768px) {
+  .room-type-container {
+    flex-direction: row;
+  }
+}

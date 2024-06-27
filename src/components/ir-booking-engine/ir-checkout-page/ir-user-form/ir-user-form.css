@@ -1,0 +1,43 @@
+:host {
+  display: block;
+  --ir-dialog-max-width: 32rem;
+}
+.user-form-section {
+  width: 100%;
+}
+
+.user-form-content {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.user-form-row {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.user-form-input {
+  width: 100%;
+}
+
+.user-form-textarea {
+  width: 100%;
+}
+
+.user-form-checkbox {
+  margin-top: 0.75rem;
+}
+
+@media (min-width: 1024px) {
+  .user-form-row {
+    flex-direction: row;
+  }
+  .user-form-input {
+    width: auto;
+    flex: 1;
+  }
+}

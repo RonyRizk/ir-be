@@ -1,0 +1,6 @@
+:host {
+  display: block;
+}
+.image-container {
+  aspect-ratio: 16/9;
+}

@@ -1,0 +1,155 @@
+:host {
+  display: block;
+}
+
+.phone-input-container {
+  width: 100%;
+  background: hsl(0, 0%, 100%);
+}
+
+.input-trigger {
+  display: flex;
+  border-radius: 8px;
+  border: 1px solid var(--gray-300, #d0d5dd);
+  transition: all 0.3s ease-in-out;
+  background: white;
+  align-items: center;
+}
+.input-trigger label {
+  position: absolute;
+  transform: translateY(-0.6rem) scale(1);
+  background: hsl(0, 0%, 100%);
+  padding: 0 0.3rem;
+  top: 0;
+  z-index: 10;
+}
+.input-trigger:dir(ltr) label {
+  left: calc(0.875rem - 0.3rem);
+}
+.input-trigger:dir(rtl) label {
+  right: calc(0.875rem - 0.3rem);
+}
+
+:host([data-state='error']) .input-trigger {
+  border-color: var(--error-500, hsl(4, 86%, 58%));
+}
+:host([data-state='error']) label {
+  color: var(--error-500, hsl(4, 86%, 58%));
+}
+
+.input-trigger:focus-within {
+  border-color: black;
+}
+.input-trigger:focus-within label {
+  color: black;
+}
+
+.input-section {
+  flex: 1;
+  padding: 0.625rem 0.875rem;
+  /* padding: 1rem; */
+}
+
+.input-section label {
+  display: block;
+  /* margin-bottom: 0.5rem; */
+  color: var(--gray-500, #667085);
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.input-subtrigger {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  font-size: 1rem;
+  outline: none;
+}
+
+.flag-icon {
+  height: 1rem;
+  border-radius: 0.125rem;
+}
+
+.dropdown-container {
+  z-index: 50;
+}
+
+.dropdown-content {
+  max-height: 250px;
+  background: white;
+  border-radius: min(var(--radius, 0.5rem), 0.5rem);
+  z-index: 99999;
+  overflow-y: auto;
+  width: 100%;
+  border: 1px solid var(--gray-300);
+  box-shadow:
+    0 10px 38px -10px rgba(22, 23, 24, 0.35),
+    0 10px 20px -15px rgba(22, 23, 24, 0.2);
+}
+
+.combobox-item {
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  padding: 0.625rem 0.875rem;
+}
+
+.combobox-item[data-highlighted='true'] {
+  background-color: var(--gray-50);
+  color: var(--gray-900);
+}
+
+.combobox-item[data-disabled] {
+  color: var(--gray-300);
+}
+
+.combobox-item-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-container {
+  padding: 0.625rem 0.875rem;
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  background: white;
+}
+
+.filter-input {
+  outline: none;
+  width: 100%;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  padding-inline: 0.5rem;
+  color: var(--gray-900);
+}
+
+.filter-icon {
+  height: 1rem;
+  width: 1rem;
+  margin-right: 0.5rem;
+}
+
+.check-icon {
+  height: 1rem;
+  width: 1rem;
+}
+.input-section {
+  position: relative;
+}
+.input-trigger .input-section:first-child {
+  max-width: max-content;
+}
+
+.input-trigger .input-section:first-child .input-subtrigger svg {
+  margin-left: 0.5rem;
+}
+.input-trigger .input-section:first-child .input-subtrigger span {
+  margin-left: 0.3rem;
+}

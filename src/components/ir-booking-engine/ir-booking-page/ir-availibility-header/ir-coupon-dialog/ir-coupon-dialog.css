@@ -1,0 +1,98 @@
+:host {
+  display: block;
+  --ir-dialog-max-width: 27rem;
+}
+.title {
+  height: 32px;
+  flex-grow: 0;
+  font-size: 16px;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.33;
+  letter-spacing: normal;
+  color: #101828;
+}
+.Supporting-text {
+  height: 24px;
+  align-self: stretch;
+  flex-grow: 0;
+  font-size: 14px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.5;
+  letter-spacing: normal;
+  color: #475467;
+}
+.coupon-container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.coupon-button {
+  width: 100%;
+}
+
+.coupon-button-wide {
+  width: fit-content;
+}
+
+.coupon-applied {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  color: hsl(var(--brand-600));
+}
+
+.icon-remove {
+  color: hsl(var(--brand-600));
+}
+
+.coupon-form {
+  padding: 1rem 1rem 0;
+}
+
+@media (min-width: 640px) {
+  .coupon-form {
+    padding: 1.5rem 1.5rem 0;
+  }
+}
+
+.error-message {
+  color: #f56565;
+}
+
+.footer-buttons {
+  padding: 1.5rem 0;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.5rem;
+}
+
+.button-cancel {
+  width: 100%;
+}
+
+.button-apply {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .footer-buttons {
+    padding: 1.5rem 0;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .button-cancel {
+    width: fit-content;
+  }
+}
+
+@media (min-width: 768px) {
+  .button-apply {
+    width: fit-content;
+  }
+}

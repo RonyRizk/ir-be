@@ -1,0 +1,6 @@
+:host {
+  display: block;
+}
+.facilities-container {
+  border-radius: min(var(--radius, 0.5rem), 0.75rem);
+}

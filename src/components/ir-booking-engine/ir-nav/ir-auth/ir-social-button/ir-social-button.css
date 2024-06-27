@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+.social-button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius, 8px);
+  border: 1px solid var(--gray-300, #d0d5dd);
+  background: white;
+  color: var(--gray-700, #344054);
+  transition: all 0.3s ease-in-out;
+  padding: 8px 16px;
+  font-size: 16px;
+  line-height: 24px;
+  position: relative;
+}
+.social-button:hover {
+  background: var(--gray-50, #f9fafb);
+  color: var(--gray-800, #1d2939);
+}
+.icon {
+  position: absolute;
+  left: 6rem;
+}

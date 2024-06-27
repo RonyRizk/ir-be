@@ -1,0 +1,134 @@
+.availability-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  background-color: #f3f4f6;
+  padding: 1rem;
+  border-radius: min(var(--radius, 0.5rem), 0.75rem);
+}
+
+.availability-inputs {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.date-popup,
+.adult-child-counter,
+.button-container {
+  width: 100%;
+}
+.availability-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+.availability-controls ir-adult-child-counter {
+  flex: 1 1 0%;
+  width: 100%;
+}
+
+.date-toast .toast-message {
+  background-color: #ef4444;
+  color: white;
+  border-radius: 0.375rem;
+  padding: 0.25rem 1.25rem;
+  font-size: 0.875rem;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.hidden-on-mobile {
+  display: none;
+}
+
+.full-width-on-mobile {
+  display: block;
+  width: 100%;
+}
+
+.promotions-container {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+.arrow-up {
+  width: 0;
+  height: 0;
+  border-left: 0.6rem solid transparent;
+  border-right: 0.6rem solid transparent;
+  border-bottom: 0.4rem solid #ef4444;
+  position: absolute;
+  top: -3.2px;
+  animation: tooltipAnimation 300ms ease-out;
+}
+.arrow-up:dir(rtl) {
+  right: 0.625rem;
+}
+.arrow-up:dir(ltr) {
+  left: 0.625rem;
+}
+.date-toast {
+  position: relative;
+  animation: tooltipAnimation 300ms ease-out;
+}
+@keyframes tooltipAnimation {
+  from {
+    transform: translateY(4px);
+    opacity: 0.6;
+  }
+}
+
+/* Media Queries */
+@media (min-width: 640px) {
+  .availability-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .availability-inputs {
+    flex-direction: row;
+    width: auto;
+  }
+
+  .date-popup {
+    width: 100%;
+  }
+  .adult-child-counter,
+  .button-container {
+    width: auto;
+  }
+
+  .hidden-on-mobile {
+    display: block;
+  }
+
+  .full-width-on-mobile {
+    display: none;
+  }
+
+  .promotions-container {
+    width: auto;
+    justify-content: flex-start;
+  }
+}
+@media (min-width: 1024px) {
+  .availability-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4rem;
+  }
+}

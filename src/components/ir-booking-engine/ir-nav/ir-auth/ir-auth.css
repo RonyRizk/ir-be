@@ -1,0 +1,65 @@
+.auth-container {
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden !important;
+  padding: 1rem 1.5rem;
+}
+
+.slide-right {
+  animation: slideRight 0.3s ease-in-out forwards;
+}
+
+.slide-left {
+  animation: slideLeft 0.3s ease-in-out forwards;
+}
+
+.flex-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-center {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.full-width {
+  width: 100%;
+}
+.social-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@keyframes slideRight {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideLeft {
+  from {
+    transform: translate3D(100%, 0, 0);
+  }
+  to {
+    transform: translate(0);
+  }
+}
+@media (min-width: 640px) {
+  .auth-container {
+    padding: 1.5rem;
+  }
+}
+@media only screen and (min-width: 1024px) {
+  :host {
+    --ir-dialog-max-width: 32rem;
+  }
+}

@@ -1,0 +1,243 @@
+{
+  "assign_units": false,
+  "check_in": false,
+  "is_pms": false,
+  "is_direct": true,
+  "agent": null,
+  "promo_key": null,
+  "booking": {
+    "booking_nbr": "",
+    "from_date": "2024-06-18",
+    "to_date": "2024-06-19",
+    "remark": null,
+    "property": {
+      "id": 42
+    },
+    "source": "webiste",
+    "referrer_site": "www.igloorooms.com",
+    "currency": {
+      "code": "USD",
+      "id": 4,
+      "symbol": "US$"
+    },
+    "arrival": {
+      "code": "001"
+    },
+    "guest": {
+      "email": "test@gmail.com",
+      "first_name": "test",
+      "last_name": "test",
+      "country_id": 2,
+      "city": null,
+      "mobile": "+96112321321",
+      "address": "",
+      "dob": null,
+      "subscribe_to_news_letter": true,
+      "cci": null
+    },
+    "rooms": [
+      {
+        "identifier": null,
+        "roomtype": {
+          "amenities": [
+            {
+              "amenity_type": "room",
+              "code": "amenities",
+              "description": "Welcome amenities"
+            },
+            {
+              "amenity_type": "room",
+              "code": "viewslopes",
+              "description": "Slopes view"
+            },
+            {
+              "amenity_type": "room",
+              "code": "soundproof",
+              "description": "Soundproof"
+            }
+          ],
+          "availabilities": null,
+          "bedding_setup": [
+            {
+              "code": "kingsizebed",
+              "count": 1,
+              "name": "King size bed"
+            },
+            {
+              "code": "singlebed",
+              "count": 1,
+              "name": "Single bed"
+            }
+          ],
+          "description": "Our Modern and Classic Rooms averages 322 square feet with custom furnishings,every room in Hotel High Season includes the finest attention to detail, from the triple-sheeted 300 thread count sheets to the one-touch “Goodnight” button.Each room will be everything you are looking for in a Lebanon hotel, and drastically more than you thought possible and our custom beds by will make you want to snooze through your morning plans.When you enter our Modern and Classic Room, you’ll only have one thought: this is what all hotels at Lebanon should be like. ",
+          "exposed_inventory": null,
+          "id": 110,
+          "images": [
+            {
+              "tooltip": "Standard Rooms",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_223.jpg"
+            },
+            {
+              "tooltip": "Standard Rooms",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_224.jpg"
+            },
+            {
+              "tooltip": "Standard Rooms",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_225.jpg"
+            },
+            {
+              "tooltip": "Standard Rooms",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_226.jpg"
+            },
+            {
+              "tooltip": "Standard Rooms",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_229.jpg"
+            },
+            {
+              "tooltip": "Standard Rooms",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_231.jpg"
+            },
+            {
+              "tooltip": "Standard Rooms",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_234.jpg"
+            },
+            {
+              "tooltip": "Standard Rooms",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_235.jpg"
+            },
+            {
+              "tooltip": "Standard Rooms",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_236.jpg"
+            },
+            {
+              "tooltip": "Standard Rooms",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_241.jpg"
+            },
+            {
+              "tooltip": "Standard Rooms",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_251.jpg"
+            },
+            {
+              "tooltip": "Standard Rooms",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_271.jpg"
+            }
+          ],
+          "inventory": 5,
+          "is_active": true,
+          "is_bed_configuration_enabled": false,
+          "main_image": {
+            "tooltip": "Standard Rooms",
+            "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_235.jpg"
+          },
+          "name": "Standard Rooms",
+          "occupancy_default": {
+            "adult_nbr": 2,
+            "children_nbr": 0,
+            "infant_nbr": null
+          },
+          "occupancy_max": {
+            "adult_nbr": 2,
+            "children_nbr": 0,
+            "infant_nbr": 0
+          },
+          "physicalrooms": null,
+          "pre_payment_amount": 18.8831,
+          "rate": null,
+          "rateplans": null,
+          "size": 25,
+          "smoking_option": {
+            "allowed_smoking_options": [
+              {
+                "code": "002",
+                "description": "Non-smoking"
+              }
+            ],
+            "code": "003",
+            "description": "Non smoking"
+          }
+        },
+        "rateplan": {
+          "assignable_units": null,
+          "cancelation": "<u><b>Cancellation</b></u>: 100% of the total price will be charged if cancelled after Tuesday, 4 Jun 2024, 22:00 or in case of no show.\r\n",
+          "custom_text": "",
+          "guarantee": "<u><b>Guarantee</b></u>: First night from your booking will be charged.",
+          "id": 3882,
+          "is_active": true,
+          "is_booking_engine_enabled": true,
+          "is_channel_enabled": false,
+          "is_closed": false,
+          "is_non_refundable": false,
+          "is_targeting_travel_agency": false,
+          "name": "Standard Rooms/Bed-only",
+          "rate_restrictions": null,
+          "selected_variation": null,
+          "sell_mode": {
+            "code": "001",
+            "description": "Per Room"
+          },
+          "short_name": "Bed-only",
+          "variations": [
+            {
+              "adult_child_offering": "2 adults",
+              "adult_nbr": 2,
+              "amount": 66.6133,
+              "amount_per_night": 66.6133,
+              "child_nbr": 0,
+              "discount_pct": 15,
+              "is_lmd": false,
+              "nights_nbr": 1,
+              "total_before_discount": 78.36859
+            },
+            {
+              "adult_child_offering": "1 adult",
+              "adult_nbr": 1,
+              "amount": 66.6133,
+              "amount_per_night": 66.6133,
+              "child_nbr": 0,
+              "discount_pct": 15,
+              "is_lmd": false,
+              "nights_nbr": 1,
+              "total_before_discount": 78.36859
+            }
+          ]
+        },
+        "unit": null,
+        "occupancy": {
+          "adult_nbr": 1,
+          "children_nbr": 0,
+          "infant_nbr": null
+        },
+        "bed_preference": null,
+        "from_date": "2024-06-18",
+        "to_date": "2024-06-19",
+        "notes": null,
+        "days": [
+          {
+            "date": "2024-06-18",
+            "amount": 66.6133,
+            "cost": null
+          }
+        ],
+        "guest": {
+          "email": null,
+          "first_name": "test",
+          "last_name": "test",
+          "country_id": null,
+          "city": null,
+          "mobile": null,
+          "address": null,
+          "dob": null,
+          "subscribe_to_news_letter": null,
+          "cci": null
+        }
+      }
+    ]
+  },
+  "extras": [
+    {
+      "key": "payment_code",
+      "value": "NetCommerce"
+    }
+  ],
+  "pickup_info": null
+}

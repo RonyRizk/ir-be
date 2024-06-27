@@ -1,0 +1,14 @@
+:host {
+  display: block;
+}
+.link {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #344054;
+}
+.link:hover {
+  text-decoration: underline;
+}
+.link.active {
+  color: hsl(var(--brand-600, 215, 87%, 51%));
+}

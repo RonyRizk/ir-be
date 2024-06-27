@@ -1,0 +1,7 @@
+:host {
+  display: block;
+}
+.banner {
+  padding: 4px 10px 4px 4px;
+  border-radius: min(var(--radius, 8px), 16px);
+}

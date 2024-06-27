@@ -1,0 +1,66 @@
+:host {
+  display: block;
+}
+.badge-group {
+  padding: 4px 10px 4px 4px;
+  border-radius: min(calc(var(--radius, 8px)), 16px);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.position-center .badge {
+  display: none;
+}
+.badge.clickable {
+  cursor: pointer;
+}
+.badge {
+  padding: 2px 8px;
+  border-radius: min(calc(var(--radius, 8px)), 16px);
+  border-width: 1px;
+  border-style: solid;
+  font-size: 12px;
+  line-height: 18px;
+  background: white;
+  width: fit-content;
+  /* margin-right: 8px; */
+}
+.badge-group.error {
+  color: var(--error-700, #b42318);
+  background: var(--error-50, #fef3f2);
+}
+
+.badge-group.error .badge {
+  border-color: var(--error-200, #fecdca);
+}
+.badge-group.primary {
+  background: hsla(var(--brand-50, 206, 100%, 97%), 10%);
+  color: hsl(var(--brand-700, 218, 80%, 46%));
+}
+
+.badge-group.primary .badge {
+  border-color: hsl(var(--brand-200, 206, 100%, 85%));
+}
+
+.badge-group.secondary {
+  color: var(--gray-700, #344054);
+  background: var(--gray-50, #f9fafb);
+}
+
+.badge-group.error .secondary {
+  border-color: var(--gray-200, #eaecf0);
+}
+.position-center .message {
+  text-align: center;
+}
+
+.message {
+  flex: 1;
+}
+
+@media (min-width: 768px) {
+  .position-center .badge {
+    display: block;
+    position: absolute;
+  }
+}

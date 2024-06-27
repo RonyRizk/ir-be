@@ -1,0 +1,26 @@
+:host {
+  display: block;
+}
+.title {
+  height: 32px;
+  flex-grow: 0;
+  font-size: 16px;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.33;
+  letter-spacing: normal;
+  color: #101828;
+  text-align: start;
+}
+.Supporting-text {
+  height: 24px;
+  align-self: stretch;
+  flex-grow: 0;
+  font-size: 14px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.5;
+  letter-spacing: normal;
+  color: #475467;
+}

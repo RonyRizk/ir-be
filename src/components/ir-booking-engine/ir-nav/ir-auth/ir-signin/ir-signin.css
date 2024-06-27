@@ -1,0 +1,102 @@
+:host {
+  display: block;
+}
+.title {
+  height: 32px;
+  align-self: stretch;
+  flex-grow: 0;
+  font-size: 24px;
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.33;
+  letter-spacing: normal;
+  text-align: center;
+  color: #101828;
+  margin-bottom: 2rem;
+}
+.Supporting-text {
+  height: 24px;
+  align-self: stretch;
+  flex-grow: 0;
+  font-size: 16px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.5;
+  letter-spacing: normal;
+  text-align: center;
+  color: #475467;
+}
+.dont-have-an-account {
+  width: 155px;
+  height: 20px;
+  flex-grow: 0;
+  font-size: 14px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.43;
+  letter-spacing: normal;
+  text-align: left;
+  color: #475467;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+fieldset {
+  border: none;
+  padding: 0;
+}
+
+.ir-input {
+  display: block;
+  width: 100%;
+}
+
+.ir-button {
+  margin-top: 1rem;
+  width: 100%;
+}
+.error {
+  color: var(--error-color, #dc3545);
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 0.75rem 0;
+}
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background-color: var(--divider-color, #ccc);
+}
+
+.divider-text {
+  color: var(--divider-text-color, #6c757d);
+}
+
+.dont-have-an-account {
+  font-size: 0.875rem;
+  color: var(--text-color, #333);
+}
+
+.sign-up-button {
+  background-color: transparent;
+  border: none;
+  color: var(--primary-color, #007bff);
+  cursor: pointer;
+  padding: 0;
+}
+
+.sign-up-button:hover {
+  text-decoration: underline;
+}

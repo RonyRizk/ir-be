@@ -1,0 +1,29 @@
+:host {
+  display: block;
+  width: 100%;
+}
+.popover-content {
+  z-index: 99;
+  /* background: var(--background); */
+}
+.trigger {
+  width: 100%;
+  width: 200px;
+  background: white;
+  border-radius: var(--radius, 8px);
+  border: 1px solid var(--gray-300, #d0d5dd);
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 14px;
+  justify-content: space-between;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.trigger:focus,
+.trigger:active {
+  border-color: var(--brand-300, #84caff);
+  box-shadow:
+    0 1px 2px 0 rgba(0, 0, 0, 0.1),
+    0 0 0 4px var(--brand-100, #d1e9ff);
+}

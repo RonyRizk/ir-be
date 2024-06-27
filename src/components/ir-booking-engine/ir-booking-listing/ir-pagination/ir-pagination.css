@@ -1,0 +1,63 @@
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+ul {
+  list-style-type: none;
+  padding: 1rem 0;
+  display: none;
+}
+.current-page-info {
+  color: var(--gray-700, #344054);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+}
+@media (min-width: 768px) {
+  .current-page-info {
+    display: none;
+  }
+  ul {
+    display: block;
+  }
+}
+li {
+  display: inline-flex;
+  margin-right: 5px;
+  height: 2.5rem;
+  width: 2.5rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border-radius: min(var(--radius, 0.5rem), 1rem);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+}
+
+li button {
+  all: unset;
+  text-decoration: none;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: min(var(--radius, 0.5rem), 0.5rem);
+  color: var(--gray-500, #667085);
+}
+li button:hover {
+  background: hsla(var(--brand-100, 206, 100%, 85%), 0.3);
+  color: hsla(var(--brand-600, 215, 87%, 51%));
+}
+
+li.active button {
+  background: hsla(var(--brand-100, 206, 100%, 85%), 0.3);
+  color: hsla(var(--brand-600, 215, 87%, 51%));
+}
+
+.ellipsis {
+  color: var(--gray-500, #667085);
+  pointer-events: none;
+}

@@ -1,0 +1,79 @@
+:host {
+  display: block;
+}
+.card-container {
+  border: 1px solid var(--gray-300, #d0d5dd);
+  transition: all 0.3s ease-in-out;
+  width: 100%;
+  position: relative;
+  background: white;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+}
+.card-container.error {
+  border-color: var(--error-500, #f04438);
+}
+.card-container.error .card-number {
+  color: var(--error-500, #f04438);
+}
+.card-container input {
+  width: 100%;
+  border-radius: 8px;
+  padding: 0.625rem 0.875rem;
+  outline: none;
+  font-size: 16px;
+  border: 0;
+}
+.card-container:focus-within {
+  border-color: black;
+}
+.card-container:focus-within .card-number {
+  color: black;
+}
+.card-number {
+  position: absolute;
+  top: -0.6rem;
+  z-index: 1;
+  background: rgb(255, 255, 255);
+  text-align: center;
+  padding: 0;
+  padding-inline: 0.3rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--gray-500, #667085);
+}
+.card-number:dir(rtl) {
+  right: calc(0.875rem - 0.3rem);
+}
+.card-number:dir(ltr) {
+  left: calc(0.875rem - 0.3rem);
+}
+/* .card-number {
+  position: absolute;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-600, #475467);
+  top: 50%;
+  transform: translateY(-1.3rem);
+  font-size: 0.75rem;
+  line-height: 1rem;
+} */
+.input-container {
+  border-radius: var(--radius, 8px);
+  width: 100%;
+  position: relative;
+  background: hsl(0, 0%, 100%);
+  display: flex;
+  align-items: center;
+}
+.icon-container {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  right: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+}

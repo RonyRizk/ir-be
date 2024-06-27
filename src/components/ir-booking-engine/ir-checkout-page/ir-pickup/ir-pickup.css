@@ -1,0 +1,55 @@
+:host {
+  display: block;
+}
+.date-range-container {
+  box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid var(--gray-100);
+  background: white;
+  box-shadow:
+    0 12px 16px -4px rgba(16, 24, 40, 0.08),
+    0 4px 6px -2px rgba(16, 24, 40, 0.03);
+}
+.popover-trigger {
+  box-sizing: border-box;
+  gap: 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid var(--gray-300, #d0d5dd);
+  display: inline-flex;
+  align-items: center;
+  min-width: 230px;
+  line-height: 1;
+  font-size: 1rem;
+  color: var(--gray-700);
+  cursor: pointer;
+  position: relative;
+  padding: 0.8rem 0.875rem;
+  /* height: 3rem; */
+}
+.popover-trigger[data-state='opened'],
+.popover-trigger:active,
+.popover-trigger:focus-visible {
+  border-color: black;
+}
+.popover-trigger:active .trigger-label,
+.popover-trigger:focus-visible .trigger-labe,
+.popover-trigger:focus-visible .trigger-labe {
+  color: black;
+}
+.trigger-label {
+  margin: 0;
+  padding: 0;
+  font-size: 0.75rem;
+  position: absolute;
+  transform: translateY(-1.35rem);
+  background: white;
+  padding-inline: 0.3rem;
+  left: 2.4rem;
+  color: var(--gray-500, #667085);
+}
+.date {
+  color: var(--gray-600);
+  font-weight: 400;
+  font-size: 1rem;
+}
