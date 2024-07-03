@@ -174,19 +174,18 @@ export class IrCheckoutPage {
     }
     const { prePaymentAmount } = calculateTotalCost();
     if (prePaymentAmount > 0) {
-      const res = await this.paymentService.GeneratePaymentCaller(token, {
-        booking_nbr: bookingResult.booking_nbr,
-        amount: prePaymentAmount,
-        currency_id: bookingResult.currency.id,
-        email: bookingResult.guest.email,
-        pgw_id: currentPayment.data.find(d => d.key === 'id')?.value,
+      await this.paymentService.GeneratePaymentCaller({
+        token,
+        params: {
+          booking_nbr: bookingResult.booking_nbr,
+          amount: prePaymentAmount,
+          currency_id: bookingResult.currency.id,
+          email: bookingResult.guest.email,
+          pgw_id: currentPayment.id.toString(),
+        },
+        onRedirect: url => (window.location.href = url),
+        onScriptRun: script => this.runScriptAndRemove(script),
       });
-
-      if (res.type === 1) {
-        window.location.href = res.caller;
-      } else {
-        this.runScriptAndRemove(res.caller);
-      }
     }
   }
 

@@ -10,6 +10,7 @@ import axios from 'axios';
 import { AuthService } from '@/services/api/auth.service';
 import { PaymentService } from '@/services/api/payment.service';
 import { isRequestPending } from '@/stores/ir-interceptor.store';
+import { AllowedPaymentMethod } from '@/models/property';
 
 @Component({
   tag: 'ir-invoice',
@@ -25,6 +26,8 @@ export class IrInvoice {
   @Prop() status: 0 | 1 = 1;
   @Prop() perma_link: string = null;
   @Prop() aName: string = null;
+  @Prop() headerShown: boolean = true;
+  @Prop() footerShown: boolean = true;
 
   @State() booking: Booking;
   @State() token: string;
@@ -47,6 +50,16 @@ export class IrInvoice {
     this.init();
     this.fetchData();
   }
+  private detectPaymentOrigin() {
+    if (!this.booking.extras) {
+      return null;
+    }
+    const code = this.booking.extras.find(e => e.key === 'payment_code').value;
+    if (!code) {
+      return null;
+    }
+    return app_store.property.allowed_payment_methods.find(apm => apm.code === code) ?? null;
+  }
   // @Watch('token')
   // handleTokenChange() {
   //   this.init();
@@ -54,7 +67,7 @@ export class IrInvoice {
   @Watch('bookingNbr')
   async handleBookingNumberChange(newValue, oldValue) {
     if (newValue !== oldValue) {
-      this.booking = await this.propertyService.getExposedBooking({ booking_nbr: this.bookingNbr, language: this.language });
+      this.booking = await this.propertyService.getExposedBooking({ booking_nbr: this.bookingNbr, language: this.language }, true);
     }
   }
   async init() {
@@ -96,19 +109,47 @@ export class IrInvoice {
     const encodedSubject = encodeURIComponent(subject);
     return `mailto:${email}?subject=${encodedSubject}`;
   }
+  renderPaymentText(paymentOption: AllowedPaymentMethod) {
+    if (paymentOption.is_payment_gateway) {
+      return (
+        <p class="total-payment text-sm">
+          {localizedWords.entries.Lcz_YouHavePaid} <span>{formatAmount(this.booking.financial.total_amount, this.booking.currency.code)}</span>
+        </p>
+      );
+    }
+    if (paymentOption.code === '005') {
+      return (
+        <div>
+          <p class="total-payment text-sm">
+            {localizedWords.entries.Lcz_DueAmountNow} <span>{formatAmount(this.booking.financial.due_amount, this.booking.currency.code)}</span>
+          </p>
+          <p>{paymentOption.description}</p>
+        </div>
+      );
+    }
+    return (
+      <p class="total-payment text-sm">
+        {localizedWords.entries.Lcz_YourCardWillBeCharged} <span>{formatAmount(this.booking.financial.gross_total, this.booking.currency.code)}</span>
+      </p>
+    );
+  }
 
   render() {
     if (!this.booking) {
       return null;
     }
     const google_maps_url = `http://maps.google.com/maps?q=${app_store.property.location.latitude},${app_store.property.location.longitude}`;
+    const payment_option = this.detectPaymentOrigin();
+
     return (
       <Host>
         <ir-interceptor></ir-interceptor>
         <main class="relative flex w-full flex-col space-y-5">
-          <section class="sticky top-0 z-50 m-0  w-full  p-0">
-            <ir-nav class={'m-0 p-0'} showBookingCode={false} website={app_store.property?.space_theme.website} logo={app_store.property?.space_theme?.logo}></ir-nav>
-          </section>
+          {this.headerShown && (
+            <section class="sticky top-0 z-50 m-0  w-full  p-0">
+              <ir-nav class={'m-0 p-0'} showBookingCode={false} website={app_store.property?.space_theme.website} logo={app_store.property?.space_theme?.logo}></ir-nav>
+            </section>
+          )}
           <section class="flex-1 px-4 lg:px-6">
             <div class="mx-auto flex max-w-6xl gap-16">
               <div class="invoice-container">
@@ -118,7 +159,7 @@ export class IrInvoice {
                       {localizedWords.entries.Lcz_GetDirections}
                     </a>
                   ) : (
-                    <ir-button variants="outline" label="Retry Payment"></ir-button>
+                    payment_option.is_payment_gateway && <ir-button variants="outline" label="Retry Payment"></ir-button>
                   )}
                   <a href={this.getPropertyEmail()} target="_blank" class={cn(`button-outline`, 'flex items-center justify-center')} data-size="sm">
                     Message property
@@ -196,15 +237,20 @@ export class IrInvoice {
                     ))}
                   </div>
                 </section>
-                <section class="space-y-2">
-                  <div class={'flex items-center gap-4'}>
-                    <ir-icons name="credit_card"></ir-icons>
-                    <h3>{localizedWords.entries.Lcz_PaymentDetails}</h3>
-                  </div>
-                  <p class="total-payment">
-                    {localizedWords.entries.Lcz_Total} <span class="text-green-500">{formatAmount(this.booking.financial.gross_total, this.booking.currency.code)}</span>
-                  </p>
-                </section>
+
+                {payment_option && (
+                  <section class="space-y-2">
+                    <div class={'flex items-center gap-4'}>
+                      <ir-icons name="credit_card"></ir-icons>
+                      <h3>{localizedWords.entries.Lcz_PaymentDetails}</h3>
+                    </div>
+                    <p class="total-payment">
+                      {localizedWords.entries.Lcz_Total} <span class="text-green-500">{formatAmount(this.booking.financial.gross_total, this.booking.currency.code)}</span>
+                    </p>
+                    {this.renderPaymentText(payment_option)}
+                  </section>
+                )}
+
                 <section class="space-y-2">
                   <div class="flex items-center gap-4">
                     <ir-icons name="danger"></ir-icons>
@@ -238,7 +284,7 @@ export class IrInvoice {
                 )}
                 <a class="mapLink" target="_blank" href={google_maps_url}>
                   <img
-                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${app_store.property?.location.latitude || 34.022},${app_store.property?.location.longitude || 35.628}&zoom=15&size=1024x768&maptype=roadmap&markers=color:red%7Clabel:${app_store.property.name}%7C34.022,35.628&key=AIzaSyCrNcuQfXO55D0I5CLaWAx7U6pBCvru8rk`}
+                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${app_store.property?.location.latitude || 34.022},${app_store.property?.location.longitude || 35.628}&zoom=15&size=1024x768&maptype=roadmap&markers=color:red%7Clabel:${app_store.property.name}%7C34.022,35.628&key=AIzaSyCJ5P4SraJdZzcBi9Ue16hyg_iWJv-aHpk`}
                     loading="lazy"
                   ></img>
                 </a>
@@ -255,7 +301,7 @@ export class IrInvoice {
               </div>
             </div>
           </section>
-          <ir-footer></ir-footer>
+          {this.footerShown && <ir-footer></ir-footer>}
           <ir-alert-dialog ref={el => (this.alertDialog = el)}>
             <h2 slot="modal-title">Booking Cancellation</h2>
             <p slot="modal-body" class="pt-2" innerHTML={this.booking.rooms[0].rateplan.cancelation}></p>

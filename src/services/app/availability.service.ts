@@ -3,7 +3,6 @@ import { Queue } from '@/models/queue';
 import booking_store from '@/stores/booking';
 import { io, Socket } from 'socket.io-client';
 import { z } from 'zod';
-// import { VariationSorter } from './VariationSorter';
 
 interface IPAYLOAD {
   ROOM_CATEGORY_ID: number;
@@ -20,6 +19,7 @@ interface IPAYLOAD {
   AMOUNT_PER_NIGHT_VAL: number;
   CURRENCY_SYMBOL: string;
   IS_LMD: boolean;
+  IS_CALCULATED: boolean;
 }
 
 class SocketManager {
@@ -177,18 +177,6 @@ export class AvailabiltyService {
     }
     return Number(result.data.replace(/,/g, ''));
   }
-  // private sortVariations(variations: Variation[]) {
-  //   return variations.sort((a, b) => {
-  //     const parsedA = { adults: a.adult_nbr, children: a.child_nbr };
-  //     const parsedB = { adults: b.adult_nbr, children: b.child_nbr };
-
-  //     if (parsedA.adults !== parsedB.adults) {
-  //       return parsedA.adults - parsedB.adults;
-  //     }
-
-  //     return parsedA.children - parsedB.children;
-  //   });
-  // }
 
   private async processPayloads(payloads: IPAYLOAD[]): Promise<void> {
     try {
@@ -224,14 +212,19 @@ export class AvailabiltyService {
           is_lmd: payload.IS_LMD,
           nights_nbr: this.validateNumberString((payload.NIGHTS_NBR ?? 0)?.toString()) ?? 0,
           total_before_discount: this.validateNumberString((payload.TOTAL_BEFORE_DISCOUNT ?? 0)?.toString()) ?? 0,
+          is_calculated: payload.IS_CALCULATED,
         };
         const variationIndex = oldVariation.findIndex(v => v.adult_child_offering === payload.ADULT_CHILD_OFFERING);
+
         if (variationIndex === -1) {
           oldVariation.push(variation);
         } else {
           oldVariation[variationIndex] = variation;
         }
-        // oldVariation = this.variationSorter.sortVariations(oldVariation);
+
+        oldVariation = oldVariation.filter(
+          v => Number(v.adult_nbr) <= Number(booking_store.bookingAvailabilityParams.adult_nbr) && Number(v.child_nbr) <= Number(booking_store.bookingAvailabilityParams.child_nbr),
+        );
 
         rateplan = { ...rateplan, variations: oldVariation };
         roomType.rateplans[selectedRatePlanIndex] = rateplan;

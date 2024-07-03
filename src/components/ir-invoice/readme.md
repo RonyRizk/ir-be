@@ -7,16 +7,18 @@
 
 ## Properties
 
-| Property     | Attribute     | Description | Type     | Default     |
-| ------------ | ------------- | ----------- | -------- | ----------- |
-| `aName`      | `a-name`      |             | `string` | `null`      |
-| `baseUrl`    | `base-url`    |             | `string` | `undefined` |
-| `bookingNbr` | `booking-nbr` |             | `string` | `undefined` |
-| `email`      | `email`       |             | `string` | `undefined` |
-| `language`   | `language`    |             | `string` | `'en'`      |
-| `perma_link` | `perma_link`  |             | `string` | `null`      |
-| `propertyId` | `property-id` |             | `number` | `undefined` |
-| `status`     | `status`      |             | `0 \| 1` | `1`         |
+| Property      | Attribute      | Description | Type      | Default     |
+| ------------- | -------------- | ----------- | --------- | ----------- |
+| `aName`       | `a-name`       |             | `string`  | `null`      |
+| `baseUrl`     | `base-url`     |             | `string`  | `undefined` |
+| `bookingNbr`  | `booking-nbr`  |             | `string`  | `undefined` |
+| `email`       | `email`        |             | `string`  | `undefined` |
+| `footerShown` | `footer-shown` |             | `boolean` | `true`      |
+| `headerShown` | `header-shown` |             | `boolean` | `true`      |
+| `language`    | `language`     |             | `string`  | `'en'`      |
+| `perma_link`  | `perma_link`   |             | `string`  | `null`      |
+| `propertyId`  | `property-id`  |             | `number`  | `undefined` |
+| `status`      | `status`       |             | `0 \| 1`  | `1`         |
 
 
 ## Dependencies
@@ -46,6 +48,7 @@ graph TD;
   ir-nav --> ir-language-picker
   ir-nav --> ir-booking-code
   ir-nav --> ir-google-maps
+  ir-nav --> ir-user-profile
   ir-nav --> ir-button
   ir-nav --> ir-menu
   ir-nav --> ir-user-avatar
@@ -58,6 +61,12 @@ graph TD;
   ir-button --> ir-icons
   ir-booking-code --> ir-input
   ir-booking-code --> ir-button
+  ir-user-profile --> ir-input
+  ir-user-profile --> ir-select
+  ir-user-profile --> ir-phone-input
+  ir-user-profile --> ir-checkbox
+  ir-user-profile --> ir-button
+  ir-phone-input --> ir-icons
   ir-user-avatar --> ir-icons
   ir-sheet --> ir-button
   ir-modal --> ir-auth

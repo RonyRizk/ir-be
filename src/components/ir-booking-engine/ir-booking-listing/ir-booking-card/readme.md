@@ -12,11 +12,18 @@
 | `booking` | --        |             | `Booking` | `undefined` |
 
 
+## Events
+
+| Event           | Description | Type                                        |
+| --------------- | ----------- | ------------------------------------------- |
+| `optionClicked` |             | `CustomEvent<{ tag: string; id: number; }>` |
+
+
 ## Dependencies
 
 ### Used by
 
- - [ir-booking-listing](..)
+ - [ir-booking-overview](../ir-booking-overview)
 
 ### Depends on
 
@@ -29,7 +36,7 @@ graph TD;
   ir-booking-card --> ir-badge
   ir-booking-card --> ir-button
   ir-button --> ir-icons
-  ir-booking-listing --> ir-booking-card
+  ir-booking-overview --> ir-booking-card
   style ir-booking-card fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

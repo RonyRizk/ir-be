@@ -60,6 +60,7 @@
  - [ir-signin](../../ir-booking-engine/ir-nav/ir-auth/ir-signin)
  - [ir-signup](../../ir-booking-engine/ir-nav/ir-auth/ir-signup)
  - [ir-user-form](../../ir-booking-engine/ir-checkout-page/ir-user-form)
+ - [ir-user-profile](../../ir-booking-engine/ir-nav/ir-user-profile)
 
 ### Graph
 ```mermaid
@@ -72,6 +73,7 @@ graph TD;
   ir-signin --> ir-input
   ir-signup --> ir-input
   ir-user-form --> ir-input
+  ir-user-profile --> ir-input
   style ir-input fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

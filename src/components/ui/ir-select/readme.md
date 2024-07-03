@@ -34,6 +34,7 @@
  - [ir-pickup](../../ir-booking-engine/ir-checkout-page/ir-pickup)
  - [ir-rateplan](../../ir-booking-engine/ir-booking-page/ir-rateplan)
  - [ir-user-form](../../ir-booking-engine/ir-checkout-page/ir-user-form)
+ - [ir-user-profile](../../ir-booking-engine/ir-nav/ir-user-profile)
 
 ### Graph
 ```mermaid
@@ -44,6 +45,7 @@ graph TD;
   ir-pickup --> ir-select
   ir-rateplan --> ir-select
   ir-user-form --> ir-select
+  ir-user-profile --> ir-select
   style ir-select fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

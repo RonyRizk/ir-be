@@ -21,13 +21,13 @@
 ### Used by
 
  - [ir-booking-card](../../ir-booking-engine/ir-booking-listing/ir-booking-card)
- - [ir-booking-listing](../../ir-booking-engine/ir-booking-listing)
+ - [ir-booking-overview](../../ir-booking-engine/ir-booking-listing/ir-booking-overview)
 
 ### Graph
 ```mermaid
 graph TD;
   ir-booking-card --> ir-badge
-  ir-booking-listing --> ir-badge
+  ir-booking-overview --> ir-badge
   style ir-badge fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

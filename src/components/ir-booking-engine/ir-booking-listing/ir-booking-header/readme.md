@@ -25,12 +25,12 @@
 
 ### Used by
 
- - [ir-booking-listing](..)
+ - [ir-booking-overview](../ir-booking-overview)
 
 ### Graph
 ```mermaid
 graph TD;
-  ir-booking-listing --> ir-booking-header
+  ir-booking-overview --> ir-booking-header
   style ir-booking-header fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

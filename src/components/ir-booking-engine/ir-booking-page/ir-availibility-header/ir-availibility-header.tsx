@@ -148,6 +148,13 @@ export class IrAvailibilityHeader {
     const params = ExposedBookingAvailability.parse(this.exposedBookingAvailabiltyParams);
     this.identifier = v4();
     this.availabiltyService.initSocket(this.identifier);
+    booking_store.bookingAvailabilityParams = {
+      ...booking_store.bookingAvailabilityParams,
+      from_date: new Date(params.from_date),
+      to_date: new Date(params.to_date),
+      adult_nbr: params.adult_nbr,
+      child_nbr: params.child_nbr,
+    };
     await this.propertyService.getExposedBookingAvailability({
       params: {
         ...this.exposedBookingAvailabiltyParams,
@@ -159,13 +166,6 @@ export class IrAvailibilityHeader {
       identifier: this.identifier,
       mode: 'default',
     });
-    booking_store.bookingAvailabilityParams = {
-      ...booking_store.bookingAvailabilityParams,
-      from_date: new Date(params.from_date),
-      to_date: new Date(params.to_date),
-      adult_nbr: params.adult_nbr,
-      child_nbr: params.child_nbr,
-    };
   }
 
   async handleCheckAvailability() {

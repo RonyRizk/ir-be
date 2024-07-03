@@ -100,17 +100,33 @@ export class IrPhoneInput {
   initializePopover() {
     if (this.triggerElement && this.contentElement) {
       this.popoverInstance = createPopper(this.triggerElement, this.contentElement, {
-        placement: localization_store.dir === 'LTR' ? 'bottom-start' : 'bottom-end',
+        placement: localization_store.dir === 'LTR' ? 'auto-start' : 'auto-end',
+        // strategy: 'fixed',
         modifiers: [
           {
             name: 'offset',
             options: {
-              offset: [0, 3],
+              offset: [0, 2],
             },
           },
         ],
       });
     }
+  }
+  adjustPopoverPlacement() {
+    requestAnimationFrame(() => {
+      const rect = this.contentElement.getBoundingClientRect();
+      if (rect.bottom > window.innerHeight) {
+        this.popoverInstance.setOptions({
+          placement: 'top-end',
+        });
+      } else if (rect.top < 0) {
+        this.popoverInstance.setOptions({
+          placement: 'bottom-end',
+        });
+      }
+      this.popoverInstance.update();
+    });
   }
   handleOutsideClick = (event: MouseEvent) => {
     const outsideClick = typeof event.composedPath === 'function' && !event.composedPath().includes(this.el);
@@ -132,6 +148,7 @@ export class IrPhoneInput {
     this.filteredCountries = phone_input_store.countries;
     if (this.isVisible && this.popoverInstance) {
       setTimeout(() => this.searchInput.focus(), 20);
+      this.adjustPopoverPlacement();
       const currentDir = localization_store.dir.toLowerCase() || 'ltr';
       if (
         (this.popoverInstance.state.options.placement === 'bottom-start' && currentDir === 'rtl') ||

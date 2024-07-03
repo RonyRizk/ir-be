@@ -13,6 +13,7 @@ export class IrPaymentView {
 
   componentWillLoad() {
     this.selectedPaymentMethod = app_store.property?.allowed_payment_methods[0].code;
+    console.log(this.selectedPaymentMethod);
     if (!checkout_store.payment) {
       checkout_store.payment = {
         code: this.selectedPaymentMethod,

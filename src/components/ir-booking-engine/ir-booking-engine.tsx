@@ -234,8 +234,13 @@ export class IrBookingEngine {
       case 'invoice':
         return (
           <ir-invoice
+            headerShown={false}
+            footerShown={false}
+            propertyId={this.propertyId}
+            perma_link={this.perma_link}
+            aName={this.aName}
+            language={this.language}
             baseUrl={this.baseUrl}
-            lang={app_store.userPreferences.language_id}
             email={app_store.invoice.email}
             bookingNbr={app_store.invoice.booking_number}
             status={1}
@@ -244,12 +249,14 @@ export class IrBookingEngine {
       case 'booking-listing':
         return (
           <ir-booking-listing
+            showAllBookings={false}
             headerShown={false}
             footerShown={false}
             propertyid={this.propertyId}
             perma_link={this.perma_link}
             aName={this.aName}
-            base-url="https://gateway.igloorooms.com/IR"
+            be={true}
+            baseUrl={this.baseUrl}
           ></ir-booking-listing>
         );
 

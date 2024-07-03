@@ -42,10 +42,12 @@
  - [ir-adult-child-counter](../../ir-booking-engine/ir-booking-page/ir-adult-child-counter)
  - [ir-auth](../../ir-booking-engine/ir-nav/ir-auth)
  - [ir-availibility-header](../../ir-booking-engine/ir-booking-page/ir-availibility-header)
+ - [ir-booking-cancelation](../../ir-booking-cancelation)
  - [ir-booking-card](../../ir-booking-engine/ir-booking-listing/ir-booking-card)
  - [ir-booking-code](../../ir-booking-engine/ir-booking-page/ir-booking-code)
  - [ir-booking-details](../../ir-booking-engine/ir-checkout-page/ir-booking-details)
- - [ir-booking-listing](../../ir-booking-engine/ir-booking-listing)
+ - [ir-booking-details-view](../../ir-booking-engine/ir-booking-listing/ir-booking-details-view)
+ - [ir-booking-overview](../../ir-booking-engine/ir-booking-listing/ir-booking-overview)
  - [ir-booking-page](../../ir-booking-engine/ir-booking-page)
  - [ir-booking-summary](../../ir-booking-engine/ir-checkout-page/ir-booking-summary)
  - [ir-checkout-page](../../ir-booking-engine/ir-checkout-page)
@@ -64,6 +66,7 @@
  - [ir-sheet](../ir-sheet)
  - [ir-signin](../../ir-booking-engine/ir-nav/ir-auth/ir-signin)
  - [ir-signup](../../ir-booking-engine/ir-nav/ir-auth/ir-signup)
+ - [ir-user-profile](../../ir-booking-engine/ir-nav/ir-user-profile)
 
 ### Depends on
 
@@ -76,10 +79,12 @@ graph TD;
   ir-adult-child-counter --> ir-button
   ir-auth --> ir-button
   ir-availibility-header --> ir-button
+  ir-booking-cancelation --> ir-button
   ir-booking-card --> ir-button
   ir-booking-code --> ir-button
   ir-booking-details --> ir-button
-  ir-booking-listing --> ir-button
+  ir-booking-details-view --> ir-button
+  ir-booking-overview --> ir-button
   ir-booking-page --> ir-button
   ir-booking-summary --> ir-button
   ir-checkout-page --> ir-button
@@ -98,6 +103,7 @@ graph TD;
   ir-sheet --> ir-button
   ir-signin --> ir-button
   ir-signup --> ir-button
+  ir-user-profile --> ir-button
   style ir-button fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

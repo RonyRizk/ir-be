@@ -133,6 +133,7 @@ graph TD;
   ir-nav --> ir-language-picker
   ir-nav --> ir-booking-code
   ir-nav --> ir-google-maps
+  ir-nav --> ir-user-profile
   ir-nav --> ir-button
   ir-nav --> ir-menu
   ir-nav --> ir-user-avatar
@@ -144,6 +145,11 @@ graph TD;
   ir-language-picker --> ir-button
   ir-booking-code --> ir-input
   ir-booking-code --> ir-button
+  ir-user-profile --> ir-input
+  ir-user-profile --> ir-select
+  ir-user-profile --> ir-phone-input
+  ir-user-profile --> ir-checkbox
+  ir-user-profile --> ir-button
   ir-user-avatar --> ir-icons
   ir-sheet --> ir-button
   ir-modal --> ir-auth
@@ -160,14 +166,24 @@ graph TD;
   ir-footer --> ir-privacy-policy
   ir-footer --> ir-icons
   ir-footer --> ir-dialog
+  ir-booking-listing --> ir-booking-details-view
+  ir-booking-listing --> ir-booking-overview
   ir-booking-listing --> ir-auth
   ir-booking-listing --> ir-nav
-  ir-booking-listing --> ir-booking-header
-  ir-booking-listing --> ir-badge
-  ir-booking-listing --> ir-button
-  ir-booking-listing --> ir-pagination
-  ir-booking-listing --> ir-booking-card
   ir-booking-listing --> ir-footer
+  ir-booking-details-view --> ir-button
+  ir-booking-details-view --> ir-icons
+  ir-booking-details-view --> ir-facilities
+  ir-booking-details-view --> ir-booking-cancelation
+  ir-booking-cancelation --> ir-alert-dialog
+  ir-booking-cancelation --> ir-button
+  ir-booking-overview --> ir-booking-header
+  ir-booking-overview --> ir-badge
+  ir-booking-overview --> ir-menu
+  ir-booking-overview --> ir-button
+  ir-booking-overview --> ir-pagination
+  ir-booking-overview --> ir-booking-card
+  ir-booking-overview --> ir-booking-cancelation
   ir-pagination --> ir-button
   ir-pagination --> ir-icons
   ir-booking-card --> ir-badge

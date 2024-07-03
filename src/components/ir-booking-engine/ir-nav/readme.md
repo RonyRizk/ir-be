@@ -38,9 +38,10 @@
 - [ir-language-picker](ir-language-picker)
 - [ir-booking-code](../ir-booking-page/ir-booking-code)
 - [ir-google-maps](../../ir-google-maps)
+- [ir-user-profile](ir-user-profile)
 - [ir-button](../../ui/ir-button)
 - [ir-menu](../../ui/ir-menu)
-- [ir-user-avatar](../../ir-user-avatar)
+- [ir-user-avatar](./ir-user-profile/ir-user-avatar)
 - [ir-icons](../../ui/ir-icons)
 - [ir-sheet](../../ui/ir-sheet)
 - [ir-modal](../../ui/ir-modal)
@@ -52,6 +53,7 @@ graph TD;
   ir-nav --> ir-language-picker
   ir-nav --> ir-booking-code
   ir-nav --> ir-google-maps
+  ir-nav --> ir-user-profile
   ir-nav --> ir-button
   ir-nav --> ir-menu
   ir-nav --> ir-user-avatar
@@ -64,6 +66,12 @@ graph TD;
   ir-button --> ir-icons
   ir-booking-code --> ir-input
   ir-booking-code --> ir-button
+  ir-user-profile --> ir-input
+  ir-user-profile --> ir-select
+  ir-user-profile --> ir-phone-input
+  ir-user-profile --> ir-checkbox
+  ir-user-profile --> ir-button
+  ir-phone-input --> ir-icons
   ir-user-avatar --> ir-icons
   ir-sheet --> ir-button
   ir-modal --> ir-auth

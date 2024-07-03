@@ -12,7 +12,7 @@ import { differenceInCalendarDays, format } from 'date-fns';
 export class IrBookingCard {
   @Prop() booking: Booking;
 
-  @Event() cardOptionClicked: EventEmitter<'cancel' | 'view' | 'pay'>;
+  @Event() optionClicked: EventEmitter<{ tag: string; id: number }>;
 
   private totalNights: number;
   private bookingListingAppService = new BookingListingAppService();
@@ -43,7 +43,7 @@ export class IrBookingCard {
   }
 
   render() {
-    const { cancel, payment } = this.bookingListingAppService.getBookingActions(this.booking);
+    const { cancel, payment, view } = this.bookingListingAppService.getBookingActions(this.booking);
     return (
       <div class="relative flex flex-col space-y-1.5 rounded-xl  bg-gray-100 p-6 text-sm " key={this.booking.booking_nbr}>
         <div class="flex items-center justify-between text-base">
@@ -67,17 +67,19 @@ export class IrBookingCard {
           {<ir-badge backgroundShown={false} label={this.booking.status.description} variant={this.getBadgeVariant(this.booking.status.code)}></ir-badge>}
         </p>
 
-        <div class="mt-2.5 flex flex-col items-center justify-end gap-2.5 pt-2">
-          {payment && (
-            <ir-button
-              class={'w-full'}
-              label={`Pay ${formatAmount(this.booking.financial.due_amount || 0, this.booking.currency.code)} to guarentee`}
-              onButtonClick={() => this.cardOptionClicked.emit('pay')}
-            ></ir-button>
-          )}
-          {cancel && <ir-button class="w-full" variants="outline" label="Cancel" onButtonClick={() => this.cardOptionClicked.emit('cancel')}></ir-button>}
-          <ir-button class="w-full" variants="outline" label="View details" onButtonClick={() => this.cardOptionClicked.emit('view')}></ir-button>
-        </div>
+        {(view || payment || cancel) && (
+          <div class="mt-2.5 flex flex-col items-center justify-end gap-2.5 pt-2">
+            {payment && (
+              <ir-button
+                class={'w-full'}
+                label={`Pay ${formatAmount(this.booking.financial.due_amount || 0, this.booking.currency.code)} to guarentee`}
+                onButtonClick={() => this.optionClicked.emit({ tag: 'pay', id: 2 })}
+              ></ir-button>
+            )}
+            {cancel && <ir-button class="w-full" variants="outline" label="Cancel booking" onButtonClick={() => this.optionClicked.emit({ tag: 'cancel', id: 3 })}></ir-button>}
+            {view && <ir-button class="w-full" variants="outline" label="Booking details" onButtonClick={() => this.optionClicked.emit({ tag: 'view', id: 1 })}></ir-button>}
+          </div>
+        )}
       </div>
     );
   }

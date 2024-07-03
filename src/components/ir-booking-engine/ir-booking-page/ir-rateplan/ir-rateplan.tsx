@@ -1,4 +1,4 @@
-import { Component, Event, EventEmitter, Fragment, Prop, State, h } from '@stencil/core';
+import { Component, Event, EventEmitter, Fragment, Prop, State, Watch, h } from '@stencil/core';
 import { RatePlan, Variation } from '@/models/property';
 import app_store from '@/stores/app.store';
 import booking_store, { IRatePlanSelection, reserveRooms, updateRoomParams } from '@/stores/booking';
@@ -31,11 +31,21 @@ export class IrRateplan {
 
   private propertyService = new PropertyService();
   private availabilityService = new AvailabiltyService();
-
+  @State() isRatePlanAvailable: boolean = true;
   componentWillLoad() {
     this.propertyService.setToken(app_store.app_data.token);
+    this.checkAvailability();
   }
-
+  @Watch('roomTypeInventory')
+  handleRTICHange(newValue: number, oldValue: number) {
+    if (newValue === oldValue) {
+      return null;
+    }
+    this.checkAvailability();
+  }
+  checkAvailability() {
+    this.isRatePlanAvailable = this.roomTypeInventory > 0 && this.ratePlan.variations.some(v => v.is_calculated && !(v.amount === 0 || v.amount === null));
+  }
   async handleVariationChange(e: CustomEvent, variations: Variation[], rateplanId: number, roomTypeId: number) {
     e.stopImmediatePropagation();
     e.stopPropagation();
@@ -87,7 +97,7 @@ export class IrRateplan {
     // console.log('ratePlan', this.ratePlan);
     return (
       <div class="rateplan-container">
-        <div class={`rateplan-header ${this.roomTypeInventory > 0 ? 'available' : 'not-available'}`}>
+        <div class={`rateplan-header ${this.isRatePlanAvailable ? 'available' : 'not-available'}`}>
           <p class="rateplan-name">
             <span class="rateplan-short-name">{this.ratePlan.short_name}</span>
             <span class="rateplan-custom-text rateplan-custom-text-hidden">{this.ratePlan.custom_text}</span>
@@ -98,7 +108,7 @@ export class IrRateplan {
             </div>
           ) : (
             <Fragment>
-              {this.roomTypeInventory > 0 ? (
+              {this.isRatePlanAvailable ? (
                 <div class="rateplan-pricing-mobile">
                   <p class="rateplan-amount">{formatAmount(this.visibleInventory?.selected_variation?.variation?.amount, app_store.userPreferences.currency_id, 0)}</p>
                   {this.visibleInventory?.selected_variation?.variation?.discount_pct > 0 && (
@@ -116,7 +126,7 @@ export class IrRateplan {
 
         <p class="rateplan-custom-text rateplan-custom-text-mobile">{this.ratePlan.custom_text}</p>
 
-        {this.roomTypeInventory > 0 && (
+        {this.isRatePlanAvailable && (
           <div class={`rateplan-details ${this.ratePlan.custom_text ? 'rateplan-details-no-custom-text' : ''}`}>
             {this.isLoading ? (
               <div class="col-span-6 w-full ">

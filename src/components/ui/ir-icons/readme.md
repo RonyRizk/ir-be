@@ -24,6 +24,7 @@
  - [ir-adult-child-counter](../../ir-booking-engine/ir-booking-page/ir-adult-child-counter)
  - [ir-badge-group](../ir-badge-group)
  - [ir-booking-details](../../ir-booking-engine/ir-checkout-page/ir-booking-details)
+ - [ir-booking-details-view](../../ir-booking-engine/ir-booking-listing/ir-booking-details-view)
  - [ir-booking-widget](../../ir-booking-widget)
  - [ir-button](../ir-button)
  - [ir-coupon-dialog](../../ir-booking-engine/ir-booking-page/ir-availibility-header/ir-coupon-dialog)
@@ -39,7 +40,7 @@
  - [ir-property-gallery](../../ir-booking-engine/ir-booking-page/ir-property-gallery)
  - [ir-quick-auth](../../ir-booking-engine/ir-checkout-page/ir-user-form/ir-quick-auth)
  - [ir-room-type-amenities](../../ir-booking-engine/ir-booking-page/ir-room-type-amenities)
- - [ir-user-avatar](../../ir-user-avatar)
+ - [ir-user-avatar](../../ir-booking-engine/ir-nav/ir-user-profile/ir-user-avatar)
 
 ### Graph
 ```mermaid
@@ -48,6 +49,7 @@ graph TD;
   ir-adult-child-counter --> ir-icons
   ir-badge-group --> ir-icons
   ir-booking-details --> ir-icons
+  ir-booking-details-view --> ir-icons
   ir-booking-widget --> ir-icons
   ir-button --> ir-icons
   ir-coupon-dialog --> ir-icons

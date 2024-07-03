@@ -25,7 +25,7 @@
 
 ### Used by
 
- - [ir-booking-listing](..)
+ - [ir-booking-overview](../ir-booking-overview)
 
 ### Depends on
 
@@ -38,7 +38,7 @@ graph TD;
   ir-pagination --> ir-button
   ir-pagination --> ir-icons
   ir-button --> ir-icons
-  ir-booking-listing --> ir-pagination
+  ir-booking-overview --> ir-pagination
   style ir-pagination fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

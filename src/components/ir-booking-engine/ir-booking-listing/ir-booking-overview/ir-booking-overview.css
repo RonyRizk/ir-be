@@ -1,0 +1,21 @@
+:host {
+  display: block;
+}
+.ct-menu-container {
+  border-radius: min(var(--radius, 0.5rem), 0.5rem);
+  border: 1px solid var(--gray-300, #d0d5dd);
+  padding: 0 0rem;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+}
+.ct-menu-trigger {
+  padding: 0.25rem 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ct-menu-button {
+  padding: 0.25rem 0.5rem;
+  border-right: 1px solid var(--gray-300, #d0d5dd);
+}

@@ -28,6 +28,7 @@
 ### Used by
 
  - [ir-user-form](../../ir-booking-engine/ir-checkout-page/ir-user-form)
+ - [ir-user-profile](../../ir-booking-engine/ir-nav/ir-user-profile)
 
 ### Depends on
 
@@ -38,6 +39,7 @@
 graph TD;
   ir-phone-input --> ir-icons
   ir-user-form --> ir-phone-input
+  ir-user-profile --> ir-phone-input
   style ir-phone-input fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

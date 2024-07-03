@@ -100,7 +100,7 @@ export class IrDialog {
                   }}
                   variants="icon"
                   title={localizedWords.entries.Lcz_Close}
-                  class="absolute right-3 top-3"
+                  class="absolute right-3 top-3 z-50"
                   iconName="xmark"
                 ></ir-button>
               )}

@@ -24,7 +24,9 @@ export class IrMenu {
   private listRef: HTMLUListElement;
   private popoverInstance: any;
   private contentElement: HTMLDivElement;
-
+  componentWillLoad() {
+    this.selectedItemName = this.data[0].item ?? '';
+  }
   @Listen('keydown', { target: 'body' })
   handleKeyDown(event: KeyboardEvent) {
     if (!this.isDropdownVisible) {
@@ -59,6 +61,7 @@ export class IrMenu {
   componentDidLoad() {
     this.popoverInstance = createPopper(this.buttonRef, this.contentElement, {
       placement: 'bottom-end',
+      strategy: 'fixed',
       modifiers: [
         {
           name: 'offset',

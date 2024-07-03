@@ -79,6 +79,11 @@ export namespace Components {
     }
     interface IrBanner {
     }
+    interface IrBookingCancelation {
+        "booking_nbr": string;
+        "cancelation": string;
+        "openDialog": () => Promise<void>;
+    }
     interface IrBookingCard {
         "booking": Booking;
     }
@@ -86,6 +91,9 @@ export namespace Components {
     }
     interface IrBookingDetails {
         "errors": string;
+    }
+    interface IrBookingDetailsView {
+        "booking": Booking | null;
     }
     interface IrBookingEngine {
         "aName": string;
@@ -117,12 +125,22 @@ export namespace Components {
     interface IrBookingListing {
         "aName": string;
         "baseUrl": string;
+        "be": boolean;
         "footerShown": boolean;
         "headerShown": boolean;
         "language": string;
         "maxPages": number;
         "perma_link": string;
         "propertyid": number;
+        "showAllBookings": boolean;
+    }
+    interface IrBookingOverview {
+        "be": boolean;
+        "language": string;
+        "maxPages": number;
+        "propertyid": number;
+        "showAllBookings": boolean;
+        "token": string;
     }
     interface IrBookingPage {
         "adultCount": string;
@@ -302,6 +320,8 @@ export namespace Components {
         "baseUrl": string;
         "bookingNbr": string;
         "email": string;
+        "footerShown": boolean;
+        "headerShown": boolean;
         "language": string;
         "perma_link": string;
         "propertyId": number;
@@ -354,6 +374,11 @@ export namespace Components {
         "toggleVisibility": () => Promise<void>;
         "trigger_label": string;
     }
+    interface IrPortal {
+        "offset": number;
+        "reference": HTMLElement;
+        "updatePosition": () => Promise<void>;
+    }
     interface IrPrivacyPolicy {
         "label": string;
         "policyTriggerStyle": Partial<CSSStyleDeclaration>;
@@ -393,11 +418,6 @@ export namespace Components {
         "select_id": string;
         "value": string | number;
         "variant": 'double-line' | 'default';
-    }
-    interface IrSeoInjector {
-        "pageDescription": string;
-        "pageKeywords": string;
-        "pageTitle": string;
     }
     interface IrSheet {
         "closeSheet": () => Promise<void>;
@@ -471,6 +491,10 @@ export interface IrBadgeGroupCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLIrBadgeGroupElement;
 }
+export interface IrBookingCancelationCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLIrBookingCancelationElement;
+}
 export interface IrBookingCardCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLIrBookingCardElement;
@@ -479,9 +503,17 @@ export interface IrBookingCodeCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLIrBookingCodeElement;
 }
+export interface IrBookingDetailsViewCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLIrBookingDetailsViewElement;
+}
 export interface IrBookingHeaderCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLIrBookingHeaderElement;
+}
+export interface IrBookingOverviewCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLIrBookingOverviewElement;
 }
 export interface IrBookingPageCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -713,8 +745,26 @@ declare global {
         prototype: HTMLIrBannerElement;
         new (): HTMLIrBannerElement;
     };
+    interface HTMLIrBookingCancelationElementEventMap {
+        "openChange": boolean;
+        "cancelationResult": { state: 'failed' | 'success'; booking_nbr: string };
+    }
+    interface HTMLIrBookingCancelationElement extends Components.IrBookingCancelation, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLIrBookingCancelationElementEventMap>(type: K, listener: (this: HTMLIrBookingCancelationElement, ev: IrBookingCancelationCustomEvent<HTMLIrBookingCancelationElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLIrBookingCancelationElementEventMap>(type: K, listener: (this: HTMLIrBookingCancelationElement, ev: IrBookingCancelationCustomEvent<HTMLIrBookingCancelationElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLIrBookingCancelationElement: {
+        prototype: HTMLIrBookingCancelationElement;
+        new (): HTMLIrBookingCancelationElement;
+    };
     interface HTMLIrBookingCardElementEventMap {
-        "cardOptionClicked": 'cancel' | 'view' | 'pay';
+        "optionClicked": { tag: string; id: number };
     }
     interface HTMLIrBookingCardElement extends Components.IrBookingCard, HTMLStencilElement {
         addEventListener<K extends keyof HTMLIrBookingCardElementEventMap>(type: K, listener: (this: HTMLIrBookingCardElement, ev: IrBookingCardCustomEvent<HTMLIrBookingCardElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -753,6 +803,26 @@ declare global {
         prototype: HTMLIrBookingDetailsElement;
         new (): HTMLIrBookingDetailsElement;
     };
+    interface HTMLIrBookingDetailsViewElementEventMap {
+        "bl_routing": {
+    route: 'booking' | 'booking-details';
+    params?: unknown;
+  };
+    }
+    interface HTMLIrBookingDetailsViewElement extends Components.IrBookingDetailsView, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLIrBookingDetailsViewElementEventMap>(type: K, listener: (this: HTMLIrBookingDetailsViewElement, ev: IrBookingDetailsViewCustomEvent<HTMLIrBookingDetailsViewElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLIrBookingDetailsViewElementEventMap>(type: K, listener: (this: HTMLIrBookingDetailsViewElement, ev: IrBookingDetailsViewCustomEvent<HTMLIrBookingDetailsViewElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLIrBookingDetailsViewElement: {
+        prototype: HTMLIrBookingDetailsViewElement;
+        new (): HTMLIrBookingDetailsViewElement;
+    };
     interface HTMLIrBookingEngineElement extends Components.IrBookingEngine, HTMLStencilElement {
     }
     var HTMLIrBookingEngineElement: {
@@ -781,6 +851,26 @@ declare global {
     var HTMLIrBookingListingElement: {
         prototype: HTMLIrBookingListingElement;
         new (): HTMLIrBookingListingElement;
+    };
+    interface HTMLIrBookingOverviewElementEventMap {
+        "bl_routing": {
+    route: 'booking' | 'booking-details';
+    params?: unknown;
+  };
+    }
+    interface HTMLIrBookingOverviewElement extends Components.IrBookingOverview, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLIrBookingOverviewElementEventMap>(type: K, listener: (this: HTMLIrBookingOverviewElement, ev: IrBookingOverviewCustomEvent<HTMLIrBookingOverviewElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLIrBookingOverviewElementEventMap>(type: K, listener: (this: HTMLIrBookingOverviewElement, ev: IrBookingOverviewCustomEvent<HTMLIrBookingOverviewElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLIrBookingOverviewElement: {
+        prototype: HTMLIrBookingOverviewElement;
+        new (): HTMLIrBookingOverviewElement;
     };
     interface HTMLIrBookingPageElementEventMap {
         "routing": pages;
@@ -1262,6 +1352,12 @@ declare global {
         prototype: HTMLIrPopoverElement;
         new (): HTMLIrPopoverElement;
     };
+    interface HTMLIrPortalElement extends Components.IrPortal, HTMLStencilElement {
+    }
+    var HTMLIrPortalElement: {
+        prototype: HTMLIrPortalElement;
+        new (): HTMLIrPortalElement;
+    };
     interface HTMLIrPrivacyPolicyElement extends Components.IrPrivacyPolicy, HTMLStencilElement {
     }
     var HTMLIrPrivacyPolicyElement: {
@@ -1342,12 +1438,6 @@ declare global {
     var HTMLIrSelectElement: {
         prototype: HTMLIrSelectElement;
         new (): HTMLIrSelectElement;
-    };
-    interface HTMLIrSeoInjectorElement extends Components.IrSeoInjector, HTMLStencilElement {
-    }
-    var HTMLIrSeoInjectorElement: {
-        prototype: HTMLIrSeoInjectorElement;
-        new (): HTMLIrSeoInjectorElement;
     };
     interface HTMLIrSheetElementEventMap {
         "openChange": boolean;
@@ -1508,12 +1598,15 @@ declare global {
         "ir-badge": HTMLIrBadgeElement;
         "ir-badge-group": HTMLIrBadgeGroupElement;
         "ir-banner": HTMLIrBannerElement;
+        "ir-booking-cancelation": HTMLIrBookingCancelationElement;
         "ir-booking-card": HTMLIrBookingCardElement;
         "ir-booking-code": HTMLIrBookingCodeElement;
         "ir-booking-details": HTMLIrBookingDetailsElement;
+        "ir-booking-details-view": HTMLIrBookingDetailsViewElement;
         "ir-booking-engine": HTMLIrBookingEngineElement;
         "ir-booking-header": HTMLIrBookingHeaderElement;
         "ir-booking-listing": HTMLIrBookingListingElement;
+        "ir-booking-overview": HTMLIrBookingOverviewElement;
         "ir-booking-page": HTMLIrBookingPageElement;
         "ir-booking-summary": HTMLIrBookingSummaryElement;
         "ir-booking-widget": HTMLIrBookingWidgetElement;
@@ -1548,6 +1641,7 @@ declare global {
         "ir-phone-input": HTMLIrPhoneInputElement;
         "ir-pickup": HTMLIrPickupElement;
         "ir-popover": HTMLIrPopoverElement;
+        "ir-portal": HTMLIrPortalElement;
         "ir-privacy-policy": HTMLIrPrivacyPolicyElement;
         "ir-property-gallery": HTMLIrPropertyGalleryElement;
         "ir-quick-auth": HTMLIrQuickAuthElement;
@@ -1556,7 +1650,6 @@ declare global {
         "ir-room-type-amenities": HTMLIrRoomTypeAmenitiesElement;
         "ir-roomtype": HTMLIrRoomtypeElement;
         "ir-select": HTMLIrSelectElement;
-        "ir-seo-injector": HTMLIrSeoInjectorElement;
         "ir-sheet": HTMLIrSheetElement;
         "ir-signin": HTMLIrSigninElement;
         "ir-signup": HTMLIrSignupElement;
@@ -1618,15 +1711,28 @@ declare namespace LocalJSX {
     }
     interface IrBanner {
     }
+    interface IrBookingCancelation {
+        "booking_nbr"?: string;
+        "cancelation"?: string;
+        "onCancelationResult"?: (event: IrBookingCancelationCustomEvent<{ state: 'failed' | 'success'; booking_nbr: string }>) => void;
+        "onOpenChange"?: (event: IrBookingCancelationCustomEvent<boolean>) => void;
+    }
     interface IrBookingCard {
         "booking"?: Booking;
-        "onCardOptionClicked"?: (event: IrBookingCardCustomEvent<'cancel' | 'view' | 'pay'>) => void;
+        "onOptionClicked"?: (event: IrBookingCardCustomEvent<{ tag: string; id: number }>) => void;
     }
     interface IrBookingCode {
         "onCloseDialog"?: (event: IrBookingCodeCustomEvent<null>) => void;
     }
     interface IrBookingDetails {
         "errors"?: string;
+    }
+    interface IrBookingDetailsView {
+        "booking"?: Booking | null;
+        "onBl_routing"?: (event: IrBookingDetailsViewCustomEvent<{
+    route: 'booking' | 'booking-details';
+    params?: unknown;
+  }>) => void;
     }
     interface IrBookingEngine {
         "aName"?: string;
@@ -1659,12 +1765,26 @@ declare namespace LocalJSX {
     interface IrBookingListing {
         "aName"?: string;
         "baseUrl"?: string;
+        "be"?: boolean;
         "footerShown"?: boolean;
         "headerShown"?: boolean;
         "language"?: string;
         "maxPages"?: number;
         "perma_link"?: string;
         "propertyid"?: number;
+        "showAllBookings"?: boolean;
+    }
+    interface IrBookingOverview {
+        "be"?: boolean;
+        "language"?: string;
+        "maxPages"?: number;
+        "onBl_routing"?: (event: IrBookingOverviewCustomEvent<{
+    route: 'booking' | 'booking-details';
+    params?: unknown;
+  }>) => void;
+        "propertyid"?: number;
+        "showAllBookings"?: boolean;
+        "token"?: string;
     }
     interface IrBookingPage {
         "adultCount"?: string;
@@ -1880,6 +2000,8 @@ declare namespace LocalJSX {
         "baseUrl"?: string;
         "bookingNbr"?: string;
         "email"?: string;
+        "footerShown"?: boolean;
+        "headerShown"?: boolean;
         "language"?: string;
         "perma_link"?: string;
         "propertyId"?: number;
@@ -1940,6 +2062,10 @@ declare namespace LocalJSX {
         "stopListeningForOutsideClicks"?: boolean;
         "trigger_label"?: string;
     }
+    interface IrPortal {
+        "offset"?: number;
+        "reference"?: HTMLElement;
+    }
     interface IrPrivacyPolicy {
         "label"?: string;
         "policyTriggerStyle"?: Partial<CSSStyleDeclaration>;
@@ -1982,11 +2108,6 @@ declare namespace LocalJSX {
         "select_id"?: string;
         "value"?: string | number;
         "variant"?: 'double-line' | 'default';
-    }
-    interface IrSeoInjector {
-        "pageDescription"?: string;
-        "pageKeywords"?: string;
-        "pageTitle"?: string;
     }
     interface IrSheet {
         "hideCloseButton"?: boolean;
@@ -2070,12 +2191,15 @@ declare namespace LocalJSX {
         "ir-badge": IrBadge;
         "ir-badge-group": IrBadgeGroup;
         "ir-banner": IrBanner;
+        "ir-booking-cancelation": IrBookingCancelation;
         "ir-booking-card": IrBookingCard;
         "ir-booking-code": IrBookingCode;
         "ir-booking-details": IrBookingDetails;
+        "ir-booking-details-view": IrBookingDetailsView;
         "ir-booking-engine": IrBookingEngine;
         "ir-booking-header": IrBookingHeader;
         "ir-booking-listing": IrBookingListing;
+        "ir-booking-overview": IrBookingOverview;
         "ir-booking-page": IrBookingPage;
         "ir-booking-summary": IrBookingSummary;
         "ir-booking-widget": IrBookingWidget;
@@ -2110,6 +2234,7 @@ declare namespace LocalJSX {
         "ir-phone-input": IrPhoneInput;
         "ir-pickup": IrPickup;
         "ir-popover": IrPopover;
+        "ir-portal": IrPortal;
         "ir-privacy-policy": IrPrivacyPolicy;
         "ir-property-gallery": IrPropertyGallery;
         "ir-quick-auth": IrQuickAuth;
@@ -2118,7 +2243,6 @@ declare namespace LocalJSX {
         "ir-room-type-amenities": IrRoomTypeAmenities;
         "ir-roomtype": IrRoomtype;
         "ir-select": IrSelect;
-        "ir-seo-injector": IrSeoInjector;
         "ir-sheet": IrSheet;
         "ir-signin": IrSignin;
         "ir-signup": IrSignup;
@@ -2143,12 +2267,15 @@ declare module "@stencil/core" {
             "ir-badge": LocalJSX.IrBadge & JSXBase.HTMLAttributes<HTMLIrBadgeElement>;
             "ir-badge-group": LocalJSX.IrBadgeGroup & JSXBase.HTMLAttributes<HTMLIrBadgeGroupElement>;
             "ir-banner": LocalJSX.IrBanner & JSXBase.HTMLAttributes<HTMLIrBannerElement>;
+            "ir-booking-cancelation": LocalJSX.IrBookingCancelation & JSXBase.HTMLAttributes<HTMLIrBookingCancelationElement>;
             "ir-booking-card": LocalJSX.IrBookingCard & JSXBase.HTMLAttributes<HTMLIrBookingCardElement>;
             "ir-booking-code": LocalJSX.IrBookingCode & JSXBase.HTMLAttributes<HTMLIrBookingCodeElement>;
             "ir-booking-details": LocalJSX.IrBookingDetails & JSXBase.HTMLAttributes<HTMLIrBookingDetailsElement>;
+            "ir-booking-details-view": LocalJSX.IrBookingDetailsView & JSXBase.HTMLAttributes<HTMLIrBookingDetailsViewElement>;
             "ir-booking-engine": LocalJSX.IrBookingEngine & JSXBase.HTMLAttributes<HTMLIrBookingEngineElement>;
             "ir-booking-header": LocalJSX.IrBookingHeader & JSXBase.HTMLAttributes<HTMLIrBookingHeaderElement>;
             "ir-booking-listing": LocalJSX.IrBookingListing & JSXBase.HTMLAttributes<HTMLIrBookingListingElement>;
+            "ir-booking-overview": LocalJSX.IrBookingOverview & JSXBase.HTMLAttributes<HTMLIrBookingOverviewElement>;
             "ir-booking-page": LocalJSX.IrBookingPage & JSXBase.HTMLAttributes<HTMLIrBookingPageElement>;
             "ir-booking-summary": LocalJSX.IrBookingSummary & JSXBase.HTMLAttributes<HTMLIrBookingSummaryElement>;
             "ir-booking-widget": LocalJSX.IrBookingWidget & JSXBase.HTMLAttributes<HTMLIrBookingWidgetElement>;
@@ -2183,6 +2310,7 @@ declare module "@stencil/core" {
             "ir-phone-input": LocalJSX.IrPhoneInput & JSXBase.HTMLAttributes<HTMLIrPhoneInputElement>;
             "ir-pickup": LocalJSX.IrPickup & JSXBase.HTMLAttributes<HTMLIrPickupElement>;
             "ir-popover": LocalJSX.IrPopover & JSXBase.HTMLAttributes<HTMLIrPopoverElement>;
+            "ir-portal": LocalJSX.IrPortal & JSXBase.HTMLAttributes<HTMLIrPortalElement>;
             "ir-privacy-policy": LocalJSX.IrPrivacyPolicy & JSXBase.HTMLAttributes<HTMLIrPrivacyPolicyElement>;
             "ir-property-gallery": LocalJSX.IrPropertyGallery & JSXBase.HTMLAttributes<HTMLIrPropertyGalleryElement>;
             "ir-quick-auth": LocalJSX.IrQuickAuth & JSXBase.HTMLAttributes<HTMLIrQuickAuthElement>;
@@ -2191,7 +2319,6 @@ declare module "@stencil/core" {
             "ir-room-type-amenities": LocalJSX.IrRoomTypeAmenities & JSXBase.HTMLAttributes<HTMLIrRoomTypeAmenitiesElement>;
             "ir-roomtype": LocalJSX.IrRoomtype & JSXBase.HTMLAttributes<HTMLIrRoomtypeElement>;
             "ir-select": LocalJSX.IrSelect & JSXBase.HTMLAttributes<HTMLIrSelectElement>;
-            "ir-seo-injector": LocalJSX.IrSeoInjector & JSXBase.HTMLAttributes<HTMLIrSeoInjectorElement>;
             "ir-sheet": LocalJSX.IrSheet & JSXBase.HTMLAttributes<HTMLIrSheetElement>;
             "ir-signin": LocalJSX.IrSignin & JSXBase.HTMLAttributes<HTMLIrSigninElement>;
             "ir-signup": LocalJSX.IrSignup & JSXBase.HTMLAttributes<HTMLIrSignupElement>;

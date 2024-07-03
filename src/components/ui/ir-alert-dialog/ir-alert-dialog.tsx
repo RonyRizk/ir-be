@@ -20,6 +20,7 @@ export class IrAlertDialog {
   @Method()
   async openModal() {
     this.isOpen = true;
+    addOverlay();
     this.prepareFocusTrap();
   }
 
@@ -30,7 +31,6 @@ export class IrAlertDialog {
   }
 
   prepareFocusTrap() {
-    addOverlay();
     const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
     const focusableContent: NodeListOf<HTMLElement> = this.el.querySelectorAll(focusableElements);
     if (focusableContent.length === 0) return;

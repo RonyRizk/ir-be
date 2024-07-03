@@ -29,12 +29,14 @@
 
  - [ir-booking-summary](../../ir-booking-engine/ir-checkout-page/ir-booking-summary)
  - [ir-user-form](../../ir-booking-engine/ir-checkout-page/ir-user-form)
+ - [ir-user-profile](../../ir-booking-engine/ir-nav/ir-user-profile)
 
 ### Graph
 ```mermaid
 graph TD;
   ir-booking-summary --> ir-checkbox
   ir-user-form --> ir-checkbox
+  ir-user-profile --> ir-checkbox
   style ir-checkbox fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

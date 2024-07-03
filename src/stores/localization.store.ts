@@ -125,6 +125,9 @@ export type TLocaleLocalizedWordsEntries = {
   Lcz_YouMustAcceptPrivacyPolicy: string;
   Lcz_YourArrivalTime: string;
   Lcz_YourCardWillBeCharged: string;
+  Lcz_YourBookingIsNotGuaranteed: string;
+  Lcz_YourBookingIsGuaranteed: string;
+  Lcz_GuestService_ContactUs: string;
 };
 
 const initialState: ILocale = {
