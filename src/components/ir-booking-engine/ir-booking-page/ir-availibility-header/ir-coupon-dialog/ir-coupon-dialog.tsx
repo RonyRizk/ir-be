@@ -13,12 +13,14 @@ import { isBefore } from 'date-fns';
 export class IrCouponDialog {
   @State() coupon: string;
   @State() validationMessage: { error: boolean; message: string };
+  @State() isValid = false;
 
   @Event() resetBooking: EventEmitter<string>;
 
   dialogRef: HTMLIrDialogElement;
 
   activateCoupon() {
+    alert('hello world');
     this.validationMessage = null;
     const c = app_store.property.promotions.find(p => p.key === this.coupon.trim());
     if (!c) {
@@ -27,6 +29,7 @@ export class IrCouponDialog {
     if (isBefore(new Date(c.to), new Date())) {
       return (this.validationMessage = { error: true, message: 'Invalid coupon' });
     }
+    this.isValid = true;
     modifyBookingStore('bookingAvailabilityParams', {
       ...booking_store.bookingAvailabilityParams,
       coupon: this.coupon,
@@ -39,6 +42,7 @@ export class IrCouponDialog {
   }
 
   removeCoupon() {
+    this.isValid = false;
     this.validationMessage = null;
     modifyBookingStore('bookingAvailabilityParams', {
       ...booking_store.bookingAvailabilityParams,
@@ -67,7 +71,7 @@ export class IrCouponDialog {
           >
             <ir-icons slot="left-icon" name="coupon"></ir-icons>
           </ir-button>
-          {this.validationMessage && !this.validationMessage.error && (
+          {this.isValid && this.validationMessage && !this.validationMessage.error && (
             <div class="coupon-applied">
               <p onClick={this.removeCoupon.bind(this)}>{localizedWords.entries.Lcz_DiscountApplied}</p>
               <ir-button
@@ -109,10 +113,12 @@ export class IrCouponDialog {
                 size="md"
                 onButtonClick={() => {
                   this.dialogRef.closeModal();
+                  this.coupon = '';
                 }}
                 variants="outline"
                 label={localizedWords.entries.Lcz_Cancel}
                 class="button-cancel"
+                type="button"
               ></ir-button>
               <ir-button type="submit" size="md" label={localizedWords.entries.Lcz_Apply} class="button-apply"></ir-button>
             </div>

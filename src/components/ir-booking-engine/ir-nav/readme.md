@@ -13,6 +13,7 @@
 | `isBookingListing` | `is-booking-listing` |             | `boolean`             | `false`     |
 | `languages`        | --                   |             | `IExposedLanguages[]` | `undefined` |
 | `logo`             | `logo`               |             | `string`              | `undefined` |
+| `menuShown`        | `menu-shown`         |             | `boolean`             | `true`      |
 | `showBookingCode`  | `show-booking-code`  |             | `boolean`             | `true`      |
 | `showCurrency`     | `show-currency`      |             | `boolean`             | `true`      |
 | `website`          | `website`            |             | `string`              | `undefined` |
@@ -20,9 +21,9 @@
 
 ## Events
 
-| Event     | Description | Type                                                                     |
-| --------- | ----------- | ------------------------------------------------------------------------ |
-| `routing` |             | `CustomEvent<"booking" \| "booking-listing" \| "checkout" \| "invoice">` |
+| Event     | Description | Type                                                                                       |
+| --------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `routing` |             | `CustomEvent<"booking" \| "booking-listing" \| "checkout" \| "invoice" \| "user-profile">` |
 
 
 ## Dependencies
@@ -80,7 +81,6 @@ graph TD;
   ir-auth --> ir-button
   ir-signin --> ir-badge-group
   ir-signin --> ir-input
-  ir-signin --> ir-button
   ir-badge-group --> ir-icons
   ir-signup --> ir-input
   ir-signup --> ir-button

@@ -20,6 +20,7 @@ export class IrNav {
   @Prop() isBookingListing = false;
   @Prop() showBookingCode: boolean = true;
   @Prop() showCurrency: boolean = true;
+  @Prop() menuShown: boolean = true;
 
   @Event() routing: EventEmitter<pages>;
   @State() currentPage: TTabsState = null;
@@ -55,12 +56,14 @@ export class IrNav {
       case 'profile':
         return (
           <ir-user-profile
+            class={'flex-1'}
             user_data={{
               email: checkout_store.userFormData.email,
               first_name: checkout_store.userFormData.firstName,
               last_name: checkout_store.userFormData.lastName,
               country_id: checkout_store.userFormData.country_id,
               mobile: checkout_store.userFormData.mobile_number,
+              country_phone_prefix: checkout_store.userFormData.country_phone_prefix.toString(),
             }}
             slot="modal-body"
           ></ir-user-profile>
@@ -107,15 +110,13 @@ export class IrNav {
     e.stopImmediatePropagation();
     e.stopPropagation();
     const id = e.detail;
-    console.log('id', id);
     switch (id) {
       case 1:
         return this.routing.emit('booking-listing');
       case 2:
         return new AuthService().signOut();
       case 3: {
-        this.currentPage = 'profile';
-        this.dialogRef.openModal();
+        this.routing.emit('user-profile');
       }
       default:
         return null;
@@ -175,16 +176,18 @@ export class IrNav {
                   }}
                 ></ir-button>
               ) : (
-                <ir-menu
-                  data={[
-                    { id: 1, item: 'My bookings' },
-                    { id: 3, item: 'Personal profile' },
-                    { id: 2, item: 'Sign out' },
-                  ]}
-                  onMenuItemClick={this.handleItemSelect.bind(this)}
-                >
-                  <ir-user-avatar slot="menu-trigger"></ir-user-avatar>
-                </ir-menu>
+                this.menuShown && (
+                  <ir-menu
+                    data={[
+                      { id: 1, item: 'My bookings' },
+                      { id: 3, item: 'Personal profile' },
+                      { id: 2, item: 'Sign out' },
+                    ]}
+                    onMenuItemClick={this.handleItemSelect.bind(this)}
+                  >
+                    <ir-user-avatar slot="menu-trigger"></ir-user-avatar>
+                  </ir-menu>
+                )
               )}
               {this.showBookingCode && this.showCurrency && (
                 <ir-button variants="icon" iconName="burger_menu" onClick={() => this.sheetRef.openSheet()}>
@@ -233,18 +236,20 @@ export class IrNav {
                   ></ir-button>
                 </li>
               ) : (
-                <li>
-                  <ir-menu
-                    data={[
-                      { id: 1, item: 'My bookings' },
-                      { id: 3, item: 'Personal profile' },
-                      { id: 2, item: 'Sign out' },
-                    ]}
-                    onMenuItemClick={this.handleItemSelect.bind(this)}
-                  >
-                    <ir-user-avatar slot="menu-trigger"></ir-user-avatar>
-                  </ir-menu>
-                </li>
+                this.menuShown && (
+                  <li>
+                    <ir-menu
+                      data={[
+                        { id: 1, item: 'My bookings' },
+                        { id: 3, item: 'Personal profile' },
+                        { id: 2, item: 'Sign out' },
+                      ]}
+                      onMenuItemClick={this.handleItemSelect.bind(this)}
+                    >
+                      <ir-user-avatar slot="menu-trigger"></ir-user-avatar>
+                    </ir-menu>
+                  </li>
+                )
               )}
             </ul>
           </div>

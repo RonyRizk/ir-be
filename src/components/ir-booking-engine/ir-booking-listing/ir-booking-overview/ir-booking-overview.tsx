@@ -4,8 +4,10 @@ import { BookingListingService } from '@/services/api/booking_listing.service';
 import { CommonService } from '@/services/api/common.service';
 import { PropertyService } from '@/services/api/property.service';
 import { BookingListingAppService } from '@/services/app/booking-listing.service';
-import { cn, formatAmount } from '@/utils/utils';
+import { cn, formatAmount, runScriptAndRemove } from '@/utils/utils';
 import { differenceInCalendarDays, format } from 'date-fns';
+import app_store from '@/stores/app.store';
+import { PaymentService } from '@/services/api/payment.service';
 
 @Component({
   tag: 'ir-booking-overview',
@@ -19,6 +21,7 @@ export class IrBookingOverview {
   @Prop() maxPages: number = 10;
   @Prop() showAllBookings: boolean = true;
   @Prop() be: boolean = false;
+  @Prop() aff: boolean = false;
 
   @State() isLoading = false;
   @State() bookings: Booking[] = [];
@@ -39,6 +42,7 @@ export class IrBookingOverview {
   private commonService = new CommonService();
   private propertyService = new PropertyService();
   private bookingListingAppService = new BookingListingAppService();
+  private paymentService = new PaymentService();
 
   private booking: Booking;
   private bookingCancelation: HTMLIrBookingCancelationElement;
@@ -110,20 +114,6 @@ export class IrBookingOverview {
     };
     this.bookings = [...bookings];
   }
-  @Listen('authFinish')
-  handleAuthFinish(e: CustomEvent) {
-    e.stopImmediatePropagation();
-    e.stopPropagation();
-    const { token, state, payload } = e.detail;
-    if (state === 'success') {
-      if (payload.method === 'direct') {
-        this.bookingNumber = payload.booking_nbr;
-      }
-      this.token = token;
-      this.initializeServices();
-      this.initializeApp();
-    }
-  }
   getBadgeVariant(code: string) {
     if (code === '001') {
       return 'pending';
@@ -170,11 +160,42 @@ export class IrBookingOverview {
       case 1:
         return this.bl_routing.emit({ route: 'booking-details', params: { booking: this.selectedBooking } });
       case 2:
-        return;
+        return this.processPayment();
       case 3:
         return this.handleBookingCancelation();
       default:
         return null;
+    }
+  }
+  private async processPayment() {
+    const paymentCode = this.selectedBooking.extras.find(e => e.key === 'payment_code');
+    if (!paymentCode) {
+      console.error('missing paymentcode');
+      return;
+    }
+    const prePaymentAmount = this.selectedBooking.extras.find(e => e.key === 'prepayment_amount');
+    if (!prePaymentAmount) {
+      console.error('missing prepayment amount');
+      return;
+    }
+    const paymentMethod = app_store.property.allowed_payment_methods.find(apm => apm.code === paymentCode.value);
+    if (!paymentMethod) {
+      console.error('Invalid payment method');
+      return;
+    }
+    if (Number(prePaymentAmount.value) > 0) {
+      await this.paymentService.GeneratePaymentCaller({
+        token: app_store.app_data.token,
+        params: {
+          booking_nbr: this.selectedBooking.booking_nbr,
+          amount: Number(prePaymentAmount.value) ?? 0,
+          currency_id: this.selectedBooking.currency.id,
+          email: this.selectedBooking.guest.email,
+          pgw_id: paymentMethod.id.toString(),
+        },
+        onRedirect: url => (window.location.href = url),
+        onScriptRun: script => runScriptAndRemove(script),
+      });
     }
   }
   renderMenuTrigger() {
@@ -198,8 +219,15 @@ export class IrBookingOverview {
   render() {
     if (this.isLoading) {
       return (
-        <div class="grid h-screen w-full place-content-center">
-          <div class="page-loader"></div>
+        <div class="flex h-screen w-full flex-col place-content-center">
+          <div class=" flex h-screen flex-col gap-4 md:hidden">
+            {[...Array(5)].map(p => (
+              <div key={p} class="block h-64 w-full animate-pulse rounded-md bg-gray-200"></div>
+            ))}
+          </div>
+          <div class="hidden h-screen flex-col  md:flex">
+            <div class="block h-[50vh] w-full animate-pulse rounded-md  bg-gray-200"></div>
+          </div>
         </div>
       );
     }
@@ -229,15 +257,19 @@ export class IrBookingOverview {
                     const totalNights = differenceInCalendarDays(new Date(booking.to_date), new Date(booking.from_date));
                     const { cancel, payment, view } = this.bookingListingAppService.getBookingActions(booking);
                     const menuItems = [];
-                    if (payment) {
-                      menuItems.push({ id: 2, item: `Pay ${formatAmount(booking.financial.due_amount || 0, booking.currency.code)} to guarentee` });
+                    if (payment.show) {
+                      const prepayment_amount = booking.extras.find(e => e.key === 'prepayment_amount');
+                      if (prepayment_amount) {
+                        menuItems.push({ id: 2, item: payment.label });
+                      }
                     }
-                    if (cancel) {
-                      menuItems.push({ id: 3, item: `Cancel booking` });
+                    if (cancel.show) {
+                      menuItems.push({ id: 3, item: cancel.label });
                     }
-                    if (view) {
-                      menuItems.push({ id: 1, item: 'Booking details' });
+                    if (view.show) {
+                      menuItems.push({ id: 1, item: view.label });
                     }
+                    this.selectedMenuIds[booking.booking_nbr] = menuItems[0]?.id;
                     return (
                       <tr class="ir-table-row" key={booking.booking_nbr}>
                         <td class="ir-table-cell">{<ir-badge label={booking.status.description} variant={this.getBadgeVariant(booking.status.code)}></ir-badge>}</td>
@@ -249,16 +281,16 @@ export class IrBookingOverview {
                         </td>
                         <td class="ir-table-cell">{formatAmount(booking.total, booking.currency.code)}</td>
                         <td class="ir-table-cell">
-                          {payment || cancel ? (
+                          {payment.show || cancel.show ? (
                             <div class={'ct-menu-container'}>
                               <button
                                 onClick={() => {
                                   this.selectedBooking = booking;
-                                  this.handleBlEvents(this.selectedMenuIds[booking.booking_nbr] ?? 1);
+                                  this.handleBlEvents(this.selectedMenuIds[booking.booking_nbr] ?? menuItems[0].id);
                                 }}
                                 class="ct-menu-button"
                               >
-                                {menuItems.find(p => p.id === this.selectedMenuIds[booking.booking_nbr] ?? 1)?.item}
+                                {menuItems.find(p => p.id === this.selectedMenuIds[booking.booking_nbr] ?? menuItems[0].id)?.item}
                               </button>
                               <ir-menu
                                 onMenuItemClick={e => {
@@ -271,11 +303,10 @@ export class IrBookingOverview {
                               </ir-menu>
                             </div>
                           ) : (
-                            view && (
-                              <ir-button
-                                variants="outline"
-                                label="Booking details"
-                                onButtonClick={() => {
+                            view.show && (
+                              <button
+                                class="booking-details-btn"
+                                onClick={() => {
                                   this.bl_routing.emit({
                                     route: 'booking-details',
                                     params: {
@@ -283,7 +314,9 @@ export class IrBookingOverview {
                                     },
                                   });
                                 }}
-                              ></ir-button>
+                              >
+                                Booking details
+                              </button>
                             )
                           )}
                         </td>

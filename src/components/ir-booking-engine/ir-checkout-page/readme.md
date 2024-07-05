@@ -7,9 +7,9 @@
 
 ## Events
 
-| Event     | Description | Type                                                                     |
-| --------- | ----------- | ------------------------------------------------------------------------ |
-| `routing` |             | `CustomEvent<"booking" \| "booking-listing" \| "checkout" \| "invoice">` |
+| Event     | Description | Type                                                                                       |
+| --------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `routing` |             | `CustomEvent<"booking" \| "booking-listing" \| "checkout" \| "invoice" \| "user-profile">` |
 
 
 ## Dependencies

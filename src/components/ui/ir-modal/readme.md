@@ -14,9 +14,10 @@
 
 ## Events
 
-| Event        | Description | Type                   |
-| ------------ | ----------- | ---------------------- |
-| `openChange` |             | `CustomEvent<boolean>` |
+| Event        | Description | Type                                                                                                                                              |
+| ------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `authStatus` |             | `CustomEvent<{ state: "success" \| "failed"; token: string; payload: { method: "google" \| "direct"; email?: string; booking_nbr?: string; }; }>` |
+| `openChange` |             | `CustomEvent<boolean>`                                                                                                                            |
 
 
 ## Methods
@@ -61,11 +62,10 @@ graph TD;
   ir-auth --> ir-button
   ir-signin --> ir-badge-group
   ir-signin --> ir-input
-  ir-signin --> ir-button
   ir-badge-group --> ir-icons
-  ir-button --> ir-icons
   ir-signup --> ir-input
   ir-signup --> ir-button
+  ir-button --> ir-icons
   ir-nav --> ir-modal
   style ir-modal fill:#f9f,stroke:#333,stroke-width:4px
 ```

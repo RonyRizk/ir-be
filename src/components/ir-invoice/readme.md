@@ -7,18 +7,20 @@
 
 ## Properties
 
-| Property      | Attribute      | Description | Type      | Default     |
-| ------------- | -------------- | ----------- | --------- | ----------- |
-| `aName`       | `a-name`       |             | `string`  | `null`      |
-| `baseUrl`     | `base-url`     |             | `string`  | `undefined` |
-| `bookingNbr`  | `booking-nbr`  |             | `string`  | `undefined` |
-| `email`       | `email`        |             | `string`  | `undefined` |
-| `footerShown` | `footer-shown` |             | `boolean` | `true`      |
-| `headerShown` | `header-shown` |             | `boolean` | `true`      |
-| `language`    | `language`     |             | `string`  | `'en'`      |
-| `perma_link`  | `perma_link`   |             | `string`  | `null`      |
-| `propertyId`  | `property-id`  |             | `number`  | `undefined` |
-| `status`      | `status`       |             | `0 \| 1`  | `1`         |
+| Property        | Attribute        | Description | Type      | Default     |
+| --------------- | ---------------- | ----------- | --------- | ----------- |
+| `aName`         | `a-name`         |             | `string`  | `null`      |
+| `baseUrl`       | `base-url`       |             | `string`  | `undefined` |
+| `be`            | `be`             |             | `boolean` | `false`     |
+| `bookingNbr`    | `booking-nbr`    |             | `string`  | `undefined` |
+| `email`         | `email`          |             | `string`  | `undefined` |
+| `footerShown`   | `footer-shown`   |             | `boolean` | `true`      |
+| `headerShown`   | `header-shown`   |             | `boolean` | `true`      |
+| `language`      | `language`       |             | `string`  | `'en'`      |
+| `locationShown` | `location-shown` |             | `boolean` | `true`      |
+| `perma_link`    | `perma_link`     |             | `string`  | `null`      |
+| `propertyId`    | `property-id`    |             | `number`  | `undefined` |
+| `status`        | `status`         |             | `0 \| 1`  | `1`         |
 
 
 ## Dependencies
@@ -26,6 +28,7 @@
 ### Used by
 
  - [ir-booking-engine](../ir-booking-engine)
+ - [ir-booking-listing](../ir-booking-engine/ir-booking-listing)
 
 ### Depends on
 
@@ -75,7 +78,6 @@ graph TD;
   ir-auth --> ir-button
   ir-signin --> ir-badge-group
   ir-signin --> ir-input
-  ir-signin --> ir-button
   ir-badge-group --> ir-icons
   ir-signup --> ir-input
   ir-signup --> ir-button
@@ -87,6 +89,7 @@ graph TD;
   ir-privacy-policy --> ir-button
   ir-privacy-policy --> ir-dialog
   ir-booking-engine --> ir-invoice
+  ir-booking-listing --> ir-invoice
   style ir-invoice fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

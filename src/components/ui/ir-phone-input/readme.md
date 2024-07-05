@@ -7,11 +7,13 @@
 
 ## Properties
 
-| Property        | Attribute       | Description | Type      | Default     |
-| --------------- | --------------- | ----------- | --------- | ----------- |
-| `country_code`  | `country_code`  |             | `number`  | `undefined` |
-| `error`         | `error`         |             | `boolean` | `undefined` |
-| `mobile_number` | `mobile_number` |             | `string`  | `undefined` |
+| Property               | Attribute              | Description | Type                                         | Default                     |
+| ---------------------- | ---------------------- | ----------- | -------------------------------------------- | --------------------------- |
+| `country_code`         | `country_code`         |             | `number`                                     | `undefined`                 |
+| `country_phone_prefix` | `country_phone_prefix` |             | `string`                                     | `undefined`                 |
+| `error`                | `error`                |             | `boolean`                                    | `undefined`                 |
+| `mobile_number`        | `mobile_number`        |             | `string`                                     | `undefined`                 |
+| `mode`                 | `mode`                 |             | `"country_code_and_prefix" \| "prefix_only"` | `'country_code_and_prefix'` |
 
 
 ## Events

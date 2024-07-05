@@ -11,6 +11,7 @@ import { differenceInCalendarDays, format } from 'date-fns';
 })
 export class IrBookingCard {
   @Prop() booking: Booking;
+  @Prop() aff: boolean = false;
 
   @Event() optionClicked: EventEmitter<{ tag: string; id: number }>;
 
@@ -47,8 +48,8 @@ export class IrBookingCard {
     return (
       <div class="relative flex flex-col space-y-1.5 rounded-xl  bg-gray-100 p-6 text-sm " key={this.booking.booking_nbr}>
         <div class="flex items-center justify-between text-base">
-          <h3 class=" font-semibold leading-none tracking-tight">Booking: #{this.booking.booking_nbr}</h3>
-          <p>{formatAmount(this.booking.total, this.booking.currency.code)}</p>
+          <h3 class=" font-semibold leading-none tracking-tight">Booking reference: {this.booking.booking_nbr}</h3>
+          <p class={'font-semibold'}>{formatAmount(this.booking.total, this.booking.currency.code)}</p>
         </div>
         <p>
           <span class="font-medium">Booked on: </span>
@@ -63,21 +64,14 @@ export class IrBookingCard {
           {this.totalNights} {this.totalNights > 1 ? 'nights' : 'night'}
         </p>
         <p class="flex items-center">
-          <span class="font-medium">Status: </span>
           {<ir-badge backgroundShown={false} label={this.booking.status.description} variant={this.getBadgeVariant(this.booking.status.code)}></ir-badge>}
         </p>
 
-        {(view || payment || cancel) && (
+        {(view.show || payment.show || cancel.show) && (
           <div class="mt-2.5 flex flex-col items-center justify-end gap-2.5 pt-2">
-            {payment && (
-              <ir-button
-                class={'w-full'}
-                label={`Pay ${formatAmount(this.booking.financial.due_amount || 0, this.booking.currency.code)} to guarentee`}
-                onButtonClick={() => this.optionClicked.emit({ tag: 'pay', id: 2 })}
-              ></ir-button>
-            )}
-            {cancel && <ir-button class="w-full" variants="outline" label="Cancel booking" onButtonClick={() => this.optionClicked.emit({ tag: 'cancel', id: 3 })}></ir-button>}
-            {view && <ir-button class="w-full" variants="outline" label="Booking details" onButtonClick={() => this.optionClicked.emit({ tag: 'view', id: 1 })}></ir-button>}
+            {payment.show && <ir-button class={'w-full'} label={payment.label} onButtonClick={() => this.optionClicked.emit({ tag: 'pay', id: 2 })}></ir-button>}
+            {cancel.show && <ir-button class="w-full" variants="outline" label={cancel.label} onButtonClick={() => this.optionClicked.emit({ tag: 'cancel', id: 3 })}></ir-button>}
+            {view.show && <ir-button class="w-full" variants="outline" label={view.label} onButtonClick={() => this.optionClicked.emit({ tag: 'view', id: 1 })}></ir-button>}
           </div>
         )}
       </div>

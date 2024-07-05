@@ -7,7 +7,19 @@ export class BookingListingService extends Token {
     if (!token) {
       throw new MissingTokenError();
     }
-    const { data } = await axios.post(`/Get_Exposed_Guest_Bookings?Ticket=${token}`, params);
+    const { data } = await axios.post(`/Get_Exposed_Guest_Bookings?Ticket=${token}`, {
+      ...params,
+      extras: [
+        {
+          key: 'payment_code',
+          value: '',
+        },
+        {
+          key: 'prepayment_amount',
+          value: '',
+        },
+      ],
+    });
     if (data['ExceptionMsg'] !== '') {
       throw new Error(data['ExceptionMsg']);
     }

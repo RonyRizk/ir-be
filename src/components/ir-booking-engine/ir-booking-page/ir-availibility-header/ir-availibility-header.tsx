@@ -155,6 +155,9 @@ export class IrAvailibilityHeader {
       adult_nbr: params.adult_nbr,
       child_nbr: params.child_nbr,
     };
+    if (window.innerWidth < 640) {
+      this.scrollToRoomType.emit(null);
+    }
     await this.propertyService.getExposedBookingAvailability({
       params: {
         ...this.exposedBookingAvailabiltyParams,
@@ -171,9 +174,6 @@ export class IrAvailibilityHeader {
   async handleCheckAvailability() {
     try {
       this.isLoading = true;
-      if (window.innerWidth < 640) {
-        this.scrollToRoomType.emit(null);
-      }
       await this.checkAvailability();
       app_store.fetchedBooking = true;
     } catch (error) {

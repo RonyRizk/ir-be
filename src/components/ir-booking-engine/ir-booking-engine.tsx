@@ -11,6 +11,7 @@ import { getUserPrefernce, matchLocale, setDefaultLocale } from '@/utils/utils';
 import Stack from '@/models/stack';
 import { v4 } from 'uuid';
 import { AvailabiltyService } from '@/services/app/availability.service';
+import { checkout_store } from '@/stores/checkout.store';
 
 @Component({
   tag: 'ir-booking-engine',
@@ -53,6 +54,7 @@ export class IrBookingEngine {
   private identifier: string;
 
   @State() router = new Stack<HTMLElement>();
+  @State() bookingListingScreenOptions: { screen: 'bookings' | 'booking-details'; params: unknown } = { params: null, screen: 'bookings' };
 
   async componentWillLoad() {
     axios.defaults.withCredentials = true;
@@ -68,6 +70,7 @@ export class IrBookingEngine {
       this.token = await this.commonService.getBEToken();
     }
   }
+
   @Watch('token')
   handleTokenChange(newValue: string, oldValue: string) {
     if (newValue !== oldValue) {
@@ -182,6 +185,28 @@ export class IrBookingEngine {
     e.stopPropagation();
     await this.resetBooking(e.detail ?? 'completeReset');
   }
+  @Listen('authStatus')
+  handleAuthFinish(e: CustomEvent) {
+    e.stopImmediatePropagation();
+    e.stopPropagation();
+    console.log('auth finish');
+    const { token, state, payload } = e.detail;
+    console.log(token, state, payload);
+    if (state === 'success') {
+      if (payload.method === 'direct') {
+        // this.bookingNumber = payload.booking_nbr;
+        // this.token = token;
+        this.bookingListingScreenOptions = {
+          screen: 'booking-details',
+          params: {
+            booking_nbr: payload.booking_nbr,
+            email: payload.email,
+          },
+        };
+        app_store.currentPage = 'booking-listing';
+      }
+    }
+  }
   async resetBooking(resetType: 'discountOnly' | 'completeReset' = 'completeReset') {
     let queries = [];
     if (resetType === 'discountOnly' && app_store.fetchedBooking) {
@@ -244,11 +269,13 @@ export class IrBookingEngine {
             email={app_store.invoice.email}
             bookingNbr={app_store.invoice.booking_number}
             status={1}
+            be={true}
           ></ir-invoice>
         );
       case 'booking-listing':
         return (
           <ir-booking-listing
+            startScreen={this.bookingListingScreenOptions}
             showAllBookings={false}
             headerShown={false}
             footerShown={false}
@@ -259,7 +286,20 @@ export class IrBookingEngine {
             baseUrl={this.baseUrl}
           ></ir-booking-listing>
         );
-
+      case 'user-profile':
+        return (
+          <ir-user-profile
+            user_data={{
+              id: checkout_store.userFormData.id,
+              email: checkout_store.userFormData.email,
+              first_name: checkout_store.userFormData.firstName,
+              last_name: checkout_store.userFormData.lastName,
+              country_id: checkout_store.userFormData.country_id,
+              mobile: checkout_store.userFormData.mobile_number,
+              country_phone_prefix: checkout_store.userFormData.country_phone_prefix.toString(),
+            }}
+          ></ir-user-profile>
+        );
       default:
         return null;
     }

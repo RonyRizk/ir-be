@@ -47,7 +47,7 @@ button {
   user-select: none;
   padding: 0.625rem 1rem;
   width: 100%;
-  cursor: default;
+  cursor: pointer;
   font-size: 0.875rem;
   color: var(--gray-700, #344054);
   line-height: 1.25rem;

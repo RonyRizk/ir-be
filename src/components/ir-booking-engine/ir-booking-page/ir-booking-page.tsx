@@ -76,7 +76,11 @@ export class IrBookingPage {
           <section class="relative justify-between gap-4 rounded-md " ref={el => (this.roomTypeSectionRef = el)}>
             <div class=" flex-1 py-2">
               {booking_store.roomTypes?.map(roomType => {
-                if (!roomType.is_active || (app_store.app_data.roomtype_id && roomType.id !== app_store.app_data.roomtype_id)) {
+                if (
+                  !roomType.is_active ||
+                  (app_store.app_data.roomtype_id && roomType.id !== app_store.app_data.roomtype_id) ||
+                  !roomType.rateplans.some(rp => rp.is_booking_engine_enabled)
+                ) {
                   return null;
                 }
                 return <ir-roomtype roomtype={roomType} key={roomType.id}></ir-roomtype>;

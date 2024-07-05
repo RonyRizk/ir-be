@@ -10,7 +10,7 @@ import app_store from '@/stores/app.store';
 import booking_store, { calculateTotalCost, validateBooking } from '@/stores/booking';
 import { checkout_store } from '@/stores/checkout.store';
 import { isRequestPending } from '@/stores/ir-interceptor.store';
-import { getDateDifference } from '@/utils/utils';
+import { getDateDifference, runScriptAndRemove } from '@/utils/utils';
 import { Component, Host, Listen, State, h, Event, EventEmitter } from '@stencil/core';
 import { ZodError, ZodIssue } from 'zod';
 
@@ -156,7 +156,7 @@ export class IrCheckoutPage {
     tag = tag.replace(/\$\$length_of_stay\$\$/g, getDateDifference(new Date(booking.from_date), new Date(booking.to_date)).toString());
     tag = tag.replace(/\$\$booking_xref\$\$/g, booking.booking_nbr.toString());
     tag = tag.replace(/\$\$curr\$\$/g, booking.currency.code.toString());
-    this.runScriptAndRemove(tag);
+    runScriptAndRemove(tag);
   }
   private async processPayment(bookingResult: Booking, currentPayment: AllowedPaymentMethod) {
     let token = app_store.app_data.token;
@@ -184,7 +184,7 @@ export class IrCheckoutPage {
           pgw_id: currentPayment.id.toString(),
         },
         onRedirect: url => (window.location.href = url),
-        onScriptRun: script => this.runScriptAndRemove(script),
+        onScriptRun: script => runScriptAndRemove(script),
       });
     }
   }
@@ -198,12 +198,6 @@ export class IrCheckoutPage {
     }
   }
 
-  runScriptAndRemove(scriptContent: string): void {
-    const script = document.createElement('script');
-    script.textContent = scriptContent;
-    document.body.appendChild(script);
-    document.body.removeChild(script);
-  }
   render() {
     console.log(isRequestPending('/Get_Setup_Entries_By_TBL_NAME_MULTI') || isRequestPending('/Get_Exposed_Countries'));
     if (isRequestPending('/Get_Setup_Entries_By_TBL_NAME_MULTI') || isRequestPending('/Get_Exposed_Countries')) {

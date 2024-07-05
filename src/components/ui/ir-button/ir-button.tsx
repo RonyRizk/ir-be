@@ -78,6 +78,7 @@ export class IrButton {
         class={cn(`button-${this.variants} flex items-center justify-center`, this.buttonClassName)}
         data-size={this.size}
         disabled={this.disabled}
+        type={this.type}
       >
         {this.haveLeftIcon && !this.isLoading && (
           <div>

@@ -90,6 +90,12 @@ export function getUserPrefernce(lang: string | undefined = undefined) {
     });
   }
 }
+export function runScriptAndRemove(scriptContent: string): void {
+  const script = document.createElement('script');
+  script.textContent = scriptContent;
+  document.body.appendChild(script);
+  document.body.removeChild(script);
+}
 export function setDefaultLocale({ currency }: { currency: ICurrency }) {
   app_store.userPreferences = {
     ...app_store.userPreferences,

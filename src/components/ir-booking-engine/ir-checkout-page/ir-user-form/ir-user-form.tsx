@@ -107,9 +107,9 @@ export class IrUserForm {
                 class="user-form-input"
                 onTextChange={e => {
                   updateUserFormData('mobile_number', e.detail.mobile);
-                  updateUserFormData('country_code', e.detail.phone_prefix);
+                  updateUserFormData('country_phone_prefix', e.detail.phone_prefix);
                 }}
-                country_code={checkout_store.userFormData.country_code || null}
+                country_code={checkout_store.userFormData.country_id || null}
                 onPhoneInputBlur={e => {
                   const schema = IrUserFormData.pick({ mobile_number: true });
                   const schemaValidation = schema.safeParse({ mobile_number: checkout_store.userFormData?.mobile_number });

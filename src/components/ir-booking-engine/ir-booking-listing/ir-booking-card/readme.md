@@ -9,6 +9,7 @@
 
 | Property  | Attribute | Description | Type      | Default     |
 | --------- | --------- | ----------- | --------- | ----------- |
+| `aff`     | `aff`     |             | `boolean` | `false`     |
 | `booking` | --        |             | `Booking` | `undefined` |
 
 

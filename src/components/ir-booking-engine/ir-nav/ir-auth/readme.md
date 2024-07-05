@@ -40,11 +40,10 @@ graph TD;
   ir-auth --> ir-button
   ir-signin --> ir-badge-group
   ir-signin --> ir-input
-  ir-signin --> ir-button
   ir-badge-group --> ir-icons
-  ir-button --> ir-icons
   ir-signup --> ir-input
   ir-signup --> ir-button
+  ir-button --> ir-icons
   ir-booking-listing --> ir-auth
   ir-modal --> ir-auth
   style ir-auth fill:#f9f,stroke:#333,stroke-width:4px

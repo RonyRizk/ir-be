@@ -44,7 +44,7 @@ export class IrRateplan {
     this.checkAvailability();
   }
   checkAvailability() {
-    this.isRatePlanAvailable = this.roomTypeInventory > 0 && this.ratePlan.variations.some(v => v.is_calculated && !(v.amount === 0 || v.amount === null));
+    this.isRatePlanAvailable = this.roomTypeInventory > 0 && !this.ratePlan.variations.some(v => v.is_calculated && (v.amount === 0 || v.amount === null));
   }
   async handleVariationChange(e: CustomEvent, variations: Variation[], rateplanId: number, roomTypeId: number) {
     e.stopImmediatePropagation();

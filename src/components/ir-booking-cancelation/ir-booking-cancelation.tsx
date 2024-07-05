@@ -37,8 +37,10 @@ export class IrBookingCancelation {
     return (
       <div>
         <ir-alert-dialog ref={el => (this.alertDialog = el)}>
-          <h2 slot="modal-title">Booking Cancellation</h2>
-          <p slot="modal-body" class="pt-2" innerHTML={this.cancelation}></p>
+          <h2 slot="modal-title" class="text-lg font-medium">
+            Booking Cancellation
+          </h2>
+          <p slot="modal-body" class="py-3" innerHTML={this.cancelation}></p>
           <div slot="modal-footer">
             <ir-button
               label="Cancel"
@@ -46,8 +48,10 @@ export class IrBookingCancelation {
               onButtonClick={() => {
                 this.closeAlertDialog();
               }}
+              size="md"
             ></ir-button>
             <ir-button
+              size="md"
               label="Accept & Confirm"
               isLoading={isRequestPending('/Request_Booking_Cancelation')}
               onButtonClick={async () => {

@@ -24,6 +24,16 @@
   min-height: 100vh;
   gap: 1rem;
 }
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.header-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
 
 @media (min-width: 768px) {
   .main-container.main-container-padding {

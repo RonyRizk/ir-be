@@ -85,6 +85,7 @@ export namespace Components {
         "openDialog": () => Promise<void>;
     }
     interface IrBookingCard {
+        "aff": boolean;
         "booking": Booking;
     }
     interface IrBookingCode {
@@ -124,6 +125,7 @@ export namespace Components {
     }
     interface IrBookingListing {
         "aName": string;
+        "aff": boolean;
         "baseUrl": string;
         "be": boolean;
         "footerShown": boolean;
@@ -133,8 +135,10 @@ export namespace Components {
         "perma_link": string;
         "propertyid": number;
         "showAllBookings": boolean;
+        "startScreen": { screen: 'bookings' | 'booking-details'; params: unknown };
     }
     interface IrBookingOverview {
+        "aff": boolean;
         "be": boolean;
         "language": string;
         "maxPages": number;
@@ -318,11 +322,13 @@ export namespace Components {
     interface IrInvoice {
         "aName": string;
         "baseUrl": string;
+        "be": boolean;
         "bookingNbr": string;
         "email": string;
         "footerShown": boolean;
         "headerShown": boolean;
         "language": string;
+        "locationShown": boolean;
         "perma_link": string;
         "propertyId": number;
         "status": 0 | 1;
@@ -347,6 +353,7 @@ export namespace Components {
         "isBookingListing": boolean;
         "languages": IExposedLanguages[];
         "logo": string;
+        "menuShown": boolean;
         "showBookingCode": boolean;
         "showCurrency": boolean;
         "website": string;
@@ -360,8 +367,10 @@ export namespace Components {
     }
     interface IrPhoneInput {
         "country_code": number;
+        "country_phone_prefix": string;
         "error": boolean;
         "mobile_number": string;
+        "mode": 'prefix_only' | 'country_code_and_prefix';
     }
     interface IrPickup {
         "errors": Record<string, ZodIssue>;
@@ -1255,6 +1264,15 @@ declare global {
     };
     interface HTMLIrModalElementEventMap {
         "openChange": boolean;
+        "authStatus": {
+    state: 'success' | 'failed';
+    token: string;
+    payload: {
+      method: 'direct' | 'google';
+      email?: string;
+      booking_nbr?: string;
+    };
+  };
     }
     interface HTMLIrModalElement extends Components.IrModal, HTMLStencilElement {
         addEventListener<K extends keyof HTMLIrModalElementEventMap>(type: K, listener: (this: HTMLIrModalElement, ev: IrModalCustomEvent<HTMLIrModalElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -1718,6 +1736,7 @@ declare namespace LocalJSX {
         "onOpenChange"?: (event: IrBookingCancelationCustomEvent<boolean>) => void;
     }
     interface IrBookingCard {
+        "aff"?: boolean;
         "booking"?: Booking;
         "onOptionClicked"?: (event: IrBookingCardCustomEvent<{ tag: string; id: number }>) => void;
     }
@@ -1764,6 +1783,7 @@ declare namespace LocalJSX {
     }
     interface IrBookingListing {
         "aName"?: string;
+        "aff"?: boolean;
         "baseUrl"?: string;
         "be"?: boolean;
         "footerShown"?: boolean;
@@ -1773,8 +1793,10 @@ declare namespace LocalJSX {
         "perma_link"?: string;
         "propertyid"?: number;
         "showAllBookings"?: boolean;
+        "startScreen"?: { screen: 'bookings' | 'booking-details'; params: unknown };
     }
     interface IrBookingOverview {
+        "aff"?: boolean;
         "be"?: boolean;
         "language"?: string;
         "maxPages"?: number;
@@ -1998,11 +2020,13 @@ declare namespace LocalJSX {
     interface IrInvoice {
         "aName"?: string;
         "baseUrl"?: string;
+        "be"?: boolean;
         "bookingNbr"?: string;
         "email"?: string;
         "footerShown"?: boolean;
         "headerShown"?: boolean;
         "language"?: string;
+        "locationShown"?: boolean;
         "perma_link"?: string;
         "propertyId"?: number;
         "status"?: 0 | 1;
@@ -2023,6 +2047,15 @@ declare namespace LocalJSX {
     }
     interface IrModal {
         "element"?: HTMLElement;
+        "onAuthStatus"?: (event: IrModalCustomEvent<{
+    state: 'success' | 'failed';
+    token: string;
+    payload: {
+      method: 'direct' | 'google';
+      email?: string;
+      booking_nbr?: string;
+    };
+  }>) => void;
         "onOpenChange"?: (event: IrModalCustomEvent<boolean>) => void;
     }
     interface IrNav {
@@ -2030,6 +2063,7 @@ declare namespace LocalJSX {
         "isBookingListing"?: boolean;
         "languages"?: IExposedLanguages[];
         "logo"?: string;
+        "menuShown"?: boolean;
         "onRouting"?: (event: IrNavCustomEvent<pages>) => void;
         "showBookingCode"?: boolean;
         "showCurrency"?: boolean;
@@ -2045,8 +2079,10 @@ declare namespace LocalJSX {
     }
     interface IrPhoneInput {
         "country_code"?: number;
+        "country_phone_prefix"?: string;
         "error"?: boolean;
         "mobile_number"?: string;
+        "mode"?: 'prefix_only' | 'country_code_and_prefix';
         "onPhoneInputBlur"?: (event: IrPhoneInputCustomEvent<FocusEvent>) => void;
         "onPhoneInputFocus"?: (event: IrPhoneInputCustomEvent<FocusEvent>) => void;
         "onTextChange"?: (event: IrPhoneInputCustomEvent<{ phone_prefix: string; mobile: string }>) => void;

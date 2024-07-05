@@ -9,6 +9,7 @@ import { Component, Element, Listen, State, Method, Event, EventEmitter, Prop } 
 export class IrModal {
   @Element() el: HTMLElement;
   @Prop() element: HTMLElement;
+
   private firstFocusableElement: HTMLElement;
   private lastFocusableElement: HTMLElement;
 
@@ -18,6 +19,15 @@ export class IrModal {
   private modalContainer: HTMLElement;
 
   @Event() openChange: EventEmitter<boolean>;
+  @Event() authStatus: EventEmitter<{
+    state: 'success' | 'failed';
+    token: string;
+    payload: {
+      method: 'direct' | 'google';
+      email?: string;
+      booking_nbr?: string;
+    };
+  }>;
   auth: HTMLIrAuthElement;
 
   componentWillLoad() {
@@ -81,6 +91,10 @@ export class IrModal {
       this.modalContainer.className = 'modal-container';
       this.auth = document.createElement('ir-auth');
       this.auth.addEventListener('closeDialog', () => this.closeModal());
+      this.auth.addEventListener('authFinish', (e: CustomEvent) => {
+        console.log('auth finish');
+        this.authStatus.emit(e.detail);
+      });
       this.modalContainer.appendChild(this.auth);
       this.portal.appendChild(this.modalContainer);
     }

@@ -5,7 +5,7 @@ import { Booking } from '@/models/booking.dto';
 import { DataStructure } from '@/models/common';
 import { ISetupEntries } from '@/models/property';
 import app_store from '@/stores/app.store';
-import booking_store, { IRatePlanSelection } from '@/stores/booking';
+import booking_store, { calculateTotalCost, IRatePlanSelection } from '@/stores/booking';
 import { checkout_store, ICardProcessingWithCVC, ICardProcessingWithoutCVC, updateUserFormData } from '@/stores/checkout.store';
 import { getDateDifference } from '@/utils/utils';
 import axios from 'axios';
@@ -86,7 +86,18 @@ export class PropertyService extends Token {
       throw new MissingTokenError();
     }
 
-    const { data } = await axios.post(`/Get_Exposed_Booking?Ticket=${token}`, { ...params, extras: withExtras ? [{ key: 'payment_code', value: '' }] : null });
+    const { data } = await axios.post(`/Get_Exposed_Booking?Ticket=${token}`, {
+      ...params,
+      extras: withExtras
+        ? [
+            { key: 'payment_code', value: '' },
+            {
+              key: 'prepayment_amount',
+              value: '',
+            },
+          ]
+        : null,
+    });
     const result = data as DataStructure;
     if (result.ExceptionMsg !== '') {
       throw new Error(result.ExceptionMsg);
@@ -196,6 +207,7 @@ export class PropertyService extends Token {
   }
 
   public async bookUser() {
+    const { prePaymentAmount } = calculateTotalCost();
     try {
       const token = this.getToken();
       if (!token) {
@@ -209,7 +221,7 @@ export class PropertyService extends Token {
         city: null,
         mobile: checkout_store.userFormData.mobile_number,
         address: '',
-        phone_prefix: checkout_store.userFormData.country_code,
+        country_phone_prefix: checkout_store.userFormData.country_phone_prefix,
         dob: null,
         subscribe_to_news_letter: true,
         cci: null,
@@ -242,10 +254,13 @@ export class PropertyService extends Token {
             key: 'payment_code',
             value: checkout_store.payment.code,
           },
+          {
+            key: 'prepayment_amount',
+            value: prePaymentAmount,
+          },
         ],
         pickup_info: checkout_store.pickup.location ? this.propertyHelpers.convertPickup(checkout_store.pickup) : null,
       };
-
       const { data } = await axios.post(`/DoReservation?Ticket=${token}`, body);
       if (data.ExceptionMsg !== '') {
         throw new Error(data.ExceptionMsg);
@@ -282,7 +297,8 @@ export class PropertyService extends Token {
       firstName: res.first_name,
       lastName: res.last_name,
       mobile_number: res.mobile,
-      country_code: res.country_id,
+      country_phone_prefix: res.country_phone_prefix,
+      id: res.id,
     };
   }
 }

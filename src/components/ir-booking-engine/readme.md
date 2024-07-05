@@ -36,6 +36,7 @@
 - [ir-checkout-page](ir-checkout-page)
 - [ir-invoice](../ir-invoice)
 - [ir-booking-listing](ir-booking-listing)
+- [ir-user-profile](./ir-nav/ir-user-profile)
 - [ir-interceptor](../ir-interceptor)
 - [ir-nav](ir-nav)
 - [ir-footer](ir-footer)
@@ -47,6 +48,7 @@ graph TD;
   ir-booking-engine --> ir-checkout-page
   ir-booking-engine --> ir-invoice
   ir-booking-engine --> ir-booking-listing
+  ir-booking-engine --> ir-user-profile
   ir-booking-engine --> ir-interceptor
   ir-booking-engine --> ir-nav
   ir-booking-engine --> ir-footer
@@ -158,7 +160,6 @@ graph TD;
   ir-auth --> ir-button
   ir-signin --> ir-badge-group
   ir-signin --> ir-input
-  ir-signin --> ir-button
   ir-badge-group --> ir-icons
   ir-signup --> ir-input
   ir-signup --> ir-button
@@ -166,21 +167,15 @@ graph TD;
   ir-footer --> ir-privacy-policy
   ir-footer --> ir-icons
   ir-footer --> ir-dialog
-  ir-booking-listing --> ir-booking-details-view
+  ir-booking-listing --> ir-button
+  ir-booking-listing --> ir-invoice
   ir-booking-listing --> ir-booking-overview
   ir-booking-listing --> ir-auth
   ir-booking-listing --> ir-nav
   ir-booking-listing --> ir-footer
-  ir-booking-details-view --> ir-button
-  ir-booking-details-view --> ir-icons
-  ir-booking-details-view --> ir-facilities
-  ir-booking-details-view --> ir-booking-cancelation
-  ir-booking-cancelation --> ir-alert-dialog
-  ir-booking-cancelation --> ir-button
   ir-booking-overview --> ir-booking-header
   ir-booking-overview --> ir-badge
   ir-booking-overview --> ir-menu
-  ir-booking-overview --> ir-button
   ir-booking-overview --> ir-pagination
   ir-booking-overview --> ir-booking-card
   ir-booking-overview --> ir-booking-cancelation
@@ -188,6 +183,8 @@ graph TD;
   ir-pagination --> ir-icons
   ir-booking-card --> ir-badge
   ir-booking-card --> ir-button
+  ir-booking-cancelation --> ir-alert-dialog
+  ir-booking-cancelation --> ir-button
   style ir-booking-engine fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

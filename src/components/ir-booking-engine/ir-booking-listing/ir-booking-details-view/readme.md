@@ -21,10 +21,6 @@
 
 ## Dependencies
 
-### Used by
-
- - [ir-booking-listing](..)
-
 ### Depends on
 
 - [ir-button](../../../ui/ir-button)
@@ -43,7 +39,6 @@ graph TD;
   ir-facilities --> ir-icons
   ir-booking-cancelation --> ir-alert-dialog
   ir-booking-cancelation --> ir-button
-  ir-booking-listing --> ir-booking-details-view
   style ir-booking-details-view fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

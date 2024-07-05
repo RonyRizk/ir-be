@@ -7,15 +7,16 @@
 
 ## Properties
 
-| Property    | Attribute | Description | Type                                                                                                                                                                                                                             | Default |
-| ----------- | --------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| `user_data` | --        |             | `{ address?: string; id?: string; email?: string; first_name?: string; last_name?: string; country_id?: number; city?: string; dob?: string; mobile?: number; subscribe_to_news_letter?: boolean; alternative_email?: string; }` | `{}`    |
+| Property    | Attribute | Description | Type                                                                                                                                                                                                                                                            | Default |
+| ----------- | --------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `user_data` | --        |             | `{ address?: string; id?: number; email?: string; first_name?: string; last_name?: string; country_id?: number; country_phone_prefix?: string; city?: string; dob?: string; mobile?: number; subscribe_to_news_letter?: boolean; alternative_email?: string; }` | `{}`    |
 
 
 ## Dependencies
 
 ### Used by
 
+ - [ir-booking-engine](../..)
  - [ir-nav](..)
 
 ### Depends on
@@ -36,6 +37,7 @@ graph TD;
   ir-user-profile --> ir-button
   ir-phone-input --> ir-icons
   ir-button --> ir-icons
+  ir-booking-engine --> ir-user-profile
   ir-nav --> ir-user-profile
   style ir-user-profile fill:#f9f,stroke:#333,stroke-width:4px
 ```

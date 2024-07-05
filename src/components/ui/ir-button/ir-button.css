@@ -36,7 +36,7 @@
 
 .button-default:hover,
 .button-icon-primary:hover {
-  background: hsl(var(--brand-700, 218, 80%, 46%));
+  background: hsl(var(--brand-800, 218, 80%, 46%));
 }
 
 .button-default:disabled,
@@ -76,7 +76,7 @@
 }
 
 .button-outline:hover {
-  background: var(--gray-50, #f9fafb);
+  background: var(--gray-100, #f9fafb);
   color: var(--gray-800, #1d2939);
 }
 
@@ -104,7 +104,7 @@
 }
 
 .button-outline-primary:hover {
-  background: hsla(var(--brand-50, #f9fafb), 0.05);
+  background: hsla(var(--brand-100, #f9fafb), 0.05);
   color: hsl(var(--brand-800, #1d2939));
 }
 
@@ -148,7 +148,7 @@
 }
 
 .button-ghost-primary:hover {
-  background: hsla(var(--brand-50, 206, 100%, 97%), 0.2);
+  background: hsla(var(--brand-100, 206, 100%, 97%), 0.2);
   color: hsl(var(--brand-700, 218, 80%, 46%));
 }
 
@@ -178,7 +178,7 @@
 }
 
 .button-destructive:hover {
-  background: var(--error-700, #b42318);
+  background: var(--error-800, #b42318);
 }
 
 .button-destructive:disabled {

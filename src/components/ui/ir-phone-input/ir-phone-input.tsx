@@ -16,7 +16,9 @@ import phone_input_store from './phone.store';
 export class IrPhoneInput {
   @Prop() error: boolean;
   @Prop() mobile_number: string;
+  @Prop() country_phone_prefix: string;
   @Prop() country_code: number;
+  @Prop() mode: 'prefix_only' | 'country_code_and_prefix' = 'country_code_and_prefix';
 
   @State() isVisible: boolean = false;
   @State() currentHighlightedIndex: number = -1;
@@ -60,16 +62,24 @@ export class IrPhoneInput {
     }
     if (this.user_country) {
       this.selectCountryByProperty('id', this.user_country.COUNTRY_ID);
-    } else if (this.country_code) {
+    } else if (this.country_code && this.mode === 'country_code_and_prefix') {
       this.selectCountryByProperty('id', this.country_code.toString());
+    } else if (this.mode === 'prefix_only' && this.country_phone_prefix) {
+      this.selectCountryByProperty('phone_prefix', this.country_phone_prefix.toString());
     }
     this.filteredCountries = phone_input_store.countries;
   }
 
   @Watch('country_code')
   handleCountryCodeChange(newValue: number, oldValue: number) {
-    if (newValue !== oldValue) {
+    if (newValue !== oldValue && this.mode === 'country_code_and_prefix') {
       this.selectCountryByProperty('id', this.country_code.toString());
+    }
+  }
+  @Watch('country_phone_prefix')
+  handleCountryPhonePrefixChange(newValue: number, oldValue: number) {
+    if (newValue !== oldValue && this.mode === 'prefix_only') {
+      this.selectCountryByProperty('phone_prefix', this.country_phone_prefix.toString());
     }
   }
   @Watch('mobile_number')
@@ -82,11 +92,14 @@ export class IrPhoneInput {
   selectCountryByProperty(property, value) {
     const selectedCountry = phone_input_store.countries.find(c => c[property].toString() === value.toString());
     if (selectedCountry) {
-      updateUserFormData('country_id', selectedCountry.id);
+      if (this.mode === 'country_code_and_prefix') {
+        updateUserFormData('country_id', selectedCountry.id);
+      }
+      updateUserFormData('country_phone_prefix', selectedCountry.phone_prefix);
       this.selectedItem = selectedCountry;
       if (!this.mobile_number) {
         this.textChange.emit({
-          phone_prefix: selectedCountry.id.toString(),
+          phone_prefix: selectedCountry.phone_prefix.toString(),
           mobile: '',
         });
       }
@@ -101,7 +114,6 @@ export class IrPhoneInput {
     if (this.triggerElement && this.contentElement) {
       this.popoverInstance = createPopper(this.triggerElement, this.contentElement, {
         placement: localization_store.dir === 'LTR' ? 'auto-start' : 'auto-end',
-        // strategy: 'fixed',
         modifiers: [
           {
             name: 'offset',
@@ -211,6 +223,10 @@ export class IrPhoneInput {
     this.filteredCountries = phone_input_store.countries;
     this.phoneInput.focus();
     this.toggleVisibility();
+    this.textChange.emit({
+      phone_prefix: this.selectedItem.phone_prefix.toString(),
+      mobile: this.mobile_number,
+    });
   }
   filterData(str: string) {
     if (str === '') {

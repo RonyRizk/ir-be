@@ -93,6 +93,10 @@ p {
 a:hover {
   text-decoration: none;
 }
+.button-outline {
+  align-items: center;
+  text-align: center;
+}
 @media (min-width: 768px) {
   .mapLink img {
     height: 200px;

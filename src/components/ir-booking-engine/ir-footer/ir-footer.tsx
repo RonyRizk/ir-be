@@ -72,6 +72,7 @@ export class IrFooter {
             <a href="https://info.igloorooms.com/" target="_blank" title="igloorooms cloud booking solutions for hotels">
               <BeLogoFooter width={120} height={40} />
             </a>
+            <p class="text-xs text-gray-400">version:2.4</p>
           </li>
         </ul>
         <ir-dialog closeButton ref={el => (this.contactDialog = el)} style={{ '--ir-dialog-max-width': '25rem' }}>

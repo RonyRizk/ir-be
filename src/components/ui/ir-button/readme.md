@@ -47,7 +47,7 @@
  - [ir-booking-code](../../ir-booking-engine/ir-booking-page/ir-booking-code)
  - [ir-booking-details](../../ir-booking-engine/ir-checkout-page/ir-booking-details)
  - [ir-booking-details-view](../../ir-booking-engine/ir-booking-listing/ir-booking-details-view)
- - [ir-booking-overview](../../ir-booking-engine/ir-booking-listing/ir-booking-overview)
+ - [ir-booking-listing](../../ir-booking-engine/ir-booking-listing)
  - [ir-booking-page](../../ir-booking-engine/ir-booking-page)
  - [ir-booking-summary](../../ir-booking-engine/ir-checkout-page/ir-booking-summary)
  - [ir-checkout-page](../../ir-booking-engine/ir-checkout-page)
@@ -64,7 +64,6 @@
  - [ir-property-gallery](../../ir-booking-engine/ir-booking-page/ir-property-gallery)
  - [ir-quick-auth](../../ir-booking-engine/ir-checkout-page/ir-user-form/ir-quick-auth)
  - [ir-sheet](../ir-sheet)
- - [ir-signin](../../ir-booking-engine/ir-nav/ir-auth/ir-signin)
  - [ir-signup](../../ir-booking-engine/ir-nav/ir-auth/ir-signup)
  - [ir-user-profile](../../ir-booking-engine/ir-nav/ir-user-profile)
 
@@ -84,7 +83,7 @@ graph TD;
   ir-booking-code --> ir-button
   ir-booking-details --> ir-button
   ir-booking-details-view --> ir-button
-  ir-booking-overview --> ir-button
+  ir-booking-listing --> ir-button
   ir-booking-page --> ir-button
   ir-booking-summary --> ir-button
   ir-checkout-page --> ir-button
@@ -101,7 +100,6 @@ graph TD;
   ir-property-gallery --> ir-button
   ir-quick-auth --> ir-button
   ir-sheet --> ir-button
-  ir-signin --> ir-button
   ir-signup --> ir-button
   ir-user-profile --> ir-button
   style ir-button fill:#f9f,stroke:#333,stroke-width:4px

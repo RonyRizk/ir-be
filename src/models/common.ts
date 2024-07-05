@@ -42,7 +42,7 @@ export interface DataStructure {
   My_Params_Get_Exposed_Property: any;
   My_Result: any;
 }
-export type pages = 'booking' | 'checkout' | 'invoice' | 'booking-listing';
+export type pages = 'booking' | 'checkout' | 'invoice' | 'booking-listing' | 'user-profile';
 export class Identifier {
   code: string;
   name: string;

@@ -29,7 +29,7 @@ export class IrSignin {
     };
   }>;
   @Event() navigate: EventEmitter<TAuthNavigation>;
-  @Event() signIn: EventEmitter<TSignInAuthTrigger>;
+  @Event({ bubbles: true, composed: true }) signIn: EventEmitter<TSignInAuthTrigger>;
 
   private authService = new AuthService();
 
@@ -166,7 +166,11 @@ export class IrSignin {
               }}
             ></ir-input>
           </fieldset>
-          <ir-button isLoading={this.isLoading} type="submit" class="ir-button" label="Sign in" size="md"></ir-button>
+          {/* <ir-button variants="default" isLoading={this.isLoading} type="submit" class="ir-buttons" label="Sign in" size="md"></ir-button> */}
+          <button class="button-default ir-button text-center" data-size={'md'}>
+            {this.isLoading && <span class="loader"></span>}
+            Sign in
+          </button>
           <div class="divider">
             <div class="divider-line"></div>
             <span class="divider-text">OR</span>

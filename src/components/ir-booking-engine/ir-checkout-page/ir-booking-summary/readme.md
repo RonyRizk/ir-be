@@ -15,10 +15,10 @@
 
 ## Events
 
-| Event            | Description | Type                                                                     |
-| ---------------- | ----------- | ------------------------------------------------------------------------ |
-| `bookingClicked` |             | `CustomEvent<null>`                                                      |
-| `routing`        |             | `CustomEvent<"booking" \| "booking-listing" \| "checkout" \| "invoice">` |
+| Event            | Description | Type                                                                                       |
+| ---------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `bookingClicked` |             | `CustomEvent<null>`                                                                        |
+| `routing`        |             | `CustomEvent<"booking" \| "booking-listing" \| "checkout" \| "invoice" \| "user-profile">` |
 
 
 ## Dependencies
