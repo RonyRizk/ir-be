@@ -67,7 +67,7 @@ export class IrGallery {
                 <button class="absolute">
                   <p class="sr-only">open gallery</p>
                 </button>
-                <img onClick={() => this.openGallery.emit(null)} draggable={false} src={image.url} alt={image.alt} />
+                <img onClick={() => this.openGallery.emit(null)} importance="high" draggable={false} src={image.url} alt={image.alt} />
               </div>
             ))}
           </div>

@@ -1,5 +1,6 @@
 import { IAllowedOptions, IPickupCurrency } from './calendarData';
 import { ICurrency } from './common';
+import { IExposedProperty } from './property';
 
 export interface Booking {
   agent: {
@@ -19,7 +20,7 @@ export interface Booking {
   occupancy: Occupancy;
   origin: Origin;
   extras: Extras[] | null;
-  property: Property;
+  property: IExposedProperty;
   remark: string;
   ota_notes: IOtaNotes[];
   rooms: Room[];
@@ -132,14 +133,6 @@ export interface Occupancy {
 export interface Origin {
   Icon: string;
   Label: string;
-}
-
-export interface Property {
-  calendar_legends: null;
-  currency: null;
-  id: number;
-  name: string;
-  roomtypes: null;
 }
 
 export interface Room {

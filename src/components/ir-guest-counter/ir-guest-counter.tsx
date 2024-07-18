@@ -83,31 +83,33 @@ export class IrGuestCounter {
           </div>
         </div>
         {/* Children Counter */}
-        <div class="counter-item">
-          <div>
-            <p class="main-text">Children</p>
-            <p class="secondary-text">Ages 1-{this.childMaxAge}</p>
+        {this.childMaxAge > 0 && (
+          <div class="counter-item">
+            <div>
+              <p class="main-text">Children</p>
+              <p class="secondary-text">Ages 1-{this.childMaxAge}</p>
+            </div>
+            <div class="counter-buttons-group">
+              <ir-button
+                disabled={this.childrenCount === this.minChildrenCount}
+                variants="icon"
+                onButtonClick={this.decrementChildrenCount.bind(this)}
+                aria-label="Decrease child count"
+                iconName="minus"
+                svgClassName="h-[14px] w-[12.25px]"
+              ></ir-button>
+              <p>{this.childrenCount}</p>
+              <ir-button
+                disabled={this.childrenCount === this.maxChildrenCount}
+                variants="icon"
+                onButtonClick={this.incrementChildrenCount.bind(this)}
+                aria-label="Increase child count"
+                iconName="plus"
+                svgClassName="h-[14px] w-[12.25px]"
+              ></ir-button>
+            </div>
           </div>
-          <div class="counter-buttons-group">
-            <ir-button
-              disabled={this.childrenCount === this.minChildrenCount}
-              variants="icon"
-              onButtonClick={this.decrementChildrenCount.bind(this)}
-              aria-label="Decrease child count"
-              iconName="minus"
-              svgClassName="h-[14px] w-[12.25px]"
-            ></ir-button>
-            <p>{this.childrenCount}</p>
-            <ir-button
-              disabled={this.childrenCount === this.maxChildrenCount}
-              variants="icon"
-              onButtonClick={this.incrementChildrenCount.bind(this)}
-              aria-label="Increase child count"
-              iconName="plus"
-              svgClassName="h-[14px] w-[12.25px]"
-            ></ir-button>
-          </div>
-        </div>
+        )}
         <ir-button
           onButtonClick={this.addChildrenAndAdult.bind(this)}
           size="md"

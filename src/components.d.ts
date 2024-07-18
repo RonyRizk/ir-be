@@ -5,8 +5,9 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { Amenity, BeddingSetup, RatePlan, RoomType } from "./models/property";
+import { Amenity, BeddingSetup, IExposedProperty, RatePlan, RoomType } from "./models/property";
 import { Booking } from "./models/booking.dto";
+import { TSource } from "./stores/app.store";
 import { ICurrency, IExposedLanguages, pages } from "./models/common";
 import { TContainerStyle } from "./components/ir-booking-widget/types";
 import { TIcons } from "./components/ui/ir-icons/icons";
@@ -19,8 +20,9 @@ import { IRatePlanSelection } from "./stores/booking";
 import { TAuthNavigation } from "./components/ir-booking-engine/ir-nav/ir-auth/auth.types";
 import { TSignInAuthTrigger, TSignUpAuthTrigger } from "./validators/auth.validator";
 import { TGuest } from "./models/user_form";
-export { Amenity, BeddingSetup, RatePlan, RoomType } from "./models/property";
+export { Amenity, BeddingSetup, IExposedProperty, RatePlan, RoomType } from "./models/property";
 export { Booking } from "./models/booking.dto";
+export { TSource } from "./stores/app.store";
 export { ICurrency, IExposedLanguages, pages } from "./models/common";
 export { TContainerStyle } from "./components/ir-booking-widget/types";
 export { TIcons } from "./components/ui/ir-icons/icons";
@@ -107,16 +109,16 @@ export namespace Components {
         "injected": boolean;
         "language": string;
         "perma_link": string;
+        "property": IExposedProperty | null;
         "propertyId": number;
+        "rateplan_id": number;
         "redirect_url": string;
         "roomtype_id": number;
-        "source": {
-    code: string;
-    desciption: string;
-  } | null;
+        "source": TSource | null;
         "stag": string | null;
         "toDate": string;
         "token": string;
+        "version": string;
     }
     interface IrBookingHeader {
         "activeLink": 'single_booking' | 'all_booking';
@@ -125,7 +127,7 @@ export namespace Components {
     }
     interface IrBookingListing {
         "aName": string;
-        "aff": boolean;
+        "aff": string;
         "baseUrl": string;
         "be": boolean;
         "footerShown": boolean;
@@ -136,6 +138,7 @@ export namespace Components {
         "propertyid": number;
         "showAllBookings": boolean;
         "startScreen": { screen: 'bookings' | 'booking-details'; params: unknown };
+        "version": string;
     }
     interface IrBookingOverview {
         "aff": boolean;
@@ -244,6 +247,7 @@ export namespace Components {
     interface IrFacilities {
     }
     interface IrFooter {
+        "version": string;
     }
     interface IrGallery {
         "images": { url: string; alt: string }[];
@@ -332,6 +336,7 @@ export namespace Components {
         "perma_link": string;
         "propertyId": number;
         "status": 0 | 1;
+        "version": string;
     }
     interface IrLanguagePicker {
         "currencies": ICurrency[];
@@ -481,6 +486,7 @@ export namespace Components {
         "errors": Record<string, ZodIssue>;
     }
     interface IrUserProfile {
+        "be": boolean;
         "user_data": TGuest;
     }
 }
@@ -1290,6 +1296,8 @@ declare global {
     };
     interface HTMLIrNavElementEventMap {
         "routing": pages;
+        "signOut": null;
+        "screenChanged": pages;
     }
     interface HTMLIrNavElement extends Components.IrNav, HTMLStencilElement {
         addEventListener<K extends keyof HTMLIrNavElementEventMap>(type: K, listener: (this: HTMLIrNavElement, ev: IrNavCustomEvent<HTMLIrNavElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -1764,16 +1772,16 @@ declare namespace LocalJSX {
         "injected"?: boolean;
         "language"?: string;
         "perma_link"?: string;
+        "property"?: IExposedProperty | null;
         "propertyId"?: number;
+        "rateplan_id"?: number;
         "redirect_url"?: string;
         "roomtype_id"?: number;
-        "source"?: {
-    code: string;
-    desciption: string;
-  } | null;
+        "source"?: TSource | null;
         "stag"?: string | null;
         "toDate"?: string;
         "token"?: string;
+        "version"?: string;
     }
     interface IrBookingHeader {
         "activeLink"?: 'single_booking' | 'all_booking';
@@ -1783,7 +1791,7 @@ declare namespace LocalJSX {
     }
     interface IrBookingListing {
         "aName"?: string;
-        "aff"?: boolean;
+        "aff"?: string;
         "baseUrl"?: string;
         "be"?: boolean;
         "footerShown"?: boolean;
@@ -1794,6 +1802,7 @@ declare namespace LocalJSX {
         "propertyid"?: number;
         "showAllBookings"?: boolean;
         "startScreen"?: { screen: 'bookings' | 'booking-details'; params: unknown };
+        "version"?: string;
     }
     interface IrBookingOverview {
         "aff"?: boolean;
@@ -1936,6 +1945,7 @@ declare namespace LocalJSX {
     interface IrFacilities {
     }
     interface IrFooter {
+        "version"?: string;
     }
     interface IrGallery {
         "images"?: { url: string; alt: string }[];
@@ -2030,6 +2040,7 @@ declare namespace LocalJSX {
         "perma_link"?: string;
         "propertyId"?: number;
         "status"?: 0 | 1;
+        "version"?: string;
     }
     interface IrLanguagePicker {
         "currencies"?: ICurrency[];
@@ -2065,6 +2076,8 @@ declare namespace LocalJSX {
         "logo"?: string;
         "menuShown"?: boolean;
         "onRouting"?: (event: IrNavCustomEvent<pages>) => void;
+        "onScreenChanged"?: (event: IrNavCustomEvent<pages>) => void;
+        "onSignOut"?: (event: IrNavCustomEvent<null>) => void;
         "showBookingCode"?: boolean;
         "showCurrency"?: boolean;
         "website"?: string;
@@ -2216,6 +2229,7 @@ declare namespace LocalJSX {
         "onChangePageLoading"?: (event: IrUserFormCustomEvent<'remove' | 'add'>) => void;
     }
     interface IrUserProfile {
+        "be"?: boolean;
         "user_data"?: TGuest;
     }
     interface IntrinsicElements {

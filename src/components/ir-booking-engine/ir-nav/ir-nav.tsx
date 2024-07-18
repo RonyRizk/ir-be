@@ -23,6 +23,8 @@ export class IrNav {
   @Prop() menuShown: boolean = true;
 
   @Event() routing: EventEmitter<pages>;
+  @Event({ bubbles: true, composed: true }) signOut: EventEmitter<null>;
+  @Event({ bubbles: true, composed: true }) screenChanged: EventEmitter<pages>;
   @State() currentPage: TTabsState = null;
 
   private dialogRef: HTMLIrDialogElement;
@@ -106,16 +108,20 @@ export class IrNav {
       </div>
     );
   }
-  handleItemSelect(e: CustomEvent) {
+  async handleItemSelect(e: CustomEvent) {
     e.stopImmediatePropagation();
     e.stopPropagation();
     const id = e.detail;
     switch (id) {
       case 1:
+        this.screenChanged.emit('booking-listing');
         return this.routing.emit('booking-listing');
       case 2:
-        return new AuthService().signOut();
+        await new AuthService().signOut();
+        this.signOut.emit(null);
+        return;
       case 3: {
+        this.screenChanged.emit('user-profile');
         this.routing.emit('user-profile');
       }
       default:
@@ -132,7 +138,7 @@ export class IrNav {
           <div class="ir-nav-container">
             {!isInjected && (
               <div class="ir-nav-left">
-                <a aria-label="home" href={`${this.website?.replace('www.', 'https://')}`}>
+                <a aria-label="home" target="_blank" href={`https://${this.website}`}>
                   <img
                     src={app_store.app_data?.affiliate ? app_store.app_data?.affiliate.sites[0]?.logo : this.logo}
                     alt={`${app_store.property?.name}, ${app_store.property?.country.name}`}
@@ -202,7 +208,7 @@ export class IrNav {
             <ul class={cn('ir-nav-links', { 'ir-nav-links-injected': isInjected })}>
               {!isInjected && currentPage !== 'checkout' && (
                 <li>
-                  <ir-button variants="ghost" haveLeftIcon title="home">
+                  <ir-button variants="ghost" haveLeftIcon title="home" onButtonClick={() => window.open(`https://${this.website}`, '_blank')}>
                     <p slot="left-icon" class="sr-only">
                       home
                     </p>

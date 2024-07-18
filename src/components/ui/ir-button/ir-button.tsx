@@ -59,7 +59,9 @@ export class IrButton {
           class={cn(`button-${this.variants}`, 'flex items-center justify-center', this.isLoading ? 'is-loading' : '', this.buttonClassName)}
           data-size={this.size}
           disabled={this.disabled}
+          name={this.label}
         >
+          <p class={'sr-only'}>{this.label}</p>
           {this.isLoading ? (
             <span class="loader"></span>
           ) : (

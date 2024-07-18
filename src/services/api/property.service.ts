@@ -7,7 +7,7 @@ import { ISetupEntries } from '@/models/property';
 import app_store from '@/stores/app.store';
 import booking_store, { calculateTotalCost, IRatePlanSelection } from '@/stores/booking';
 import { checkout_store, ICardProcessingWithCVC, ICardProcessingWithoutCVC, updateUserFormData } from '@/stores/checkout.store';
-import { getDateDifference } from '@/utils/utils';
+import { getDateDifference, injectHTML } from '@/utils/utils';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { Colors } from '../app/colors.service';
@@ -31,21 +31,21 @@ export class PropertyService extends Token {
     if (result.ExceptionMsg !== '') {
       throw new Error(result.ExceptionMsg);
     }
-    // if (result.My_Result.tags) {
-    //   result.My_Result.tags.map(({ key, value }) => {
-    //     if (!value) {
-    //       return;
-    //     }
-    //     switch (key) {
-    //       case 'header':
-    //         return injectHTML(value, 'head', 'first');
-    //       case 'body':
-    //         return injectHTML(value, 'body', 'first');
-    //       case 'footer':
-    //         return injectHTML(value, 'body', 'last');
-    //     }
-    //   });
-    // }
+    if (result.My_Result.tags) {
+      result.My_Result.tags.map(({ key, value }) => {
+        if (!value) {
+          return;
+        }
+        switch (key) {
+          case 'header':
+            return injectHTML(value, 'head', 'first');
+          case 'body':
+            return injectHTML(value, 'body', 'first');
+          case 'footer':
+            return injectHTML(value, 'body', 'last');
+        }
+      });
+    }
     if (!app_store.fetchedBooking) {
       booking_store.roomTypes = [...result.My_Result.roomtypes];
     }

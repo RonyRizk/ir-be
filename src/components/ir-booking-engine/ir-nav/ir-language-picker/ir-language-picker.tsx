@@ -38,8 +38,9 @@ export class IrLanguagePicker {
 
   init() {
     if (this.languages && this.currencies) {
+      console.log(this.languages, this.currencies);
       this.selectedLanguage = this.languages?.find(l => l.code.toLowerCase() === app_store.userPreferences.language_id.toLowerCase());
-      this.selectedCurrency = this.currencies.find(c => c.code.toLowerCase() === app_store.userPreferences.currency_id.toLowerCase());
+      this.selectedCurrency = this.currencies?.find(c => c.code.toLowerCase() === app_store.userPreferences.currency_id.toLowerCase());
     }
   }
 

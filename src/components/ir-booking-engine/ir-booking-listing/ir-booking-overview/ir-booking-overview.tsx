@@ -1,4 +1,4 @@
-import { Component, Host, Listen, Prop, State, h, Event, EventEmitter } from '@stencil/core';
+import { Component, Host, Listen, Prop, State, h, Event, EventEmitter, Fragment } from '@stencil/core';
 import { Booking } from '@/models/booking.dto';
 import { BookingListingService } from '@/services/api/booking_listing.service';
 import { CommonService } from '@/services/api/common.service';
@@ -32,6 +32,7 @@ export class IrBookingOverview {
   @State() activeLink: 'single_booking' | 'all_booking' = 'single_booking';
   @State() selectedBooking: Booking | null;
   @State() selectedMenuIds: Record<string, number> = {};
+  @State() hoveredBooking = null;
 
   @Event() bl_routing: EventEmitter<{
     route: 'booking' | 'booking-details';
@@ -183,12 +184,24 @@ export class IrBookingOverview {
       console.error('Invalid payment method');
       return;
     }
-    if (Number(prePaymentAmount.value) > 0) {
+    const { amount } = await this.paymentService.GetExposedApplicablePolicies({
+      book_date: new Date(this.selectedBooking.booked_on.date),
+      token: app_store.app_data.token,
+      params: {
+        booking_nbr: this.selectedBooking.booking_nbr,
+        property_id: app_store.app_data.property_id,
+        room_type_id: 0,
+        rate_plan_id: 0,
+        currency_id: this.selectedBooking.currency.id,
+        language: app_store.userPreferences.language_id,
+      },
+    });
+    if (amount || Number(prePaymentAmount.value) > 0) {
       await this.paymentService.GeneratePaymentCaller({
         token: app_store.app_data.token,
         params: {
           booking_nbr: this.selectedBooking.booking_nbr,
-          amount: Number(prePaymentAmount.value) ?? 0,
+          amount: Number(amount || prePaymentAmount.value) ?? 0,
           currency_id: this.selectedBooking.currency.id,
           email: this.selectedBooking.guest.email,
           pgw_id: paymentMethod.id.toString(),
@@ -271,56 +284,81 @@ export class IrBookingOverview {
                     }
                     this.selectedMenuIds[booking.booking_nbr] = menuItems[0]?.id;
                     return (
-                      <tr class="ir-table-row" key={booking.booking_nbr}>
-                        <td class="ir-table-cell">{<ir-badge label={booking.status.description} variant={this.getBadgeVariant(booking.status.code)}></ir-badge>}</td>
-                        <td class="ir-table-cell">{booking.booking_nbr}</td>
-                        <td class="ir-table-cell md:hidden lg:table-cell">{format(new Date(booking.booked_on.date), 'dd-MMM-yyyy')}</td>
-                        <td class="ir-table-cell">{format(new Date(booking.from_date), 'dd-MMM-yyyy')}</td>
-                        <td class="ir-table-cell">
-                          {totalNights} {totalNights > 1 ? 'nights' : 'night'}
-                        </td>
-                        <td class="ir-table-cell">{formatAmount(booking.total, booking.currency.code)}</td>
-                        <td class="ir-table-cell">
-                          {payment.show || cancel.show ? (
-                            <div class={'ct-menu-container'}>
-                              <button
-                                onClick={() => {
-                                  this.selectedBooking = booking;
-                                  this.handleBlEvents(this.selectedMenuIds[booking.booking_nbr] ?? menuItems[0].id);
-                                }}
-                                class="ct-menu-button"
-                              >
-                                {menuItems.find(p => p.id === this.selectedMenuIds[booking.booking_nbr] ?? menuItems[0].id)?.item}
-                              </button>
-                              <ir-menu
-                                onMenuItemClick={e => {
-                                  this.selectedBooking = booking;
-                                  this.handleMenuItemChange(e);
-                                }}
-                                data={menuItems}
-                              >
-                                {this.renderMenuTrigger()}
-                              </ir-menu>
-                            </div>
-                          ) : (
-                            view.show && (
-                              <button
-                                class="booking-details-btn"
-                                onClick={() => {
-                                  this.bl_routing.emit({
-                                    route: 'booking-details',
-                                    params: {
-                                      booking,
-                                    },
-                                  });
-                                }}
-                              >
-                                Booking details
-                              </button>
-                            )
-                          )}
-                        </td>
-                      </tr>
+                      <Fragment>
+                        {this.aff && (
+                          <tr
+                            class="ir-table-row group-hover"
+                            onMouseEnter={() => {
+                              this.hoveredBooking = booking.booking_nbr;
+                            }}
+                            onMouseLeave={() => (this.hoveredBooking = null)}
+                            key={booking.booking_nbr}
+                            data-state={this.hoveredBooking === booking.booking_nbr ? 'hovered' : ''}
+                          >
+                            <th class="ir-table-cell" colSpan={7}>
+                              {booking.property.name}
+                            </th>
+                          </tr>
+                        )}
+                        <tr
+                          class="ir-table-row group-hover"
+                          onMouseEnter={() => {
+                            this.hoveredBooking = booking.booking_nbr;
+                          }}
+                          onMouseLeave={() => (this.hoveredBooking = null)}
+                          key={booking.booking_nbr}
+                          data-state={this.hoveredBooking === booking.booking_nbr ? 'hovered' : ''}
+                        >
+                          <td class="ir-table-cell">{<ir-badge label={booking.status.description} variant={this.getBadgeVariant(booking.status.code)}></ir-badge>}</td>
+                          <td class="ir-table-cell">{booking.booking_nbr}</td>
+                          <td class="ir-table-cell md:hidden lg:table-cell">{format(new Date(booking.booked_on.date), 'dd-MMM-yyyy')}</td>
+                          <td class="ir-table-cell">{format(new Date(booking.from_date), 'dd-MMM-yyyy')}</td>
+                          <td class="ir-table-cell">
+                            {totalNights} {totalNights > 1 ? 'nights' : 'night'}
+                          </td>
+                          <td class="ir-table-cell">{formatAmount(booking.total, booking.currency.code)}</td>
+                          <td class="ir-table-cell">
+                            {payment.show || cancel.show ? (
+                              <div class={'ct-menu-container'}>
+                                <button
+                                  onClick={() => {
+                                    this.selectedBooking = booking;
+                                    this.handleBlEvents(this.selectedMenuIds[booking.booking_nbr] ?? menuItems[0].id);
+                                  }}
+                                  class="ct-menu-button"
+                                >
+                                  {menuItems.find(p => p.id === this.selectedMenuIds[booking.booking_nbr] ?? menuItems[0].id)?.item}
+                                </button>
+                                <ir-menu
+                                  onMenuItemClick={e => {
+                                    this.selectedBooking = booking;
+                                    this.handleMenuItemChange(e);
+                                  }}
+                                  data={menuItems}
+                                >
+                                  {this.renderMenuTrigger()}
+                                </ir-menu>
+                              </div>
+                            ) : (
+                              view.show && (
+                                <button
+                                  class="booking-details-btn"
+                                  onClick={() => {
+                                    this.bl_routing.emit({
+                                      route: 'booking-details',
+                                      params: {
+                                        booking,
+                                      },
+                                    });
+                                  }}
+                                >
+                                  Booking details
+                                </button>
+                              )
+                            )}
+                          </td>
+                        </tr>
+                      </Fragment>
                     );
                   })}
                 </tbody>
@@ -340,6 +378,7 @@ export class IrBookingOverview {
             {this.showAllBookings && <ir-booking-header bookingNumber={this.bookingNumber} mode={this.bookingNumber ? 'multi' : 'single'}></ir-booking-header>}
             {this.bookings?.map(booking => (
               <ir-booking-card
+                aff={this.aff}
                 booking={booking}
                 key={booking.booking_nbr}
                 onOptionClicked={(e: CustomEvent) => {

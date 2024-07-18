@@ -1,6 +1,7 @@
 import { RoomType } from '@/models/property';
 import app_store from '@/stores/app.store';
 import localizedWords from '@/stores/localization.store';
+import { formatImageAlt } from '@/utils/utils';
 import { Component, Fragment, h, Listen, Prop } from '@stencil/core';
 import { v4 } from 'uuid';
 
@@ -33,13 +34,13 @@ export class IrPropertyGallery {
     const maxNumber = adult_nbr + children_nbr;
 
     const renderOccupancy = () => (
-      <div class="flex items-end">
+      <div class="flex items-end gap-1">
         <div class="flex items-center">
           <ir-icons svgClassName="size-3" name="user"></ir-icons>
           <p>{adult_nbr}</p>
         </div>
         {children_nbr > 0 && (
-          <div class="flex items-center gap-2">
+          <div class="flex items-center">
             <ir-icons svgClassName="size-3" name="child"></ir-icons>
             <p>{children_nbr}</p>
           </div>
@@ -58,7 +59,7 @@ export class IrPropertyGallery {
         </p>
       );
 
-    if (maxNumber > 7) {
+    if (maxNumber > 4) {
       return (
         <div class="capacity-container pointer-events-none absolute -bottom-1 z-40 flex w-full items-center justify-between bg-white/80 px-2 py-1 pb-2 text-sm">
           <div class="flex items-center gap-2">
@@ -78,6 +79,9 @@ export class IrPropertyGallery {
             {[...Array(adult_nbr)].map((_, i) => (
               <ir-icons svgClassName="size-3" key={i} name="user"></ir-icons>
             ))}
+            {[...Array(children_nbr)].map((_, i) => (
+              <ir-icons key={i} svgClassName="size-3" name="child"></ir-icons>
+            ))}
           </div>
         </div>
         {renderRoomSize()}
@@ -90,7 +94,10 @@ export class IrPropertyGallery {
     return (
       <div>
         {this.property_state === 'gallery' ? (
-          <ir-gallery totalImages={app_store.property?.images.length} images={app_store.property?.images?.map(i => ({ url: i.url, alt: i.tooltip })).slice(0, 5)}></ir-gallery>
+          <ir-gallery
+            totalImages={app_store.property?.images.length}
+            images={app_store.property?.images?.map(i => ({ url: i.url, alt: formatImageAlt(i.tooltip) })).slice(0, 5)}
+          ></ir-gallery>
         ) : (
           <Fragment>
             <div class="flex flex-wrap items-center gap-2 py-2 text-sm font-normal text-gray-700 md:hidden">
@@ -111,11 +118,16 @@ export class IrPropertyGallery {
                   {this.showPlanLimitations()}
                 </Fragment>
               ) : this.roomType.images.length === 1 ? (
-                <img onClick={() => this.irDialog.openModal()} class="gallery-img object-cover " src={this.roomType.images[0].url} alt={this.roomType.images[0].tooltip} />
+                <img
+                  onClick={() => this.irDialog.openModal()}
+                  class="gallery-img object-cover "
+                  src={this.roomType.images[0].url}
+                  alt={formatImageAlt(this.roomType.images[0].tooltip, this.roomType?.name)}
+                />
               ) : (
                 <ir-carousel
                   slides={this.roomType?.images?.map(img => ({
-                    alt: img.tooltip,
+                    alt: formatImageAlt(img.tooltip, this.roomType?.name),
                     id: v4(),
                     image_uri: img.url,
                   }))}
@@ -137,7 +149,7 @@ export class IrPropertyGallery {
                     <img
                       onClick={() => this.irDialog.openModal()}
                       src={this.roomType.images[0].url}
-                      alt={this.roomType.images[0].tooltip}
+                      alt={formatImageAlt(this.roomType.images[0].tooltip, this.roomType?.name)}
                       class="h-full w-full cursor-pointer rounded-[var(--radius,8px)] object-cover "
                     />
                     {this.showPlanLimitations()}
@@ -146,7 +158,7 @@ export class IrPropertyGallery {
                   <Fragment>
                     <ir-carousel
                       slides={this.roomType.images?.map(img => ({
-                        alt: img.tooltip,
+                        alt: formatImageAlt(img.tooltip, this.roomType?.name),
                         id: v4(),
                         image_uri: img.url,
                       }))}
@@ -187,7 +199,7 @@ export class IrPropertyGallery {
                     dir={app_store.dir}
                     key={this.roomType?.id + '_' + app_store.dir}
                     slides={images?.map(img => ({
-                      alt: img.tooltip,
+                      alt: formatImageAlt(img.tooltip, this.roomType?.name),
                       id: v4(),
                       image_uri: img.url,
                     }))}

@@ -146,6 +146,9 @@ export class IrAvailibilityHeader {
 
   async checkAvailability() {
     const params = ExposedBookingAvailability.parse(this.exposedBookingAvailabiltyParams);
+    if (app_store.app_data.injected) {
+      return (location.href = `https://${app_store.property.perma_link}.bookingmystay.com?checkin=${params.from_date}&checkout=${params.to_date}&adults=${params.adult_nbr}&children=${params.child_nbr}&cur=${params.currency_ref}`);
+    }
     this.identifier = v4();
     this.availabiltyService.initSocket(this.identifier);
     booking_store.bookingAvailabilityParams = {
@@ -296,6 +299,7 @@ export class IrAvailibilityHeader {
               size="pill"
               variants="icon-primary"
               iconName="search"
+              label="Check availability"
             ></ir-button>
           </div>
           {/* <ir-button

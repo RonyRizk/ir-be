@@ -87,7 +87,6 @@ export class AuthService extends Token {
     }
     const loginToken = data['My_Result'];
     if (signIn) {
-      localStorage.setItem('ir-token', loginToken);
       app_store.app_data.token = loginToken;
       app_store.is_signed_in = true;
       manageAnchorSession({ login: { method: option, ...rest, isLoggedIn: true, token: loginToken } });
@@ -115,7 +114,6 @@ export class AuthService extends Token {
     if (data['ExceptionMsg'] !== '') {
       throw new Error(data['ExceptionMsg']);
     }
-    localStorage.setItem('ir-token', data['My_Result']);
     app_store.app_data.token = data['My_Result'];
   }
 

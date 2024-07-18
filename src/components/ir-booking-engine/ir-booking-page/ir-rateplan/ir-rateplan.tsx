@@ -45,12 +45,14 @@ export class IrRateplan {
   }
   checkAvailability() {
     this.isRatePlanAvailable = this.roomTypeInventory > 0 && !this.ratePlan.variations.some(v => v.is_calculated && (v.amount === 0 || v.amount === null));
+    // this.isRatePlanAvailable = this.roomTypeInventory > 0;
   }
   async handleVariationChange(e: CustomEvent, variations: Variation[], rateplanId: number, roomTypeId: number) {
     e.stopImmediatePropagation();
     e.stopPropagation();
     const value = e.detail;
     let selectedVariation = variations[value];
+    console.log(selectedVariation);
     if (!selectedVariation) {
       return;
     }
@@ -109,14 +111,16 @@ export class IrRateplan {
           ) : (
             <Fragment>
               {this.isRatePlanAvailable ? (
-                <div class="rateplan-pricing-mobile">
-                  <p class="rateplan-amount">{formatAmount(this.visibleInventory?.selected_variation?.variation?.amount, app_store.userPreferences.currency_id, 0)}</p>
-                  {this.visibleInventory?.selected_variation?.variation?.discount_pct > 0 && (
-                    <p class="rateplan-discounted-amount">
-                      {formatAmount(this.visibleInventory?.selected_variation?.variation?.total_before_discount, app_store.userPreferences.currency_id, 0)}
-                    </p>
-                  )}
-                </div>
+                !this.visibleInventory?.selected_variation?.variation?.IS_MLS_VIOLATED && (
+                  <div class="rateplan-pricing-mobile">
+                    <p class="rateplan-amount">{formatAmount(this.visibleInventory?.selected_variation?.variation?.amount, app_store.userPreferences.currency_id, 0)}</p>
+                    {this.visibleInventory?.selected_variation?.variation?.discount_pct > 0 && (
+                      <p class="rateplan-discounted-amount">
+                        {formatAmount(this.visibleInventory?.selected_variation?.variation?.total_before_discount, app_store.userPreferences.currency_id, 0)}
+                      </p>
+                    )}
+                  </div>
+                )
               ) : (
                 <p class="no-availability">Not available</p>
               )}
@@ -162,38 +166,43 @@ export class IrRateplan {
                     )}
                   </div>
                 </div>
+                {!this.visibleInventory?.selected_variation?.variation?.IS_MLS_VIOLATED ? (
+                  <Fragment>
+                    {this.visibleInventory?.selected_variation?.variation?.discount_pct > 0 && (
+                      <div class="rateplan-pricing">
+                        <p class="rateplan-discounted-amount">
+                          {formatAmount(this.visibleInventory?.selected_variation?.variation?.total_before_discount, app_store.userPreferences.currency_id, 0)}
+                        </p>
+                        <p class="rateplan-discount">{`-${this.visibleInventory?.selected_variation?.variation?.discount_pct}%`}</p>
+                      </div>
+                    )}
+                    <div class="rateplan-final-pricing">
+                      <p class="rateplan-amount">{formatAmount(this.visibleInventory?.selected_variation?.variation?.amount, app_store.userPreferences.currency_id, 0)}</p>
+                      <p class="rateplan-amount-per-night">{`${formatAmount(this.visibleInventory?.selected_variation?.variation?.amount_per_night, app_store.userPreferences.currency_id, 0)}/${localizedWords.entries.Lcz_night}`}</p>
+                    </div>
 
-                {this.visibleInventory?.selected_variation?.variation?.discount_pct > 0 && (
-                  <div class="rateplan-pricing">
-                    <p class="rateplan-discounted-amount">
-                      {formatAmount(this.visibleInventory?.selected_variation?.variation?.total_before_discount, app_store.userPreferences.currency_id, 0)}
-                    </p>
-                    <p class="rateplan-discount">{`-${this.visibleInventory?.selected_variation?.variation?.discount_pct}%`}</p>
-                  </div>
+                    <ir-select
+                      onValueChange={e => {
+                        reserveRooms(this.roomTypeId, this.ratePlan.id, Number(e.detail));
+                        this.animateBookingButton.emit(null);
+                      }}
+                      label={localizedWords.entries.Lcz_Rooms}
+                      value={this.visibleInventory?.reserved}
+                      class="rateplan-select-rooms"
+                      data={[...new Array(this.roomTypeInventory + 1)]?.map((_, i) => ({
+                        id: i,
+                        value:
+                          i === 0
+                            ? `${localizedWords.entries.Lcz_Select}`
+                            : `${i}&nbsp;&nbsp;&nbsp;${i === 0 ? '' : formatAmount(this.visibleInventory?.selected_variation?.variation?.amount * i, app_store.userPreferences.currency_id, 0)}`,
+                        disabled: i >= this.visibleInventory?.visibleInventory + 1,
+                        html: true,
+                      }))}
+                    ></ir-select>
+                  </Fragment>
+                ) : (
+                  <p class="mls_alert">{this.visibleInventory.selected_variation?.variation?.MLS_ALERT}</p>
                 )}
-                <div class="rateplan-final-pricing">
-                  <p class="rateplan-amount">{formatAmount(this.visibleInventory?.selected_variation?.variation?.amount, app_store.userPreferences.currency_id, 0)}</p>
-                  <p class="rateplan-amount-per-night">{`${formatAmount(this.visibleInventory?.selected_variation?.variation?.amount_per_night, app_store.userPreferences.currency_id, 0)}/${localizedWords.entries.Lcz_night}`}</p>
-                </div>
-
-                <ir-select
-                  onValueChange={e => {
-                    reserveRooms(this.roomTypeId, this.ratePlan.id, Number(e.detail));
-                    this.animateBookingButton.emit(null);
-                  }}
-                  label={localizedWords.entries.Lcz_Rooms}
-                  value={this.visibleInventory?.reserved}
-                  class="rateplan-select-rooms"
-                  data={[...new Array(this.roomTypeInventory + 1)]?.map((_, i) => ({
-                    id: i,
-                    value:
-                      i === 0
-                        ? `${localizedWords.entries.Lcz_Select}`
-                        : `${i}&nbsp;&nbsp;&nbsp;${i === 0 ? '' : formatAmount(this.visibleInventory?.selected_variation?.variation?.amount * i, app_store.userPreferences.currency_id, 0)}`,
-                    disabled: i >= this.visibleInventory?.visibleInventory + 1,
-                    html: true,
-                  }))}
-                ></ir-select>
               </Fragment>
             )}
           </div>

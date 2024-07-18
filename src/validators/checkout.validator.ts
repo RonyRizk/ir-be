@@ -54,3 +54,22 @@ export const ZCreditCardSchema = z
       });
     }
   });
+
+const ICardProcessingWithoutCVC = z.object({
+  code: z.literal('004'),
+  cardNumber: z.string(),
+  cardHolderName: z.string(),
+  expiry_month: z.string(),
+  expiry_year: z.string(),
+});
+
+const ICardProcessingWithCVC = z.object({
+  code: z.literal('001'),
+  cardNumber: z.string(),
+  cardHolderName: z.string(),
+  expiry_month: z.string(),
+  expiry_year: z.string(),
+  cvc: z.string(),
+});
+
+export const ICardProcessing = z.union([ICardProcessingWithoutCVC, ICardProcessingWithCVC]);

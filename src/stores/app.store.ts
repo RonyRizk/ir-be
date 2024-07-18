@@ -14,6 +14,10 @@ interface IUserDefaultCountry {
   name: string;
   phone_prefix: string;
 }
+export type TSource = {
+  code: string;
+  description: string;
+};
 
 export interface IAppStore {
   currencies: TCurrency[];
@@ -29,10 +33,7 @@ export interface IAppStore {
     redirect_url: string;
     affiliate: Affiliate;
     tag: string | null;
-    source: {
-      code: string;
-      desciption: string;
-    } | null;
+    source: TSource | null;
   };
   property: IExposedProperty;
   setup_entries: {

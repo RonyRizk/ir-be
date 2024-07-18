@@ -31,6 +31,7 @@
  - [ir-date-popup](../../ir-booking-engine/ir-booking-page/ir-availibility-header/ir-date-popup)
  - [ir-facilities](../../ir-booking-engine/ir-booking-page/ir-facilities)
  - [ir-footer](../../ir-booking-engine/ir-footer)
+ - [ir-interceptor](../../ir-interceptor)
  - [ir-invoice](../../ir-invoice)
  - [ir-loyalty](../../ir-booking-engine/ir-booking-page/ir-availibility-header/ir-loyalty)
  - [ir-nav](../../ir-booking-engine/ir-nav)
@@ -56,6 +57,7 @@ graph TD;
   ir-date-popup --> ir-icons
   ir-facilities --> ir-icons
   ir-footer --> ir-icons
+  ir-interceptor --> ir-icons
   ir-invoice --> ir-icons
   ir-loyalty --> ir-icons
   ir-nav --> ir-icons

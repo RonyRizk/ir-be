@@ -17,10 +17,18 @@
 }
 .ct-menu-button {
   padding: 0.25rem 0.5rem;
+}
+.ct-menu-button:dir(rtl) {
+  border-left: 1px solid var(--gray-300, #d0d5dd);
+}
+.ct-menu-button:dir(ltr) {
   border-right: 1px solid var(--gray-300, #d0d5dd);
 }
 .booking-details-btn {
   padding: 0.25rem 0.5rem;
   border-radius: min(var(--radius, 0.5rem), 0.5rem);
   border: 1px solid var(--gray-300, #d0d5dd);
+}
+.group-hover[data-state='hovered'] {
+  background: var(--gray-100, #f2f4f7) !important; /* Example hover color */
 }

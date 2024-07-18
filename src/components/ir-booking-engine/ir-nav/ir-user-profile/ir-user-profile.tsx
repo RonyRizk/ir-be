@@ -5,6 +5,8 @@ import { checkout_store } from '@/stores/checkout.store';
 import { ZodError } from 'zod';
 import { PropertyService } from '@/services/api/property.service';
 import app_store from '@/stores/app.store';
+import { CommonService } from '@/services/api/common.service';
+import { isRequestPending } from '@/stores/ir-interceptor.store';
 
 @Component({
   tag: 'ir-user-profile',
@@ -13,15 +15,27 @@ import app_store from '@/stores/app.store';
 })
 export class IrUserProfile {
   @Prop() user_data: TGuest = {};
+  @Prop() be: boolean = true;
 
   @State() user: TGuest = {};
   @State() isLoading: boolean = false;
+  @State() isPageLoading: boolean = false;
 
   private propertyService = new PropertyService();
+  private commonService = new CommonService();
 
-  componentWillLoad() {
+  async componentWillLoad() {
     this.propertyService.setToken(app_store.app_data.token);
+    console.log('token', app_store.app_data.token);
+    this.commonService.setToken(app_store.app_data.token);
+    await this.fetchData();
     this.user = { ...this.user_data };
+  }
+  async fetchData() {
+    if (this.be) {
+      return;
+    }
+    await this.commonService.getExposedCountryByIp();
   }
 
   updateUserData(key: keyof TGuest, value: unknown) {
@@ -58,9 +72,12 @@ export class IrUserProfile {
   }
 
   render() {
-    console.log(JSON.stringify(this.user, null, 2));
+    console.log(isRequestPending('/Get_Exposed_Country_By_IP'));
+    if (isRequestPending('/Get_Exposed_Country_By_IP')) {
+      return null;
+    }
     return (
-      <section class="mx-auto h-full min-h-[80vh] max-w-xl">
+      <section class={`mx-auto h-full min-h-[80vh] max-w-xl ${!this.be ? 'p-4 md:p-6' : ''}`}>
         <h1 class="mb-6 text-lg font-medium">Personal profile</h1>
         <form onSubmit={this.handleSubmit.bind(this)}>
           <div class="relative  flex flex-col gap-4 md:grid md:grid-cols-2 ">

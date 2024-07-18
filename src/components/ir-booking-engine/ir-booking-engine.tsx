@@ -4,10 +4,10 @@ import { Component, Listen, Prop, State, Watch, h } from '@stencil/core';
 import { format, Locale } from 'date-fns';
 import { ICurrency, IExposedLanguages } from '@/models/common';
 import axios from 'axios';
-import { Variation } from '@/models/property';
+import { IExposedProperty, Variation } from '@/models/property';
 import booking_store, { updateRoomParams } from '@/stores/booking';
-import app_store, { changeLocale, updateUserPreference } from '@/stores/app.store';
-import { getUserPrefernce, matchLocale, setDefaultLocale } from '@/utils/utils';
+import app_store, { changeLocale, TSource, updateUserPreference } from '@/stores/app.store';
+import { checkAffiliate, getUserPrefernce, matchLocale, setDefaultLocale } from '@/utils/utils';
 import Stack from '@/models/stack';
 import { v4 } from 'uuid';
 import { AvailabiltyService } from '@/services/app/availability.service';
@@ -25,6 +25,7 @@ export class IrBookingEngine {
   @Prop() baseUrl: string;
   @Prop() injected: boolean;
   @Prop() roomtype_id: number = null;
+  @Prop() rateplan_id: number = null;
   @Prop() redirect_url: string = null;
 
   //extra props
@@ -38,29 +39,29 @@ export class IrBookingEngine {
   @Prop() cur: string;
   @Prop() aff: string;
   @Prop() stag: string | null;
-  @Prop() source: {
-    code: string;
-    desciption: string;
-  } | null = null;
+  @Prop() property: IExposedProperty | null = null;
+  @Prop() source: TSource | null = null;
+  @Prop() version: string = '2.0';
 
   @State() selectedLocale: Locale;
   @State() currencies: ICurrency[];
   @State() languages: IExposedLanguages[];
   @State() isLoading: boolean = false;
+  @State() router = new Stack<HTMLElement>();
+  @State() bookingListingScreenOptions: { screen: 'bookings' | 'booking-details'; params: unknown } = { params: null, screen: 'bookings' };
 
   private commonService = new CommonService();
   private propertyService = new PropertyService();
   private availabiltyService = new AvailabiltyService();
   private identifier: string;
 
-  @State() router = new Stack<HTMLElement>();
-  @State() bookingListingScreenOptions: { screen: 'bookings' | 'booking-details'; params: unknown } = { params: null, screen: 'bookings' };
-
   async componentWillLoad() {
     axios.defaults.withCredentials = true;
     axios.defaults.baseURL = this.baseUrl;
     getUserPrefernce(this.language);
-
+    if (this.property) {
+      app_store.property = { ...this.property };
+    }
     const isAuthenticated = this.commonService.checkUserAuthState();
     if (isAuthenticated) {
       app_store.is_signed_in = true;
@@ -77,16 +78,26 @@ export class IrBookingEngine {
       this.initializeApp();
     }
   }
+  @Watch('source')
+  handleSourceChange(newSource: TSource, oldSource: TSource) {
+    if (newSource && (!oldSource || oldSource.code !== newSource.code)) {
+      this.setSource(newSource);
+    }
+  }
 
-  // @Watch('language')
-  // handleLanguageChange(newValue: string, oldValue: string) {
-  //   if (!this.languages) {
-  //     return;
-  //   }
-  //   if (newValue !== oldValue) {
-  //     this.modifyLanguage(newValue);
-  //   }
-  // }
+  @Watch('cur')
+  handleCurrencyChange(newValue: string, oldValue: string) {
+    if (newValue !== oldValue) {
+      updateUserPreference({
+        currency_id: newValue,
+      });
+    }
+  }
+
+  setSource(newSource: TSource) {
+    app_store.app_data = { ...app_store.app_data, source: newSource };
+  }
+
   modifyLanguage(code: string) {
     if (!this.languages) {
       return;
@@ -95,14 +106,6 @@ export class IrBookingEngine {
     updateUserPreference({
       language_id: code,
     });
-  }
-  @Watch('cur')
-  handleCurrencyChange(newValue: string, oldValue: string) {
-    if (newValue !== oldValue) {
-      updateUserPreference({
-        currency_id: newValue,
-      });
-    }
   }
 
   initializeApp() {
@@ -120,47 +123,41 @@ export class IrBookingEngine {
     };
     this.initRequest();
   }
+
   async initRequest() {
     this.isLoading = true;
     const p = JSON.parse(localStorage.getItem('user_preference'));
     let requests = [
-      this.propertyService.getExposedProperty({ id: this.propertyId, language: app_store.userPreferences?.language_id || 'en', aname: this.aName, perma_link: this.perma_link }),
       this.commonService.getCurrencies(),
       this.commonService.getExposedLanguages(),
       this.commonService.getExposedCountryByIp(),
       this.commonService.getExposedLanguage(),
-      // ,
+      this.propertyService.getExposedProperty({ id: this.propertyId, language: app_store.userPreferences?.language_id || 'en', aname: this.aName, perma_link: this.perma_link }),
     ];
     if (app_store.is_signed_in) {
       requests.push(this.propertyService.getExposedGuest());
     }
-    const [_, currencies, languages] = await Promise.all(requests);
+    const [currencies, languages] = await Promise.all(requests);
     this.currencies = currencies;
     this.languages = languages;
-
     if (!p) {
       if (this.language) {
         this.modifyLanguage(this.language);
       }
-      setDefaultLocale({ currency: app_store.userDefaultCountry.currency });
+      let currency = app_store.userDefaultCountry.currency;
+      if (this.cur) {
+        const newCurr = this.currencies.find(c => c.code.toLowerCase() === this.cur.toLowerCase());
+        if (newCurr) {
+          currency = newCurr;
+        }
+      }
+      setDefaultLocale({ currency });
     }
     app_store.app_data = {
       ...app_store.app_data,
-      affiliate: this.checkAffiliate(),
+      affiliate: checkAffiliate(this.aff?.toLowerCase().trim()),
     };
-
-    // booking_store.roomTypes = [...roomtypes];
     this.isLoading = false;
-  }
-  checkAffiliate() {
-    if (this.aff) {
-      const affiliate = app_store?.property?.affiliates.find(aff => aff.afname.toLowerCase().trim() === this.aff.toLowerCase().trim());
-      if (!affiliate) {
-        return null;
-      }
-      return affiliate;
-    }
-    return null;
   }
   handleVariationChange(e: CustomEvent, variations: Variation[], rateplanId: number, roomTypeId: number) {
     e.stopImmediatePropagation();
@@ -194,8 +191,6 @@ export class IrBookingEngine {
     console.log(token, state, payload);
     if (state === 'success') {
       if (payload.method === 'direct') {
-        // this.bookingNumber = payload.booking_nbr;
-        // this.token = token;
         this.bookingListingScreenOptions = {
           screen: 'booking-details',
           params: {
@@ -207,6 +202,7 @@ export class IrBookingEngine {
       }
     }
   }
+
   async resetBooking(resetType: 'discountOnly' | 'completeReset' = 'completeReset') {
     let queries = [];
     if (resetType === 'discountOnly' && app_store.fetchedBooking) {
@@ -228,6 +224,7 @@ export class IrBookingEngine {
     }
     await Promise.all(queries);
   }
+
   async checkAvailability() {
     this.identifier = v4();
     this.availabiltyService.initSocket(this.identifier);
@@ -250,6 +247,7 @@ export class IrBookingEngine {
       mode: 'default',
     });
   }
+
   renderScreens() {
     switch (app_store.currentPage) {
       case 'booking':
@@ -259,6 +257,7 @@ export class IrBookingEngine {
       case 'invoice':
         return (
           <ir-invoice
+            version={this.version}
             headerShown={false}
             footerShown={false}
             propertyId={this.propertyId}
@@ -275,6 +274,7 @@ export class IrBookingEngine {
       case 'booking-listing':
         return (
           <ir-booking-listing
+            version={this.version}
             startScreen={this.bookingListingScreenOptions}
             showAllBookings={false}
             headerShown={false}
@@ -284,6 +284,7 @@ export class IrBookingEngine {
             aName={this.aName}
             be={true}
             baseUrl={this.baseUrl}
+            aff={this.aff}
           ></ir-booking-listing>
         );
       case 'user-profile':
@@ -304,9 +305,11 @@ export class IrBookingEngine {
         return null;
     }
   }
+
   disconnectedCallback() {
     this.availabiltyService.disconnectSocket();
   }
+
   render() {
     if (this.isLoading) {
       return null;
@@ -326,7 +329,7 @@ export class IrBookingEngine {
         <section class="flex-1 px-4 lg:px-6">
           <div class="mx-auto max-w-6xl">{this.renderScreens()}</div>
         </section>
-        {!this.injected && <ir-footer></ir-footer>}
+        {!this.injected && <ir-footer version={this.version}></ir-footer>}
       </main>
     );
   }

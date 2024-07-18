@@ -114,12 +114,19 @@
 }
 
 .rateplan-discount,
-.no-availability {
+.no-availability,
+.mls_alert {
   font-weight: 500;
   color: #ef4444;
 }
 .rateplan-discount {
   font-size: 1rem;
+}
+.mls_alert {
+  /* width: 60%; */
+  text-align: end;
+  grid-column: span 4 !important;
+  flex: 1 1 0%;
 }
 .no-availability {
   text-align: end;

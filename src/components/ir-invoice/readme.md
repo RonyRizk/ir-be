@@ -48,6 +48,8 @@ graph TD;
   ir-invoice --> ir-icons
   ir-invoice --> ir-footer
   ir-invoice --> ir-alert-dialog
+  ir-interceptor --> ir-alert-dialog
+  ir-interceptor --> ir-icons
   ir-nav --> ir-language-picker
   ir-nav --> ir-booking-code
   ir-nav --> ir-google-maps

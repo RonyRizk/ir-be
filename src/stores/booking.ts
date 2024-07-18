@@ -69,6 +69,7 @@ const initialState: BookingStore = {
 
 export const { state: booking_store, onChange: onRoomTypeChange } = createStore<BookingStore>(initialState);
 function setSelectedVariation(lastVariation: Variation, variations: Variation[], currentVariation: ISelectedVariation): ISelectedVariation {
+  // console.log(lastVariation, variations, currentVariation);
   if (currentVariation?.state === 'default' || !currentVariation || booking_store.resetBooking) {
     return { state: 'default', variation: lastVariation };
   }
@@ -82,7 +83,6 @@ onRoomTypeChange('roomTypes', (newValue: RoomType[]) => {
   // console.log('hellow', newValue);
   const currentSelections = booking_store.ratePlanSelections;
   const ratePlanSelections: { [roomTypeId: number]: IRoomTypeSelection } = {};
-
   newValue.forEach(roomType => {
     if (!roomType.is_active) return;
 
@@ -126,8 +126,7 @@ onRoomTypeChange('roomTypes', (newValue: RoomType[]) => {
             };
     });
   });
-  console.log(booking_store.roomTypes);
-  // console.log(ratePlanSelections);
+  console.log(ratePlanSelections);
   booking_store.ratePlanSelections = ratePlanSelections;
   booking_store.resetBooking = false;
 });

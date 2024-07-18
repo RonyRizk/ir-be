@@ -31,6 +31,7 @@ export class IrInvoice {
   @Prop() footerShown: boolean = true;
   @Prop() locationShown: boolean = true;
   @Prop() be: boolean = false;
+  @Prop() version: string = '2.0';
 
   @State() booking: Booking;
   @State() token: string;
@@ -42,6 +43,8 @@ export class IrInvoice {
   private authService = new AuthService();
   private paymentService = new PaymentService();
   private bookingListingAppService = new BookingListingAppService();
+  private payment_option: AllowedPaymentMethod = null;
+  private amount: number = null;
 
   private alertDialog: HTMLIrAlertDialogElement;
 
@@ -74,10 +77,7 @@ export class IrInvoice {
     }
     return app_store.property.allowed_payment_methods.find(apm => apm.code === code) ?? null;
   }
-  // @Watch('token')
-  // handleTokenChange() {
-  //   this.init();
-  // }
+
   @Watch('bookingNbr')
   async handleBookingNumberChange(newValue, oldValue) {
     if (newValue !== oldValue) {
@@ -110,8 +110,28 @@ export class IrInvoice {
     }
 
     const results = await Promise.all(requests);
-    this.isLoading = false;
     this.booking = results[0];
+    this.payment_option = this.detectPaymentOrigin();
+    await this.setAmount();
+    this.isLoading = false;
+  }
+  async setAmount() {
+    if (this.amount) {
+      return;
+    }
+    const { amount } = await this.paymentService.GetExposedApplicablePolicies({
+      book_date: new Date(this.booking.booked_on.date),
+      token: this.token,
+      params: {
+        booking_nbr: this.booking.booking_nbr,
+        property_id: this.propertyId,
+        room_type_id: 0,
+        rate_plan_id: 0,
+        currency_id: this.booking.currency.id,
+        language: this.language,
+      },
+    });
+    this.amount = amount;
   }
 
   renderBookingDetailHeader() {
@@ -135,7 +155,7 @@ export class IrInvoice {
     if (paymentOption.is_payment_gateway) {
       return (
         <p class="total-payment text-sm">
-          {localizedWords.entries.Lcz_YouHavePaid} <span>{formatAmount(this.booking.financial.total_amount, this.booking.currency.code)}</span>
+          {localizedWords.entries.Lcz_YouHavePaid} <span>{formatAmount(this.amount, this.booking.currency.code)}</span>
         </p>
       );
     }
@@ -171,12 +191,12 @@ export class IrInvoice {
       console.error('Invalid payment method');
       return;
     }
-    if (Number(prePaymentAmount.value) > 0) {
+    if (this.amount || Number(prePaymentAmount.value) > 0) {
       await this.paymentService.GeneratePaymentCaller({
         token: app_store.app_data.token,
         params: {
           booking_nbr: this.booking.booking_nbr,
-          amount: Number(prePaymentAmount.value) ?? 0,
+          amount: Number(this.amount || prePaymentAmount.value) ?? 0,
           currency_id: this.booking.currency.id,
           email: this.booking.guest.email,
           pgw_id: paymentMethod.id.toString(),
@@ -200,7 +220,7 @@ export class IrInvoice {
       );
     }
     const google_maps_url = `http://maps.google.com/maps?q=${app_store.property.location.latitude},${app_store.property.location.longitude}`;
-    const payment_option = this.detectPaymentOrigin();
+
     const { cancel } = this.bookingListingAppService.getBookingActions(this.booking);
     return (
       <Host>
@@ -226,12 +246,12 @@ export class IrInvoice {
                       {localizedWords.entries.Lcz_GetDirections}
                     </a>
                   ) : (
-                    payment_option.is_payment_gateway && <ir-button variants="outline" label="Retry Payment" onButtonClick={() => this.processPayment()}></ir-button>
+                    this.payment_option.is_payment_gateway && <ir-button variants="outline" label="Retry Payment" onButtonClick={() => this.processPayment()}></ir-button>
                   )}
                   <a href={this.getPropertyEmail()} target="_blank" class={cn(`button-outline`, 'flex items-center justify-center')} data-size="sm">
                     Message property
                   </a>
-                  {cancel && (
+                  {cancel.show && (
                     <ir-button
                       class={'w-full md:w-fit'}
                       variants="outline"
@@ -308,7 +328,7 @@ export class IrInvoice {
                   </div>
                 </section>
 
-                {payment_option && (
+                {this.payment_option && (
                   <section class="space-y-2">
                     <div class={'flex items-center gap-4'}>
                       <ir-icons name="credit_card"></ir-icons>
@@ -317,7 +337,7 @@ export class IrInvoice {
                     <p class="total-payment">
                       {localizedWords.entries.Lcz_Total} <span class="text-green-500">{formatAmount(this.booking.financial.gross_total, this.booking.currency.code)}</span>
                     </p>
-                    {this.renderPaymentText(payment_option)}
+                    {this.renderPaymentText(this.payment_option)}
                   </section>
                 )}
 
@@ -373,7 +393,7 @@ export class IrInvoice {
               )}
             </div>
           </section>
-          {this.footerShown && <ir-footer></ir-footer>}
+          {this.footerShown && <ir-footer version={this.version}></ir-footer>}
           <ir-alert-dialog ref={el => (this.alertDialog = el)}>
             <h2 slot="modal-title">Booking Cancellation</h2>
             <p slot="modal-body" class="pt-2" innerHTML={this.booking.rooms[0].rateplan.cancelation}></p>

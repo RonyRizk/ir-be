@@ -20,6 +20,8 @@ interface IPAYLOAD {
   CURRENCY_SYMBOL: string;
   IS_LMD: boolean;
   IS_CALCULATED: boolean;
+  IS_MLS_VIOLATED: boolean;
+  MLS_ALERT: string | null;
 }
 
 class SocketManager {
@@ -180,11 +182,15 @@ export class AvailabiltyService {
 
   private async processPayloads(payloads: IPAYLOAD[]): Promise<void> {
     try {
-      console.log('payload', payloads);
+      // console.log('payload', payloads);
       if (!booking_store.enableBooking) {
         booking_store.enableBooking = true;
       }
+
       payloads.forEach(payload => {
+        if (payload.ROOM_CATEGORY_ID === 2345) {
+          console.log(payload);
+        }
         const selectedRoomTypeIndex = this.roomTypes.findIndex(rt => rt.id === payload.ROOM_CATEGORY_ID);
         if (selectedRoomTypeIndex === -1) {
           console.error('Invalid room type');
@@ -213,6 +219,8 @@ export class AvailabiltyService {
           nights_nbr: this.validateNumberString((payload.NIGHTS_NBR ?? 0)?.toString()) ?? 0,
           total_before_discount: this.validateNumberString((payload.TOTAL_BEFORE_DISCOUNT ?? 0)?.toString()) ?? 0,
           is_calculated: payload.IS_CALCULATED,
+          MLS_ALERT: payload.MLS_ALERT,
+          IS_MLS_VIOLATED: payload.IS_MLS_VIOLATED,
         };
         const variationIndex = oldVariation.findIndex(v => v.adult_child_offering === payload.ADULT_CHILD_OFFERING);
 

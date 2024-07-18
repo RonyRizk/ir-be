@@ -1,6 +1,6 @@
 import BeLogoFooter from '@/assets/be_logo_footer';
 import app_store from '@/stores/app.store';
-import { Component, h } from '@stencil/core';
+import { Component, h, Prop } from '@stencil/core';
 
 @Component({
   tag: 'ir-footer',
@@ -8,6 +8,7 @@ import { Component, h } from '@stencil/core';
   shadow: true,
 })
 export class IrFooter {
+  @Prop() version: string;
   private socials = {
     '006': 'whatsapp',
     '002': 'instagram',
@@ -69,10 +70,10 @@ export class IrFooter {
             })}
           </li>
           <li>
+            <p class="text-end text-xs text-gray-400">V:{this.version} Powered by</p>
             <a href="https://info.igloorooms.com/" target="_blank" title="igloorooms cloud booking solutions for hotels">
-              <BeLogoFooter width={120} height={40} />
+              <BeLogoFooter width={120} height={30} />
             </a>
-            <p class="text-xs text-gray-400">version:2.4</p>
           </li>
         </ul>
         <ir-dialog closeButton ref={el => (this.contactDialog = el)} style={{ '--ir-dialog-max-width': '25rem' }}>

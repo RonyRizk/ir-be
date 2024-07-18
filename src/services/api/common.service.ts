@@ -42,15 +42,16 @@ export class CommonService extends Token {
   public async getUserDefaultCountry() {
     try {
       const token = this.getToken();
-      if (token) {
-        const { data } = await axios.post(`/Get_Country_By_IP?Ticket=${token}`, {
-          IP: '',
-        });
-        if (data.ExceptionMsg !== '') {
-          throw new Error(data.ExceptionMsg);
-        }
-        return data['My_Result'];
+      if (!token) {
+        throw new MissingTokenError();
       }
+      const { data } = await axios.post(`/Get_Country_By_IP?Ticket=${token}`, {
+        IP: '',
+      });
+      if (data.ExceptionMsg !== '') {
+        throw new Error(data.ExceptionMsg);
+      }
+      return data['My_Result'];
     } catch (error) {
       console.error(error);
       throw new Error(error);
@@ -59,17 +60,19 @@ export class CommonService extends Token {
   public async getExposedCountryByIp() {
     try {
       const token = this.getToken();
-      if (token) {
-        const { data } = await axios.post(`/Get_Exposed_Country_By_IP?Ticket=${token}`, {
-          IP: '',
-          lang: 'en',
-        });
-        if (data.ExceptionMsg !== '') {
-          throw new Error(data.ExceptionMsg);
-        }
-        app_store.userDefaultCountry = data['My_Result'];
-        return data['My_Result'];
+      if (!token) {
+        throw new MissingTokenError();
       }
+
+      const { data } = await axios.post(`/Get_Exposed_Country_By_IP?Ticket=${token}`, {
+        IP: '',
+        lang: 'en',
+      });
+      if (data.ExceptionMsg !== '') {
+        throw new Error(data.ExceptionMsg);
+      }
+      app_store.userDefaultCountry = data['My_Result'];
+      return data['My_Result'];
     } catch (error) {
       console.error(error);
       throw new Error(error);
@@ -90,16 +93,17 @@ export class CommonService extends Token {
   public async getExposedLanguage() {
     try {
       const token = this.getToken();
-      if (token !== null) {
-        const { data } = await axios.post(`/Get_Exposed_Language?Ticket=${token}`, { code: app_store.userPreferences.language_id, sections: ['_BE_FRONT'] });
-        if (data.ExceptionMsg !== '') {
-          throw new Error(data.ExceptionMsg);
-        }
-        let entries = this.transformArrayToObject(data.My_Result.entries);
-        localizedWords.entries = { ...localizedWords.entries, ...entries };
-        localizedWords.direction = data.My_Result.direction;
-        return { entries, direction: data.My_Result.direction };
+      if (!token) {
+        throw new MissingTokenError();
       }
+      const { data } = await axios.post(`/Get_Exposed_Language?Ticket=${token}`, { code: app_store.userPreferences.language_id, sections: ['_BE_FRONT'] });
+      if (data.ExceptionMsg !== '') {
+        throw new Error(data.ExceptionMsg);
+      }
+      let entries = this.transformArrayToObject(data.My_Result.entries);
+      localizedWords.entries = { ...localizedWords.entries, ...entries };
+      localizedWords.direction = data.My_Result.direction;
+      return { entries, direction: data.My_Result.direction };
     } catch (error) {
       console.log(error);
       throw new Error(error);

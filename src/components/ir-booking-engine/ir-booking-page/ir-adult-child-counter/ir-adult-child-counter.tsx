@@ -132,44 +132,46 @@ export class IrAdultChildCounter {
               </ir-button>
             </div>
           </div>
-          <div class="counter-item">
-            <div>
-              <p class="main-text">{localizedWords.entries.Lcz_Children}</p>
-              <p class="secondary-text">
-                {localizedWords.entries.Lcz_Ages} 1-{this.childMaxAge}
-              </p>
-            </div>
-            <div class="counter-buttons-group" role="group">
-              <ir-button
-                disabled={this.childrenCount === this.minChildrenCount}
-                variants="icon"
-                onButtonClick={this.decrementChildrenCount.bind(this)}
-                aria-label="Decrease child count"
-                iconName="minus"
-                svgClassName="h-[14px] w-[12.25px]"
-              >
-                {/* <svg slot="btn-icon" xmlns="http://www.w3.org/2000/svg" height="14" width="12.25" viewBox="0 0 448 512">
+          {this.childMaxAge > 0 && (
+            <div class="counter-item">
+              <div>
+                <p class="main-text">{localizedWords.entries.Lcz_Children}</p>
+                <p class="secondary-text">
+                  {localizedWords.entries.Lcz_Ages} 1-{this.childMaxAge}
+                </p>
+              </div>
+              <div class="counter-buttons-group" role="group">
+                <ir-button
+                  disabled={this.childrenCount === this.minChildrenCount}
+                  variants="icon"
+                  onButtonClick={this.decrementChildrenCount.bind(this)}
+                  aria-label="Decrease child count"
+                  iconName="minus"
+                  svgClassName="h-[14px] w-[12.25px]"
+                >
+                  {/* <svg slot="btn-icon" xmlns="http://www.w3.org/2000/svg" height="14" width="12.25" viewBox="0 0 448 512">
                   <path fill="currentColor" d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z" />
                 </svg> */}
-              </ir-button>
-              <p>{this.childrenCount}</p>
-              <ir-button
-                disabled={this.childrenCount === this.maxChildrenCount}
-                variants="icon"
-                onButtonClick={this.incrementChildrenCount.bind(this)}
-                aria-label="Increase child count"
-                iconName="plus"
-                svgClassName="h-[14px] w-[12.25px]"
-              >
-                {/* <svg slot="btn-icon" xmlns="http://www.w3.org/2000/svg" height="14" width="12.25" viewBox="0 0 448 512">
+                </ir-button>
+                <p>{this.childrenCount}</p>
+                <ir-button
+                  disabled={this.childrenCount === this.maxChildrenCount}
+                  variants="icon"
+                  onButtonClick={this.incrementChildrenCount.bind(this)}
+                  aria-label="Increase child count"
+                  iconName="plus"
+                  svgClassName="h-[14px] w-[12.25px]"
+                >
+                  {/* <svg slot="btn-icon" xmlns="http://www.w3.org/2000/svg" height="14" width="12.25" viewBox="0 0 448 512">
                   <path
                     fill="currentColor"
                     d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"
                   />
                 </svg> */}
-              </ir-button>
+                </ir-button>
+              </div>
             </div>
-          </div>
+          )}
           <ir-button
             onButtonClick={this.addChildrenAndAdult.bind(this)}
             size="md"

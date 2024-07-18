@@ -166,8 +166,7 @@ export class IrSignin {
               }}
             ></ir-input>
           </fieldset>
-          {/* <ir-button variants="default" isLoading={this.isLoading} type="submit" class="ir-buttons" label="Sign in" size="md"></ir-button> */}
-          <button class="button-default ir-button text-center" data-size={'md'}>
+          <button type="submit" class="button-default ir-button" data-size={'md'}>
             {this.isLoading && <span class="loader"></span>}
             Sign in
           </button>

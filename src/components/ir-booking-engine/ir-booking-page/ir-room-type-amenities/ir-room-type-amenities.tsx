@@ -15,19 +15,19 @@ export class IrRoomTypeAmenities {
 
     const renderOccupancy = () => (
       <div class="flex items-end">
-        <div class="flex items-center">
+        <div class="flex items-center gap-1">
           <ir-icons svgClassName="size-3" name="user"></ir-icons>
           <p>{adult_nbr}</p>
         </div>
         {children_nbr > 0 && (
-          <div class="flex items-center gap-2">
+          <div class="flex items-center ">
             <ir-icons svgClassName="size-3" name="child"></ir-icons>
             <p>{children_nbr}</p>
           </div>
         )}
       </div>
     );
-    if (maxNumber > 7) {
+    if (maxNumber > 5) {
       return (
         <div class="flex w-full items-center justify-between text-sm">
           <div class="flex items-center gap-2">
@@ -45,6 +45,9 @@ export class IrRoomTypeAmenities {
           <div class="flex items-center">
             {[...Array(adult_nbr)].map((_, i) => (
               <ir-icons svgClassName="size-3" key={i} name="user"></ir-icons>
+            ))}
+            {[...Array(children_nbr)].map((_, i) => (
+              <ir-icons key={i} svgClassName="size-3" name="child"></ir-icons>
             ))}
           </div>
         </div>

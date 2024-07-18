@@ -21,9 +21,11 @@
 
 ## Events
 
-| Event     | Description | Type                                                                                       |
-| --------- | ----------- | ------------------------------------------------------------------------------------------ |
-| `routing` |             | `CustomEvent<"booking" \| "booking-listing" \| "checkout" \| "invoice" \| "user-profile">` |
+| Event           | Description | Type                                                                                       |
+| --------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `routing`       |             | `CustomEvent<"booking" \| "booking-listing" \| "checkout" \| "invoice" \| "user-profile">` |
+| `screenChanged` |             | `CustomEvent<"booking" \| "booking-listing" \| "checkout" \| "invoice" \| "user-profile">` |
+| `signOut`       |             | `CustomEvent<null>`                                                                        |
 
 
 ## Dependencies

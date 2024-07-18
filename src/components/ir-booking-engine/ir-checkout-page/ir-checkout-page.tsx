@@ -11,6 +11,7 @@ import booking_store, { calculateTotalCost, validateBooking } from '@/stores/boo
 import { checkout_store } from '@/stores/checkout.store';
 import { isRequestPending } from '@/stores/ir-interceptor.store';
 import { getDateDifference, runScriptAndRemove } from '@/utils/utils';
+import { ICardProcessing } from '@/validators/checkout.validator';
 import { Component, Host, Listen, State, h, Event, EventEmitter } from '@stencil/core';
 import { ZodError, ZodIssue } from 'zod';
 
@@ -30,16 +31,18 @@ export class IrCheckoutPage {
         cause: 'booking-details' | 'booking-summary';
         issues: string;
       };
+  @State() selectedPaymentMethod: AllowedPaymentMethod | null = null;
+
+  @Event() routing: EventEmitter<pages>;
 
   private propertyService = new PropertyService();
   private paymentService = new PaymentService();
   private authService = new AuthService();
 
-  @Event() routing: EventEmitter<pages>;
-  userForm: HTMLIrUserFormElement;
-  bookingDetails: HTMLIrBookingDetailsElement;
-  pickupForm: HTMLIrPickupElement;
-  errorElement: HTMLElement;
+  private userForm: HTMLIrUserFormElement;
+  private bookingDetails: HTMLIrBookingDetailsElement;
+  private pickupForm: HTMLIrPickupElement;
+  private errorElement: HTMLElement;
 
   componentWillLoad() {
     const token = app_store.app_data.token;
@@ -54,18 +57,48 @@ export class IrCheckoutPage {
     e.stopPropagation();
     this.resetErrorState();
 
-    if (!this.validateUserForm() || !this.validateBookingDetails() || !this.validatePickupForm() || this.validatePolicyAcceptance()) {
+    if (!this.validateUserForm() || !this.validateBookingDetails() || !this.validatePickupForm() || !this.validatePayment() || this.validatePolicyAcceptance()) {
       this.isLoading = false;
       return;
     }
+    // alert('do reservation');
     await this.processBooking();
   }
-  validatePolicyAcceptance(): boolean {
+  private validatePolicyAcceptance(): boolean {
     if (checkout_store.agreed_to_services) {
       return false;
     }
     this.error = { cause: 'booking-summary', issues: 'unchecked aggreement' };
     return true;
+  }
+
+  private validatePayment(): boolean {
+    const currentPayment = app_store.property.allowed_payment_methods.find(p => p.code === checkout_store.payment?.code);
+    this.selectedPaymentMethod = currentPayment;
+    console.log(currentPayment);
+    if (!currentPayment) {
+      console.log('no current payment');
+      return false;
+    }
+    if (currentPayment.is_payment_gateway) {
+      return true;
+    }
+    try {
+      ICardProcessing.parse({
+        code: checkout_store.payment?.code,
+        cardNumber: (checkout_store.payment as any)?.cardHolderName,
+        cardHolderName: checkout_store.payment as any,
+        expiry_month: (checkout_store.payment as any)?.expiry_month?.split('/')[0],
+        expiry_year: (checkout_store.payment as any)?.expiry_month?.split('/')[1],
+        cvc: (checkout_store.payment as any)?.cvc,
+      });
+      return true;
+    } catch (error) {
+      if (error instanceof ZodError) {
+        console.log(error.issues);
+      }
+      return false;
+    }
   }
 
   private resetErrorState() {
@@ -134,15 +167,16 @@ export class IrCheckoutPage {
       if (conversionTag && conversionTag.value) {
         this.modifyConversionTag(conversionTag.value);
       }
-      const currentPayment = app_store.property.allowed_payment_methods.find(p => p.code === checkout_store.payment?.code);
-      if (!currentPayment || !currentPayment?.is_payment_gateway) {
+
+      if (!this.selectedPaymentMethod || !this.selectedPaymentMethod?.is_payment_gateway) {
         app_store.invoice = {
           email: booking_store.booking.guest.email,
           booking_number: booking_store.booking.booking_nbr,
         };
         this.routing.emit('invoice');
       } else {
-        await this.processPayment(result, currentPayment);
+        const paymentAmount = await this.checkPaymentOption(result, app_store.app_data.token);
+        await this.processPayment(result, this.selectedPaymentMethod, paymentAmount);
       }
     } catch (error) {
       console.error('Booking process failed:', error);
@@ -150,6 +184,23 @@ export class IrCheckoutPage {
       this.isLoading = false;
     }
   }
+
+  private async checkPaymentOption(booking: Booking, token: string) {
+    const { amount } = await this.paymentService.GetExposedApplicablePolicies({
+      token,
+      params: {
+        booking_nbr: booking.booking_nbr,
+        property_id: app_store.app_data.property_id,
+        room_type_id: 0,
+        rate_plan_id: 0,
+        currency_id: booking.currency.id,
+        language: app_store.userPreferences.language_id,
+      },
+      book_date: new Date(),
+    });
+    return amount;
+  }
+
   private modifyConversionTag(tag: string) {
     const booking = booking_store.booking;
     tag = tag.replace(/\$\$total_price\$\$/g, booking.financial.total_amount.toString());
@@ -158,7 +209,7 @@ export class IrCheckoutPage {
     tag = tag.replace(/\$\$curr\$\$/g, booking.currency.code.toString());
     runScriptAndRemove(tag);
   }
-  private async processPayment(bookingResult: Booking, currentPayment: AllowedPaymentMethod) {
+  private async processPayment(bookingResult: Booking, currentPayment: AllowedPaymentMethod, paymentAmount: number) {
     let token = app_store.app_data.token;
     if (!app_store.is_signed_in) {
       token = await this.authService.login(
@@ -172,13 +223,17 @@ export class IrCheckoutPage {
         false,
       );
     }
-    const { prePaymentAmount } = calculateTotalCost();
-    if (prePaymentAmount > 0) {
+    let amountToBePayed = paymentAmount;
+    if (!paymentAmount) {
+      const { prePaymentAmount } = calculateTotalCost();
+      amountToBePayed = prePaymentAmount;
+    }
+    if (amountToBePayed > 0) {
       await this.paymentService.GeneratePaymentCaller({
         token,
         params: {
           booking_nbr: bookingResult.booking_nbr,
-          amount: prePaymentAmount,
+          amount: amountToBePayed,
           currency_id: bookingResult.currency.id,
           email: bookingResult.guest.email,
           pgw_id: currentPayment.id.toString(),
@@ -199,7 +254,6 @@ export class IrCheckoutPage {
   }
 
   render() {
-    console.log(isRequestPending('/Get_Setup_Entries_By_TBL_NAME_MULTI') || isRequestPending('/Get_Exposed_Countries'));
     if (isRequestPending('/Get_Setup_Entries_By_TBL_NAME_MULTI') || isRequestPending('/Get_Exposed_Countries')) {
       return <ir-checkout-skeleton></ir-checkout-skeleton>;
     }

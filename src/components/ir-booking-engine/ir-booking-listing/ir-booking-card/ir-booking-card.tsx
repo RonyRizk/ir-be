@@ -1,6 +1,6 @@
 import { Booking } from '@/models/booking.dto';
 import { BookingListingAppService } from '@/services/app/booking-listing.service';
-import { formatAmount } from '@/utils/utils';
+import { formatAmount, formatFullLocation } from '@/utils/utils';
 import { Component, Event, EventEmitter, Prop, Watch, h } from '@stencil/core';
 import { differenceInCalendarDays, format } from 'date-fns';
 
@@ -47,6 +47,12 @@ export class IrBookingCard {
     const { cancel, payment, view } = this.bookingListingAppService.getBookingActions(this.booking);
     return (
       <div class="relative flex flex-col space-y-1.5 rounded-xl  bg-gray-100 p-6 text-sm " key={this.booking.booking_nbr}>
+        {!this.aff && (
+          <div class="">
+            <span class="font-medium">{this.booking.property.name}</span>
+            <span class="mx-2 text-xs text-gray-700">{formatFullLocation(this.booking.property)}</span>
+          </div>
+        )}
         <div class="flex items-center justify-between text-base">
           <h3 class=" font-semibold leading-none tracking-tight">Booking reference: {this.booking.booking_nbr}</h3>
           <p class={'font-semibold'}>{formatAmount(this.booking.total, this.booking.currency.code)}</p>

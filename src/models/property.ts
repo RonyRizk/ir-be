@@ -29,6 +29,7 @@ export interface IExposedProperty {
   pets_acceptance: PetsAcceptance;
   phone: string;
   postal: string;
+  perma_link: string;
   pickup_service: PickupService;
   roomtypes: RoomType[];
   social_media: SocialMedia[];
@@ -333,6 +334,8 @@ export interface Variation {
   nights_nbr: number;
   total_before_discount: number;
   is_calculated?: boolean;
+  IS_MLS_VIOLATED?: boolean;
+  MLS_ALERT?: string;
 }
 export interface Assignableunit {
   Is_Fully_Available: boolean;
@@ -427,4 +430,16 @@ export interface ISetupEntries {
   arrivalTime: IEntries[];
   ratePricingMode: IEntries[];
   bedPreferenceType: IEntries[];
+}
+export interface IExposedApplicablePolicies {
+  type: 'guarantee' | 'cancelation';
+  brackets: IBrackets[];
+}
+export interface IBrackets {
+  due_on: string;
+  code: string;
+  statement: string;
+  amount: number;
+  currency_id: number;
+  gross_amount: number;
 }

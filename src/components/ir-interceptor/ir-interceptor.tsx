@@ -12,8 +12,10 @@ export class IrInterceptor {
   @State() isShown = false;
   @State() isLoading = false;
   @State() isUnassignedUnit = false;
+  @State() errorMessage: string | null = null;
 
   @Prop({ reflect: true }) handledEndpoints = ['/ReAllocate_Exposed_Room', '/Do_Payment', '/Get_Exposed_Bookings'];
+  alertRef: HTMLIrAlertDialogElement;
   //@Event({ bubbles: true, composed: true }) toast: EventEmitter<IToast>;
   componentWillLoad() {
     this.setupAxiosInterceptors();
@@ -42,6 +44,7 @@ export class IrInterceptor {
   }
 
   handleResponse(response: AxiosResponse) {
+    console.log('handleResponse');
     const extractedUrl = this.extractEndpoint(response.config.url);
     if (this.isHandledEndpoint(extractedUrl)) {
       this.isLoading = false;
@@ -55,24 +58,26 @@ export class IrInterceptor {
   }
 
   handleError(error: string) {
-    // this.toast.emit({
-    //   type: 'error',
-    //   title: error,
-    //   description: '',
-    //   position: 'top-right',
-    // });
+    console.log('error', error);
+    this.errorMessage = error;
+    this.alertRef.openModal();
     return Promise.reject(error);
   }
   render() {
     return (
       <Host>
-        {this.isLoading && (
-          <div class="loadingScreenContainer">
-            <div class="loaderContainer">
-              <span class="loader"></span>
-            </div>
+        <ir-alert-dialog ref={el => (this.alertRef = el)}>
+          <h1 slot="modal-title" class={'flex items-center'}>
+            {' '}
+            <ir-icons name="danger"></ir-icons>
+            <span>Something went wrong!</span>
+          </h1>
+          <div slot="modal-body">
+            <p>{this.errorMessage}</p>
+            <button>Cancel</button>
+            <button>Ok</button>
           </div>
-        )}
+        </ir-alert-dialog>
       </Host>
     );
   }

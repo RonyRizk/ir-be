@@ -1,5 +1,5 @@
 import { ICurrency } from '@/components';
-import { Assignableunit } from '@/models/property';
+import { Assignableunit, IExposedProperty } from '@/models/property';
 import app_store, { changeLocale, updateUserPreference } from '@/stores/app.store';
 import clsx, { ClassValue } from 'clsx';
 import { addDays, differenceInCalendarDays, format, Locale } from 'date-fns';
@@ -96,6 +96,7 @@ export function runScriptAndRemove(scriptContent: string): void {
   document.body.appendChild(script);
   document.body.removeChild(script);
 }
+
 export function setDefaultLocale({ currency }: { currency: ICurrency }) {
   app_store.userPreferences = {
     ...app_store.userPreferences,
@@ -154,4 +155,20 @@ export function injectHTML(htmlContent: string, target: 'head' | 'body' = 'body'
   } else {
     destination.appendChild(element);
   }
+}
+export function checkAffiliate(afName: string) {
+  if (afName) {
+    const affiliate = app_store?.property?.affiliates.find(aff => aff.afname.toLowerCase().trim() === afName);
+    if (!affiliate) {
+      return null;
+    }
+    return affiliate;
+  }
+  return null;
+}
+export function formatFullLocation(property: IExposedProperty) {
+  return [property?.area ?? null, property?.city?.name ?? null, property?.country?.name ?? null].filter(f => f !== null).join(', ');
+}
+export function formatImageAlt(alt: string | null, roomTypeName: string | null = null) {
+  return [roomTypeName, alt, `${app_store.property.name}, ${app_store.property.country.name}`].filter(f => f !== null).join(' - ');
 }
