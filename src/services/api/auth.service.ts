@@ -12,7 +12,7 @@ interface BaseLoginParams {
 
 interface GoogleLoginParams extends BaseLoginParams {
   option: 'google';
-  token: string;
+  google_token: string;
 }
 
 interface DirectLoginParams extends BaseLoginParams {
@@ -144,7 +144,7 @@ export class AuthService extends Token {
 
   private async handleCredentialResponse(response) {
     try {
-      const token = await this.login({ option: 'google', token: response.credential });
+      const token = await this.login({ option: 'google', google_token: response.credential });
       return { state: 'success', token };
     } catch (error) {
       console.error('Error during Google Sign-In:', error);

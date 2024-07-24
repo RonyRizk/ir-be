@@ -70,7 +70,7 @@ export class IrFooter {
             })}
           </li>
           <li>
-            <p class="text-end text-xs text-gray-400">V:{this.version} Powered by</p>
+            <p class="text-end text-xs text-gray-400">V{this.version} - Powered by</p>
             <a href="https://info.igloorooms.com/" target="_blank" title="igloorooms cloud booking solutions for hotels">
               <BeLogoFooter width={120} height={30} />
             </a>

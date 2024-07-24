@@ -42,6 +42,7 @@ export class IrBookingEngine {
   @Prop() property: IExposedProperty | null = null;
   @Prop() source: TSource | null = null;
   @Prop() version: string = '2.0';
+  @Prop() hideGoogleSignIn: boolean = true;
 
   @State() selectedLocale: Locale;
   @State() currencies: ICurrency[];
@@ -120,6 +121,7 @@ export class IrBookingEngine {
       affiliate: null,
       tag: this.stag,
       source: this.source,
+      hideGoogleSignIn: this.hideGoogleSignIn,
     };
     this.initRequest();
   }

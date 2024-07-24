@@ -26,6 +26,7 @@ export class IrBookingListing {
   @Prop() startScreen: { screen: 'bookings' | 'booking-details'; params: unknown } = { screen: 'bookings', params: null };
   @Prop() aff: string = null;
   @Prop() version: string = '2.0';
+  @Prop() hideGoogleSignIn: boolean = true;
 
   @State() isLoading = false;
   @State() token: string;
@@ -39,7 +40,7 @@ export class IrBookingListing {
 
   async componentWillLoad() {
     axios.defaults.baseURL = this.baseUrl;
-
+    app_store.app_data.hideGoogleSignIn = this.hideGoogleSignIn;
     if (!this.propertyid) {
       throw new Error('missing property id');
     }

@@ -170,11 +170,13 @@ export class IrSignin {
             {this.isLoading && <span class="loader"></span>}
             Sign in
           </button>
-          <div class="divider">
-            <div class="divider-line"></div>
-            <span class="divider-text">OR</span>
-            <div class="divider-line"></div>
-          </div>
+          {!app_store.app_data.hideGoogleSignIn && (
+            <div class="divider">
+              <div class="divider-line"></div>
+              <span class="divider-text">OR</span>
+              <div class="divider-line"></div>
+            </div>
+          )}
         </form>
         {/* {this.enableSignUp && (
           <div class="flex items-center justify-center">

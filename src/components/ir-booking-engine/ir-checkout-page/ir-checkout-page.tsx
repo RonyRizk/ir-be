@@ -273,7 +273,7 @@ export class IrCheckoutPage {
               ></ir-button>
               <p class="text-2xl font-semibold">Complete your booking</p>
             </div>
-            {!app_store.is_signed_in && (
+            {!app_store.is_signed_in && !app_store.app_data.hideGoogleSignIn && (
               <div>
                 <ir-quick-auth></ir-quick-auth>
               </div>

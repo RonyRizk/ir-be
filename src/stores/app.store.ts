@@ -34,6 +34,7 @@ export interface IAppStore {
     affiliate: Affiliate;
     tag: string | null;
     source: TSource | null;
+    hideGoogleSignIn: boolean;
   };
   property: IExposedProperty;
   setup_entries: {
@@ -72,6 +73,7 @@ const initialState: IAppStore = {
     redirect_url: null,
     tag: null,
     source: null,
+    hideGoogleSignIn: false,
   },
   property: undefined,
   setup_entries: undefined,

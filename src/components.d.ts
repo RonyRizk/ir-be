@@ -106,6 +106,7 @@ export namespace Components {
         "childrenCount": string;
         "cur": string;
         "fromDate": string;
+        "hideGoogleSignIn": boolean;
         "injected": boolean;
         "language": string;
         "perma_link": string;
@@ -132,6 +133,7 @@ export namespace Components {
         "be": boolean;
         "footerShown": boolean;
         "headerShown": boolean;
+        "hideGoogleSignIn": boolean;
         "language": string;
         "maxPages": number;
         "perma_link": string;
@@ -1769,6 +1771,7 @@ declare namespace LocalJSX {
         "childrenCount"?: string;
         "cur"?: string;
         "fromDate"?: string;
+        "hideGoogleSignIn"?: boolean;
         "injected"?: boolean;
         "language"?: string;
         "perma_link"?: string;
@@ -1796,6 +1799,7 @@ declare namespace LocalJSX {
         "be"?: boolean;
         "footerShown"?: boolean;
         "headerShown"?: boolean;
+        "hideGoogleSignIn"?: boolean;
         "language"?: string;
         "maxPages"?: number;
         "perma_link"?: string;
