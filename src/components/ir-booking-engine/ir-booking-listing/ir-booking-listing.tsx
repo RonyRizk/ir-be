@@ -14,7 +14,7 @@ import axios from 'axios';
 })
 export class IrBookingListing {
   @Prop() propertyid: number;
-  @Prop() baseUrl: string;
+  @Prop() baseUrl: string = 'https://gateway.igloorooms.com/IRBE';
   @Prop() language: string;
   @Prop() headerShown: boolean = true;
   @Prop() footerShown: boolean = true;
@@ -41,9 +41,6 @@ export class IrBookingListing {
   async componentWillLoad() {
     axios.defaults.baseURL = this.baseUrl;
     app_store.app_data.hideGoogleSignIn = this.hideGoogleSignIn;
-    if (!this.propertyid) {
-      throw new Error('missing property id');
-    }
     this.currentPage = this.startScreen.screen;
     this.selectedBooking = (this.startScreen.params as any) ?? null;
     getUserPrefernce();
@@ -59,7 +56,9 @@ export class IrBookingListing {
       }
     }
     this.initializeServices();
-    this.initializeApp();
+    if (!this.be) {
+      this.initializeApp();
+    }
   }
 
   @Watch('aff')
@@ -88,6 +87,7 @@ export class IrBookingListing {
         requests = [
           ...requests,
           this.commonService.getExposedLanguage(),
+          this.commonService.getCurrencies(),
           this.propertyService.getExposedProperty({
             id: this.propertyid,
             language: app_store.userPreferences?.language_id || 'en',
@@ -112,6 +112,9 @@ export class IrBookingListing {
   handleAuthFinish(e: CustomEvent) {
     e.stopImmediatePropagation();
     e.stopPropagation();
+    if (this.be) {
+      return;
+    }
     const { token, state, payload } = e.detail;
     if (state === 'success') {
       if (payload.method === 'direct') {
@@ -148,7 +151,7 @@ export class IrBookingListing {
           <ir-booking-overview
             aff={this.isAffiliate}
             token={this.token}
-            propertyid={this.propertyid}
+            propertyid={app_store.app_data.property_id}
             language={this.language}
             maxPages={this.maxPages}
             showAllBookings={this.showAllBookings}
@@ -157,7 +160,7 @@ export class IrBookingListing {
         );
       case 'booking-details':
         return (
-          <div>
+          <div class={this.be ? '' : 'mx-auto px-4 lg:px-6'}>
             <div class="header-left">
               <ir-button
                 variants="icon"
@@ -175,8 +178,9 @@ export class IrBookingListing {
             <ir-invoice
               locationShown={false}
               headerShown={false}
+              headerMessageShown={false}
               footerShown={false}
-              propertyId={this.propertyid}
+              propertyId={app_store.app_data.property_id}
               perma_link={this.perma_link}
               aName={this.aName}
               language={this.language}
@@ -211,7 +215,7 @@ export class IrBookingListing {
           <ir-booking-overview
             aff={this.isAffiliate}
             token={this.token}
-            propertyid={this.propertyid}
+            propertyid={app_store.app_data.property_id}
             language={this.language}
             maxPages={this.maxPages}
             showAllBookings={this.showAllBookings}

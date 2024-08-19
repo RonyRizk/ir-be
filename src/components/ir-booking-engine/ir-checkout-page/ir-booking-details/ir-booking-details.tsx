@@ -1,4 +1,5 @@
 import { ISmokingOption, RatePlan, RoomType, Variation } from '@/models/property';
+import { PaymentService } from '@/services/api/payment.service';
 import { PropertyService } from '@/services/api/property.service';
 import app_store from '@/stores/app.store';
 import booking_store, { IRatePlanSelection } from '@/stores/booking';
@@ -18,13 +19,16 @@ export class IrBookingDetails {
   @Prop() errors: string;
   @State() currentRatePlan: RatePlan | null = null;
   @State() isLoading: number = null;
+  @State() cancelationMessage: string;
 
   private dialogRef: HTMLIrDialogElement;
   private firstRoom: { roomtypeId: string; ratePlanId: string };
   private propertyService = new PropertyService();
+  private paymentService = new PaymentService();
 
   componentWillLoad() {
     this.propertyService.setToken(app_store.app_data.token);
+    this.paymentService.setToken(app_store.app_data.token);
     this.modifyBookings();
     onCheckoutDataChange('userFormData', newValue => {
       if (!checkout_store.modifiedGuestName) {
@@ -57,7 +61,7 @@ export class IrBookingDetails {
           if (!checkout_store.modifiedGuestName && r.guestName?.length === 0) {
             const name = [...new Array(r.reserved)].map((_, i) => {
               if (i === 0 && !checkout_store.userFormData.bookingForSomeoneElse && this.firstRoom.roomtypeId === roomTypeId && this.firstRoom.ratePlanId === ratePlanId) {
-                return (checkout_store.userFormData?.firstName || '') + ' ' + (checkout_store.userFormData?.lastName || '') ?? '';
+                return (checkout_store.userFormData?.firstName || '') + ' ' + (checkout_store.userFormData?.lastName || '') || '';
               }
               return '';
             });
@@ -225,7 +229,9 @@ export class IrBookingDetails {
       },
     };
   }
-
+  async fetchCancelationMessage(id: number, roomTypeId: number) {
+    this.cancelationMessage = (await this.paymentService.fetchCancelationMessage({ id, roomTypeId })).message;
+  }
   renderSmokingView(smoking_option: ISmokingOption, index: number, ratePlanId: string, roomTypeId: string, checkoutSmokingSelection: string[]) {
     if (smoking_option.code === '002') {
       return null;
@@ -288,7 +294,7 @@ export class IrBookingDetails {
                             <div class="flex flex-row items-center gap-3 ">
                               <h3 class="font-semibold">{r.roomtype.name}</h3>
                               {r.ratePlan.is_non_refundable ? (
-                                <p class="text-xs text-green-500">Non refundable</p>
+                                <p class="text-xs text-[var(--ir-green)]">Non refundable</p>
                               ) : (
                                 <div class={'inline-flex  h-6 items-center justify-center pt-0.5'}>
                                   <ir-button
@@ -297,8 +303,9 @@ export class IrBookingDetails {
                                     class="text-sm"
                                     buttonClassName="pl-0"
                                     buttonStyles={{ paddingLeft: '0', fontSize: '12px', paddingTop: '0', paddingBottom: '0' }}
-                                    onButtonClick={() => {
+                                    onButtonClick={async () => {
                                       this.currentRatePlan = r.ratePlan;
+                                      await this.fetchCancelationMessage(r.ratePlan.id, r.roomtype.id);
                                       this.dialogRef.openModal();
                                     }}
                                     label={localizedWords.entries.Lcz_IfICancel}
@@ -401,9 +408,9 @@ export class IrBookingDetails {
             }
           }}
         >
-          <div slot="modal-body" class="p-4 md:p-6">
-            <p innerHTML={this.currentRatePlan?.cancelation}></p>
-            <p innerHTML={this.currentRatePlan?.guarantee}></p>
+          <div slot="modal-body" class="p-6 ">
+            <p class={'px-6'} innerHTML={this.cancelationMessage || this.currentRatePlan?.cancelation}></p>
+            <p class={'px-6'} innerHTML={this.currentRatePlan?.guarantee}></p>
           </div>
         </ir-dialog>
       </Host>

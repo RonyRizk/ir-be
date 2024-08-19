@@ -122,7 +122,7 @@ export class CommonService extends Token {
   private transformArrayToObject(data: any) {
     let object: any = {};
     for (const d of data) {
-      object[d.code] = d.description;
+      object[d.code] = `${d.description}`;
     }
     return object;
   }

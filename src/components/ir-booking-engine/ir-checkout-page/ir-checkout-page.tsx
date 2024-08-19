@@ -1,5 +1,5 @@
 import { Booking } from '@/models/booking.dto';
-import { pages } from '@/models/common';
+import { CheckoutErrors, pages } from '@/models/commun';
 import { PickupFormData } from '@/models/pickup';
 import { AllowedPaymentMethod } from '@/models/property';
 import { IrUserFormData } from '@/models/user_form';
@@ -7,11 +7,11 @@ import { AuthService } from '@/services/api/auth.service';
 import { PaymentService } from '@/services/api/payment.service';
 import { PropertyService } from '@/services/api/property.service';
 import app_store from '@/stores/app.store';
-import booking_store, { calculateTotalCost, validateBooking } from '@/stores/booking';
+import booking_store, { IRatePlanSelection, validateBooking } from '@/stores/booking';
 import { checkout_store } from '@/stores/checkout.store';
 import { isRequestPending } from '@/stores/ir-interceptor.store';
-import { getDateDifference, runScriptAndRemove } from '@/utils/utils';
-import { ICardProcessing } from '@/validators/checkout.validator';
+import { destroyBookingCookie, getDateDifference, runScriptAndRemove } from '@/utils/utils';
+import { ZCreditCardSchemaWithCvc } from '@/validators/checkout.validator';
 import { Component, Host, Listen, State, h, Event, EventEmitter } from '@stencil/core';
 import { ZodError, ZodIssue } from 'zod';
 
@@ -22,16 +22,9 @@ import { ZodError, ZodIssue } from 'zod';
 })
 export class IrCheckoutPage {
   @State() isLoading = false;
-  @State() error:
-    | {
-        cause: 'user' | 'pickup';
-        issues: Record<string, ZodIssue>;
-      }
-    | {
-        cause: 'booking-details' | 'booking-summary';
-        issues: string;
-      };
+  @State() error: CheckoutErrors;
   @State() selectedPaymentMethod: AllowedPaymentMethod | null = null;
+  @State() prepaymentAmount: number;
 
   @Event() routing: EventEmitter<pages>;
 
@@ -44,13 +37,50 @@ export class IrCheckoutPage {
   private pickupForm: HTMLIrPickupElement;
   private errorElement: HTMLElement;
 
-  componentWillLoad() {
-    const token = app_store.app_data.token;
-    this.propertyService.setToken(token);
-    this.paymentService.setToken(token);
-    this.authService.setToken(token);
+  async componentWillLoad() {
+    try {
+      this.isLoading = true;
+      const token = app_store.app_data.token;
+      this.propertyService.setToken(token);
+      this.paymentService.setToken(token);
+      this.authService.setToken(token);
+      await this.calculateTotalPrepaymentAmount();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.isLoading = false;
+    }
   }
-
+  private async calculateTotalPrepaymentAmount() {
+    let list: { booking_nbr: string; ratePlanId: number; roomTypeId: number }[] = [];
+    Object.keys(booking_store.ratePlanSelections).map(roomTypeId => {
+      return Object.keys(booking_store.ratePlanSelections[roomTypeId]).map(ratePlanId => {
+        const r: IRatePlanSelection = booking_store.ratePlanSelections[roomTypeId][ratePlanId];
+        if (r.reserved === 0) {
+          return null;
+        }
+        list.push({ booking_nbr: booking_store.fictus_booking_nbr.nbr, ratePlanId: r.ratePlan.id, roomTypeId: r.roomtype.id });
+      });
+    });
+    let requests = await Promise.all(
+      list.map(l =>
+        this.paymentService.GetExposedApplicablePolicies({
+          token: app_store.app_data.token,
+          book_date: new Date(),
+          params: {
+            booking_nbr: l.booking_nbr,
+            currency_id: app_store.currencies.find(c => c.code.toLowerCase() === (app_store.userPreferences.currency_id.toLowerCase() || 'usd')).id,
+            language: app_store.userPreferences.language_id,
+            rate_plan_id: l.ratePlanId,
+            room_type_id: l.roomTypeId,
+            property_id: app_store.property.id,
+          },
+        }),
+      ),
+    );
+    this.prepaymentAmount = requests.reduce((prev, curr) => prev + curr.amount, 0);
+    console.log(requests);
+  }
   @Listen('bookingClicked')
   async handleBooking(e: CustomEvent) {
     e.stopImmediatePropagation();
@@ -58,10 +88,9 @@ export class IrCheckoutPage {
     this.resetErrorState();
 
     if (!this.validateUserForm() || !this.validateBookingDetails() || !this.validatePickupForm() || !this.validatePayment() || this.validatePolicyAcceptance()) {
-      this.isLoading = false;
       return;
     }
-    // alert('do reservation');
+
     await this.processBooking();
   }
   private validatePolicyAcceptance(): boolean {
@@ -84,18 +113,17 @@ export class IrCheckoutPage {
       return true;
     }
     try {
-      ICardProcessing.parse({
-        code: checkout_store.payment?.code,
-        cardNumber: (checkout_store.payment as any)?.cardHolderName,
-        cardHolderName: checkout_store.payment as any,
-        expiry_month: (checkout_store.payment as any)?.expiry_month?.split('/')[0],
-        expiry_year: (checkout_store.payment as any)?.expiry_month?.split('/')[1],
+      ZCreditCardSchemaWithCvc.parse({
+        cardNumber: (checkout_store.payment as any)?.cardNumber?.replace(/ /g, ''),
+        cardHolderName: (checkout_store.payment as any).cardHolderName,
+        expiryDate: (checkout_store.payment as any)?.expiry_month,
         cvc: (checkout_store.payment as any)?.cvc,
       });
       return true;
     } catch (error) {
       if (error instanceof ZodError) {
         console.log(error.issues);
+        this.handleError('payment', error);
       }
       return false;
     }
@@ -103,7 +131,6 @@ export class IrCheckoutPage {
 
   private resetErrorState() {
     this.error = undefined;
-    this.isLoading = true;
   }
 
   private validateUserForm(): boolean {
@@ -148,15 +175,17 @@ export class IrCheckoutPage {
     return true;
   }
 
-  handleError(cause: 'pickup' | 'user', error: ZodError<any>) {
+  handleError(cause: 'pickup' | 'user' | 'payment', error: ZodError<any>) {
     let issues: Record<string, ZodIssue> = {};
     error.issues.map(issue => (issues[issue.path[0]] = issue));
     this.error = {
       cause,
       issues,
     };
-    this.errorElement = cause === 'pickup' ? this.pickupForm : this.userForm;
-    this.scrollToError();
+    this.errorElement = cause === 'pickup' ? this.pickupForm : cause === 'user' ? this.userForm : null;
+    if (cause !== 'payment') {
+      this.scrollToError();
+    }
   }
 
   private async processBooking() {
@@ -175,31 +204,42 @@ export class IrCheckoutPage {
         };
         this.routing.emit('invoice');
       } else {
-        const paymentAmount = await this.checkPaymentOption(result, app_store.app_data.token);
-        await this.processPayment(result, this.selectedPaymentMethod, paymentAmount);
+        let token = app_store.app_data.token;
+        if (!app_store.is_signed_in) {
+          token = await this.authService.login(
+            {
+              option: 'direct',
+              params: {
+                email: result.guest.email,
+                booking_nbr: result.booking_nbr,
+              },
+            },
+            false,
+          );
+        }
+        const paymentAmount = this.prepaymentAmount;
+        await this.processPayment(result, this.selectedPaymentMethod, paymentAmount, token);
       }
     } catch (error) {
       console.error('Booking process failed:', error);
-    } finally {
-      this.isLoading = false;
     }
   }
 
-  private async checkPaymentOption(booking: Booking, token: string) {
-    const { amount } = await this.paymentService.GetExposedApplicablePolicies({
-      token,
-      params: {
-        booking_nbr: booking.booking_nbr,
-        property_id: app_store.app_data.property_id,
-        room_type_id: 0,
-        rate_plan_id: 0,
-        currency_id: booking.currency.id,
-        language: app_store.userPreferences.language_id,
-      },
-      book_date: new Date(),
-    });
-    return amount;
-  }
+  // private async checkPaymentOption(booking: Booking, token: string) {
+  //   const { amount } = await this.paymentService.GetExposedApplicablePolicies({
+  //     token,
+  //     params: {
+  //       booking_nbr: booking.booking_nbr,
+  //       property_id: app_store.app_data.property_id,
+  //       room_type_id: 0,
+  //       rate_plan_id: 0,
+  //       currency_id: booking.currency.id,
+  //       language: app_store.userPreferences.language_id,
+  //     },
+  //     book_date: new Date(),
+  //   });
+  //   return amount;
+  // }
 
   private modifyConversionTag(tag: string) {
     const booking = booking_store.booking;
@@ -209,24 +249,10 @@ export class IrCheckoutPage {
     tag = tag.replace(/\$\$curr\$\$/g, booking.currency.code.toString());
     runScriptAndRemove(tag);
   }
-  private async processPayment(bookingResult: Booking, currentPayment: AllowedPaymentMethod, paymentAmount: number) {
-    let token = app_store.app_data.token;
-    if (!app_store.is_signed_in) {
-      token = await this.authService.login(
-        {
-          option: 'direct',
-          params: {
-            email: bookingResult.guest.email,
-            booking_nbr: bookingResult.booking_nbr,
-          },
-        },
-        false,
-      );
-    }
+  private async processPayment(bookingResult: Booking, currentPayment: AllowedPaymentMethod, paymentAmount: number, token) {
     let amountToBePayed = paymentAmount;
-    if (!paymentAmount) {
-      const { prePaymentAmount } = calculateTotalCost();
-      amountToBePayed = prePaymentAmount;
+    if (app_store.app_data.isFromGhs) {
+      destroyBookingCookie();
     }
     if (amountToBePayed > 0) {
       await this.paymentService.GeneratePaymentCaller({
@@ -254,12 +280,17 @@ export class IrCheckoutPage {
   }
 
   render() {
-    if (isRequestPending('/Get_Setup_Entries_By_TBL_NAME_MULTI') || isRequestPending('/Get_Exposed_Countries')) {
-      return <ir-checkout-skeleton></ir-checkout-skeleton>;
+    console.log(isRequestPending('/Get_Setup_Entries_By_TBL_NAME_MULTI'));
+    if (this.isLoading) {
+      return (
+        <div class={'flex min-h-screen flex-col'}>
+          <ir-checkout-skeleton></ir-checkout-skeleton>
+        </div>
+      );
     }
     return (
       <Host>
-        <main class="flex w-full  flex-col justify-between gap-4  md:flex-row md:items-start">
+        <main class="flex min-h-screen w-full  flex-col justify-between gap-4  md:flex-row md:items-start">
           <section class="w-full space-y-4 md:max-w-4xl">
             <div class="flex items-center gap-2.5">
               <ir-button
@@ -294,7 +325,7 @@ export class IrCheckoutPage {
             </div>
           </section>
           <section class="w-full md:sticky  md:top-20  md:flex md:max-w-md md:justify-end">
-            <ir-booking-summary error={this.error && this.error.cause === 'booking-summary' ? true : false} isLoading={this.isLoading}></ir-booking-summary>
+            <ir-booking-summary prepaymentAmount={this.prepaymentAmount} error={this.error}></ir-booking-summary>
           </section>
         </main>
       </Host>

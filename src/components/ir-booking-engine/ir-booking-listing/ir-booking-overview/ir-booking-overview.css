@@ -32,3 +32,14 @@
 .group-hover[data-state='hovered'] {
   background: var(--gray-100, #f2f4f7) !important; /* Example hover color */
 }
+.ir-table-cell[data-state='affiliate'] {
+  padding-bottom: 0;
+}
+.ir-table-cell[data-state='booking-affiliate'] {
+  padding-top: 0.5rem;
+}
+.property-location {
+  font-weight: 500;
+  font-size: small;
+  color: #475467;
+}

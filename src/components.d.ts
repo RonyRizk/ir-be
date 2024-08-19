@@ -6,10 +6,10 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Amenity, BeddingSetup, IExposedProperty, RatePlan, RoomType } from "./models/property";
-import { Booking } from "./models/booking.dto";
 import { TSource } from "./stores/app.store";
-import { ICurrency, IExposedLanguages, pages } from "./models/common";
-import { TContainerStyle } from "./components/ir-booking-widget/types";
+import { TBookingInfo } from "./services/api/payment.service";
+import { Booking } from "./models/booking.dto";
+import { CheckoutErrors, ICurrency, IExposedLanguages, pages } from "./models/commun";
 import { TIcons } from "./components/ui/ir-icons/icons";
 import { IDateModifiers } from "./components/ui/ir-date-range/ir-date-range.types";
 import { Locale } from "date-fns";
@@ -20,11 +20,12 @@ import { IRatePlanSelection } from "./stores/booking";
 import { TAuthNavigation } from "./components/ir-booking-engine/ir-nav/ir-auth/auth.types";
 import { TSignInAuthTrigger, TSignUpAuthTrigger } from "./validators/auth.validator";
 import { TGuest } from "./models/user_form";
+import { TContainerStyle } from "./components/ir-booking-widget/types";
 export { Amenity, BeddingSetup, IExposedProperty, RatePlan, RoomType } from "./models/property";
-export { Booking } from "./models/booking.dto";
 export { TSource } from "./stores/app.store";
-export { ICurrency, IExposedLanguages, pages } from "./models/common";
-export { TContainerStyle } from "./components/ir-booking-widget/types";
+export { TBookingInfo } from "./services/api/payment.service";
+export { Booking } from "./models/booking.dto";
+export { CheckoutErrors, ICurrency, IExposedLanguages, pages } from "./models/commun";
 export { TIcons } from "./components/ui/ir-icons/icons";
 export { IDateModifiers } from "./components/ui/ir-date-range/ir-date-range.types";
 export { Locale } from "date-fns";
@@ -35,6 +36,7 @@ export { IRatePlanSelection } from "./stores/booking";
 export { TAuthNavigation } from "./components/ir-booking-engine/ir-nav/ir-auth/auth.types";
 export { TSignInAuthTrigger, TSignUpAuthTrigger } from "./validators/auth.validator";
 export { TGuest } from "./models/user_form";
+export { TContainerStyle } from "./components/ir-booking-widget/types";
 export namespace Components {
     interface IrAccomodations {
         "amenities": Amenity[];
@@ -81,9 +83,36 @@ export namespace Components {
     }
     interface IrBanner {
     }
+    interface IrBe {
+        "adults": string;
+        "aff": string;
+        "agent_code": string;
+        "checkin": string;
+        "checkout": string;
+        "child": string;
+        "coupon": string;
+        "cur": string;
+        "hideGoogleSignIn": boolean;
+        "injected": boolean;
+        "language": string;
+        "loyalty": boolean;
+        "p": string;
+        "perma_link": string;
+        "property": IExposedProperty | null;
+        "propertyId": number;
+        "rp_id": number;
+        "rt_id": number;
+        "source": TSource | null;
+        "stag": string | null;
+        "token": string;
+        "version": string;
+    }
     interface IrBookingCancelation {
+        "booking": Booking;
         "booking_nbr": string;
         "cancelation": string;
+        "cancelation_policies": TBookingInfo[];
+        "currency": { code: string; id: number };
         "openDialog": () => Promise<void>;
     }
     interface IrBookingCard {
@@ -97,29 +126,6 @@ export namespace Components {
     }
     interface IrBookingDetailsView {
         "booking": Booking | null;
-    }
-    interface IrBookingEngine {
-        "aName": string;
-        "adultCount": string;
-        "aff": string;
-        "baseUrl": string;
-        "childrenCount": string;
-        "cur": string;
-        "fromDate": string;
-        "hideGoogleSignIn": boolean;
-        "injected": boolean;
-        "language": string;
-        "perma_link": string;
-        "property": IExposedProperty | null;
-        "propertyId": number;
-        "rateplan_id": number;
-        "redirect_url": string;
-        "roomtype_id": number;
-        "source": TSource | null;
-        "stag": string | null;
-        "toDate": string;
-        "token": string;
-        "version": string;
     }
     interface IrBookingHeader {
         "activeLink": 'single_booking' | 'all_booking';
@@ -158,18 +164,8 @@ export namespace Components {
         "toDate": string;
     }
     interface IrBookingSummary {
-        "error": boolean;
-        "isLoading": boolean;
-    }
-    interface IrBookingWidget {
-        "aName": string;
-        "baseUrl": string;
-        "contentContainerStyle": TContainerStyle;
-        "language": string;
-        "perma_link": string;
-        "position": 'sticky' | 'block';
-        "propertyId": number;
-        "roomTypeId": string | null;
+        "error": CheckoutErrors;
+        "prepaymentAmount": any;
     }
     interface IrButton {
         "buttonClassName": string;
@@ -201,7 +197,11 @@ export namespace Components {
         "toDate": Date | null;
     }
     interface IrCarousel {
+        "activeIndex": number;
+        "carouselClasses": string;
+        "enableCarouselSwipe": boolean;
         "slides": TCarouselSlides[];
+        "styles": Partial<CSSStyleDeclaration>;
     }
     interface IrCheckbox {
         "checkboxId": string;
@@ -252,7 +252,12 @@ export namespace Components {
         "version": string;
     }
     interface IrGallery {
+        "carouselClasses": string;
+        "carouselStyles": Partial<CSSStyleDeclaration>;
+        "disableCarouselClick": boolean;
+        "enableCarouselSwipe": boolean;
         "images": { url: string; alt: string }[];
+        "maxLength": number;
         "totalImages": number;
     }
     interface IrGoogleMaps {
@@ -263,6 +268,8 @@ export namespace Components {
         "maxChildrenCount": number;
         "minAdultCount": number;
         "minChildrenCount": number;
+    }
+    interface IrHomeLoader {
     }
     interface IrIcons {
         "height": number;
@@ -323,7 +330,7 @@ export namespace Components {
         "value": string;
     }
     interface IrInterceptor {
-        "handledEndpoints": string[];
+        "handledEndpoints": any[];
     }
     interface IrInvoice {
         "aName": string;
@@ -332,6 +339,7 @@ export namespace Components {
         "bookingNbr": string;
         "email": string;
         "footerShown": boolean;
+        "headerMessageShown": boolean;
         "headerShown": boolean;
         "language": string;
         "locationShown": boolean;
@@ -371,6 +379,7 @@ export namespace Components {
         "total": number;
     }
     interface IrPaymentView {
+        "errors": Record<string, ZodIssue>;
     }
     interface IrPhoneInput {
         "country_code": number;
@@ -428,6 +437,8 @@ export namespace Components {
         "roomtype": RoomType;
     }
     interface IrSelect {
+        "containerStyle": string;
+        "customStyles": string;
         "data": { id: string | number; value: string; disabled?: boolean; html?: boolean }[];
         "icon": boolean;
         "label": string;
@@ -445,6 +456,12 @@ export namespace Components {
         "enableSignUp": boolean;
     }
     interface IrSignup {
+    }
+    interface IrSkeleton {
+        "customClasses": string;
+        "styles": {
+    [className: string]: boolean;
+  };
     }
     interface IrSocialButton {
         "label": string;
@@ -479,7 +496,9 @@ export namespace Components {
     }
     interface IrTooltip {
         "label": string;
+        "labelColors": 'default' | 'green' | 'red';
         "message": string;
+        "open_behavior": 'hover' | 'click';
         "withHtml": boolean;
     }
     interface IrUserAvatar {
@@ -490,6 +509,16 @@ export namespace Components {
     interface IrUserProfile {
         "be": boolean;
         "user_data": TGuest;
+    }
+    interface IrWidget {
+        "aff": string;
+        "contentContainerStyle": TContainerStyle;
+        "language": string;
+        "p": string;
+        "perma_link": string;
+        "position": 'fixed' | 'block';
+        "propertyId": number;
+        "roomTypeId": string | null;
     }
 }
 export interface IrAdultChildCounterCustomEvent<T> extends CustomEvent<T> {
@@ -664,6 +693,10 @@ export interface IrTextareaCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLIrTextareaElement;
 }
+export interface IrTooltipCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLIrTooltipElement;
+}
 export interface IrUserFormCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLIrUserFormElement;
@@ -762,6 +795,12 @@ declare global {
         prototype: HTMLIrBannerElement;
         new (): HTMLIrBannerElement;
     };
+    interface HTMLIrBeElement extends Components.IrBe, HTMLStencilElement {
+    }
+    var HTMLIrBeElement: {
+        prototype: HTMLIrBeElement;
+        new (): HTMLIrBeElement;
+    };
     interface HTMLIrBookingCancelationElementEventMap {
         "openChange": boolean;
         "cancelationResult": { state: 'failed' | 'success'; booking_nbr: string };
@@ -839,12 +878,6 @@ declare global {
     var HTMLIrBookingDetailsViewElement: {
         prototype: HTMLIrBookingDetailsViewElement;
         new (): HTMLIrBookingDetailsViewElement;
-    };
-    interface HTMLIrBookingEngineElement extends Components.IrBookingEngine, HTMLStencilElement {
-    }
-    var HTMLIrBookingEngineElement: {
-        prototype: HTMLIrBookingEngineElement;
-        new (): HTMLIrBookingEngineElement;
     };
     interface HTMLIrBookingHeaderElementEventMap {
         "linkChanged": 'single_booking' | 'all_booking';
@@ -924,12 +957,6 @@ declare global {
         prototype: HTMLIrBookingSummaryElement;
         new (): HTMLIrBookingSummaryElement;
     };
-    interface HTMLIrBookingWidgetElement extends Components.IrBookingWidget, HTMLStencilElement {
-    }
-    var HTMLIrBookingWidgetElement: {
-        prototype: HTMLIrBookingWidgetElement;
-        new (): HTMLIrBookingWidgetElement;
-    };
     interface HTMLIrButtonElementEventMap {
         "buttonClick": MouseEvent;
     }
@@ -966,6 +993,7 @@ declare global {
     };
     interface HTMLIrCarouselElementEventMap {
         "carouselImageClicked": null;
+        "carouselImageIndexChange": number;
     }
     interface HTMLIrCarouselElement extends Components.IrCarousel, HTMLStencilElement {
         addEventListener<K extends keyof HTMLIrCarouselElementEventMap>(type: K, listener: (this: HTMLIrCarouselElement, ev: IrCarouselCustomEvent<HTMLIrCarouselElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -1141,7 +1169,7 @@ declare global {
         new (): HTMLIrFooterElement;
     };
     interface HTMLIrGalleryElementEventMap {
-        "openGallery": null;
+        "openGallery": number;
     }
     interface HTMLIrGalleryElement extends Components.IrGallery, HTMLStencilElement {
         addEventListener<K extends keyof HTMLIrGalleryElementEventMap>(type: K, listener: (this: HTMLIrGalleryElement, ev: IrGalleryCustomEvent<HTMLIrGalleryElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -1180,6 +1208,12 @@ declare global {
     var HTMLIrGuestCounterElement: {
         prototype: HTMLIrGuestCounterElement;
         new (): HTMLIrGuestCounterElement;
+    };
+    interface HTMLIrHomeLoaderElement extends Components.IrHomeLoader, HTMLStencilElement {
+    }
+    var HTMLIrHomeLoaderElement: {
+        prototype: HTMLIrHomeLoaderElement;
+        new (): HTMLIrHomeLoaderElement;
     };
     interface HTMLIrIconsElement extends Components.IrIcons, HTMLStencilElement {
     }
@@ -1529,6 +1563,12 @@ declare global {
         prototype: HTMLIrSignupElement;
         new (): HTMLIrSignupElement;
     };
+    interface HTMLIrSkeletonElement extends Components.IrSkeleton, HTMLStencilElement {
+    }
+    var HTMLIrSkeletonElement: {
+        prototype: HTMLIrSkeletonElement;
+        new (): HTMLIrSkeletonElement;
+    };
     interface HTMLIrSocialButtonElementEventMap {
         "socialButtonClick": MouseEvent;
     }
@@ -1582,7 +1622,18 @@ declare global {
         prototype: HTMLIrTextareaElement;
         new (): HTMLIrTextareaElement;
     };
+    interface HTMLIrTooltipElementEventMap {
+        "tooltipOpenChange": boolean;
+    }
     interface HTMLIrTooltipElement extends Components.IrTooltip, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLIrTooltipElementEventMap>(type: K, listener: (this: HTMLIrTooltipElement, ev: IrTooltipCustomEvent<HTMLIrTooltipElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLIrTooltipElementEventMap>(type: K, listener: (this: HTMLIrTooltipElement, ev: IrTooltipCustomEvent<HTMLIrTooltipElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLIrTooltipElement: {
         prototype: HTMLIrTooltipElement;
@@ -1617,6 +1668,12 @@ declare global {
         prototype: HTMLIrUserProfileElement;
         new (): HTMLIrUserProfileElement;
     };
+    interface HTMLIrWidgetElement extends Components.IrWidget, HTMLStencilElement {
+    }
+    var HTMLIrWidgetElement: {
+        prototype: HTMLIrWidgetElement;
+        new (): HTMLIrWidgetElement;
+    };
     interface HTMLElementTagNameMap {
         "ir-accomodations": HTMLIrAccomodationsElement;
         "ir-adult-child-counter": HTMLIrAdultChildCounterElement;
@@ -1626,18 +1683,17 @@ declare global {
         "ir-badge": HTMLIrBadgeElement;
         "ir-badge-group": HTMLIrBadgeGroupElement;
         "ir-banner": HTMLIrBannerElement;
+        "ir-be": HTMLIrBeElement;
         "ir-booking-cancelation": HTMLIrBookingCancelationElement;
         "ir-booking-card": HTMLIrBookingCardElement;
         "ir-booking-code": HTMLIrBookingCodeElement;
         "ir-booking-details": HTMLIrBookingDetailsElement;
         "ir-booking-details-view": HTMLIrBookingDetailsViewElement;
-        "ir-booking-engine": HTMLIrBookingEngineElement;
         "ir-booking-header": HTMLIrBookingHeaderElement;
         "ir-booking-listing": HTMLIrBookingListingElement;
         "ir-booking-overview": HTMLIrBookingOverviewElement;
         "ir-booking-page": HTMLIrBookingPageElement;
         "ir-booking-summary": HTMLIrBookingSummaryElement;
-        "ir-booking-widget": HTMLIrBookingWidgetElement;
         "ir-button": HTMLIrButtonElement;
         "ir-calendar": HTMLIrCalendarElement;
         "ir-carousel": HTMLIrCarouselElement;
@@ -1655,6 +1711,7 @@ declare global {
         "ir-gallery": HTMLIrGalleryElement;
         "ir-google-maps": HTMLIrGoogleMapsElement;
         "ir-guest-counter": HTMLIrGuestCounterElement;
+        "ir-home-loader": HTMLIrHomeLoaderElement;
         "ir-icons": HTMLIrIconsElement;
         "ir-input": HTMLIrInputElement;
         "ir-interceptor": HTMLIrInterceptorElement;
@@ -1681,6 +1738,7 @@ declare global {
         "ir-sheet": HTMLIrSheetElement;
         "ir-signin": HTMLIrSigninElement;
         "ir-signup": HTMLIrSignupElement;
+        "ir-skeleton": HTMLIrSkeletonElement;
         "ir-social-button": HTMLIrSocialButtonElement;
         "ir-switch": HTMLIrSwitchElement;
         "ir-textarea": HTMLIrTextareaElement;
@@ -1688,6 +1746,7 @@ declare global {
         "ir-user-avatar": HTMLIrUserAvatarElement;
         "ir-user-form": HTMLIrUserFormElement;
         "ir-user-profile": HTMLIrUserProfileElement;
+        "ir-widget": HTMLIrWidgetElement;
     }
 }
 declare namespace LocalJSX {
@@ -1739,9 +1798,36 @@ declare namespace LocalJSX {
     }
     interface IrBanner {
     }
+    interface IrBe {
+        "adults"?: string;
+        "aff"?: string;
+        "agent_code"?: string;
+        "checkin"?: string;
+        "checkout"?: string;
+        "child"?: string;
+        "coupon"?: string;
+        "cur"?: string;
+        "hideGoogleSignIn"?: boolean;
+        "injected"?: boolean;
+        "language"?: string;
+        "loyalty"?: boolean;
+        "p"?: string;
+        "perma_link"?: string;
+        "property"?: IExposedProperty | null;
+        "propertyId"?: number;
+        "rp_id"?: number;
+        "rt_id"?: number;
+        "source"?: TSource | null;
+        "stag"?: string | null;
+        "token"?: string;
+        "version"?: string;
+    }
     interface IrBookingCancelation {
+        "booking"?: Booking;
         "booking_nbr"?: string;
         "cancelation"?: string;
+        "cancelation_policies"?: TBookingInfo[];
+        "currency"?: { code: string; id: number };
         "onCancelationResult"?: (event: IrBookingCancelationCustomEvent<{ state: 'failed' | 'success'; booking_nbr: string }>) => void;
         "onOpenChange"?: (event: IrBookingCancelationCustomEvent<boolean>) => void;
     }
@@ -1762,29 +1848,6 @@ declare namespace LocalJSX {
     route: 'booking' | 'booking-details';
     params?: unknown;
   }>) => void;
-    }
-    interface IrBookingEngine {
-        "aName"?: string;
-        "adultCount"?: string;
-        "aff"?: string;
-        "baseUrl"?: string;
-        "childrenCount"?: string;
-        "cur"?: string;
-        "fromDate"?: string;
-        "hideGoogleSignIn"?: boolean;
-        "injected"?: boolean;
-        "language"?: string;
-        "perma_link"?: string;
-        "property"?: IExposedProperty | null;
-        "propertyId"?: number;
-        "rateplan_id"?: number;
-        "redirect_url"?: string;
-        "roomtype_id"?: number;
-        "source"?: TSource | null;
-        "stag"?: string | null;
-        "toDate"?: string;
-        "token"?: string;
-        "version"?: string;
     }
     interface IrBookingHeader {
         "activeLink"?: 'single_booking' | 'all_booking';
@@ -1829,20 +1892,10 @@ declare namespace LocalJSX {
         "toDate"?: string;
     }
     interface IrBookingSummary {
-        "error"?: boolean;
-        "isLoading"?: boolean;
+        "error"?: CheckoutErrors;
         "onBookingClicked"?: (event: IrBookingSummaryCustomEvent<null>) => void;
         "onRouting"?: (event: IrBookingSummaryCustomEvent<pages>) => void;
-    }
-    interface IrBookingWidget {
-        "aName"?: string;
-        "baseUrl"?: string;
-        "contentContainerStyle"?: TContainerStyle;
-        "language"?: string;
-        "perma_link"?: string;
-        "position"?: 'sticky' | 'block';
-        "propertyId"?: number;
-        "roomTypeId"?: string | null;
+        "prepaymentAmount"?: any;
     }
     interface IrButton {
         "buttonClassName"?: string;
@@ -1876,8 +1929,13 @@ declare namespace LocalJSX {
         "toDate"?: Date | null;
     }
     interface IrCarousel {
+        "activeIndex"?: number;
+        "carouselClasses"?: string;
+        "enableCarouselSwipe"?: boolean;
         "onCarouselImageClicked"?: (event: IrCarouselCustomEvent<null>) => void;
+        "onCarouselImageIndexChange"?: (event: IrCarouselCustomEvent<number>) => void;
         "slides"?: TCarouselSlides[];
+        "styles"?: Partial<CSSStyleDeclaration>;
     }
     interface IrCheckbox {
         "checkboxId"?: string;
@@ -1952,8 +2010,13 @@ declare namespace LocalJSX {
         "version"?: string;
     }
     interface IrGallery {
+        "carouselClasses"?: string;
+        "carouselStyles"?: Partial<CSSStyleDeclaration>;
+        "disableCarouselClick"?: boolean;
+        "enableCarouselSwipe"?: boolean;
         "images"?: { url: string; alt: string }[];
-        "onOpenGallery"?: (event: IrGalleryCustomEvent<null>) => void;
+        "maxLength"?: number;
+        "onOpenGallery"?: (event: IrGalleryCustomEvent<number>) => void;
         "totalImages"?: number;
     }
     interface IrGoogleMaps {
@@ -1966,6 +2029,8 @@ declare namespace LocalJSX {
         "minChildrenCount"?: number;
         "onCloseGuestCounter"?: (event: IrGuestCounterCustomEvent<any>) => void;
         "onUpdateCounts"?: (event: IrGuestCounterCustomEvent<any>) => void;
+    }
+    interface IrHomeLoader {
     }
     interface IrIcons {
         "height"?: number;
@@ -2029,7 +2094,7 @@ declare namespace LocalJSX {
         "value"?: string;
     }
     interface IrInterceptor {
-        "handledEndpoints"?: string[];
+        "handledEndpoints"?: any[];
     }
     interface IrInvoice {
         "aName"?: string;
@@ -2038,6 +2103,7 @@ declare namespace LocalJSX {
         "bookingNbr"?: string;
         "email"?: string;
         "footerShown"?: boolean;
+        "headerMessageShown"?: boolean;
         "headerShown"?: boolean;
         "language"?: string;
         "locationShown"?: boolean;
@@ -2093,6 +2159,7 @@ declare namespace LocalJSX {
         "total"?: number;
     }
     interface IrPaymentView {
+        "errors"?: Record<string, ZodIssue>;
     }
     interface IrPhoneInput {
         "country_code"?: number;
@@ -2154,6 +2221,8 @@ declare namespace LocalJSX {
         "roomtype"?: RoomType;
     }
     interface IrSelect {
+        "containerStyle"?: string;
+        "customStyles"?: string;
         "data"?: { id: string | number; value: string; disabled?: boolean; html?: boolean }[];
         "icon"?: boolean;
         "label"?: string;
@@ -2184,6 +2253,12 @@ declare namespace LocalJSX {
     interface IrSignup {
         "onNavigate"?: (event: IrSignupCustomEvent<TAuthNavigation>) => void;
         "onSignUp"?: (event: IrSignupCustomEvent<TSignUpAuthTrigger>) => void;
+    }
+    interface IrSkeleton {
+        "customClasses"?: string;
+        "styles"?: {
+    [className: string]: boolean;
+  };
     }
     interface IrSocialButton {
         "label"?: string;
@@ -2223,7 +2298,10 @@ declare namespace LocalJSX {
     }
     interface IrTooltip {
         "label"?: string;
+        "labelColors"?: 'default' | 'green' | 'red';
         "message"?: string;
+        "onTooltipOpenChange"?: (event: IrTooltipCustomEvent<boolean>) => void;
+        "open_behavior"?: 'hover' | 'click';
         "withHtml"?: boolean;
     }
     interface IrUserAvatar {
@@ -2236,6 +2314,16 @@ declare namespace LocalJSX {
         "be"?: boolean;
         "user_data"?: TGuest;
     }
+    interface IrWidget {
+        "aff"?: string;
+        "contentContainerStyle"?: TContainerStyle;
+        "language"?: string;
+        "p"?: string;
+        "perma_link"?: string;
+        "position"?: 'fixed' | 'block';
+        "propertyId"?: number;
+        "roomTypeId"?: string | null;
+    }
     interface IntrinsicElements {
         "ir-accomodations": IrAccomodations;
         "ir-adult-child-counter": IrAdultChildCounter;
@@ -2245,18 +2333,17 @@ declare namespace LocalJSX {
         "ir-badge": IrBadge;
         "ir-badge-group": IrBadgeGroup;
         "ir-banner": IrBanner;
+        "ir-be": IrBe;
         "ir-booking-cancelation": IrBookingCancelation;
         "ir-booking-card": IrBookingCard;
         "ir-booking-code": IrBookingCode;
         "ir-booking-details": IrBookingDetails;
         "ir-booking-details-view": IrBookingDetailsView;
-        "ir-booking-engine": IrBookingEngine;
         "ir-booking-header": IrBookingHeader;
         "ir-booking-listing": IrBookingListing;
         "ir-booking-overview": IrBookingOverview;
         "ir-booking-page": IrBookingPage;
         "ir-booking-summary": IrBookingSummary;
-        "ir-booking-widget": IrBookingWidget;
         "ir-button": IrButton;
         "ir-calendar": IrCalendar;
         "ir-carousel": IrCarousel;
@@ -2274,6 +2361,7 @@ declare namespace LocalJSX {
         "ir-gallery": IrGallery;
         "ir-google-maps": IrGoogleMaps;
         "ir-guest-counter": IrGuestCounter;
+        "ir-home-loader": IrHomeLoader;
         "ir-icons": IrIcons;
         "ir-input": IrInput;
         "ir-interceptor": IrInterceptor;
@@ -2300,6 +2388,7 @@ declare namespace LocalJSX {
         "ir-sheet": IrSheet;
         "ir-signin": IrSignin;
         "ir-signup": IrSignup;
+        "ir-skeleton": IrSkeleton;
         "ir-social-button": IrSocialButton;
         "ir-switch": IrSwitch;
         "ir-textarea": IrTextarea;
@@ -2307,6 +2396,7 @@ declare namespace LocalJSX {
         "ir-user-avatar": IrUserAvatar;
         "ir-user-form": IrUserForm;
         "ir-user-profile": IrUserProfile;
+        "ir-widget": IrWidget;
     }
 }
 export { LocalJSX as JSX };
@@ -2321,18 +2411,17 @@ declare module "@stencil/core" {
             "ir-badge": LocalJSX.IrBadge & JSXBase.HTMLAttributes<HTMLIrBadgeElement>;
             "ir-badge-group": LocalJSX.IrBadgeGroup & JSXBase.HTMLAttributes<HTMLIrBadgeGroupElement>;
             "ir-banner": LocalJSX.IrBanner & JSXBase.HTMLAttributes<HTMLIrBannerElement>;
+            "ir-be": LocalJSX.IrBe & JSXBase.HTMLAttributes<HTMLIrBeElement>;
             "ir-booking-cancelation": LocalJSX.IrBookingCancelation & JSXBase.HTMLAttributes<HTMLIrBookingCancelationElement>;
             "ir-booking-card": LocalJSX.IrBookingCard & JSXBase.HTMLAttributes<HTMLIrBookingCardElement>;
             "ir-booking-code": LocalJSX.IrBookingCode & JSXBase.HTMLAttributes<HTMLIrBookingCodeElement>;
             "ir-booking-details": LocalJSX.IrBookingDetails & JSXBase.HTMLAttributes<HTMLIrBookingDetailsElement>;
             "ir-booking-details-view": LocalJSX.IrBookingDetailsView & JSXBase.HTMLAttributes<HTMLIrBookingDetailsViewElement>;
-            "ir-booking-engine": LocalJSX.IrBookingEngine & JSXBase.HTMLAttributes<HTMLIrBookingEngineElement>;
             "ir-booking-header": LocalJSX.IrBookingHeader & JSXBase.HTMLAttributes<HTMLIrBookingHeaderElement>;
             "ir-booking-listing": LocalJSX.IrBookingListing & JSXBase.HTMLAttributes<HTMLIrBookingListingElement>;
             "ir-booking-overview": LocalJSX.IrBookingOverview & JSXBase.HTMLAttributes<HTMLIrBookingOverviewElement>;
             "ir-booking-page": LocalJSX.IrBookingPage & JSXBase.HTMLAttributes<HTMLIrBookingPageElement>;
             "ir-booking-summary": LocalJSX.IrBookingSummary & JSXBase.HTMLAttributes<HTMLIrBookingSummaryElement>;
-            "ir-booking-widget": LocalJSX.IrBookingWidget & JSXBase.HTMLAttributes<HTMLIrBookingWidgetElement>;
             "ir-button": LocalJSX.IrButton & JSXBase.HTMLAttributes<HTMLIrButtonElement>;
             "ir-calendar": LocalJSX.IrCalendar & JSXBase.HTMLAttributes<HTMLIrCalendarElement>;
             "ir-carousel": LocalJSX.IrCarousel & JSXBase.HTMLAttributes<HTMLIrCarouselElement>;
@@ -2350,6 +2439,7 @@ declare module "@stencil/core" {
             "ir-gallery": LocalJSX.IrGallery & JSXBase.HTMLAttributes<HTMLIrGalleryElement>;
             "ir-google-maps": LocalJSX.IrGoogleMaps & JSXBase.HTMLAttributes<HTMLIrGoogleMapsElement>;
             "ir-guest-counter": LocalJSX.IrGuestCounter & JSXBase.HTMLAttributes<HTMLIrGuestCounterElement>;
+            "ir-home-loader": LocalJSX.IrHomeLoader & JSXBase.HTMLAttributes<HTMLIrHomeLoaderElement>;
             "ir-icons": LocalJSX.IrIcons & JSXBase.HTMLAttributes<HTMLIrIconsElement>;
             "ir-input": LocalJSX.IrInput & JSXBase.HTMLAttributes<HTMLIrInputElement>;
             "ir-interceptor": LocalJSX.IrInterceptor & JSXBase.HTMLAttributes<HTMLIrInterceptorElement>;
@@ -2376,6 +2466,7 @@ declare module "@stencil/core" {
             "ir-sheet": LocalJSX.IrSheet & JSXBase.HTMLAttributes<HTMLIrSheetElement>;
             "ir-signin": LocalJSX.IrSignin & JSXBase.HTMLAttributes<HTMLIrSigninElement>;
             "ir-signup": LocalJSX.IrSignup & JSXBase.HTMLAttributes<HTMLIrSignupElement>;
+            "ir-skeleton": LocalJSX.IrSkeleton & JSXBase.HTMLAttributes<HTMLIrSkeletonElement>;
             "ir-social-button": LocalJSX.IrSocialButton & JSXBase.HTMLAttributes<HTMLIrSocialButtonElement>;
             "ir-switch": LocalJSX.IrSwitch & JSXBase.HTMLAttributes<HTMLIrSwitchElement>;
             "ir-textarea": LocalJSX.IrTextarea & JSXBase.HTMLAttributes<HTMLIrTextareaElement>;
@@ -2383,6 +2474,7 @@ declare module "@stencil/core" {
             "ir-user-avatar": LocalJSX.IrUserAvatar & JSXBase.HTMLAttributes<HTMLIrUserAvatarElement>;
             "ir-user-form": LocalJSX.IrUserForm & JSXBase.HTMLAttributes<HTMLIrUserFormElement>;
             "ir-user-profile": LocalJSX.IrUserProfile & JSXBase.HTMLAttributes<HTMLIrUserProfileElement>;
+            "ir-widget": LocalJSX.IrWidget & JSXBase.HTMLAttributes<HTMLIrWidgetElement>;
         }
     }
 }

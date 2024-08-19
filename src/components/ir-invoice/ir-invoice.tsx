@@ -1,5 +1,5 @@
 import { Component, Host, Prop, State, Watch, h } from '@stencil/core';
-import { format } from 'date-fns';
+import { format, isBefore } from 'date-fns';
 import { cn, formatAmount, getDateDifference, runScriptAndRemove } from '@/utils/utils';
 import localizedWords from '@/stores/localization.store';
 import app_store from '@/stores/app.store';
@@ -8,10 +8,10 @@ import { PropertyService } from '@/services/api/property.service';
 import { CommonService } from '@/services/api/common.service';
 import axios from 'axios';
 import { AuthService } from '@/services/api/auth.service';
-import { PaymentService } from '@/services/api/payment.service';
-import { isRequestPending } from '@/stores/ir-interceptor.store';
+import { PaymentService, TBookingInfo } from '@/services/api/payment.service';
 import { AllowedPaymentMethod } from '@/models/property';
 import { BookingListingAppService } from '@/services/app/booking-listing.service';
+import InvoiceSkeleton from './InvoiceSkeleton';
 
 @Component({
   tag: 'ir-invoice',
@@ -21,7 +21,7 @@ import { BookingListingAppService } from '@/services/app/booking-listing.service
 export class IrInvoice {
   @Prop({ mutable: true }) email: string;
   @Prop() propertyId: number;
-  @Prop() baseUrl: string;
+  @Prop() baseUrl: string = 'https://gateway.igloorooms.com/IRBE';
   @Prop() language: string = 'en';
   @Prop() bookingNbr: string;
   @Prop() status: 0 | 1 = 1;
@@ -29,6 +29,7 @@ export class IrInvoice {
   @Prop() aName: string = null;
   @Prop() headerShown: boolean = true;
   @Prop() footerShown: boolean = true;
+  @Prop() headerMessageShown: boolean = true;
   @Prop() locationShown: boolean = true;
   @Prop() be: boolean = false;
   @Prop() version: string = '2.0';
@@ -37,6 +38,11 @@ export class IrInvoice {
   @State() token: string;
   @State() isAuthenticated = false;
   @State() isLoading = false;
+  @State() cancelation_message: string = null;
+  @State() guarantee_message: string = null;
+  @State() cancelationMessage: string;
+  @State() amountToBePayed: number;
+  @State() cancelation_policies: TBookingInfo[] = [];
 
   private propertyService = new PropertyService();
   private commonService = new CommonService();
@@ -45,8 +51,7 @@ export class IrInvoice {
   private bookingListingAppService = new BookingListingAppService();
   private payment_option: AllowedPaymentMethod = null;
   private amount: number = null;
-
-  private alertDialog: HTMLIrAlertDialogElement;
+  bookingCancelation: HTMLIrBookingCancelationElement;
 
   async componentWillLoad() {
     if (!this.baseUrl) {
@@ -63,7 +68,6 @@ export class IrInvoice {
     } else {
       this.token = await this.commonService.getBEToken();
     }
-
     this.init();
     this.fetchData();
   }
@@ -89,10 +93,11 @@ export class IrInvoice {
     this.commonService.setToken(this.token);
     this.authService.setToken(this.token);
     this.paymentService.setToken(this.token);
+    app_store.app_data.token = this.token;
   }
   async fetchData() {
     if (!this.isAuthenticated) {
-      this.token = await this.authService.login({ option: 'direct', params: { email: this.email, booking_nbr: this.bookingNbr } }, true);
+      this.token = await this.authService.login({ option: 'direct', params: { email: this.email, booking_nbr: this.bookingNbr } }, false);
       this.init();
     }
     const requests: any[] = [this.propertyService.getExposedBooking({ booking_nbr: this.bookingNbr, language: this.language })];
@@ -112,26 +117,55 @@ export class IrInvoice {
     const results = await Promise.all(requests);
     this.booking = results[0];
     this.payment_option = this.detectPaymentOrigin();
-    await this.setAmount();
+    const book_date = new Date(this.booking.booked_on.date);
+    book_date.setHours(this.booking.booked_on.hour + 1);
+    book_date.setMinutes(this.booking.booked_on.minute);
+    await this.setAmountAndCancelationPolicy();
     this.isLoading = false;
   }
-  async setAmount() {
-    if (this.amount) {
+
+  async setAmountAndCancelationPolicy() {
+    if (this.amount || isBefore(new Date(this.booking.to_date), new Date())) {
       return;
     }
-    const { amount } = await this.paymentService.GetExposedApplicablePolicies({
-      book_date: new Date(this.booking.booked_on.date),
-      token: this.token,
-      params: {
-        booking_nbr: this.booking.booking_nbr,
-        property_id: this.propertyId,
-        room_type_id: 0,
-        rate_plan_id: 0,
-        currency_id: this.booking.currency.id,
-        language: this.language,
-      },
-    });
+    const [bookings_by_amount, newPrepayment] = await Promise.all([
+      this.paymentService.getBookingPrepaymentAmount(this.booking),
+      await this.paymentService.GetExposedApplicablePolicies({
+        book_date: new Date(this.booking.booked_on.date),
+        token: this.token,
+        params: {
+          booking_nbr: this.bookingNbr,
+          property_id: this.booking.property.id,
+          room_type_id: 0,
+          rate_plan_id: 0,
+          currency_id: this.booking.currency.id,
+          language: this.language,
+        },
+      }),
+    ]);
+    const { amount, cancelation_message, guarantee_message, cancelation_policies } = bookings_by_amount;
+    this.cancelation_policies = cancelation_policies;
+    this.cancelation_message = cancelation_message;
+    this.guarantee_message = guarantee_message;
     this.amount = amount;
+    let cancelation = null;
+    let guarantee = null;
+    const { message } = await this.paymentService.fetchCancelationMessage({ data: newPrepayment.data });
+    this.cancelationMessage = message;
+    const cancelationBrackets = newPrepayment.data.find(t => t.type === 'cancelation');
+    if (cancelationBrackets?.brackets) {
+      cancelation = this.paymentService.findClosestDate(cancelationBrackets?.brackets);
+    }
+    const guaranteeBrackets = newPrepayment.data.find(t => t.type === 'guarantee');
+    if (guaranteeBrackets?.brackets) {
+      guarantee = this.paymentService.findClosestDate(guaranteeBrackets?.brackets);
+    }
+    if (guarantee && cancelation) {
+      console.log(guarantee, cancelation);
+      if (isBefore(new Date(guarantee.due_on), new Date(cancelation.due_on))) {
+        this.amountToBePayed = cancelation.gross_amount;
+      }
+    }
   }
 
   renderBookingDetailHeader() {
@@ -207,21 +241,25 @@ export class IrInvoice {
     }
   }
   render() {
-    if (!this.booking) {
+    if (!this.booking && !this.isLoading) {
       return null;
     }
     if (this.isLoading) {
       return (
-        <div class="flex h-[80vh] flex-col gap-4 ">
-          {[...Array(10)].map((_, i) => (
-            <div key={i} class="max-h-52 w-full animate-pulse bg-gray-200"></div>
-          ))}
+        // <div >
+        //   {[...new Array(10)].map((_, i) => (
+        //     <div key={i} class="h-72 w-full animate-pulse rounded-md bg-gray-200"></div>
+        //   ))}
+        // </div>
+        <div class="flex  flex-col gap-4 ">
+          <InvoiceSkeleton />
         </div>
       );
     }
     const google_maps_url = `http://maps.google.com/maps?q=${app_store.property.location.latitude},${app_store.property.location.longitude}`;
 
     const { cancel } = this.bookingListingAppService.getBookingActions(this.booking);
+
     return (
       <Host>
         <ir-interceptor></ir-interceptor>
@@ -237,9 +275,22 @@ export class IrInvoice {
               ></ir-nav>
             </section>
           )}
-          <section class={`flex-1 ${this.be ? '' : 'mx-auto px-4 lg:px-6'}`}>
-            <div class={`flex  ${this.locationShown ? 'max-w-6xl' : 'w-full'} gap-16`}>
-              <div class={`invoice-container ${this.locationShown ? '' : 'w-full'}`}>
+          <section class={`flex-1 ${this.be ? '' : 'invoice-container mx-auto w-full max-w-6xl'}`}>
+            {this.headerMessageShown && isBefore(new Date(), new Date(this.booking.to_date)) ? (
+              <div class={this.be ? '' : 'invoice-container'}>
+                <p class={`flex items-center gap-4 text-xl font-medium ${this.status === 1 ? 'text-green-600' : 'text-red-500'} ${this.be ? '' : ''}`}>
+                  <ir-icons name={this.status === 1 ? 'check' : 'xmark'} />
+                  <span> {this.status === 1 ? 'Your booking is now confirmed' : 'Payment unsuccessful'}</span>
+                </p>
+                {this.status === 1 && <p>An email has been sent to {this.booking.guest.email}</p>}
+              </div>
+            ) : (
+              <div class={this.be ? '' : 'invoice-container'}>
+                <p class={'text-xl font-medium '}>This booking is {this.booking.status.description}</p>
+              </div>
+            )}
+            <div class={`flex  ${this.locationShown ? 'w-full' : 'w-full'} gap-16 `}>
+              <div class={`invoice-container ${this.locationShown ? 'w-full' : 'w-full'}`}>
                 <section class="flex flex-col gap-4 md:flex-row md:items-center">
                   {this.status === 1 ? (
                     <a href={google_maps_url} target="_blank" class={cn(`button-outline`, 'flex items-center justify-center')} data-size="sm">
@@ -256,8 +307,8 @@ export class IrInvoice {
                       class={'w-full md:w-fit'}
                       variants="outline"
                       label={localizedWords.entries.Lcz_CancelBooking}
-                      onButtonClick={() => {
-                        this.alertDialog.openModal();
+                      onButtonClick={async () => {
+                        this.bookingCancelation.openDialog();
                       }}
                     ></ir-button>
                   )}
@@ -306,7 +357,7 @@ export class IrInvoice {
                       <div class="room-info" key={room.identifier}>
                         <div class="flex w-full items-center justify-between">
                           <h4 class="room-type">{room.roomtype.name}</h4>
-                          <p class="text-lg font-medium text-green-500"> {formatAmount(room.gross_total, this.booking.currency.code)}</p>
+                          <p class="text-lg font-medium text-green-600"> {formatAmount(room.gross_total, this.booking.currency.code)}</p>
                         </div>
                         <p class="room-info-text">
                           {localizedWords.entries.Lcz_GuestName}{' '}
@@ -321,21 +372,55 @@ export class IrInvoice {
                             {/* <span>{"- Non-smoking"}</span> */}
                           </span>
                         </p>
-                        <p class="room-info-text" innerHTML={room.rateplan.cancelation}></p>
-                        <p class="room-info-text" innerHTML={room.rateplan.guarantee}></p>
+                        {this.cancelation_message && <p class="room-info-text" innerHTML={`<b><u>Cancelation:</u></b>${this.cancelation_message}`}></p>}
+                        {this.guarantee_message && <p class="room-info-text" innerHTML={`<b><u>Guarantee:</u></b>${this.guarantee_message}`}></p>}
                       </div>
                     ))}
                   </div>
                 </section>
-
+                {this.booking.pickup_info && (
+                  <section class="space-y-2">
+                    <div class={'flex items-center gap-4'}>
+                      <ir-icons name="taxi"></ir-icons>
+                      <h3 class={'booking-details-header'}>Pickup</h3>
+                    </div>
+                    <div class="room-info">
+                      <div class="flex w-full items-center justify-between">
+                        <p class="flex items-center gap-4">
+                          <p class="room-info-text">
+                            {'Date:'} <span>{format(new Date(this.booking.pickup_info.date), 'eee, dd MMM yyyy')}</span>
+                          </p>
+                          <p class="room-info-text">
+                            {'Time:'}{' '}
+                            <span>
+                              {this.booking.pickup_info.hour}:{this.booking.pickup_info.minute}
+                            </span>
+                          </p>
+                        </p>
+                        <p class="text-lg font-medium text-green-600">{formatAmount(this.booking.pickup_info.total, this.booking.pickup_info.currency.code)}</p>
+                      </div>
+                      <p class="room-info-text">
+                        {'Flight details:'} <span>{this.booking.pickup_info.details}</span>
+                      </p>
+                      <p class="room-info-text">
+                        {'No. of vehicles:'} <span>{this.booking.pickup_info.nbr_of_units}</span>
+                      </p>
+                      <p class={'room-info-text text-xs'}>
+                        {app_store.property.pickup_service.pickup_instruction.description}
+                        {app_store.property.pickup_service.pickup_cancelation_prepayment.description}
+                      </p>
+                    </div>
+                  </section>
+                )}
                 {this.payment_option && (
                   <section class="space-y-2">
                     <div class={'flex items-center gap-4'}>
                       <ir-icons name="credit_card"></ir-icons>
-                      <h3>{localizedWords.entries.Lcz_PaymentDetails}</h3>
+                      <h3 class={'booking-details-header'}>{localizedWords.entries.Lcz_PaymentDetails}</h3>
                     </div>
                     <p class="total-payment">
-                      {localizedWords.entries.Lcz_Total} <span class="text-green-500">{formatAmount(this.booking.financial.gross_total, this.booking.currency.code)}</span>
+                      {localizedWords.entries.Lcz_Total}{' '}
+                      <span class="payment_amount text-green-600">{formatAmount(this.booking.financial.gross_total, this.booking.currency.code)}</span>
                     </p>
                     {this.renderPaymentText(this.payment_option)}
                   </section>
@@ -344,7 +429,7 @@ export class IrInvoice {
                 <section class="space-y-2">
                   <div class="flex items-center gap-4">
                     <ir-icons name="danger"></ir-icons>
-                    <h3>{localizedWords.entries.Lcz_ImportantInformation}</h3>
+                    <h3 class={'booking-details-header'}>{localizedWords.entries.Lcz_ImportantInformation}</h3>
                   </div>
                   <p>{app_store.property.description.important_info}</p>
                 </section>
@@ -394,27 +479,13 @@ export class IrInvoice {
             </div>
           </section>
           {this.footerShown && <ir-footer version={this.version}></ir-footer>}
-          <ir-alert-dialog ref={el => (this.alertDialog = el)}>
-            <h2 slot="modal-title">Booking Cancellation</h2>
-            <p slot="modal-body" class="pt-2" innerHTML={this.booking.rooms[0].rateplan.cancelation}></p>
-            <div slot="modal-footer">
-              <ir-button
-                label="Cancel"
-                variants="outline"
-                onButtonClick={() => {
-                  this.alertDialog.closeModal();
-                }}
-              ></ir-button>
-              <ir-button
-                label="Accept & Confirm"
-                isLoading={isRequestPending('/Request_Booking_Cancelation')}
-                onButtonClick={async () => {
-                  await this.paymentService.RequestBookingCancelation(this.bookingNbr);
-                  this.alertDialog.closeModal();
-                }}
-              ></ir-button>
-            </div>
-          </ir-alert-dialog>
+          <ir-booking-cancelation
+            cancelation_policies={this.cancelation_policies}
+            ref={el => (this.bookingCancelation = el)}
+            booking_nbr={this.booking?.booking_nbr}
+            currency={{ code: this.booking.currency.code, id: this.booking.currency.id }}
+            cancelation={this.cancelationMessage || this.booking?.rooms[0].rateplan.cancelation}
+          ></ir-booking-cancelation>
         </main>
       </Host>
     );

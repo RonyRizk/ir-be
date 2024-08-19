@@ -30,14 +30,19 @@
 
 ### Depends on
 
-- [ir-select](../../../ui/ir-select)
 - [ir-tooltip](../../../ui/ir-tooltip)
+- [ir-skeleton](../../../ui/ir-skeleton)
+- [ir-select](../../../ui/ir-select)
+- [ir-button](../../../ui/ir-button)
 
 ### Graph
 ```mermaid
 graph TD;
-  ir-rateplan --> ir-select
   ir-rateplan --> ir-tooltip
+  ir-rateplan --> ir-skeleton
+  ir-rateplan --> ir-select
+  ir-rateplan --> ir-button
+  ir-button --> ir-icons
   ir-roomtype --> ir-rateplan
   style ir-rateplan fill:#f9f,stroke:#333,stroke-width:4px
 ```

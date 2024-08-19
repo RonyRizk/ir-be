@@ -160,10 +160,11 @@ export class IrDateRange {
     this.minDate.setHours(0, 0, 0, 0);
     this.maxDate.setHours(0, 0, 0, 0);
     if (this.fromDate) {
-      this.toDate.setHours(0, 0, 0, 0);
+      this.fromDate.setHours(0, 0, 0, 0);
     }
     if (this.toDate) {
-      this.fromDate.setHours(0, 0, 0, 0);
+      console.log(this.toDate);
+      this.toDate.setHours(0, 0, 0, 0);
     }
   }
   handleMouseEnter(day: Date) {

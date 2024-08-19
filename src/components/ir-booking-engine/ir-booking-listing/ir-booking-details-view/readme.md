@@ -38,6 +38,8 @@ graph TD;
   ir-button --> ir-icons
   ir-facilities --> ir-icons
   ir-booking-cancelation --> ir-alert-dialog
+  ir-booking-cancelation --> ir-skeleton
+  ir-booking-cancelation --> ir-icons
   ir-booking-cancelation --> ir-button
   style ir-booking-details-view fill:#f9f,stroke:#333,stroke-width:4px
 ```

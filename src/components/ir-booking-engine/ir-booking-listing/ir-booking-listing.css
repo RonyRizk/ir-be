@@ -33,6 +33,8 @@
 .header-title {
   font-size: 1.125rem;
   font-weight: 600;
+  padding: 0;
+  margin: 0;
 }
 
 @media (min-width: 768px) {

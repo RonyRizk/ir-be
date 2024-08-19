@@ -57,10 +57,10 @@ export class IrRoomTypeAmenities {
   render() {
     return (
       <div class="space-y-3">
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <div class=" flex items-center gap-4">
+        <div class="flex flex-col gap-6 sm:flex-row sm:items-center">
+          <div class=" flex items-center gap-6">
             {this.roomType.size > 0 && (
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-1">
                 <ir-icons name="dimensions"></ir-icons>
                 <p>
                   {this.roomType.size}{' '}
@@ -70,7 +70,7 @@ export class IrRoomTypeAmenities {
                 </p>
               </div>
             )}{' '}
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1">
               <ir-icons name="wifi"></ir-icons>
               <p>{this.aminities?.some(amenity => amenity.amenity_type === 'room' && amenity.code === 'freewifi') ? localizedWords.entries.Lcz_wifi : ''} </p>
               {/* <p>Free Wifi</p> */}
@@ -82,7 +82,7 @@ export class IrRoomTypeAmenities {
               <ir-icons name="user_group"></ir-icons>
               <p>Sleeps {this.roomType.occupancy_max.adult_nbr}</p>
             </div> */}
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1">
               <ir-icons name="bed"></ir-icons>
               {this.roomType?.bedding_setup?.map((bed_setup, index) => (
                 <p key={bed_setup.code}>

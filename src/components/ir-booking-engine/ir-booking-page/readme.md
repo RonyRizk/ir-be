@@ -26,7 +26,7 @@
 
 ### Used by
 
- - [ir-booking-engine](..)
+ - [ir-be](..)
 
 ### Depends on
 
@@ -46,14 +46,12 @@ graph TD;
   ir-booking-page --> ir-button
   ir-property-gallery --> ir-icons
   ir-property-gallery --> ir-gallery
-  ir-property-gallery --> ir-accomodations
   ir-property-gallery --> ir-carousel
-  ir-property-gallery --> ir-button
   ir-property-gallery --> ir-dialog
+  ir-property-gallery --> ir-button
   ir-property-gallery --> ir-room-type-amenities
-  ir-accomodations --> ir-icons
-  ir-button --> ir-icons
   ir-dialog --> ir-button
+  ir-button --> ir-icons
   ir-room-type-amenities --> ir-icons
   ir-availibility-header --> ir-date-popup
   ir-availibility-header --> ir-adult-child-counter
@@ -76,10 +74,13 @@ graph TD;
   ir-roomtype --> ir-property-gallery
   ir-roomtype --> ir-accomodations
   ir-roomtype --> ir-rateplan
-  ir-rateplan --> ir-select
+  ir-accomodations --> ir-icons
   ir-rateplan --> ir-tooltip
+  ir-rateplan --> ir-skeleton
+  ir-rateplan --> ir-select
+  ir-rateplan --> ir-button
   ir-facilities --> ir-icons
-  ir-booking-engine --> ir-booking-page
+  ir-be --> ir-booking-page
   style ir-booking-page fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

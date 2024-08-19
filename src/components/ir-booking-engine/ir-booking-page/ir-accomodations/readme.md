@@ -17,7 +17,6 @@
 
 ### Used by
 
- - [ir-property-gallery](../ir-property-gallery)
  - [ir-roomtype](../ir-roomtype)
 
 ### Depends on
@@ -28,7 +27,6 @@
 ```mermaid
 graph TD;
   ir-accomodations --> ir-icons
-  ir-property-gallery --> ir-accomodations
   ir-roomtype --> ir-accomodations
   style ir-accomodations fill:#f9f,stroke:#333,stroke-width:4px
 ```

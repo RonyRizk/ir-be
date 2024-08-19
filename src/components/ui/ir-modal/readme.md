@@ -52,11 +52,13 @@ Type: `Promise<void>`
 ### Depends on
 
 - [ir-auth](../../ir-booking-engine/ir-nav/ir-auth)
+- [ir-dialog](../ir-dialog)
 
 ### Graph
 ```mermaid
 graph TD;
   ir-modal --> ir-auth
+  ir-modal --> ir-dialog
   ir-auth --> ir-signin
   ir-auth --> ir-signup
   ir-auth --> ir-button
@@ -66,6 +68,7 @@ graph TD;
   ir-signup --> ir-input
   ir-signup --> ir-button
   ir-button --> ir-icons
+  ir-dialog --> ir-button
   ir-nav --> ir-modal
   style ir-modal fill:#f9f,stroke:#333,stroke-width:4px
 ```

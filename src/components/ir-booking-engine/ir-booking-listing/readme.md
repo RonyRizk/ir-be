@@ -7,27 +7,29 @@
 
 ## Properties
 
-| Property          | Attribute           | Description | Type                                                            | Default                                |
-| ----------------- | ------------------- | ----------- | --------------------------------------------------------------- | -------------------------------------- |
-| `aName`           | `a-name`            |             | `string`                                                        | `null`                                 |
-| `aff`             | `aff`               |             | `string`                                                        | `null`                                 |
-| `baseUrl`         | `base-url`          |             | `string`                                                        | `undefined`                            |
-| `be`              | `be`                |             | `boolean`                                                       | `false`                                |
-| `footerShown`     | `footer-shown`      |             | `boolean`                                                       | `true`                                 |
-| `headerShown`     | `header-shown`      |             | `boolean`                                                       | `true`                                 |
-| `language`        | `language`          |             | `string`                                                        | `undefined`                            |
-| `maxPages`        | `max-pages`         |             | `number`                                                        | `10`                                   |
-| `perma_link`      | `perma_link`        |             | `string`                                                        | `null`                                 |
-| `propertyid`      | `propertyid`        |             | `number`                                                        | `undefined`                            |
-| `showAllBookings` | `show-all-bookings` |             | `boolean`                                                       | `true`                                 |
-| `startScreen`     | --                  |             | `{ screen: "bookings" \| "booking-details"; params: unknown; }` | `{ screen: 'bookings', params: null }` |
+| Property           | Attribute             | Description | Type                                                            | Default                                 |
+| ------------------ | --------------------- | ----------- | --------------------------------------------------------------- | --------------------------------------- |
+| `aName`            | `a-name`              |             | `string`                                                        | `null`                                  |
+| `aff`              | `aff`                 |             | `string`                                                        | `null`                                  |
+| `baseUrl`          | `base-url`            |             | `string`                                                        | `'https://gateway.igloorooms.com/IRBE'` |
+| `be`               | `be`                  |             | `boolean`                                                       | `false`                                 |
+| `footerShown`      | `footer-shown`        |             | `boolean`                                                       | `true`                                  |
+| `headerShown`      | `header-shown`        |             | `boolean`                                                       | `true`                                  |
+| `hideGoogleSignIn` | `hide-google-sign-in` |             | `boolean`                                                       | `true`                                  |
+| `language`         | `language`            |             | `string`                                                        | `undefined`                             |
+| `maxPages`         | `max-pages`           |             | `number`                                                        | `10`                                    |
+| `perma_link`       | `perma_link`          |             | `string`                                                        | `null`                                  |
+| `propertyid`       | `propertyid`          |             | `number`                                                        | `undefined`                             |
+| `showAllBookings`  | `show-all-bookings`   |             | `boolean`                                                       | `true`                                  |
+| `startScreen`      | --                    |             | `{ screen: "booking-details" \| "bookings"; params: unknown; }` | `{ screen: 'bookings', params: null }`  |
+| `version`          | `version`             |             | `string`                                                        | `'2.0'`                                 |
 
 
 ## Dependencies
 
 ### Used by
 
- - [ir-booking-engine](..)
+ - [ir-be](..)
 
 ### Depends on
 
@@ -51,6 +53,7 @@ graph TD;
   ir-booking-listing --> ir-interceptor
   ir-booking-listing --> ir-nav
   ir-booking-listing --> ir-footer
+  ir-booking-overview --> ir-skeleton
   ir-booking-overview --> ir-booking-header
   ir-booking-overview --> ir-badge
   ir-booking-overview --> ir-menu
@@ -63,15 +66,19 @@ graph TD;
   ir-booking-card --> ir-badge
   ir-booking-card --> ir-button
   ir-booking-cancelation --> ir-alert-dialog
+  ir-booking-cancelation --> ir-skeleton
+  ir-booking-cancelation --> ir-icons
   ir-booking-cancelation --> ir-button
   ir-invoice --> ir-interceptor
   ir-invoice --> ir-nav
-  ir-invoice --> ir-button
   ir-invoice --> ir-icons
+  ir-invoice --> ir-button
   ir-invoice --> ir-footer
-  ir-invoice --> ir-alert-dialog
+  ir-invoice --> ir-booking-cancelation
+  ir-invoice --> ir-skeleton
   ir-interceptor --> ir-alert-dialog
   ir-interceptor --> ir-icons
+  ir-interceptor --> ir-button
   ir-nav --> ir-language-picker
   ir-nav --> ir-booking-code
   ir-nav --> ir-google-maps
@@ -96,6 +103,7 @@ graph TD;
   ir-user-avatar --> ir-icons
   ir-sheet --> ir-button
   ir-modal --> ir-auth
+  ir-modal --> ir-dialog
   ir-auth --> ir-signin
   ir-auth --> ir-signup
   ir-auth --> ir-button
@@ -111,7 +119,7 @@ graph TD;
   ir-footer --> ir-dialog
   ir-privacy-policy --> ir-button
   ir-privacy-policy --> ir-dialog
-  ir-booking-engine --> ir-booking-listing
+  ir-be --> ir-booking-listing
   style ir-booking-listing fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

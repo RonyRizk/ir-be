@@ -30,14 +30,14 @@
 
 ### Used by
 
- - [ir-booking-widget](../../ir-booking-widget)
  - [ir-date-popup](../../ir-booking-engine/ir-booking-page/ir-availibility-header/ir-date-popup)
+ - [ir-widget](../../ir-booking-widget)
 
 ### Graph
 ```mermaid
 graph TD;
-  ir-booking-widget --> ir-date-range
   ir-date-popup --> ir-date-range
+  ir-widget --> ir-date-range
   style ir-date-range fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

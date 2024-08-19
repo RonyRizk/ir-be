@@ -7,7 +7,9 @@
   padding: 1rem;
   border-radius: min(var(--radius, 0.5rem), 0.75rem);
 }
-
+.full-width-on-mobile {
+  width: 100%;
+}
 .availability-inputs {
   display: flex;
   width: 100%;
@@ -82,6 +84,11 @@
   position: relative;
   animation: tooltipAnimation 300ms ease-out;
 }
+.availability-inputs.promotions,
+.availability-inputs.promotions .adult-child-counter,
+.availability-inputs.promotions .date-popup {
+  flex: 1 1 0%;
+}
 @keyframes tooltipAnimation {
   from {
     transform: translateY(4px);
@@ -128,7 +135,12 @@
   .availability-container {
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: center;
     gap: 4rem;
   }
+  .availability-container.promotions {
+    justify-content: flex-start;
+  }
 }
+/* @media (min-width: 1280px) {
+ 
+} */

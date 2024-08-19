@@ -9,14 +9,14 @@
 
 | Property                | Attribute      | Description | Type                                                                                              | Default     |
 | ----------------------- | -------------- | ----------- | ------------------------------------------------------------------------------------------------- | ----------- |
-| `aName`                 | `a-name`       |             | `string`                                                                                          | `null`      |
-| `baseUrl`               | `base-url`     |             | `string`                                                                                          | `undefined` |
+| `aff`                   | `aff`          |             | `string`                                                                                          | `null`      |
 | `contentContainerStyle` | --             |             | `{ color?: string; height?: string; width?: string; borderColor?: string; background?: string; }` | `undefined` |
 | `language`              | `language`     |             | `string`                                                                                          | `'en'`      |
+| `p`                     | `p`            |             | `string`                                                                                          | `null`      |
 | `perma_link`            | `perma_link`   |             | `string`                                                                                          | `null`      |
-| `position`              | `position`     |             | `"block" \| "sticky"`                                                                             | `'sticky'`  |
+| `position`              | `position`     |             | `"block" \| "fixed"`                                                                              | `'fixed'`   |
 | `propertyId`            | `property-id`  |             | `number`                                                                                          | `42`        |
-| `roomTypeId`            | `room-type-id` |             | `string`                                                                                          | `'110'`     |
+| `roomTypeId`            | `room-type-id` |             | `string`                                                                                          | `null`      |
 
 
 ## Dependencies
@@ -31,15 +31,15 @@
 ### Graph
 ```mermaid
 graph TD;
-  ir-booking-widget --> ir-icons
-  ir-booking-widget --> ir-popover
-  ir-booking-widget --> ir-date-range
-  ir-booking-widget --> ir-guest-counter
+  ir-widget --> ir-icons
+  ir-widget --> ir-popover
+  ir-widget --> ir-date-range
+  ir-widget --> ir-guest-counter
   ir-popover --> ir-dialog
   ir-dialog --> ir-button
   ir-button --> ir-icons
   ir-guest-counter --> ir-button
-  style ir-booking-widget fill:#f9f,stroke:#333,stroke-width:4px
+  style ir-widget fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
 ----------------------------------------------

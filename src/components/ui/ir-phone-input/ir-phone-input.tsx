@@ -3,7 +3,7 @@ import { createPopper } from '@popperjs/core';
 import localization_store from '@/stores/app.store';
 import { CommonService } from '@/services/api/common.service';
 import app_store from '@/stores/app.store';
-import { ICountry } from '@/models/common';
+import { ICountry } from '@/models/commun';
 import { updateUserFormData } from '@/stores/checkout.store';
 import localizedWords from '@/stores/localization.store';
 import phone_input_store from './phone.store';

@@ -49,6 +49,7 @@ Type: `Promise<void>`
  - [ir-booking-details](../../ir-booking-engine/ir-checkout-page/ir-booking-details)
  - [ir-coupon-dialog](../../ir-booking-engine/ir-booking-page/ir-availibility-header/ir-coupon-dialog)
  - [ir-footer](../../ir-booking-engine/ir-footer)
+ - [ir-modal](../ir-modal)
  - [ir-nav](../../ir-booking-engine/ir-nav)
  - [ir-popover](../ir-popover)
  - [ir-privacy-policy](../../ir-booking-engine/ir-privacy-policy)
@@ -66,6 +67,7 @@ graph TD;
   ir-booking-details --> ir-dialog
   ir-coupon-dialog --> ir-dialog
   ir-footer --> ir-dialog
+  ir-modal --> ir-dialog
   ir-nav --> ir-dialog
   ir-popover --> ir-dialog
   ir-privacy-policy --> ir-dialog

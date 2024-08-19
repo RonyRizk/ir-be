@@ -1,4 +1,5 @@
 import localizedWords from '@/stores/localization.store';
+import { ZCreditCardSchemaWithCvc } from '@/validators/checkout.validator';
 import { Component, Host, h, Event, EventEmitter, State, Element, Prop } from '@stencil/core';
 import IMask from 'imask';
 
@@ -88,14 +89,20 @@ export class IrCreditCardInput {
             <input
               type="text"
               class="w-full"
+              onFocus={() => {
+                if (this.el.hasAttribute('data-state')) this.el.removeAttribute('data-state');
+              }}
               onBlur={e => {
                 const target = e.target as HTMLInputElement;
-                if (target.value.length === 0) {
-                  this.error = true;
-                  target.setAttribute('aria-invalid', 'true');
+                const cardNumberSchema = ZCreditCardSchemaWithCvc.pick({ cardNumber: true });
+                const cardNumberValidation = cardNumberSchema.safeParse({ cardNumber: target.value?.replace(/ /g, '') });
+
+                if (!cardNumberValidation.success) {
+                  this.el.setAttribute('data-state', 'error');
+                  this.el.setAttribute('aria-invalid', 'true');
                 } else {
-                  if (target.hasAttribute('aria-invalid')) {
-                    target.setAttribute('aria-invalid', 'false');
+                  if (this.el.hasAttribute('aria-invalid')) {
+                    this.el.setAttribute('aria-invalid', 'false');
                   }
                 }
               }}

@@ -13,9 +13,11 @@ export class IrInterceptor {
   @State() isLoading = false;
   @State() isUnassignedUnit = false;
   @State() errorMessage: string | null = null;
+  @State() lastFailedRequest: AxiosRequestConfig | null = null;
 
-  @Prop({ reflect: true }) handledEndpoints = ['/ReAllocate_Exposed_Room', '/Do_Payment', '/Get_Exposed_Bookings'];
+  @Prop({ reflect: true }) handledEndpoints = [];
   alertRef: HTMLIrAlertDialogElement;
+  private ignoredErrorRoutes = ['/Exposed_Guest_SignIn', '/Exposed_Guest_SignUp'];
   //@Event({ bubbles: true, composed: true }) toast: EventEmitter<IToast>;
   componentWillLoad() {
     this.setupAxiosInterceptors();
@@ -51,7 +53,10 @@ export class IrInterceptor {
     }
     interceptor_requests[extractedUrl] = 'done';
     if (response.data.ExceptionMsg?.trim()) {
-      this.handleError(response.data.ExceptionMsg);
+      if (!this.ignoredErrorRoutes.includes(extractedUrl)) {
+        this.handleError(response.data.ExceptionMsg);
+        this.lastFailedRequest = response.config;
+      }
       throw new Error(response.data.ExceptionMsg);
     }
     return response;
@@ -63,19 +68,25 @@ export class IrInterceptor {
     this.alertRef.openModal();
     return Promise.reject(error);
   }
+  retryLastRequest() {
+    this.alertRef.closeModal();
+    this.errorMessage = null;
+    if (this.lastFailedRequest) {
+      return axios(this.lastFailedRequest);
+    }
+  }
   render() {
     return (
       <Host>
         <ir-alert-dialog ref={el => (this.alertRef = el)}>
-          <h1 slot="modal-title" class={'flex items-center'}>
-            {' '}
-            <ir-icons name="danger"></ir-icons>
-            <span>Something went wrong!</span>
-          </h1>
-          <div slot="modal-body">
-            <p>{this.errorMessage}</p>
-            <button>Cancel</button>
-            <button>Ok</button>
+          <div slot="modal-title" class={'flex items-center gap-4 pb-2'}>
+            <ir-icons name="danger" class={'text-red-500'} svgClassName="size-6"></ir-icons>
+            <h1 class={'text-lg font-semibold'}>Something went wrong!</h1>
+          </div>
+          <p slot="modal-body">{this.errorMessage}</p>
+          <div slot="modal-footer">
+            <ir-button label="Cancel" variants="outline" onButtonClick={() => this.alertRef.closeModal()}></ir-button>
+            <ir-button label="Try again" onButtonClick={() => this.retryLastRequest()}></ir-button>
           </div>
         </ir-alert-dialog>
       </Host>

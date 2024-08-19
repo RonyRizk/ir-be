@@ -41,9 +41,9 @@ Type: `Promise<void>`
 ### Used by
 
  - [ir-adult-child-counter](../../ir-booking-engine/ir-booking-page/ir-adult-child-counter)
- - [ir-booking-widget](../../ir-booking-widget)
  - [ir-date-popup](../../ir-booking-engine/ir-booking-page/ir-availibility-header/ir-date-popup)
  - [ir-pickup](../../ir-booking-engine/ir-checkout-page/ir-pickup)
+ - [ir-widget](../../ir-booking-widget)
 
 ### Depends on
 
@@ -56,9 +56,9 @@ graph TD;
   ir-dialog --> ir-button
   ir-button --> ir-icons
   ir-adult-child-counter --> ir-popover
-  ir-booking-widget --> ir-popover
   ir-date-popup --> ir-popover
   ir-pickup --> ir-popover
+  ir-widget --> ir-popover
   style ir-popover fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

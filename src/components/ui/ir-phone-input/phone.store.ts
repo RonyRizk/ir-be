@@ -1,4 +1,4 @@
-import { ICountry } from '@/models/common';
+import { ICountry } from '@/models/commun';
 import { createStore } from '@stencil/store';
 interface PhoneInputStore {
   countries: ICountry[];

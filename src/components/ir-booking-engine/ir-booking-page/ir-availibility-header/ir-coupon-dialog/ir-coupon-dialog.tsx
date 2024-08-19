@@ -1,9 +1,8 @@
 import app_store from '@/stores/app.store';
 import booking_store, { modifyBookingStore } from '@/stores/booking';
 import localizedWords from '@/stores/localization.store';
-import { cn } from '@/utils/utils';
+import { cn, validateCoupon } from '@/utils/utils';
 import { Component, Fragment, h, State, Event, EventEmitter } from '@stencil/core';
-import { isBefore } from 'date-fns';
 
 @Component({
   tag: 'ir-coupon-dialog',
@@ -20,21 +19,11 @@ export class IrCouponDialog {
   dialogRef: HTMLIrDialogElement;
 
   activateCoupon() {
-    alert('hello world');
     this.validationMessage = null;
-    const c = app_store.property.promotions.find(p => p.key === this.coupon.trim());
-    if (!c) {
-      return (this.validationMessage = { error: true, message: 'Invalid coupon' });
-    }
-    if (isBefore(new Date(c.to), new Date())) {
+    if (!validateCoupon(this.coupon)) {
       return (this.validationMessage = { error: true, message: 'Invalid coupon' });
     }
     this.isValid = true;
-    modifyBookingStore('bookingAvailabilityParams', {
-      ...booking_store.bookingAvailabilityParams,
-      coupon: this.coupon,
-      loyalty: false,
-    });
     this.validationMessage = { error: false, message: this.coupon };
     this.resetBooking.emit('discountOnly');
     this.coupon = null;
@@ -62,7 +51,7 @@ export class IrCouponDialog {
         <div class="coupon-container">
           <ir-button
             class={cn('coupon-button', {
-              'coupon-button-wide': this.validationMessage && !this.validationMessage.error,
+              'coupon-button-wide': !!booking_store.bookingAvailabilityParams.coupon,
             })}
             onButtonClick={() => this.dialogRef.openModal()}
             variants="outline"
@@ -71,7 +60,7 @@ export class IrCouponDialog {
           >
             <ir-icons slot="left-icon" name="coupon"></ir-icons>
           </ir-button>
-          {this.isValid && this.validationMessage && !this.validationMessage.error && (
+          {!!booking_store.bookingAvailabilityParams.coupon && (
             <div class="coupon-applied">
               <p onClick={this.removeCoupon.bind(this)}>{localizedWords.entries.Lcz_DiscountApplied}</p>
               <ir-button
@@ -88,7 +77,16 @@ export class IrCouponDialog {
           )}
         </div>
 
-        <ir-dialog ref={el => (this.dialogRef = el)}>
+        <ir-dialog
+          ref={el => (this.dialogRef = el)}
+          onOpenChange={e => {
+            e.stopImmediatePropagation();
+            e.stopPropagation();
+            if (!e.detail) {
+              this.coupon = '';
+            }
+          }}
+        >
           <form
             onSubmit={e => {
               e.preventDefault();

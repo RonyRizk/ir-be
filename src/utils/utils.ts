@@ -1,8 +1,9 @@
 import { ICurrency } from '@/components';
 import { Assignableunit, IExposedProperty } from '@/models/property';
 import app_store, { changeLocale, updateUserPreference } from '@/stores/app.store';
+import booking_store, { modifyBookingStore } from '@/stores/booking';
 import clsx, { ClassValue } from 'clsx';
-import { addDays, differenceInCalendarDays, format, Locale } from 'date-fns';
+import { addDays, differenceInCalendarDays, format, isBefore, Locale } from 'date-fns';
 import { ar, es, fr, de, pl, uk, ru, el, enUS } from 'date-fns/locale';
 import { twMerge } from 'tailwind-merge';
 // import DOMPurify from 'dompurify';
@@ -157,18 +158,88 @@ export function injectHTML(htmlContent: string, target: 'head' | 'body' = 'body'
   }
 }
 export function checkAffiliate(afName: string) {
-  if (afName) {
-    const affiliate = app_store?.property?.affiliates.find(aff => aff.afname.toLowerCase().trim() === afName);
-    if (!affiliate) {
-      return null;
-    }
-    return affiliate;
+  if (!afName) {
+    return null;
   }
-  return null;
+  const affiliate = app_store?.property?.affiliates.find(aff => aff.afname.toLowerCase().trim() === afName);
+  if (!affiliate) {
+    return null;
+  }
+  console.log(affiliate);
+  return affiliate;
 }
 export function formatFullLocation(property: IExposedProperty) {
   return [property?.area ?? null, property?.city?.name ?? null, property?.country?.name ?? null].filter(f => f !== null).join(', ');
 }
 export function formatImageAlt(alt: string | null, roomTypeName: string | null = null) {
   return [roomTypeName, alt, `${app_store.property.name}, ${app_store.property.country.name}`].filter(f => f !== null).join(' - ');
+}
+export function validateCoupon(coupon: string) {
+  if (!coupon) {
+    return false;
+  }
+  let isValidCoupon = false;
+  const c = app_store.property.promotions.find(p => p.key === coupon.trim());
+  if (c) {
+    if (isBefore(new Date(c.to), new Date())) {
+      return false;
+    }
+    isValidCoupon = true;
+    modifyBookingStore('bookingAvailabilityParams', {
+      ...booking_store.bookingAvailabilityParams,
+      coupon,
+      loyalty: false,
+    });
+  }
+  return isValidCoupon;
+}
+export function validateAgentCode(code: string) {
+  if (!code) {
+    return false;
+  }
+  let isValidCode = false;
+  const agent = app_store.property?.agents.find(a => a.code.toLowerCase() === code.trim().toLowerCase());
+  console.log(agent);
+  if (agent) {
+    isValidCode = true;
+    booking_store.bookingAvailabilityParams = {
+      ...booking_store.bookingAvailabilityParams,
+      agent: agent.id,
+    };
+  }
+  return isValidCode;
+}
+export function renderPropertyLocation() {
+  const affiliate = app_store.app_data.affiliate;
+  if (affiliate) {
+    return [app_store.app_data.affiliate?.address ?? null, app_store.app_data.affiliate.city ?? null, app_store.app_data.affiliate.country.name ?? null]
+      .filter(f => f !== null)
+      .join(', ');
+  }
+  return [app_store.property?.area ?? null, app_store.property?.city.name ?? null, app_store.property?.country.name ?? null].filter(f => f !== null).join(', ');
+}
+function setBookingCookie() {
+  const cookieName = 'ghs_booking';
+  const cookieValue = 'true';
+  const date = addDays(new Date(), 30);
+  const expires = 'expires=' + date.toUTCString();
+  document.cookie = `${cookieName}=${cookieValue};${expires};path=/`;
+}
+export function destroyBookingCookie() {
+  const cookieName = 'ghs_booking';
+  const pastDate = new Date(0).toUTCString();
+  document.cookie = `${cookieName}=; expires=${pastDate}; path=/`;
+}
+
+export function checkGhs(source_code: string, stag: string) {
+  const ghsCookie = getCookie('ghs_booking');
+  if (source_code === 'ghs' || stag === 'ghs') {
+    destroyBookingCookie();
+    setBookingCookie();
+    return true;
+  }
+  if (ghsCookie) {
+    return true;
+  }
+  return false;
 }

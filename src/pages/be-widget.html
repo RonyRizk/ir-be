@@ -17,7 +17,7 @@
     <style>
         :root {
             --background: white;
-            --radius: 30px;
+            /* --radius: 30px; */
             /* Brand colors */
             --brand-25: 210, 100%, 98%;
             --brand-50: 206, 100%, 97%;
@@ -83,14 +83,14 @@
 </head>
 
 <body>
-    <ir-booking-widget class="mt-1" base-url="https://gateway.igloorooms.com/IR"></ir-booking-widget>
+    <ir-widget class="mt-4"></ir-widget>
     <script>
-        const widget = document.querySelector('ir-booking-widget')
-        widget.contentContainerStyle = {
-            background: "green",
-            color: "yellow",
-            borderColor: "orange"
-        }
+        // const widget = document.querySelector('ir-widget')
+        // widget.contentContainerStyle = {
+        //   background: "green",
+        //   color: "yellow",
+        //   borderColor: "orange"
+        // }
     </script>
 </body>
 

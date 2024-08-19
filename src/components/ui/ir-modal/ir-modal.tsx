@@ -1,5 +1,5 @@
-import { addOverlay, removeOverlay } from '@/stores/overlay.store';
-import { Component, Element, Listen, State, Method, Event, EventEmitter, Prop } from '@stencil/core';
+// import { addOverlay, removeOverlay } from '@/stores/overlay.store';
+import { Component, Element, Listen, State, Method, Event, EventEmitter, Prop, h } from '@stencil/core';
 
 @Component({
   tag: 'ir-modal',
@@ -29,6 +29,7 @@ export class IrModal {
     };
   }>;
   auth: HTMLIrAuthElement;
+  dialogRef: HTMLIrDialogElement;
 
   componentWillLoad() {
     this.createPortal();
@@ -37,24 +38,29 @@ export class IrModal {
   disconnectedCallback() {
     this.cleanup();
   }
-
+  @Listen('authFinish')
+  handleAuthFinish(e: CustomEvent) {
+    this.authStatus.emit(e.detail);
+  }
   @Method()
   async openModal() {
     this.isOpen = true;
     this.openChange.emit(this.isOpen);
-    addOverlay();
-    this.createOverlay();
-    this.insertModalContent();
-    this.prepareFocusTrap();
+    // addOverlay();
+    // this.createOverlay();
+    // this.insertModalContent();
+    // this.prepareFocusTrap();
+    this.dialogRef.openModal();
   }
 
   @Method()
   async closeModal() {
     this.isOpen = false;
     this.openChange.emit(this.isOpen);
-    removeOverlay();
-    this.removeModalContent();
-    this.removeOverlay();
+    // removeOverlay();
+    // this.removeModalContent();
+    // this.removeOverlay();
+    this.dialogRef.closeModal();
   }
 
   createPortal() {
@@ -158,6 +164,10 @@ export class IrModal {
   }
 
   render() {
-    return null;
+    return (
+      <ir-dialog ref={el => (this.dialogRef = el)}>
+        <ir-auth slot="modal-body" onCloseDialog={() => this.closeModal()}></ir-auth>
+      </ir-dialog>
+    );
   }
 }

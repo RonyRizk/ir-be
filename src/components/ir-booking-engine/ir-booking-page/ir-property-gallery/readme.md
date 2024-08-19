@@ -24,10 +24,9 @@
 
 - [ir-icons](../../../ui/ir-icons)
 - [ir-gallery](../../../ui/ir-gallery)
-- [ir-accomodations](../ir-accomodations)
 - [ir-carousel](../../../ui/ir-carousel)
-- [ir-button](../../../ui/ir-button)
 - [ir-dialog](../../../ui/ir-dialog)
+- [ir-button](../../../ui/ir-button)
 - [ir-room-type-amenities](../ir-room-type-amenities)
 
 ### Graph
@@ -35,14 +34,12 @@
 graph TD;
   ir-property-gallery --> ir-icons
   ir-property-gallery --> ir-gallery
-  ir-property-gallery --> ir-accomodations
   ir-property-gallery --> ir-carousel
-  ir-property-gallery --> ir-button
   ir-property-gallery --> ir-dialog
+  ir-property-gallery --> ir-button
   ir-property-gallery --> ir-room-type-amenities
-  ir-accomodations --> ir-icons
-  ir-button --> ir-icons
   ir-dialog --> ir-button
+  ir-button --> ir-icons
   ir-room-type-amenities --> ir-icons
   ir-booking-page --> ir-property-gallery
   ir-roomtype --> ir-property-gallery

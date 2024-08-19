@@ -7,10 +7,10 @@
 
 ## Properties
 
-| Property    | Attribute    | Description | Type      | Default     |
-| ----------- | ------------ | ----------- | --------- | ----------- |
-| `error`     | `error`      |             | `boolean` | `undefined` |
-| `isLoading` | `is-loading` |             | `boolean` | `false`     |
+| Property           | Attribute           | Description | Type                                                                                                                                                  | Default     |
+| ------------------ | ------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `error`            | --                  |             | `{ cause: "booking-details" \| "booking-summary"; issues: string; } \| { cause: "user" \| "pickup" \| "payment"; issues: Record<string, ZodIssue>; }` | `undefined` |
+| `prepaymentAmount` | `prepayment-amount` |             | `any`                                                                                                                                                 | `null`      |
 
 
 ## Events

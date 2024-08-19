@@ -20,19 +20,19 @@ export class IrAccomodations {
     const climatecontrol = this.checkAmenity('climatecontrol');
     const balcony = this.checkAmenity('balcony');
     return (
-      <ul class="flex flex-wrap items-center  gap-2 text-xs">
+      <ul class="flex flex-wrap items-center  gap-3 text-xs">
         {wifi && (
-          <li class="flex items-center gap-2">
+          <li class="flex items-center gap-1">
             <ir-icons name="wifi" svgClassName="size-4"></ir-icons> <span>{wifi.description}</span>
           </li>
         )}
         {climatecontrol && (
-          <li class="flex items-center gap-2">
+          <li class="flex items-center gap-1">
             <ir-icons name="snowflake" svgClassName="size-4"></ir-icons> <span>{climatecontrol.description}</span>
           </li>
         )}
         {balcony && (
-          <li class="flex items-center gap-2">
+          <li class="flex items-center gap-1">
             <ir-icons name="sun" svgClassName="size-4"></ir-icons> <span>{balcony.description}</span>
           </li>
         )}

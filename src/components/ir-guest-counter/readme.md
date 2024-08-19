@@ -28,7 +28,7 @@
 
 ### Used by
 
- - [ir-booking-widget](../ir-booking-widget)
+ - [ir-widget](../ir-booking-widget)
 
 ### Depends on
 
@@ -39,7 +39,7 @@
 graph TD;
   ir-guest-counter --> ir-button
   ir-button --> ir-icons
-  ir-booking-widget --> ir-guest-counter
+  ir-widget --> ir-guest-counter
   style ir-guest-counter fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

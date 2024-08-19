@@ -33,6 +33,7 @@
 
 ### Depends on
 
+- [ir-skeleton](../../../ui/ir-skeleton)
 - [ir-booking-header](../ir-booking-header)
 - [ir-badge](../../../ui/ir-badge)
 - [ir-menu](../../../ui/ir-menu)
@@ -43,6 +44,7 @@
 ### Graph
 ```mermaid
 graph TD;
+  ir-booking-overview --> ir-skeleton
   ir-booking-overview --> ir-booking-header
   ir-booking-overview --> ir-badge
   ir-booking-overview --> ir-menu
@@ -55,6 +57,8 @@ graph TD;
   ir-booking-card --> ir-badge
   ir-booking-card --> ir-button
   ir-booking-cancelation --> ir-alert-dialog
+  ir-booking-cancelation --> ir-skeleton
+  ir-booking-cancelation --> ir-icons
   ir-booking-cancelation --> ir-button
   ir-booking-listing --> ir-booking-overview
   style ir-booking-overview fill:#f9f,stroke:#333,stroke-width:4px

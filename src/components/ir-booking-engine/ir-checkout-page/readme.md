@@ -16,7 +16,7 @@
 
 ### Used by
 
- - [ir-booking-engine](..)
+ - [ir-be](..)
 
 ### Depends on
 
@@ -68,7 +68,7 @@ graph TD;
   ir-payment-view --> ir-select
   ir-privacy-policy --> ir-button
   ir-privacy-policy --> ir-dialog
-  ir-booking-engine --> ir-checkout-page
+  ir-be --> ir-checkout-page
   style ir-checkout-page fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

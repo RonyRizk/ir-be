@@ -1,5 +1,5 @@
 import { createPopper } from '@popperjs/core';
-import { Component, Fragment, Host, Prop, State, h, Element } from '@stencil/core';
+import { Component, Fragment, Host, Prop, State, h, Element, Event, EventEmitter } from '@stencil/core';
 
 @Component({
   tag: 'ir-tooltip',
@@ -12,8 +12,12 @@ export class IrTooltip {
   @Prop({ reflect: true }) message: string;
   @Prop() withHtml: boolean = true;
   @Prop() label: string;
+  @Prop() labelColors: 'default' | 'green' | 'red' = 'default';
+  @Prop() open_behavior: 'hover' | 'click' = 'hover';
 
   @State() open: boolean;
+
+  @Event() tooltipOpenChange: EventEmitter<boolean>;
 
   private popperInstance: any;
   private tooltipTimeout: NodeJS.Timeout;
@@ -23,7 +27,12 @@ export class IrTooltip {
   componentDidLoad() {
     this.createPopperInstance();
   }
-
+  handleOutsideClick = (event: MouseEvent) => {
+    const outsideClick = typeof event.composedPath === 'function' && !event.composedPath().includes(this.el);
+    if (outsideClick && this.open) {
+      this.open = false;
+    }
+  };
   createPopperInstance() {
     if (this.trigger && this.content) {
       this.popperInstance = createPopper(this.trigger, this.content, {
@@ -41,6 +50,11 @@ export class IrTooltip {
   }
 
   toggleOpen(shouldOpen: boolean) {
+    if (shouldOpen) {
+      document.addEventListener('click', this.handleOutsideClick, true);
+    } else {
+      document.removeEventListener('click', this.handleOutsideClick, true);
+    }
     if (this.tooltipTimeout) {
       clearTimeout(this.tooltipTimeout);
     }
@@ -61,20 +75,37 @@ export class IrTooltip {
         this.popperInstance = null;
       }
     }
+    this.tooltipOpenChange.emit(shouldOpen);
   }
 
   disconnectedCallback() {
     if (this.popperInstance) {
       this.popperInstance.destroy();
     }
+    document.removeEventListener('click', this.handleOutsideClick, true);
   }
   render() {
     return (
       <Host>
-        <button ref={el => (this.trigger = el)} onMouseEnter={() => this.toggleOpen(true)} onMouseLeave={() => this.toggleOpen(false)}>
+        <button
+          ref={el => (this.trigger = el)}
+          onMouseEnter={() => {
+            if (this.open_behavior === 'hover') {
+              this.toggleOpen(true);
+            }
+          }}
+          onMouseLeave={() => {
+            if (this.open_behavior === 'hover') this.toggleOpen(false);
+          }}
+          onClick={() => {
+            if (this.open_behavior === 'click') {
+              this.toggleOpen(!this.open);
+            }
+          }}
+        >
           <slot name="tooltip-trigger">
             <div class="tooltip-container">
-              <p class="tooltip-label">{this.label}</p>
+              <p class={`tooltip-label label-${this.labelColors}`}>{this.label}</p>
               <svg data-toggle="tooltip" data-placement="top" xmlns="http://www.w3.org/2000/svg" height="16" width="16" class="tooltip-icon" viewBox="0 0 512 512">
                 <path
                   fill={'currentColor'}

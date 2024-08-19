@@ -47,7 +47,7 @@ export class IrBookingCard {
     const { cancel, payment, view } = this.bookingListingAppService.getBookingActions(this.booking);
     return (
       <div class="relative flex flex-col space-y-1.5 rounded-xl  bg-gray-100 p-6 text-sm " key={this.booking.booking_nbr}>
-        {!this.aff && (
+        {this.aff && (
           <div class="">
             <span class="font-medium">{this.booking.property.name}</span>
             <span class="mx-2 text-xs text-gray-700">{formatFullLocation(this.booking.property)}</span>

@@ -32,7 +32,7 @@
 
 ### Used by
 
- - [ir-booking-engine](..)
+ - [ir-be](..)
  - [ir-booking-listing](../ir-booking-listing)
  - [ir-invoice](../../ir-invoice)
 
@@ -78,6 +78,7 @@ graph TD;
   ir-user-avatar --> ir-icons
   ir-sheet --> ir-button
   ir-modal --> ir-auth
+  ir-modal --> ir-dialog
   ir-auth --> ir-signin
   ir-auth --> ir-signup
   ir-auth --> ir-button
@@ -87,7 +88,7 @@ graph TD;
   ir-signup --> ir-input
   ir-signup --> ir-button
   ir-dialog --> ir-button
-  ir-booking-engine --> ir-nav
+  ir-be --> ir-nav
   ir-booking-listing --> ir-nav
   ir-invoice --> ir-nav
   style ir-nav fill:#f9f,stroke:#333,stroke-width:4px

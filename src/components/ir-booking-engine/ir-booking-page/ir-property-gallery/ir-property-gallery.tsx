@@ -2,7 +2,7 @@ import { RoomType } from '@/models/property';
 import app_store from '@/stores/app.store';
 import localizedWords from '@/stores/localization.store';
 import { formatImageAlt } from '@/utils/utils';
-import { Component, Fragment, h, Listen, Prop } from '@stencil/core';
+import { Component, Fragment, h, Listen, Prop, State } from '@stencil/core';
 import { v4 } from 'uuid';
 
 @Component({
@@ -13,11 +13,15 @@ import { v4 } from 'uuid';
 export class IrPropertyGallery {
   @Prop() property_state: 'carousel' | 'gallery' = 'gallery';
   @Prop() roomType: RoomType;
+
+  @State() activeIndex = 0;
+
   private irDialog: HTMLIrDialogElement;
 
   @Listen('openGallery')
-  handleOpenGallery() {
+  handleOpenGallery(e: CustomEvent) {
     if (window.innerWidth > 650) {
+      this.activeIndex = e.detail;
       this.irDialog.openModal();
     }
   }
@@ -25,7 +29,7 @@ export class IrPropertyGallery {
   handleOpenCarouselGallery() {
     this.irDialog.openModal();
   }
-  showPlanLimitations(withRoomSize = true) {
+  showPlanLimitations({ withRoomSize = true, showMoreTag = false }: { withRoomSize: boolean; showMoreTag: boolean }) {
     if (!this.roomType) {
       return null;
     }
@@ -61,12 +65,20 @@ export class IrPropertyGallery {
 
     if (maxNumber > 4) {
       return (
-        <div class="capacity-container pointer-events-none absolute -bottom-1 z-40 flex w-full items-center justify-between bg-white/80 px-2 py-1 pb-2 text-sm">
+        <div class="capacity-container pointer-events-none absolute -bottom-0 z-40 flex w-full items-center justify-between bg-white/80 px-2 py-1 pb-2 text-sm">
           <div class="flex items-center gap-2">
             <p>{localizedWords.entries.Lcz_Maximum}</p>
             {renderOccupancy()}
           </div>
           {renderRoomSize()}
+          {showMoreTag && (
+            <div class="flex items-center gap-1.5">
+              <span>More</span>
+              <span>
+                <ir-icons name="arrow-up-right-from-square" svgClassName="size-3"></ir-icons>
+              </span>
+            </div>
+          )}
         </div>
       );
     }
@@ -85,6 +97,14 @@ export class IrPropertyGallery {
           </div>
         </div>
         {renderRoomSize()}
+        {showMoreTag && (
+          <div class="flex items-center gap-1.5">
+            <span>More</span>
+            <span>
+              <ir-icons name="arrow-up-right-from-square" svgClassName="size-3"></ir-icons>
+            </span>
+          </div>
+        )}
       </div>
     );
   }
@@ -96,26 +116,20 @@ export class IrPropertyGallery {
         {this.property_state === 'gallery' ? (
           <ir-gallery
             totalImages={app_store.property?.images.length}
-            images={app_store.property?.images?.map(i => ({ url: i.url, alt: formatImageAlt(i.tooltip) })).slice(0, 5)}
+            images={app_store.property?.images?.map(i => ({ url: i.url, alt: formatImageAlt(i.tooltip) }))}
+            maxLength={5}
+            disableCarouselClick={true}
+            enableCarouselSwipe={true}
           ></ir-gallery>
         ) : (
           <Fragment>
-            <div class="flex flex-wrap items-center gap-2 py-2 text-sm font-normal text-gray-700 md:hidden">
-              <ir-accomodations
-                bookingAttributes={{
-                  max_occupancy: this.roomType.occupancy_max.adult_nbr,
-                  bedding_setup: this.roomType.bedding_setup,
-                }}
-                amenities={app_store.property?.amenities}
-              ></ir-accomodations>
-            </div>
-            <div class="carousel-container relative h-48 w-full overflow-hidden rounded-md md:hidden">
+            <div class="carousel-container relative aspect-[16/9] w-full overflow-hidden  md:hidden">
               {this.roomType.images.length === 0 ? (
                 <Fragment>
                   <div onClick={() => this.irDialog.openModal()} class="gallery-img icon bg-gray-300 text-white">
                     <ir-icons name="image" svgClassName="size-10 mb-4"></ir-icons>
                   </div>
-                  {this.showPlanLimitations()}
+                  {this.showPlanLimitations({ showMoreTag: true, withRoomSize: true })}
                 </Fragment>
               ) : this.roomType.images.length === 1 ? (
                 <img
@@ -126,6 +140,8 @@ export class IrPropertyGallery {
                 />
               ) : (
                 <ir-carousel
+                  carouselClasses="pg_carousel"
+                  onCarouselImageIndexChange={e => (this.activeIndex = e.detail)}
                   slides={this.roomType?.images?.map(img => ({
                     alt: formatImageAlt(img.tooltip, this.roomType?.name),
                     id: v4(),
@@ -133,7 +149,7 @@ export class IrPropertyGallery {
                   }))}
                 ></ir-carousel>
               )}
-              {this.showPlanLimitations()}
+              {this.showPlanLimitations({ showMoreTag: true, withRoomSize: true })}
             </div>
             <div class="hidden  md:block">
               <div class="carousel-container relative mb-1 w-full rounded-md md:max-h-[200px] md:w-auto xl:max-h-[250px] ">
@@ -142,7 +158,7 @@ export class IrPropertyGallery {
                     <div onClick={() => this.irDialog.openModal()} class="gallery-img icon hover:bg-gray-400">
                       <ir-icons name="image" svgClassName="size-10 mb-4"></ir-icons>
                     </div>
-                    {this.showPlanLimitations()}
+                    {this.showPlanLimitations({ showMoreTag: true, withRoomSize: true })}
                   </Fragment>
                 ) : this.roomType.images?.length === 1 ? (
                   <Fragment>
@@ -152,18 +168,19 @@ export class IrPropertyGallery {
                       alt={formatImageAlt(this.roomType.images[0].tooltip, this.roomType?.name)}
                       class="h-full w-full cursor-pointer rounded-[var(--radius,8px)] object-cover "
                     />
-                    {this.showPlanLimitations()}
+                    {this.showPlanLimitations({ showMoreTag: true, withRoomSize: true })}
                   </Fragment>
                 ) : (
                   <Fragment>
                     <ir-carousel
+                      onCarouselImageIndexChange={e => (this.activeIndex = e.detail)}
                       slides={this.roomType.images?.map(img => ({
                         alt: formatImageAlt(img.tooltip, this.roomType?.name),
                         id: v4(),
                         image_uri: img.url,
                       }))}
                     ></ir-carousel>
-                    {this.showPlanLimitations()}
+                    {this.showPlanLimitations({ showMoreTag: true, withRoomSize: true })}
                   </Fragment>
                 )}
                 {/* <div class="lg:hidden">
@@ -176,13 +193,13 @@ export class IrPropertyGallery {
                   ></ir-accomodations>
                 </div> */}
               </div>
-              <ir-button
+              {/* <ir-button
                 onButtonClick={() => this.irDialog.openModal()}
                 variants="link"
                 label={localizedWords.entries.Lcz_MoreDetails}
                 class="more-details-button"
                 buttonStyles={{ paddingLeft: '0', paddingBottom: '0', background: 'transparent', fontSize: '12px' }}
-              ></ir-button>
+              ></ir-button> */}
             </div>
           </Fragment>
         )}
@@ -196,6 +213,8 @@ export class IrPropertyGallery {
               {images.length > 0 && (
                 <div class="coursel_gallery_container hidden sm:block">
                   <ir-carousel
+                    enableCarouselSwipe
+                    activeIndex={this.activeIndex}
                     dir={app_store.dir}
                     key={this.roomType?.id + '_' + app_store.dir}
                     slides={images?.map(img => ({
@@ -209,7 +228,7 @@ export class IrPropertyGallery {
                       e.stopPropagation();
                     }}
                   ></ir-carousel>
-                  {this.showPlanLimitations(false)}
+                  {/* {this.showPlanLimitations({ showMoreTag: false, withRoomSize: false })} */}
                 </div>
               )}
               {this.property_state === 'carousel' && (

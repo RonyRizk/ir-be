@@ -14,10 +14,7 @@
   height: auto;
   position: relative;
 }
-.capacity-container {
-  border-bottom-right-radius: min(var(--radius, 8px), 12px);
-  border-bottom-left-radius: min(var(--radius, 8px), 12px);
-}
+
 .more-details-button {
   margin: 0 0.5rem;
 }
@@ -32,6 +29,10 @@
   width: 100%;
   aspect-ratio: 16/9;
 }
+.pg_carousel {
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
 @media (min-width: 768px) {
   .gallery-img {
     min-height: 200px;
@@ -40,6 +41,10 @@
     max-height: 200px;
     color: white;
     background-color: rgb(209 213 219);
+  }
+  .capacity-container {
+    border-bottom-right-radius: min(var(--radius, 8px), 1rem);
+    border-bottom-left-radius: min(var(--radius, 8px), 1rem);
   }
 }
 @media (min-width: 1280px) {

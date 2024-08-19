@@ -1,5 +1,5 @@
 import { IAllowedOptions, IPickupCurrency } from './calendarData';
-import { ICurrency } from './common';
+import { ICurrency } from './commun';
 import { IExposedProperty } from './property';
 
 export interface Booking {

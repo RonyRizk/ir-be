@@ -4,7 +4,7 @@ import { Component, h, Prop, State, Element, EventEmitter, Event, Listen, Fragme
 @Component({
   tag: 'ir-menu',
   styleUrl: 'ir-menu.css',
-  scoped: true,
+  shadow: true,
 })
 export class IrMenu {
   @Prop({ reflect: true }) data: IItems[] = [];
@@ -81,8 +81,12 @@ export class IrMenu {
   }
   @Listen('click', { target: 'document' })
   handleDocumentClick(event: MouseEvent) {
-    const target = event.target as HTMLElement;
-    if (!this.el.contains(target)) {
+    // const target = event.target as HTMLElement;
+    // if (!this.el.contains(target)) {
+    //   this.isDropdownVisible = false;
+    // }
+    const outsideClick = typeof event.composedPath === 'function' && !event.composedPath().includes(this.el);
+    if (outsideClick && this.isDropdownVisible) {
       this.isDropdownVisible = false;
     }
   }
@@ -116,6 +120,7 @@ export class IrMenu {
 
   toggleDropdown() {
     this.isDropdownVisible = !this.isDropdownVisible;
+    console.log(this.isDropdownVisible)
     if (this.isDropdownVisible) {
       this.currentHighlightedIndex = -1;
       this.adjustPopoverPlacement();
@@ -152,7 +157,10 @@ export class IrMenu {
   render() {
     return (
       <Fragment>
-        <button ref={el => (this.buttonRef = el)} type="button" aria-haspopup="listbox" aria-expanded={this.isDropdownVisible.toString()} onClick={() => this.toggleDropdown()}>
+        <button ref={el => (this.buttonRef = el)}  type="button" aria-haspopup="listbox" aria-expanded={this.isDropdownVisible?"true":"false"}
+          onClick={() => {
+           this.toggleDropdown()
+        }}>
           <slot name="menu-trigger">
             <div class="SelectTrigger">
               {this.selectedItemName || this.menuItem}
@@ -166,6 +174,7 @@ export class IrMenu {
               </svg>
             </div>
           </slot>
+          
         </button>
         <div ref={el => (this.contentElement = el)} class="SelectContent" data-state={this.isDropdownVisible ? 'open' : 'closed'}>
           {this.isDropdownVisible && (

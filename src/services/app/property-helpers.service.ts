@@ -1,15 +1,17 @@
-import { DataStructure } from '@/models/common';
+import { DataStructure } from '@/models/commun';
 import { TPickupFormData } from '@/models/pickup';
 import { RoomType } from '@/models/property';
 import { MissingTokenError } from '@/models/Token';
-import booking_store from '@/stores/booking';
+import booking_store, { modifyBookingStore } from '@/stores/booking';
 import axios from 'axios';
 import { addDays, format } from 'date-fns';
+import { PaymentService } from '../api/payment.service';
+import app_store from '@/stores/app.store';
 
 export class PropertyHelpers {
   private static readonly MODE_MODIFY_RT = 'modify_rt';
   private static readonly MODE_DEFAULT = 'default';
-
+  private paymentService = new PaymentService();
   public validateModeProps(props: any) {
     if (props.mode === PropertyHelpers.MODE_MODIFY_RT && (!props.rp_id || !props.rt_id)) {
       throw new Error('Missing property: rp_id or rt_id is required in modify_rt mode');
@@ -97,12 +99,44 @@ export class PropertyHelpers {
       rate_plan_ids: rateplanIds,
       skip_getting_assignable_units: true,
       is_specific_variation: true,
+      is_backend: false,
     });
     const result = response.data as DataStructure;
     if (result.ExceptionMsg !== '') {
       throw new Error(result.ExceptionMsg);
     }
+    if (result.My_Result.booking_nbr) {
+      modifyBookingStore('fictus_booking_nbr', {
+        nbr: result.My_Result.booking_nbr,
+      });
+      this.validateFreeCancelationZone(token, result.My_Result.booking_nbr);
+    }
     return result;
+  }
+  private async validateFreeCancelationZone(token: string, booking_nbr: string) {
+    this.paymentService.setToken(token);
+    console.log(app_store.currencies.find(c => c.code.toLowerCase() === app_store.userPreferences.currency_id?.toLowerCase()));
+    const result = await this.paymentService.GetExposedApplicablePolicies({
+      book_date: new Date(),
+      params: {
+        booking_nbr,
+        currency_id: app_store.currencies.find(c => c.code.toLowerCase() === (app_store.userPreferences.currency_id.toLowerCase() || 'usd')).id,
+        language: app_store.userPreferences.language_id,
+        property_id: app_store.app_data.property_id,
+        rate_plan_id: 0,
+        room_type_id: 0,
+      },
+      token,
+    });
+    console.log('applicable policies', result);
+    if (!result) {
+      booking_store.isInFreeCancelationZone = true;
+    }
+    if (result) {
+      const { isInFreeCancelationZone } = this.paymentService.processAlicablePolicies(result.data, new Date());
+      console.log(result, isInFreeCancelationZone);
+      booking_store.isInFreeCancelationZone = isInFreeCancelationZone;
+    }
   }
   private updateInventory(roomtypes: RoomType[], newRoomtypes: RoomType[]): RoomType[] {
     const newRoomtypesMap = new Map(newRoomtypes.map(rt => [rt.id, rt]));
@@ -114,6 +148,7 @@ export class PropertyHelpers {
       const updatedRoomtype = {
         ...rt,
         inventory: newRoomtype.inventory,
+        pre_payment_amount: newRoomtype.pre_payment_amount,
         rateplans: rt.rateplans.reduce((updatedRatePlans, rp) => {
           const newRatePlan = newRoomtype.rateplans.find(newRP => newRP.id === rp.id);
           if (!newRatePlan || !newRatePlan.is_active || !newRatePlan.is_booking_engine_enabled) {

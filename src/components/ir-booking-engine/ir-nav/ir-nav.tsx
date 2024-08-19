@@ -1,8 +1,8 @@
-import { Component, Event, EventEmitter, Fragment, h, Listen, Prop, State } from '@stencil/core';
+import { Component, Event, EventEmitter, Fragment, h, Listen, Prop, State, Watch } from '@stencil/core';
 import { TTabsState } from './nav-types';
-import { ICurrency, IExposedLanguages, pages } from '@/models/common';
+import { ICurrency, IExposedLanguages, pages } from '@/models/commun';
 import app_store from '@/stores/app.store';
-import { cn } from '@/utils/utils';
+import { cn, renderPropertyLocation } from '@/utils/utils';
 import localizedWords from '@/stores/localization.store';
 import { AuthService } from '@/services/api/auth.service';
 import { checkout_store } from '@/stores/checkout.store';
@@ -10,13 +10,13 @@ import { checkout_store } from '@/stores/checkout.store';
 @Component({
   tag: 'ir-nav',
   styleUrl: 'ir-nav.css',
-  scoped: true,
+  shadow: true,
 })
 export class IrNav {
   @Prop() currencies: ICurrency[];
   @Prop() languages: IExposedLanguages[];
   @Prop() logo: string;
-  @Prop() website: string;
+  @Prop({ mutable: true }) website: string;
   @Prop() isBookingListing = false;
   @Prop() showBookingCode: boolean = true;
   @Prop() showCurrency: boolean = true;
@@ -26,10 +26,21 @@ export class IrNav {
   @Event({ bubbles: true, composed: true }) signOut: EventEmitter<null>;
   @Event({ bubbles: true, composed: true }) screenChanged: EventEmitter<pages>;
   @State() currentPage: TTabsState = null;
+  private preferences: { currency: string | null; language: string | null } = { currency: null, language: null };
 
   private dialogRef: HTMLIrDialogElement;
   private sheetRef: HTMLIrSheetElement;
   modalRef: HTMLIrModalElement;
+
+  componentWillLoad() {
+    this.website = app_store.app_data.affiliate ? app_store.app_data.affiliate.sites[0]?.url : this.website;
+  }
+  @Watch('website')
+  handleWebsiteChange(newValue: string, oldValue: string) {
+    if (newValue !== oldValue) {
+      this.website = app_store.app_data.affiliate ? app_store.app_data.affiliate.sites[0]?.url : newValue;
+    }
+  }
 
   handleButtonClick(e: CustomEvent = undefined, page: TTabsState) {
     if (e) {
@@ -74,19 +85,7 @@ export class IrNav {
         return null;
     }
   }
-  renderLocationField(field: string | null, withComma: boolean = true) {
-    if (!field) {
-      return '';
-    }
-    return withComma ? `, ${field}` : field;
-  }
-  renderLocation() {
-    const affiliate = app_store.app_data.affiliate;
-    if (affiliate) {
-      return [app_store.property?.city.name ?? null, app_store.property?.country.name ?? null].filter(f => f !== null).join(', ');
-    }
-    return [app_store.property?.area ?? null, app_store.property?.city.name ?? null, app_store.property?.country.name ?? null].filter(f => f !== null).join(', ');
-  }
+
   renderLanguageTrigger() {
     if (this.isBookingListing) {
       return;
@@ -96,10 +95,15 @@ export class IrNav {
     if (!currency || !country) {
       return null;
     }
+    const c = (0).toLocaleString('en-US', { style: 'currency', currency: currency.code, minimumFractionDigits: 0, maximumFractionDigits: 0 }).replace(/\d/g, '').trim();
+    this.preferences = {
+      currency: `${currency.code} ${c}`,
+      language: country?.description,
+    };
     return (
       <div class="flex">
         <button type="button" class="ir-language-trigger" onClick={() => this.handleButtonClick(undefined, 'language')}>
-          <p>{(0).toLocaleString('en-US', { style: 'currency', currency: currency.code, minimumFractionDigits: 0, maximumFractionDigits: 0 }).replace(/\d/g, '').trim()}</p>
+          <p>{c}</p>
         </button>
         <button type="button" class="ir-language-trigger" onClick={() => this.handleButtonClick(undefined, 'language')}>
           {/* <ir-icons name="globe"></ir-icons> */}
@@ -107,6 +111,15 @@ export class IrNav {
         </button>
       </div>
     );
+  }
+  private handleSignIn(e: CustomEvent) {
+    e.stopImmediatePropagation();
+    e.stopPropagation();
+    if (app_store.app_data.injected) {
+      return (window.location.href = `https://${app_store.property.perma_link}.bookingmystay.com/bookings`);
+    }
+    this.currentPage = 'auth';
+    this.modalRef.openModal();
   }
   async handleItemSelect(e: CustomEvent) {
     e.stopImmediatePropagation();
@@ -128,14 +141,22 @@ export class IrNav {
         return null;
     }
   }
-
+  private showAgentCode() {
+    const currentPage = app_store.currentPage;
+    return (
+      currentPage === 'booking' &&
+      this.showBookingCode &&
+      app_store.property.agents &&
+      app_store.property.roomtypes.filter(rt => rt.rateplans.some(rp => rp.is_targeting_travel_agency)).length > 0
+    );
+  }
   render() {
     const currentPage = app_store.currentPage;
     const isInjected = app_store.app_data.injected && currentPage === 'booking';
     return (
       <Fragment>
         <nav class="ir-nav">
-          <div class="ir-nav-container">
+          <div class="ir-nav-container" data-state={isInjected ? 'injected' : 'default'}>
             {!isInjected && (
               <div class="ir-nav-left">
                 <a aria-label="home" target="_blank" href={`https://${this.website}`}>
@@ -148,13 +169,8 @@ export class IrNav {
                 <div class="ir-nav-property-details">
                   <h3 class="ir-property-name">{app_store.property?.name}</h3>
                   <button onClick={() => this.handleButtonClick(undefined, 'map')} class="ir-property-location">
-                    {/* {this.renderLocationField(app_store.property?.area, false)}
-                    {this.renderLocationField(app_store.property?.city.name)} */}
-                    {/* {this.renderLocationField(app_store.property?.postal)} */}
-                    {/* {this.renderLocationField(app_store.property?.country.name)} */}
-                    {this.renderLocation()}
+                    {renderPropertyLocation()}
                     <span class={'mx-1'}></span>
-                    {/* <ir-icons name="location_dot" slot="btn-icon"></ir-icons> */}
                     <svg slot="btn-icon" xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 384 512">
                       <path
                         fill="currentColor"
@@ -169,18 +185,14 @@ export class IrNav {
 
             <div class={`ir-burger-menu ${isInjected ? 'ir-nav-injected' : ''}`}>
               {!app_store.is_signed_in ? (
-                <ir-button
-                  class="ir-sheet-button"
-                  variants="ghost"
-                  label="Sign in"
-                  name="auth"
-                  onButtonClick={e => {
-                    e.stopImmediatePropagation();
-                    e.stopPropagation();
-                    this.currentPage = 'auth';
-                    this.modalRef.openModal();
-                  }}
-                ></ir-button>
+                <Fragment>
+                  <div class="hidden md:block">
+                    <ir-button class="ir-sheet-button" variants="ghost" label="Sign in" name="auth" onButtonClick={this.handleSignIn.bind(this)}></ir-button>
+                  </div>
+                  <div class="md:hidden">
+                    <ir-button class="ir-sheet-button" variants="icon" iconName="circle-user" label="Sign in" name="auth" onButtonClick={this.handleSignIn.bind(this)}></ir-button>
+                  </div>
+                </Fragment>
               ) : (
                 this.menuShown && (
                   <ir-menu
@@ -195,14 +207,7 @@ export class IrNav {
                   </ir-menu>
                 )
               )}
-              {this.showBookingCode && this.showCurrency && (
-                <ir-button variants="icon" iconName="burger_menu" onClick={() => this.sheetRef.openSheet()}>
-                  {/* <p slot="btn-icon" class="sr-only">
-                  burger menu
-                </p>
-                <ir-icons slot="btn-icon" ></ir-icons> */}
-                </ir-button>
-              )}
+              {this.showBookingCode && this.showCurrency && <ir-button variants="icon" iconName="burger_menu" onClick={() => this.sheetRef.openSheet()}></ir-button>}
             </div>
 
             <ul class={cn('ir-nav-links', { 'ir-nav-links-injected': isInjected })}>
@@ -216,7 +221,8 @@ export class IrNav {
                   </ir-button>
                 </li>
               )}
-              {currentPage === 'booking' && this.showBookingCode && (
+
+              {this.showAgentCode() && (
                 <li>
                   <ir-button
                     variants="ghost"
@@ -229,17 +235,7 @@ export class IrNav {
               {this.showCurrency && <li>{this.renderLanguageTrigger()}</li>}
               {!app_store.is_signed_in ? (
                 <li>
-                  <ir-button
-                    variants="ghost"
-                    label={localizedWords.entries.Lcz_SignIn}
-                    name="auth"
-                    onButtonClick={e => {
-                      e.stopImmediatePropagation();
-                      e.stopPropagation();
-                      this.currentPage = 'auth';
-                      this.modalRef.openModal();
-                    }}
-                  ></ir-button>
+                  <ir-button variants="ghost" label={localizedWords.entries.Lcz_SignIn} name="auth" onButtonClick={this.handleSignIn.bind(this)}></ir-button>
                 </li>
               ) : (
                 this.menuShown && (
@@ -263,22 +259,63 @@ export class IrNav {
 
         <ir-sheet ref={el => (this.sheetRef = el)}>
           <ul slot="sheet-content" class="ir-sheet-content">
-            <li>{this.renderLanguageTrigger()}</li>
+            {/* <li>{this.renderLanguageTrigger()}</li> */}
             {!isInjected && (
               <li>
-                <ir-button class="ir-sheet-button" buttonClassName="justify-start" variants="ghost" label="Home" name="home"></ir-button>
+                <ir-button
+                  onButtonClick={() => window.open(`https://${this.website}`)}
+                  class="ir-sheet-button"
+                  buttonClassName="justify-start"
+                  variants="ghost"
+                  label="Home"
+                  name="home"
+                ></ir-button>
+              </li>
+            )}
+            {!app_store.is_signed_in && (
+              <li>
+                <ir-button
+                  buttonClassName="justify-start"
+                  class="ir-sheet-button"
+                  variants="ghost"
+                  label="Sign in"
+                  name="auth"
+                  onButtonClick={this.handleSignIn.bind(this)}
+                ></ir-button>
               </li>
             )}
             <li>
               <ir-button
                 class="ir-sheet-button"
+                onButtonClick={() => this.handleButtonClick(undefined, 'language')}
                 buttonClassName="justify-start"
                 variants="ghost"
-                label="Booking code"
-                name="booking_code"
-                onButtonClick={e => this.handleButtonClick(e, 'booking_code')}
+                label={this.preferences.currency}
+                name="home"
               ></ir-button>
             </li>
+            <li>
+              <ir-button
+                class="ir-sheet-button"
+                onButtonClick={() => this.handleButtonClick(undefined, 'language')}
+                buttonClassName="justify-start"
+                variants="ghost"
+                label={this.preferences.language}
+                name="home"
+              ></ir-button>
+            </li>
+            {this.showAgentCode() && (
+              <li>
+                <ir-button
+                  class="ir-sheet-button"
+                  buttonClassName="justify-start"
+                  variants="ghost"
+                  label="Booking code"
+                  name="booking_code"
+                  onButtonClick={e => this.handleButtonClick(e, 'booking_code')}
+                ></ir-button>
+              </li>
+            )}
           </ul>
         </ir-sheet>
         {!app_store.is_signed_in && <ir-modal ref={el => (this.modalRef = el)} style={{ '--ir-modal-max-width': '32rem' }}></ir-modal>}

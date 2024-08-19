@@ -5,20 +5,26 @@ import { v4 } from 'uuid';
 @Component({
   tag: 'ir-select',
   styleUrl: 'ir-select.css',
-  shadow: true,
+  scoped: true,
 })
 export class IrSelect {
   @Prop() label: string;
+  @Prop() icon: boolean;
+
   @Prop() value: string | number;
   @Prop() data: { id: string | number; value: string; disabled?: boolean; html?: boolean }[];
+
   @Prop() select_id = v4();
   @Prop() variant: 'double-line' | 'default' = 'default';
-  @Prop() icon: boolean;
+
+  @Prop() customStyles: string = '';
+  @Prop() containerStyle: string = '';
+
   @Event() valueChange: EventEmitter<string | number>;
 
   render() {
     return (
-      <div class={'selected-trigger'}>
+      <div class={`selected-trigger ${this.containerStyle}`}>
         {this.variant === 'double-line' && (
           <label
             htmlFor={this.select_id}
@@ -39,11 +45,12 @@ export class IrSelect {
           onInput={e => this.valueChange.emit((e.target as HTMLSelectElement).value)}
           id={this.select_id}
           data-stid={this.select_id}
-          class={cn(`h-full w-full rounded-md bg-white pe-7  text-gray-900`, this.variant, {
-            'ps-9': this.icon,
-            'px-[0.875rem] py-1 text-sm': this.variant === 'default',
-            'px-[0.875rem] py-[0.625rem] text-[1rem]': this.variant === 'double-line',
-          })}
+          class={`select-el ${this.variant} ${this.customStyles} ${this.icon ? 'icon' : ''}`}
+          // class={cn(`h-full w-full rounded-md bg-white pe-7  text-gray-900`, this.variant, this.customStyles, {
+          //   'ps-9': this.icon,
+          //   'px-[0.875rem] py-1 text-sm': this.variant === 'default',
+          //   'px-[0.875rem] py-[0.625rem] text-[1rem]': this.variant === 'double-line',
+          // })}
         >
           {this.data?.map(d => {
             if (d.html) {

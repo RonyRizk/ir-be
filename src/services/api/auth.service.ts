@@ -91,6 +91,7 @@ export class AuthService extends Token {
       app_store.is_signed_in = true;
       manageAnchorSession({ login: { method: option, ...rest, isLoggedIn: true, token: loginToken } });
     }
+    console.count('auth called');
     const propertyService = new PropertyService();
     propertyService.setToken(loginToken);
     propertyService.getExposedGuest();

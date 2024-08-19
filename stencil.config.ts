@@ -1,28 +1,19 @@
 import { Config } from '@stencil/core';
-import tailwind, { setPluginConfigurationDefaults, tailwindGlobal, tailwindHMR } from 'stencil-tailwind-plugin';
-const opts = {
-  debug: false,
-  stripComments: true,
-};
+import { sass } from '@stencil/sass';
+import tailwind, { tailwindHMR, setPluginConfigurationDefaults } from 'stencil-tailwind-plugin';
+import tailwindcss from 'tailwindcss';
+import tailwindConf from './tailwind.config';
+import autoprefixer from 'autoprefixer';
 
-setPluginConfigurationDefaults(opts);
+setPluginConfigurationDefaults({
+  tailwindConf,
+  tailwindCssPath: './src/styles/tailwind.css',
+  postcss: {
+    plugins: [tailwindcss(), autoprefixer()],
+  },
+});
 export const config: Config = {
   namespace: 'iglooroom',
-  plugins: [
-    tailwindGlobal({ minify: true, useAutoPrefixer: true }),
-    tailwind({
-      useAutoPrefixer: true,
-      minify: true,
-      // tailwindCssPath: 'tailwind.config.js',
-      postcss: {
-        plugins: [require('postcss-import'), require('tailwindcss'), require('autoprefixer')],
-      },
-    }),
-    tailwindHMR({ minify: true, useAutoPrefixer: true }),
-  ],
-  // devServer: {
-  //   reloadStrategy: 'pageReload',
-  // },
   outputTargets: [
     {
       type: 'dist',
@@ -50,7 +41,5 @@ export const config: Config = {
       ], // disable service workers
     },
   ],
-  testing: {
-    browserHeadless: 'new',
-  },
+  plugins: [sass(), tailwind(), tailwindHMR()],
 };

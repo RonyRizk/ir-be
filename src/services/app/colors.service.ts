@@ -71,6 +71,7 @@ export class Colors {
           shade_number = shade_number - 100;
         }
       });
+      root.style.setProperty('--radius', property.space_theme.button_border_radius + 'px');
     }
   }
 }

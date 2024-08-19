@@ -97,6 +97,7 @@
 .button-outline-primary {
   border: 0.0625rem solid hsl(var(--brand-600, #d0d5dd));
   color: hsl(var(--brand-700, #344054));
+  background: white;
 }
 
 .button-outline-primary .loader {
@@ -128,7 +129,7 @@
 
 .button-ghost:hover,
 .button-icon:hover {
-  background: var(--gray-100, #fcfcfd);
+  background: var(--gray-200, #eaecf0);
   color: var(--gray-700, #344054);
 }
 .button-ghost:active,

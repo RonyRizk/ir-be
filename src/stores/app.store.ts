@@ -1,4 +1,4 @@
-import { ICurrency, IExposedLanguages, pages, TCurrency, TDirection } from '@/models/common';
+import { ICurrency, IExposedLanguages, pages, TCurrency, TDirection } from '@/models/commun';
 import { Affiliate, IEntries, IExposedProperty } from '@/models/property';
 import { createStore } from '@stencil/store';
 import { enUS, Locale } from 'date-fns/locale';
@@ -30,11 +30,12 @@ export interface IAppStore {
     property_id: number;
     injected: boolean;
     roomtype_id: number | null;
-    redirect_url: string;
     affiliate: Affiliate;
     tag: string | null;
     source: TSource | null;
     hideGoogleSignIn: boolean;
+    isFromGhs: boolean;
+    stag: string | null;
   };
   property: IExposedProperty;
   setup_entries: {
@@ -66,14 +67,15 @@ const initialState: IAppStore = {
   invoice: null,
   app_data: {
     affiliate: null,
+    stag: null,
     token: '',
     property_id: null,
     injected: false,
     roomtype_id: null,
-    redirect_url: null,
     tag: null,
     source: null,
     hideGoogleSignIn: false,
+    isFromGhs: false,
   },
   property: undefined,
   setup_entries: undefined,

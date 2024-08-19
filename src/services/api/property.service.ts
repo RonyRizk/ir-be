@@ -2,7 +2,7 @@ import { PropertyHelpers } from './../app/property-helpers.service';
 import { TExposedBookingAvailability } from '@/components/ir-booking-engine/ir-booking-page/ir-availibility-header/availability';
 import { MissingTokenError, Token } from '@/models/Token';
 import { Booking } from '@/models/booking.dto';
-import { DataStructure } from '@/models/common';
+import { DataStructure } from '@/models/commun';
 import { ISetupEntries } from '@/models/property';
 import app_store from '@/stores/app.store';
 import booking_store, { calculateTotalCost, IRatePlanSelection } from '@/stores/booking';
@@ -25,7 +25,7 @@ export class PropertyService extends Token {
     const { data } = await axios.post(`/Get_Exposed_Property?Ticket=${token}`, {
       ...params,
       currency: app_store.userPreferences.currency_id,
-      include_sales_rate_plans: !!booking_store.bookingAvailabilityParams.agent,
+      include_sales_rate_plans: true,
     });
     const result = data as DataStructure;
     if (result.ExceptionMsg !== '') {
@@ -53,6 +53,7 @@ export class PropertyService extends Token {
       app_store.app_data = { ...app_store.app_data, property_id: result.My_Result.id };
     }
     app_store.property = { ...result.My_Result };
+    app_store.app_data.property_id = result.My_Result.id;
     if (initTheme) {
       this.colors.initTheme(result.My_Result);
     }
@@ -242,8 +243,8 @@ export class PropertyService extends Token {
           property: {
             id: app_store.app_data.property_id,
           },
-          source: app_store.app_data.source,
-          referrer_site: app_store.app_data.affiliate ? window.location.href : 'www.igloorooms.com',
+          source: { code: app_store.app_data.isFromGhs ? 'ghs' : window.location.href, tag: app_store.app_data.stag, description: '' },
+          referrer_site: app_store.app_data.affiliate ? `https://${app_store.app_data.affiliate.sites[0].url}` : 'www.igloorooms.com',
           currency: app_store.property.currency,
           arrival: { code: checkout_store.userFormData.arrival_time },
           guest,
@@ -289,7 +290,7 @@ export class PropertyService extends Token {
       app_store.is_signed_in = false;
       return;
     }
-    app_store.is_signed_in = true;
+    // app_store.is_signed_in = true;
     checkout_store.userFormData = {
       ...checkout_store.userFormData,
       country_id: res.country_id,

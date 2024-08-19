@@ -7,16 +7,16 @@
 
 ## Properties
 
-| Property           | Attribute | Description | Type       | Default                                                                |
-| ------------------ | --------- | ----------- | ---------- | ---------------------------------------------------------------------- |
-| `handledEndpoints` | --        |             | `string[]` | `['/ReAllocate_Exposed_Room', '/Do_Payment', '/Get_Exposed_Bookings']` |
+| Property           | Attribute | Description | Type    | Default |
+| ------------------ | --------- | ----------- | ------- | ------- |
+| `handledEndpoints` | --        |             | `any[]` | `[]`    |
 
 
 ## Dependencies
 
 ### Used by
 
- - [ir-booking-engine](../ir-booking-engine)
+ - [ir-be](../ir-booking-engine)
  - [ir-booking-listing](../ir-booking-engine/ir-booking-listing)
  - [ir-invoice](../ir-invoice)
 
@@ -24,13 +24,16 @@
 
 - [ir-alert-dialog](../ui/ir-alert-dialog)
 - [ir-icons](../ui/ir-icons)
+- [ir-button](../ui/ir-button)
 
 ### Graph
 ```mermaid
 graph TD;
   ir-interceptor --> ir-alert-dialog
   ir-interceptor --> ir-icons
-  ir-booking-engine --> ir-interceptor
+  ir-interceptor --> ir-button
+  ir-button --> ir-icons
+  ir-be --> ir-interceptor
   ir-booking-listing --> ir-interceptor
   ir-invoice --> ir-interceptor
   style ir-interceptor fill:#f9f,stroke:#333,stroke-width:4px

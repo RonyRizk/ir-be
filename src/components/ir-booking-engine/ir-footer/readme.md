@@ -5,11 +5,18 @@
 <!-- Auto Generated Below -->
 
 
+## Properties
+
+| Property  | Attribute | Description | Type     | Default     |
+| --------- | --------- | ----------- | -------- | ----------- |
+| `version` | `version` |             | `string` | `undefined` |
+
+
 ## Dependencies
 
 ### Used by
 
- - [ir-booking-engine](..)
+ - [ir-be](..)
  - [ir-booking-listing](../ir-booking-listing)
  - [ir-invoice](../../ir-invoice)
 
@@ -31,7 +38,7 @@ graph TD;
   ir-privacy-policy --> ir-button
   ir-privacy-policy --> ir-dialog
   ir-dialog --> ir-button
-  ir-booking-engine --> ir-footer
+  ir-be --> ir-footer
   ir-booking-listing --> ir-footer
   ir-invoice --> ir-footer
   style ir-footer fill:#f9f,stroke:#333,stroke-width:4px

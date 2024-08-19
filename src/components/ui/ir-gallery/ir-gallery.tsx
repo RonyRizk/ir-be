@@ -1,5 +1,5 @@
 import { onAppDataChange } from '@/stores/app.store';
-import { Component, Event, EventEmitter, Prop, h } from '@stencil/core';
+import { Component, Event, EventEmitter, Prop, Watch, h } from '@stencil/core';
 import Swiper from 'swiper';
 import { Navigation } from 'swiper/modules';
 
@@ -11,7 +11,12 @@ import { Navigation } from 'swiper/modules';
 export class IrGallery {
   @Prop() images: { url: string; alt: string }[] = [];
   @Prop() totalImages: number = 0;
-  @Event() openGallery: EventEmitter<null>;
+  @Prop() maxLength: number;
+  @Prop() disableCarouselClick: boolean = false;
+  @Prop() enableCarouselSwipe: boolean = false;
+  @Prop() carouselStyles: Partial<CSSStyleDeclaration>;
+  @Prop() carouselClasses: string;
+  @Event() openGallery: EventEmitter<number>;
   private swiperInstance: Swiper;
 
   carouselEl: HTMLDivElement;
@@ -19,20 +24,43 @@ export class IrGallery {
   prevEl: HTMLElement;
 
   componentWillLoad() {
+    if (!this.maxLength) {
+      this.maxLength = this.totalImages;
+    }
     onAppDataChange('dir', () => {
       this.reinitializeSwiper();
     });
   }
   componentDidLoad() {
     this.initializeSwiper();
+    setTimeout(() => {
+      this.applyStyles();
+    }, 10);
+  }
+  @Watch('carouselStyles')
+  handleStylesChange() {
+    this.applyStyles();
+  }
+  applyStyles() {
+    if (!this.carouselStyles || !this.carouselEl) {
+      return;
+    }
+    for (const property in this.carouselStyles) {
+      if (this.carouselStyles.hasOwnProperty(property)) {
+        this.carouselEl.style[property] = this.carouselStyles[property];
+      }
+    }
   }
   initializeSwiper() {
+    if (this.swiperInstance) {
+      return;
+    }
     this.swiperInstance = new Swiper(this.carouselEl, {
       modules: [Navigation],
-      simulateTouch: false,
-      allowTouchMove: false,
+      simulateTouch: this.enableCarouselSwipe,
+      allowTouchMove: this.enableCarouselSwipe,
       direction: 'horizontal',
-      touchMoveStopPropagation: false,
+      touchMoveStopPropagation: this.enableCarouselSwipe,
       navigation: {
         nextEl: this.nextEl,
         prevEl: this.prevEl,
@@ -42,15 +70,21 @@ export class IrGallery {
   reinitializeSwiper() {
     if (this.swiperInstance) {
       this.swiperInstance.destroy(true, true);
+      this.swiperInstance = null;
     }
     this.initializeSwiper();
   }
-
+  private handleOpenGallery(index = 0) {
+    if (this.totalImages <= 1) {
+      return;
+    }
+    this.openGallery.emit(index);
+  }
   render() {
     return (
       <div class="gallery-container">
-        {this.totalImages > 0 && (
-          <button onClick={() => this.openGallery.emit(null)} class="total-images-number">
+        {this.totalImages > 1 && (
+          <button onClick={() => this.handleOpenGallery()} class="total-images-number">
             <svg xmlns="http://www.w3.org/2000/svg" height="14" width="15.75" viewBox="0 0 576 512">
               <path
                 fill="currentColor"
@@ -60,14 +94,28 @@ export class IrGallery {
             <span>{this.totalImages} +</span>
           </button>
         )}
-        <div class="swiper" ref={el => (this.carouselEl = el)}>
+        <div class={`swiper ${this.carouselClasses ?? ''}`} ref={el => (this.carouselEl = el)}>
           <div class="swiper-wrapper">
             {this.images.map(image => (
-              <div class="swiper-slide">
-                <button class="absolute">
-                  <p class="sr-only">open gallery</p>
-                </button>
-                <img onClick={() => this.openGallery.emit(null)} importance="high" draggable={false} src={image.url} alt={image.alt} />
+              <div class="swiper-slide" data-swipable={this.enableCarouselSwipe}>
+                {!this.disableCarouselClick && (
+                  <button class="absolute">
+                    <p class="sr-only">open gallery</p>
+                  </button>
+                )}
+                <img
+                  data-disabled={this.disableCarouselClick}
+                  onClick={() => {
+                    if (this.disableCarouselClick) {
+                      return;
+                    }
+                    this.handleOpenGallery();
+                  }}
+                  importance="high"
+                  draggable={false}
+                  src={image.url}
+                  alt={image.alt}
+                />
               </div>
             ))}
           </div>
@@ -82,13 +130,13 @@ export class IrGallery {
             </svg>
           </div>
         </div>
-        <div class="gallery">
-          {this.images.map(image => (
+        <div class={'gallery'} data-images={this.images.length}>
+          {this.images.slice(0, this.maxLength).map((image, idx) => (
             <figure class="gallery-item">
               <button class="absolute">
                 <p class="sr-only">open gallery</p>
               </button>
-              <img onClick={() => this.openGallery.emit(null)} src={image.url} alt={image.alt} />
+              <img onClick={() => this.handleOpenGallery(idx)} src={image.url} alt={image.alt} />
             </figure>
           ))}
         </div>

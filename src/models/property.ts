@@ -1,4 +1,4 @@
-import { ICurrency } from './common';
+import { ICurrency } from './commun';
 
 export interface IExposedProperty {
   adult_child_constraints: AdultChildConstraints;
@@ -52,6 +52,7 @@ export interface Affiliate {
   name: string;
   phone: string;
   sites: Site[];
+  email: string;
 }
 interface Site {
   button_bg_color: string;
@@ -322,6 +323,8 @@ export interface RatePlan {
   sell_mode: SellMode;
   variations: Variation[];
   short_name: string;
+  pre_payment_amount: number;
+  pre_payment_amount_gross: number;
 }
 export interface Variation {
   adult_child_offering: string;
@@ -336,6 +339,7 @@ export interface Variation {
   is_calculated?: boolean;
   IS_MLS_VIOLATED?: boolean;
   MLS_ALERT?: string;
+  amount_gross: number;
 }
 export interface Assignableunit {
   Is_Fully_Available: boolean;
@@ -388,6 +392,7 @@ export interface SpaceTheme {
   heading_font_color: string;
   logo: string;
   website: string;
+  button_border_radius: string;
 }
 
 export interface Tax {
@@ -434,6 +439,7 @@ export interface ISetupEntries {
 export interface IExposedApplicablePolicies {
   type: 'guarantee' | 'cancelation';
   brackets: IBrackets[];
+  combined_statement: string;
 }
 export interface IBrackets {
   due_on: string;

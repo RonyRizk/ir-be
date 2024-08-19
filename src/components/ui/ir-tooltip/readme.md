@@ -7,11 +7,20 @@
 
 ## Properties
 
-| Property   | Attribute   | Description | Type      | Default     |
-| ---------- | ----------- | ----------- | --------- | ----------- |
-| `label`    | `label`     |             | `string`  | `undefined` |
-| `message`  | `message`   |             | `string`  | `undefined` |
-| `withHtml` | `with-html` |             | `boolean` | `true`      |
+| Property        | Attribute       | Description | Type                            | Default     |
+| --------------- | --------------- | ----------- | ------------------------------- | ----------- |
+| `label`         | `label`         |             | `string`                        | `undefined` |
+| `labelColors`   | `label-colors`  |             | `"default" \| "green" \| "red"` | `'default'` |
+| `message`       | `message`       |             | `string`                        | `undefined` |
+| `open_behavior` | `open_behavior` |             | `"click" \| "hover"`            | `'hover'`   |
+| `withHtml`      | `with-html`     |             | `boolean`                       | `true`      |
+
+
+## Events
+
+| Event               | Description | Type                   |
+| ------------------- | ----------- | ---------------------- |
+| `tooltipOpenChange` |             | `CustomEvent<boolean>` |
 
 
 ## Dependencies

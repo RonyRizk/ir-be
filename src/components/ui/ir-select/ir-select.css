@@ -5,7 +5,7 @@
 .select-label {
   /* transform-origin: left top; */
   top: -0.8rem;
-  background: white;
+  background: hsl(0, 0%, 100%);
 }
 .select-label:dir(ltr) {
   left: calc(0.875rem - 0.3rem);
@@ -13,11 +13,38 @@
 .select-label:dir(rtl) {
   right: calc(0.875rem - 0.3rem);
 }
-
+.select-el {
+  height: 100%;
+  width: 100%;
+  border-radius: 0.375rem;
+  background-color: hsl(0, 0%, 100%);
+  padding-inline-end: 1.75rem;
+  color: hsl(221, 39%, 11%);
+}
+.select-el.default {
+  padding-left: 0.875rem;
+  padding-right: 0.875rem;
+  padding-top: 0.25rem /* 4px */;
+  padding-bottom: 0.25rem /* 4px */;
+  font-size: 0.875rem /* 14px */;
+  line-height: 1.25rem /* 20px */;
+}
+.select-el.double-line {
+  padding-left: 0.875rem;
+  padding-right: 0.875rem;
+  font-size: 1rem /* 16px */;
+  padding-top: 0.625rem /* 10px */;
+  padding-bottom: 0.625rem /* 10px */;
+}
+.select-el.icon {
+  padding-inline-start: 2.25rem;
+}
 .selected-trigger {
   position: relative;
   border-radius: min(var(--radius, 0.5rem), 0.5rem);
   border: 1px solid var(--gray-300, #d0d5dd);
+  /* width: fit-content; */
+  /* width: 100%; */
 }
 :host([variant='default']) .selected-trigger {
   width: 100%;

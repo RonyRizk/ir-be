@@ -10,7 +10,7 @@
   <script src="index.js"></script>
   <style>
     :root {
-      --background: white;
+      --background: black;
       --radius: 30px;
       /* Brand colors */
       --brand-25: 210, 100%, 98%;
@@ -78,26 +78,32 @@
 </head>
 
 <body>
-  <div>
+  <!-- <div style="position: relative;width: 100%; height: 50vh;">
 
-    <!-- not injected mode -->
-    <ir-booking-engine base-url="https://gateway.igloorooms.com/IRBE" cur="usd"></ir-booking-engine>
-    <!-- aff="AF6" a-name='A286' -->
+    <div
+      style="width: 100%; height: 50vh; z-index: 9999999999999; background: #000; position: absolute; top:0;left: 0;">
+    </div>
+  </div> -->
+  <!-- not injected mode -->
+  <ir-be></ir-be>
+  <!-- aff="AF6" a-name='A286' -->
 
-    <!-- Injected mode -->
-    <!-- <ir-booking-engine injected  base-url="https://gateway.igloorooms.com/IR"></ir-booking-engine> -->
-  </div>
+  <!-- Injected mode -->
+  <!-- <ir-be injected></ir-be> -->
+
   <script>
-    const testCmp = document.querySelector('ir-booking-engine');
+    const testCmp = document.querySelector('ir-be');
     async function init() {
       testCmp.propertyId = getId()
-      // testCmp.aName = "a237"
-      // testCmp.aName = "A506"
-
-      try {
-      } catch (error) {
-        console.log(error)
-      }
+      // testCmp.p = 'A222'
+      // testCmp.stag = "ghs"
+      // testCmp.propertyId = 60 || getId()
+      // testCmp.p = "a237"
+      // testCmp.p = "A506"
+      //Valentinos appartments
+      // testCmp.p = 'A19'
+      // testCmp.p = 'a461'
+      // testCmp.p = 'a77'
 
     }
     init()

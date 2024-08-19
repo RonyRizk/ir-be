@@ -8,21 +8,21 @@ import app_store from '@/stores/app.store';
 import { addDays, format } from 'date-fns';
 import localizedWords from '@/stores/localization.store';
 @Component({
-  tag: 'ir-booking-widget',
+  tag: 'ir-widget',
   styleUrl: 'ir-booking-widget.css',
   shadow: true,
 })
 export class IrBookingWidget {
-  @Element() el: HTMLIrBookingWidgetElement;
+  @Element() el: HTMLIrWidgetElement;
 
-  @Prop({ reflect: true }) position: 'sticky' | 'block' = 'sticky';
+  @Prop({ reflect: true }) position: 'fixed' | 'block' = 'fixed';
   @Prop() contentContainerStyle: TContainerStyle;
   @Prop() propertyId: number = 42;
   @Prop() perma_link: string = null;
-  @Prop() aName: string = null;
-  @Prop() baseUrl: string;
+  @Prop() p: string = null;
   @Prop() language: string = 'en';
-  @Prop() roomTypeId: string | null = '110';
+  @Prop() roomTypeId: string | null = null;
+  @Prop() aff: string = null;
 
   @State() isPopoverOpen: boolean;
   @State() isLoading: boolean;
@@ -35,12 +35,13 @@ export class IrBookingWidget {
     childrenCount: 0,
   };
 
+  private baseUrl: string = 'https://gateway.igloorooms.com/IRBE';
   private popover: HTMLIrPopoverElement;
   private token: string;
 
   private commonService = new CommonService();
   private propertyService = new PropertyService();
-  guestPopover: HTMLIrPopoverElement;
+  private guestPopover: HTMLIrPopoverElement;
 
   private initApp() {
     this.modifyContainerStyle();
@@ -58,6 +59,13 @@ export class IrBookingWidget {
     this.propertyService.setToken(this.token);
     this.initProperty();
   }
+  componentDidLoad() {
+    console.log('the widget is loaded');
+    if (this.position === 'fixed') {
+      console.log('widget appended to body');
+      document.body.appendChild(this.el);
+    }
+  }
   async initProperty() {
     try {
       this.isLoading = true;
@@ -65,7 +73,7 @@ export class IrBookingWidget {
         this.propertyService.getExposedProperty({
           id: this.propertyId,
           language: this.language,
-          aname: this.aName,
+          aname: this.p,
           perma_link: this.perma_link,
         }),
         this.commonService.getExposedLanguage(),
@@ -88,27 +96,19 @@ export class IrBookingWidget {
     }
   }
   handleBooknow() {
-    if (this.guests.adultCount === 0) {
-      return;
-    }
-    let currentDomain = window.location.hostname;
-    let subdomainURL = `bookingdirect.com`;
-    if (currentDomain === 'localhost') {
-      currentDomain = `localhost:7742`;
-    } else {
-      currentDomain = `${subdomainURL}`;
-    }
-
+    let subdomainURL = `bookingmystay.com`;
+    const currentDomain = `${app_store.property.perma_link}.${subdomainURL}`;
     const { from_date, to_date } = this.dates;
     const { adultCount, childrenCount } = this.guests;
     const fromDate = from_date ? `checkin=${format(from_date, 'yyyy-MM-dd')}` : '';
-    const toDate = from_date ? `checkout=${format(to_date, 'yyyy-MM-dd')}` : '';
+    const toDate = to_date ? `checkout=${format(to_date, 'yyyy-MM-dd')}` : '';
     const adults = adultCount > 0 ? `adults=${adultCount}` : '';
     const children = childrenCount > 0 ? `children=${childrenCount}` : '';
     const roomTypeId = this.roomTypeId ? `rtid=${this.roomTypeId}` : '';
-    const queryParams = [fromDate, toDate, adults, children, roomTypeId];
+    const affiliate = this.aff ? `aff=${this.aff}` : '';
+    const queryParams = [fromDate, toDate, adults, children, roomTypeId, affiliate];
     const queryString = queryParams.filter(param => param !== '').join('&');
-    window.open(`http://${currentDomain}?${queryString}`, '_blank');
+    window.open(`https://${currentDomain}?${queryString}`, '_blank');
   }
 
   private renderDateTrigger() {
@@ -160,6 +160,7 @@ export class IrBookingWidget {
     return (
       <Fragment>
         <div class="booking-widget-container" style={this.contentContainerStyle}>
+          <div class={'hovered-container'}></div>
           <ir-popover
             class={'ir-popover'}
             showCloseButton={false}
@@ -215,7 +216,9 @@ export class IrBookingWidget {
               onCloseGuestCounter={() => this.guestPopover.toggleVisibility()}
             ></ir-guest-counter>
           </ir-popover>
-          <button class="btn-flip" onClick={this.handleBooknow.bind(this)} data-back="Book now" data-front="Book now"></button>
+          <button class="btn-flip" onClick={this.handleBooknow.bind(this)}>
+            Book now
+          </button>
         </div>
       </Fragment>
     );

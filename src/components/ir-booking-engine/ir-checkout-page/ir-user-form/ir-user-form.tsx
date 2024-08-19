@@ -13,15 +13,22 @@ import { ZodIssue } from 'zod';
 })
 export class IrUserForm {
   @Prop() errors: Record<string, ZodIssue>;
-  private propertyService = new PropertyService();
+
   @Event() changePageLoading: EventEmitter<'remove' | 'add'>;
+
+  private propertyService = new PropertyService();
+
   async componentWillLoad() {
     this.propertyService.setToken(app_store.app_data.token);
     await this.propertyService.fetchSetupEntries();
   }
   render() {
     if (!app_store.setup_entries) {
-      return null;
+      return (
+        <div>
+          <p>Loading</p>
+        </div>
+      );
     }
     return (
       <Fragment>

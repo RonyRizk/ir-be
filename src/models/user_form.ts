@@ -21,7 +21,7 @@ export type TUserFormData = z.infer<typeof IrUserFormData>;
 export const IrGuest = z.object({
   address: z.string().nullable().default(null),
   city: z.string().nullable().default(null),
-  country_id: z.number().min(1),
+  country_id: z.coerce.number().min(1),
   dob: z.string().nullable().default(null),
   email: z.string().email(),
   first_name: z.string().min(2, {

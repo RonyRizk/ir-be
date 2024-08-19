@@ -1,4 +1,4 @@
-import { ICurrency, IExposedLanguages } from '@/models/common';
+import { ICurrency, IExposedLanguages } from '@/models/commun';
 import app_store, { changeLocale, onAppDataChange, updateUserPreference } from '@/stores/app.store';
 import { cn, matchLocale } from '@/utils/utils';
 import { Component, h, Event, EventEmitter, Prop, State } from '@stencil/core';

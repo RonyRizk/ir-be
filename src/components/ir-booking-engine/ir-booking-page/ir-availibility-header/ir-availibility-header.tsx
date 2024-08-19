@@ -147,7 +147,20 @@ export class IrAvailibilityHeader {
   async checkAvailability() {
     const params = ExposedBookingAvailability.parse(this.exposedBookingAvailabiltyParams);
     if (app_store.app_data.injected) {
-      return (location.href = `https://${app_store.property.perma_link}.bookingmystay.com?checkin=${params.from_date}&checkout=${params.to_date}&adults=${params.adult_nbr}&children=${params.child_nbr}&cur=${params.currency_ref}`);
+      const { from_date, to_date, adult_nbr, child_nbr } = params;
+      const fromDate = `checkin=${from_date}`;
+      const toDate = `checkout=${to_date}`;
+      const adults = `adults=${adult_nbr}`;
+      const children = child_nbr > 0 ? `children=${child_nbr}` : '';
+      const affiliate = app_store.app_data.affiliate ? `aff=${app_store.app_data.affiliate.afname}` : '';
+      const currency = `cur=${app_store.userPreferences.currency_id}`;
+      const language = `lang=${app_store.userPreferences.language_id}`;
+      const loyalty = booking_store.bookingAvailabilityParams.loyalty ? 'loyalty=true' : '';
+      const promo_key = booking_store.bookingAvailabilityParams.coupon ? `promo=${booking_store.bookingAvailabilityParams.coupon}` : '';
+      const agent = booking_store.bookingAvailabilityParams.agent ? `agent=${booking_store.bookingAvailabilityParams.agent}` : '';
+      const queryParams = [fromDate, toDate, adults, children, affiliate, language, currency, loyalty, promo_key, agent];
+      const queryString = queryParams.filter(param => param !== '').join('&');
+      return (location.href = `https://${app_store.property.perma_link}.bookingmystay.com?${queryString}`);
     }
     this.identifier = v4();
     this.availabiltyService.initSocket(this.identifier);
@@ -168,6 +181,8 @@ export class IrAvailibilityHeader {
         is_in_agent_mode: !!booking_store.bookingAvailabilityParams.agent || false,
         agent_id: booking_store.bookingAvailabilityParams.agent || 0,
         is_in_loyalty_mode: booking_store.bookingAvailabilityParams.loyalty ? true : !!booking_store.bookingAvailabilityParams.coupon,
+        is_in_affiliate_mode: !!app_store.app_data.affiliate,
+        affiliate_id: app_store.app_data.affiliate ? app_store.app_data.affiliate.id : null,
       },
       identifier: this.identifier,
       mode: 'default',
@@ -266,9 +281,12 @@ export class IrAvailibilityHeader {
 
   render() {
     this.shouldRenderErrorToast();
+    const show_loyalty = app_store.property?.promotions?.some(p => p.is_loyalty);
+    const show_coupon = app_store.property?.promotions?.some(p => p.is_loyalty);
+    const showPromotions = app_store?.property?.promotions && (show_coupon || show_loyalty);
     return (
-      <div class="availability-container">
-        <div class="availability-inputs">
+      <div class={`availability-container ${showPromotions ? 'promotions' : ''} xl:text-cyan-50`}>
+        <div class={`availability-inputs ${showPromotions ? 'promotions' : ''}`}>
           <ir-date-popup
             data-state={this.errorCause?.find(c => c === 'date') ? 'error' : ''}
             dates={{
@@ -277,18 +295,19 @@ export class IrAvailibilityHeader {
             }}
             class="date-popup"
           ></ir-date-popup>
-          <div class="availability-controls">
-            <ir-adult-child-counter
-              data-state={this.errorCause?.find(c => c === 'adult_child') ? 'error' : ''}
-              adultCount={this.exposedBookingAvailabiltyParams.adult_nbr}
-              childrenCount={this.exposedBookingAvailabiltyParams.child_nbr}
-              minAdultCount={0}
-              maxAdultCount={app_store.property.adult_child_constraints.adult_max_nbr}
-              maxChildrenCount={app_store.property.adult_child_constraints.child_max_nbr}
-              childMaxAge={app_store.property.adult_child_constraints.child_max_age}
-              class="adult-child-counter"
-              // ref={el => (this.personCounter = el)}
-            ></ir-adult-child-counter>
+          {/* <div class="availability-controls"> */}
+          <ir-adult-child-counter
+            data-state={this.errorCause?.find(c => c === 'adult_child') ? 'error' : ''}
+            adultCount={this.exposedBookingAvailabiltyParams.adult_nbr}
+            childrenCount={this.exposedBookingAvailabiltyParams.child_nbr}
+            minAdultCount={0}
+            maxAdultCount={app_store.property.adult_child_constraints.adult_max_nbr}
+            maxChildrenCount={app_store.property.adult_child_constraints.child_max_nbr}
+            childMaxAge={app_store.property.adult_child_constraints.child_max_age}
+            class="adult-child-counter"
+            // ref={el => (this.personCounter = el)}
+          ></ir-adult-child-counter>
+          <div class={'hidden sm:block'}>
             <ir-button
               isLoading={this.isLoading}
               onButtonClick={e => {
@@ -302,17 +321,20 @@ export class IrAvailibilityHeader {
               label="Check availability"
             ></ir-button>
           </div>
-          {/* <ir-button
+          {/* </div> */}
+          <div class="full-width-on-mobile sm:hidden">
+            <ir-button
               isLoading={this.isLoading}
               onButtonClick={e => {
                 e.stopImmediatePropagation();
                 e.stopPropagation();
                 this.handleCheckAvailability();
               }}
-              size="lg"
+              size="md"
               label="search"
-              class="full-width-on-mobile"
-            ></ir-button> */}
+              buttonStyles={{ width: '100%' }}
+            ></ir-button>
+          </div>
         </div>
 
         {app_store?.property?.promotions && (

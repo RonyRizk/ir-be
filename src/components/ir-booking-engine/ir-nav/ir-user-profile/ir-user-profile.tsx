@@ -151,7 +151,7 @@ export class IrUserProfile {
               onTextChanged={e => this.updateUserData('email', e.detail)}
             ></ir-input>
             <ir-select
-              value={2}
+              value={this.user.country_id}
               label="Country"
               variant="double-line"
               data={phone_input_store.countries?.map(country => ({

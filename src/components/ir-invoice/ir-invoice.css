@@ -40,10 +40,10 @@ p {
   font-size: 0.875rem;
 }
 
-.total-payment {
+.payment_amount {
   font-size: 1rem;
+  font-weight: 500;
 }
-
 .mapLink {
   background: #000;
   position: relative;
@@ -58,13 +58,16 @@ p {
 .mapLink:hover img {
   filter: brightness(0.9);
 }
-
+.invoice-container {
+  padding-left: 1rem /* 16px */;
+  padding-right: 1rem /* 16px */;
+}
 .property_info {
   display: none;
   background-color: hsl(220, 14%, 96%);
   border-radius: min(var(--radius, 0.5rem), 1rem);
   height: fit-content;
-  width: 800px;
+  width: 500px;
 }
 
 .property_img {
@@ -100,11 +103,18 @@ a:hover {
 @media (min-width: 768px) {
   .mapLink img {
     height: 200px;
-    aspect-ratio: 16/9;
+    /* aspect-ratio: 16/9; */
+    width: 100%;
   }
 
   .property_info {
     display: flex;
     flex-direction: column;
+  }
+}
+@media (min-width: 1280px) {
+  .invoice-container {
+    padding-left: 0px;
+    padding-right: 0px;
   }
 }

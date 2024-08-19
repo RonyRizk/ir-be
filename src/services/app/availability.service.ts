@@ -12,6 +12,7 @@ interface IPAYLOAD {
   ADULT_CHILD_OFFERING: string;
   TOTAL_BEFORE_DISCOUNT: string;
   ALLOT_RATE_V: number;
+  ALLOT_RATE_V_GROSS: number;
   DISCOUNTED_ALLOTMENT_RATE: string;
   DISCOUNT: number;
   NIGHTS_NBR: number;
@@ -182,7 +183,7 @@ export class AvailabiltyService {
 
   private async processPayloads(payloads: IPAYLOAD[]): Promise<void> {
     try {
-      // console.log('payload', payloads);
+      console.log('payload', payloads);
       if (!booking_store.enableBooking) {
         booking_store.enableBooking = true;
       }
@@ -210,6 +211,10 @@ export class AvailabiltyService {
           adult_nbr: Number(payload.ADULTS_NBR ?? 0),
           amount: (() => {
             const amount = this.validateNumberString((payload.ALLOT_RATE_V ?? 0)?.toString()) ?? 0;
+            return amount === 0 ? null : amount;
+          })(),
+          amount_gross:(() => {
+            const amount = this.validateNumberString((payload.ALLOT_RATE_V_GROSS ?? 0)?.toString()) ?? 0;
             return amount === 0 ? null : amount;
           })(),
           child_nbr: Number(payload.CHILD_NBR ?? 0),

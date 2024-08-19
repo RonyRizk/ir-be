@@ -1,14 +1,17 @@
 import app_store from '@/stores/app.store';
 import { checkout_store, ICardProcessingWithCVC, ICardProcessingWithoutCVC } from '@/stores/checkout.store';
 import localizedWords from '@/stores/localization.store';
-import { Component, State, h } from '@stencil/core';
+import { ZCreditCardSchemaWithCvc } from '@/validators/checkout.validator';
+import { Component, Prop, State, h } from '@stencil/core';
 import IMask from 'imask';
+import { ZodIssue } from 'zod';
 @Component({
   tag: 'ir-payment-view',
   styleUrl: 'ir-payment-view.css',
   shadow: true,
 })
 export class IrPaymentView {
+  @Prop() errors: Record<string, ZodIssue>;
   @State() selectedPaymentMethod: string;
 
   componentWillLoad() {
@@ -51,7 +54,7 @@ export class IrPaymentView {
     const method = app_store.property?.allowed_payment_methods.find(apm => apm.code === this.selectedPaymentMethod);
     if (this.selectedPaymentMethod === '001' || this.selectedPaymentMethod === '004')
       return (
-        <div class="flex w-full gap-4" key={method.code}>
+        <form class="flex w-full gap-4" key={method.code}>
           <div class={'flex-1 space-y-4'}>
             <fieldset>
               <ir-input
@@ -59,11 +62,31 @@ export class IrPaymentView {
                 onTextChanged={e => {
                   checkout_store.payment = { ...checkout_store.payment, cardHolderName: e.detail } as ICardProcessingWithoutCVC | ICardProcessingWithCVC;
                 }}
+                autocomplete="cc-name"
+                data-state={this.errors?.cardHolderName ? 'error' : ''}
                 label={localizedWords.entries.Lcz_NameOnCard}
                 class="w-full"
+                onInputBlur={e => {
+                  const cardHolderNameSchema = ZCreditCardSchemaWithCvc.pick({ cardHolderName: true });
+                  const cardHolderNameValidation = cardHolderNameSchema.safeParse({ cardHolderName: (checkout_store.payment as ICardProcessingWithCVC)?.cardHolderName });
+                  const target: HTMLIrInputElement = e.target;
+                  if (!cardHolderNameValidation.success) {
+                    target.setAttribute('data-state', 'error');
+                    target.setAttribute('aria-invalid', 'true');
+                  } else {
+                    if (target.hasAttribute('aria-invalid')) {
+                      target.setAttribute('aria-invalid', 'false');
+                    }
+                  }
+                }}
+                onInputFocus={e => {
+                  const target: HTMLIrInputElement = e.target;
+                  if (target.hasAttribute('data-state')) target.removeAttribute('data-state');
+                }}
               ></ir-input>
             </fieldset>
             <ir-credit-card-input
+              data-state={this.errors?.cardNumber ? 'error' : ''}
               onCreditCardChange={e => {
                 checkout_store.payment = { ...checkout_store.payment, cardNumber: e.detail } as ICardProcessingWithoutCVC | ICardProcessingWithCVC;
               }}
@@ -71,6 +94,8 @@ export class IrPaymentView {
             <div class="flex flex-col gap-2.5 sm:flex-row sm:items-center">
               <fieldset class="w-full">
                 <ir-input
+                  autocomplete="cc-exp"
+                  data-state={this.errors?.expiryDate ? 'error' : ''}
                   type="text"
                   value=""
                   placeholder="MM/YY"
@@ -80,6 +105,23 @@ export class IrPaymentView {
                   rightIcon
                   onTextChanged={e => {
                     checkout_store.payment = { ...checkout_store.payment, expiry_month: e.detail, expiry_year: e.detail } as ICardProcessingWithoutCVC | ICardProcessingWithCVC;
+                  }}
+                  onInputBlur={e => {
+                    const expiryDateSchema = ZCreditCardSchemaWithCvc.pick({ expiryDate: true });
+                    const expiryDateValidation = expiryDateSchema.safeParse({ expiryDate: (checkout_store.payment as ICardProcessingWithCVC)?.expiry_month });
+                    const target: HTMLIrInputElement = e.target;
+                    if (!expiryDateValidation.success) {
+                      target.setAttribute('data-state', 'error');
+                      target.setAttribute('aria-invalid', 'true');
+                    } else {
+                      if (target.hasAttribute('aria-invalid')) {
+                        target.setAttribute('aria-invalid', 'false');
+                      }
+                    }
+                  }}
+                  onInputFocus={e => {
+                    const target: HTMLIrInputElement = e.target;
+                    if (target.hasAttribute('data-state')) target.removeAttribute('data-state');
                   }}
                 >
                   <svg slot="right-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -95,6 +137,25 @@ export class IrPaymentView {
               </fieldset>
               <fieldset class="w-full">
                 <ir-input
+                  autocomplete="cc-csc"
+                  onInputBlur={e => {
+                    const cvcSchema = ZCreditCardSchemaWithCvc.pick({ cvc: true });
+                    const cvcValidation = cvcSchema.safeParse({ cvc: (checkout_store.payment as ICardProcessingWithCVC)?.cvc });
+                    const target: HTMLIrInputElement = e.target;
+                    if (!cvcValidation.success) {
+                      target.setAttribute('data-state', 'error');
+                      target.setAttribute('aria-invalid', 'true');
+                    } else {
+                      if (target.hasAttribute('aria-invalid')) {
+                        target.setAttribute('aria-invalid', 'false');
+                      }
+                    }
+                  }}
+                  onInputFocus={e => {
+                    const target: HTMLIrInputElement = e.target;
+                    if (target.hasAttribute('data-state')) target.removeAttribute('data-state');
+                  }}
+                  data-state={this.errors?.cvc ? 'error' : ''}
                   label={localizedWords.entries.Lcz_SecurityCode}
                   maxlength={4}
                   tooltip={localizedWords.entries.Lcz_SecurityCodeHint}
@@ -116,7 +177,7 @@ export class IrPaymentView {
               </fieldset>
             </div>
           </div>
-        </div>
+        </form>
       );
     if (this.selectedPaymentMethod === '005') {
       return (

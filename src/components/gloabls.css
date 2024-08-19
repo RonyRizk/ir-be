@@ -1,3 +1,7 @@
+:host {
+  --ir-green: #227950;
+}
+
 .app_container {
   border-radius: min(var(--radius, 0.5rem), 0.5rem) !important;
 }

@@ -13,48 +13,60 @@ export class IrRoomtype {
 
   render() {
     return (
-      <section class="room-type-container">
+      <section class="room-type-container p-0 md:p-4">
         <aside class="hidden md:block">
           <ir-property-gallery property_state="carousel" roomType={this.roomtype}></ir-property-gallery>
         </aside>
-        <div class="w-full flex-1 space-y-2">
-          <h3 class="text-start text-lg  font-medium text-slate-900 ">{this.roomtype.name}</h3>
+        <div class="w-full flex-1 md:space-y-2">
+          <h3 class="hidden text-start  text-lg font-medium text-slate-900 md:block ">{this.roomtype.name}</h3>
           {/* Mobile view for carousel */}
           <div class="md:hidden">
             <ir-property-gallery property_state="carousel" roomType={this.roomtype}></ir-property-gallery>
           </div>
-          <div class="hidden md:block">
-            <ir-accomodations
-              bookingAttributes={{
-                max_occupancy: this.roomtype.occupancy_max.adult_nbr,
-                bedding_setup: this.roomtype.bedding_setup,
-              }}
-              amenities={app_store.property.amenities}
-            ></ir-accomodations>
-          </div>
-
-          {booking_store.enableBooking ? (
-            this.roomtype.rateplans.map(ratePlan => {
-              if (!ratePlan.is_active || !ratePlan.is_booking_engine_enabled || !ratePlan.variations) {
-                return null;
-              }
-
-              const visibleInventory = getVisibleInventory(this.roomtype.id, ratePlan.id);
-              return (
-                <ir-rateplan
-                  key={ratePlan.id}
-                  ratePlan={ratePlan}
-                  visibleInventory={visibleInventory}
-                  roomTypeId={this.roomtype.id}
-                  roomTypeInventory={this.roomtype.inventory}
-                ></ir-rateplan>
-              );
-            })
-          ) : (
-            <div class="app_container flex w-full flex-1 flex-col justify-between space-y-1 rounded-md bg-gray-100  text-sm md:flex-row">
-              <p>{this.roomtype.description}</p>
+          <div class="p-4 pt-2 md:p-0">
+            <h3 class="text-start  text-lg font-medium text-slate-900 md:hidden ">{this.roomtype.name}</h3>
+            <div class="flex flex-wrap items-center gap-2 py-2 text-sm font-normal text-gray-700 md:hidden">
+              <ir-accomodations
+                bookingAttributes={{
+                  max_occupancy: this.roomtype.occupancy_max.adult_nbr,
+                  bedding_setup: this.roomtype.bedding_setup,
+                }}
+                amenities={app_store.property.amenities}
+              ></ir-accomodations>
             </div>
-          )}
+            <div class="hidden md:block">
+              <ir-accomodations
+                bookingAttributes={{
+                  max_occupancy: this.roomtype.occupancy_max.adult_nbr,
+                  bedding_setup: this.roomtype.bedding_setup,
+                }}
+                amenities={app_store.property.amenities}
+              ></ir-accomodations>
+            </div>
+
+            {booking_store.enableBooking ? (
+              this.roomtype.rateplans.map(ratePlan => {
+                if (!ratePlan.is_active || !ratePlan.is_booking_engine_enabled || !ratePlan.variations) {
+                  return null;
+                }
+
+                const visibleInventory = getVisibleInventory(this.roomtype.id, ratePlan.id);
+                return (
+                  <ir-rateplan
+                    key={ratePlan.id}
+                    ratePlan={ratePlan}
+                    visibleInventory={visibleInventory}
+                    roomTypeId={this.roomtype.id}
+                    roomTypeInventory={this.roomtype.inventory}
+                  ></ir-rateplan>
+                );
+              })
+            ) : (
+              <div class="app_container flex w-full flex-1 flex-col justify-between space-y-1 rounded-md bg-gray-100  text-sm md:flex-row">
+                <p>{this.roomtype.description}</p>
+              </div>
+            )}
+          </div>
         </div>
       </section>
     );

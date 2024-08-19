@@ -1,6 +1,5 @@
-import app_store from '@/stores/app.store';
-import booking_store from '@/stores/booking';
 import localizedWords from '@/stores/localization.store';
+import { validateAgentCode } from '@/utils/utils';
 import { Component, Host, h, Event, EventEmitter, State } from '@stencil/core';
 
 @Component({
@@ -15,14 +14,9 @@ export class IrBookingCode {
   handleSubmit(e: Event) {
     e.preventDefault();
     this.validationMessage = null;
-    const agent = app_store.property?.agents.find(a => a.code === this.code.trim());
-    if (!agent) {
+    if (!validateAgentCode(this.code)) {
       return (this.validationMessage = { error: true, message: localizedWords.entries.Lcz_InvalidAgentCode });
     }
-    booking_store.bookingAvailabilityParams = {
-      ...booking_store.bookingAvailabilityParams,
-      agent: agent.id,
-    };
     this.validationMessage = { error: false, message: this.code };
     this.closeDialog.emit(null);
   }
@@ -42,11 +36,12 @@ export class IrBookingCode {
           ></ir-input>
           {this.validationMessage?.error && <p class="text-red-500">{this.validationMessage.message}</p>}
           <div class="mt-8 flex w-full flex-col items-center gap-4 md:flex-row-reverse">
-            <ir-button size="md" label={localizedWords.entries.Lcz_Apply} class="w-full md:w-fit"></ir-button>
+            <ir-button type="submit" size="md" label={localizedWords.entries.Lcz_Apply} class="w-full md:w-fit"></ir-button>
             <ir-button
               size="md"
               onButtonClick={() => this.closeDialog.emit(null)}
               variants="outline"
+              type="button"
               label={localizedWords.entries.Lcz_Cancel}
               class={'w-full md:w-fit'}
             ></ir-button>

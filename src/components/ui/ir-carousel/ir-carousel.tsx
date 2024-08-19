@@ -1,4 +1,4 @@
-import { Component, Event, EventEmitter, Prop, h } from '@stencil/core';
+import { Component, Event, EventEmitter, Prop, Watch, h } from '@stencil/core';
 import Swiper from 'swiper';
 import { Navigation, Pagination } from 'swiper/modules';
 import { TCarouselSlides } from './carousel';
@@ -6,12 +6,17 @@ import { onAppDataChange } from '@/stores/app.store';
 @Component({
   tag: 'ir-carousel',
   styleUrl: 'ir-carousel.css',
-  shadow: true,
+  scoped: true,
 })
 export class IrCarousel {
   @Prop() slides: TCarouselSlides[] = [];
+  @Prop() activeIndex: number = 0;
+  @Prop() enableCarouselSwipe: boolean = false;
+  @Prop() styles: Partial<CSSStyleDeclaration>;
+  @Prop() carouselClasses: string;
 
   @Event() carouselImageClicked: EventEmitter<null>;
+  @Event() carouselImageIndexChange: EventEmitter<number>;
 
   private swiperInstance: Swiper;
 
@@ -27,35 +32,66 @@ export class IrCarousel {
 
   componentDidLoad() {
     this.initializeSwiper();
+    setTimeout(() => {
+      this.applyStyles();
+    }, 10);
+  }
+  @Watch('styles')
+  handleStylesChange() {
+    this.applyStyles();
+  }
+  applyStyles() {
+    if (!this.styles || !this.carouselEl) {
+      return;
+    }
+    for (const property in this.styles) {
+      if (this.styles.hasOwnProperty(property)) {
+        this.carouselEl.style[property] = this.styles[property];
+      }
+    }
   }
 
   reinitializeSwiper() {
     if (this.swiperInstance) {
       this.swiperInstance.destroy(true, true);
+      this.swiperInstance = null;
     }
     this.initializeSwiper();
   }
   initializeSwiper() {
+    if (this.swiperInstance) {
+      return;
+    }
     this.swiperInstance = new Swiper(this.carouselEl, {
       modules: [Navigation, Pagination],
-      simulateTouch: false,
-      allowTouchMove: false,
+      simulateTouch: this.enableCarouselSwipe,
+      allowTouchMove: this.enableCarouselSwipe,
       direction: 'horizontal',
-      touchMoveStopPropagation: false,
+      touchMoveStopPropagation: this.enableCarouselSwipe,
       navigation: {
         nextEl: this.nextEl,
         prevEl: this.prevEl,
       },
     });
+    this.swiperInstance.on('slideChange', s => {
+      this.carouselImageIndexChange.emit(s.activeIndex);
+    });
+    this.swiperInstance.slideTo(this.activeIndex);
+  }
+  @Watch('activeIndex')
+  handleActiveIndexChange(newValue: number, oldValue: number) {
+    if (newValue !== oldValue) {
+      this.swiperInstance.slideTo(newValue);
+    }
   }
 
   render() {
     return (
-      <div class="swiper" ref={el => (this.carouselEl = el)}>
+      <div class={`swiper ${this.carouselClasses ?? ''}`} ref={el => (this.carouselEl = el)}>
         <div class="swiper-wrapper">
           {/* Slides */}
           {this.slides.map(slide => (
-            <div class="swiper-slide">
+            <div class="swiper-slide" data-swipable={this.enableCarouselSwipe}>
               <img src={slide.image_uri} onClick={() => this.carouselImageClicked.emit(null)} key={slide.id} alt={slide.alt} />
             </div>
           ))}

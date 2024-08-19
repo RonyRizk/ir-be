@@ -22,7 +22,6 @@ export interface IRatePlanSelection {
     rate: number;
     smoking_option: ISmokingOption;
     bedding_setup: BeddingSetup[];
-    pre_payment_amount: number;
   };
 }
 
@@ -50,6 +49,8 @@ interface BookingStore {
   bookingAvailabilityParams: IBookinAvailabilityParams;
   booking: Booking;
   resetBooking: boolean;
+  isInFreeCancelationZone: boolean;
+  fictus_booking_nbr: { nbr: string | null };
 }
 
 const initialState: BookingStore = {
@@ -58,6 +59,7 @@ const initialState: BookingStore = {
   enableBooking: false,
   resetBooking: false,
   ratePlanSelections: {},
+  isInFreeCancelationZone: false,
   bookingAvailabilityParams: {
     from_date: null,
     to_date: null,
@@ -65,6 +67,7 @@ const initialState: BookingStore = {
     child_nbr: 0,
   },
   booking: null,
+  fictus_booking_nbr: null,
 };
 
 export const { state: booking_store, onChange: onRoomTypeChange } = createStore<BookingStore>(initialState);
@@ -85,7 +88,6 @@ onRoomTypeChange('roomTypes', (newValue: RoomType[]) => {
   const ratePlanSelections: { [roomTypeId: number]: IRoomTypeSelection } = {};
   newValue.forEach(roomType => {
     if (!roomType.is_active) return;
-
     ratePlanSelections[roomType.id] = ratePlanSelections[roomType.id] || {};
 
     roomType.rateplans.forEach(ratePlan => {
@@ -106,6 +108,9 @@ onRoomTypeChange('roomTypes', (newValue: RoomType[]) => {
               checkoutBedSelection: roomType.inventory === 0 ? [] : currentRatePlanSelection.checkoutBedSelection,
               checkoutSmokingSelection: roomType.inventory === 0 ? [] : currentRatePlanSelection.checkoutSmokingSelection,
               guestName: roomType.inventory === 0 ? [] : currentRatePlanSelection.guestName,
+              roomtype: {
+                ...currentRatePlanSelection.roomtype,
+              },
             }
           : {
               reserved: 0,
@@ -126,7 +131,6 @@ onRoomTypeChange('roomTypes', (newValue: RoomType[]) => {
             };
     });
   });
-  console.log(ratePlanSelections);
   booking_store.ratePlanSelections = ratePlanSelections;
   booking_store.resetBooking = false;
 });
@@ -186,6 +190,7 @@ export function reserveRooms(roomTypeId: number, ratePlanId: number, rooms: numb
     throw new Error('Invalid rate plan');
   }
   if (!booking_store.ratePlanSelections[roomTypeId][ratePlanId]) {
+    console.log('prepayment_amount', roomType.pre_payment_amount);
     booking_store.ratePlanSelections[roomTypeId][ratePlanId] = {
       guestName: null,
       reserved: 0,
@@ -206,7 +211,6 @@ export function reserveRooms(roomTypeId: number, ratePlanId: number, rooms: numb
         rate: roomType.rate,
         bedding_setup: roomType.bedding_setup,
         smoking_option: roomType.smoking_option,
-        pre_payment_amount: roomType.pre_payment_amount,
       },
     };
   }
@@ -232,14 +236,17 @@ export function modifyBookingStore(key: keyof BookingStore, value: any) {
   booking_store[key] = value;
 }
 
-export function calculateTotalCost(): { totalAmount: number; prePaymentAmount: number } {
+export function calculateTotalCost(gross:boolean=false): { totalAmount: number; prePaymentAmount: number } {
   let prePaymentAmount = 0;
   let totalAmount = 0;
   const calculateCost = (ratePlan: IRatePlanSelection, isPrePayment: boolean = false) => {
     if (ratePlan.checkoutVariations.length > 0 && ratePlan.reserved > 0) {
-      return ratePlan.checkoutVariations.reduce((sum, variation) => sum + Number(variation.amount), 0);
+      if (isPrePayment) {
+        return ratePlan.reserved * ratePlan.ratePlan.pre_payment_amount || 0;
+      }
+      return ratePlan.checkoutVariations.reduce((sum, variation) => sum + (Number(variation[gross?"amount_gross":"amount"])), 0);
     } else if (ratePlan.reserved > 0) {
-      const amount = isPrePayment ? ratePlan.roomtype.pre_payment_amount : ratePlan.selected_variation?.variation?.amount;
+      const amount = isPrePayment ? ratePlan.ratePlan.pre_payment_amount ?? 0 : ratePlan.selected_variation?.variation[gross?"amount_gross":"amount"];
       return ratePlan.reserved * (amount ?? 0);
     }
     return 0;

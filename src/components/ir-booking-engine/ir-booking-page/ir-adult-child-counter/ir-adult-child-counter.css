@@ -5,7 +5,7 @@
   box-sizing: border-box;
   padding: 10px;
   border-radius: min(var(--radius, 0.5rem), 0.5rem);
-  border: 1px solid var(--gray-100);
+  border: 1px solid var(--gray-100, #f2f4f7);
   background: white;
   box-shadow:
     0 12px 16px -4px rgba(16, 24, 40, 0.08),
@@ -25,7 +25,7 @@
 .counter-item {
   display: flex;
   align-items: center;
-  color: var(--gray-800);
+  color: var(--gray-800, #1d2939);
   justify-content: space-between;
   gap: 32px;
 }
@@ -67,7 +67,7 @@
   font-size: 0.75rem;
 }
 .guests {
-  color: var(--gray-600);
+  color: var(--gray-600, #475467);
   font-size: 0.875rem !important;
   font-weight: 400;
 }
@@ -82,14 +82,14 @@
 }
 .popover-trigger {
   box-sizing: border-box;
-  gap: 8px;
+  gap: 0.875rem;
   background: white;
   border-radius: min(var(--radius, 0.5rem), 0.5rem);
   border: 1px solid var(--gray-300, #d0d5dd);
   display: inline-flex;
   align-items: center;
-  padding: 0px 14px;
-  width: fit-content;
+  padding: 0px 0.875rem;
+  width: 100% !important;
   min-width: 12.5rem;
   line-height: 1;
   color: var(--gray-700, #344054);
@@ -108,7 +108,7 @@
 .popover-trigger[data-state='opened'],
 .popover-trigger:active,
 .popover-trigger:focus-visible {
-  border-color: var(--gray-700, 206, 100%, 76%);
+  border-color: var(--gray-700, #344054);
   color: var(--gray-700, #344054);
 }
 .popover-trigger p {

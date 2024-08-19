@@ -1,6 +1,7 @@
 :host {
   display: block;
 }
+
 .card-container {
   border: 1px solid var(--gray-300, #d0d5dd);
   transition: all 0.3s ease-in-out;
@@ -11,9 +12,11 @@
   align-items: center;
   border-radius: 8px;
 }
+:host([data-state='error']) .card-container,
 .card-container.error {
   border-color: var(--error-500, #f04438);
 }
+:host([data-state='error']) .card-container .card-number,
 .card-container.error .card-number {
   color: var(--error-500, #f04438);
 }

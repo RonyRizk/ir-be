@@ -5,6 +5,13 @@
 <!-- Auto Generated Below -->
 
 
+## Properties
+
+| Property | Attribute | Description | Type                         | Default     |
+| -------- | --------- | ----------- | ---------------------------- | ----------- |
+| `errors` | --        |             | `{ [x: string]: ZodIssue; }` | `undefined` |
+
+
 ## Dependencies
 
 ### Used by

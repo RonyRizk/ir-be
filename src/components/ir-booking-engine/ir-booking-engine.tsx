@@ -2,40 +2,40 @@ import { CommonService } from '@/services/api/common.service';
 import { PropertyService } from '@/services/api/property.service';
 import { Component, Listen, Prop, State, Watch, h } from '@stencil/core';
 import { format, Locale } from 'date-fns';
-import { ICurrency, IExposedLanguages } from '@/models/common';
+import { ICurrency, IExposedLanguages } from '@/models/commun';
 import axios from 'axios';
 import { IExposedProperty, Variation } from '@/models/property';
-import booking_store, { updateRoomParams } from '@/stores/booking';
+import booking_store, { modifyBookingStore, updateRoomParams } from '@/stores/booking';
 import app_store, { changeLocale, TSource, updateUserPreference } from '@/stores/app.store';
-import { checkAffiliate, getUserPrefernce, matchLocale, setDefaultLocale } from '@/utils/utils';
+import { checkAffiliate, checkGhs, getUserPrefernce, matchLocale, setDefaultLocale, validateAgentCode, validateCoupon } from '@/utils/utils';
 import Stack from '@/models/stack';
 import { v4 } from 'uuid';
 import { AvailabiltyService } from '@/services/app/availability.service';
 import { checkout_store } from '@/stores/checkout.store';
+// import { PaymentService } from '@/services/api/payment.service';
+// import { isRequestPending } from '@/stores/ir-interceptor.store';
 
 @Component({
-  tag: 'ir-booking-engine',
+  tag: 'ir-be',
   styleUrl: 'ir-booking-engine.css',
-  scoped: true,
+  shadow: true,
 })
 export class IrBookingEngine {
   @Prop({ mutable: true }) token: string =
     'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MTQ1NTQ5OTIsIkNMQUlNLTAxIjoiOGJpaUdjK21FQVE9IiwiQ0xBSU0tMDIiOiI5UStMQm93VTl6az0iLCJDTEFJTS0wMyI6Ilp3Tys5azJoTzUwPSIsIkNMQUlNLTA0IjoicUxHWllZcVA3SzB5aENrRTFaY0tENm5TeFowNkEvQ2lPc1JrWUpYTHFhTEF5M3N0akltbU9CWkdDb080dDRyNVRiWjkxYnZQelFIQ2c1YlBGU2J3cm5HdjNsNjVVcjVLT3RnMmZQVWFnNHNEYmE3WTJkMDF4RGpDWUs2SFlGREhkcTFYTzBLdTVtd0NKeU5rWDFSeWZmSnhJdWdtZFBUeTZPWjk0RUVjYTJleWVSVzZFa0pYMnhCZzFNdnJ3aFRKRHF1cUxzaUxvZ3I0UFU5Y2x0MjdnQ2tJZlJzZ2lZbnpOK2szclZnTUdsQTUvWjRHekJWcHl3a0dqcWlpa0M5T0owWFUrdWJJM1dzNmNvSWEwSks4SWRqVjVaQ1VaZjZ1OGhBMytCUlpsUWlyWmFZVWZlVmpzU1FETFNwWFowYjVQY0FncE1EWVpmRGtWbGFscjRzZ1pRNVkwODkwcEp6dE16T0s2VTR5Z1FMQkdQbTlTSmRLY0ExSGU2MXl2YlhuIiwiQ0xBSU0tMDUiOiJFQTEzejA3ejBUcWRkM2gwNElyYThBcklIUzg2aEpCQSJ9.ySJjLhWwUDeP4X8LIJcbsjO74y_UgMHwRDpNrCClndc';
   @Prop() propertyId: number;
-  @Prop() baseUrl: string;
   @Prop() injected: boolean;
-  @Prop() roomtype_id: number = null;
-  @Prop() rateplan_id: number = null;
-  @Prop() redirect_url: string = null;
+  @Prop() rt_id: number = null;
+  @Prop() rp_id: number = null;
 
   //extra props
   @Prop() perma_link: string = null;
-  @Prop() aName: string = null;
-  @Prop() fromDate: string;
+  @Prop() p: string = null;
+  @Prop() checkin: string;
+  @Prop() checkout: string;
   @Prop() language: string;
-  @Prop() toDate: string;
-  @Prop() adultCount: string;
-  @Prop() childrenCount: string;
+  @Prop() adults: string;
+  @Prop() child: string;
   @Prop() cur: string;
   @Prop() aff: string;
   @Prop() stag: string | null;
@@ -44,6 +44,11 @@ export class IrBookingEngine {
   @Prop() version: string = '2.0';
   @Prop() hideGoogleSignIn: boolean = true;
 
+  //discount properties
+  @Prop() coupon: string;
+  @Prop() loyalty: boolean;
+  @Prop() agent_code: string;
+
   @State() selectedLocale: Locale;
   @State() currencies: ICurrency[];
   @State() languages: IExposedLanguages[];
@@ -51,6 +56,7 @@ export class IrBookingEngine {
   @State() router = new Stack<HTMLElement>();
   @State() bookingListingScreenOptions: { screen: 'bookings' | 'booking-details'; params: unknown } = { params: null, screen: 'bookings' };
 
+  private baseUrl: string = 'https://gateway.igloorooms.com/IRBE';
   private commonService = new CommonService();
   private propertyService = new PropertyService();
   private availabiltyService = new AvailabiltyService();
@@ -94,6 +100,25 @@ export class IrBookingEngine {
       });
     }
   }
+  @Watch('coupon')
+  handleCouponChange(newValue: string, oldValue: string) {
+    if (newValue !== oldValue) {
+      validateCoupon(newValue);
+    }
+  }
+  @Watch('loyalty')
+  handleLoyaltyChange(newValue: boolean, oldValue: boolean) {
+    if (newValue !== oldValue) {
+      this.modifyLoyalty();
+    }
+  }
+
+  @Watch('agent_code')
+  handleAgentCodeChange(newValue: string, oldValue: string) {
+    if (newValue !== oldValue) {
+      validateAgentCode(newValue);
+    }
+  }
 
   setSource(newSource: TSource) {
     app_store.app_data = { ...app_store.app_data, source: newSource };
@@ -113,15 +138,16 @@ export class IrBookingEngine {
     this.commonService.setToken(this.token);
     this.propertyService.setToken(this.token);
     app_store.app_data = {
+      isFromGhs: checkGhs(this.source?.code, this.stag),
       token: this.token,
       property_id: this.propertyId,
       injected: this.injected,
-      roomtype_id: this.roomtype_id,
-      redirect_url: this.redirect_url,
+      roomtype_id: this.rt_id,
       affiliate: null,
       tag: this.stag,
       source: this.source,
       hideGoogleSignIn: this.hideGoogleSignIn,
+      stag: this.stag,
     };
     this.initRequest();
   }
@@ -134,7 +160,7 @@ export class IrBookingEngine {
       this.commonService.getExposedLanguages(),
       this.commonService.getExposedCountryByIp(),
       this.commonService.getExposedLanguage(),
-      this.propertyService.getExposedProperty({ id: this.propertyId, language: app_store.userPreferences?.language_id || 'en', aname: this.aName, perma_link: this.perma_link }),
+      this.propertyService.getExposedProperty({ id: this.propertyId, language: app_store.userPreferences?.language_id || 'en', aname: this.p, perma_link: this.perma_link }),
     ];
     if (app_store.is_signed_in) {
       requests.push(this.propertyService.getExposedGuest());
@@ -148,6 +174,7 @@ export class IrBookingEngine {
       }
       let currency = app_store.userDefaultCountry.currency;
       if (this.cur) {
+        console.log(this.cur);
         const newCurr = this.currencies.find(c => c.code.toLowerCase() === this.cur.toLowerCase());
         if (newCurr) {
           currency = newCurr;
@@ -155,11 +182,24 @@ export class IrBookingEngine {
       }
       setDefaultLocale({ currency });
     }
+    this.checkAndApplyDiscounts();
+
     app_store.app_data = {
       ...app_store.app_data,
       affiliate: checkAffiliate(this.aff?.toLowerCase().trim()),
     };
     this.isLoading = false;
+  }
+  checkAndApplyDiscounts() {
+    if (this.coupon) {
+      validateCoupon(this.coupon);
+    }
+    if (this.loyalty) {
+      this.modifyLoyalty();
+    }
+    if (this.agent_code) {
+      validateAgentCode(this.agent_code);
+    }
   }
   handleVariationChange(e: CustomEvent, variations: Variation[], rateplanId: number, roomTypeId: number) {
     e.stopImmediatePropagation();
@@ -171,7 +211,13 @@ export class IrBookingEngine {
     }
     updateRoomParams({ params: { selected_variation: { variation: selectedVariation, state: 'modified' } }, ratePlanId: rateplanId, roomTypeId });
   }
-
+  private modifyLoyalty() {
+    modifyBookingStore('bookingAvailabilityParams', {
+      ...booking_store.bookingAvailabilityParams,
+      coupon: null,
+      loyalty: this.loyalty,
+    });
+  }
   @Listen('routing')
   handleNavigation(e: CustomEvent) {
     e.stopImmediatePropagation();
@@ -215,7 +261,7 @@ export class IrBookingEngine {
         ...[
           this.commonService.getExposedLanguage(),
           this.propertyService.getExposedProperty(
-            { id: app_store.app_data.property_id, language: app_store.userPreferences?.language_id || 'en', aname: this.aName, perma_link: this.perma_link },
+            { id: app_store.app_data.property_id, language: app_store.userPreferences?.language_id || 'en', aname: this.p, perma_link: this.perma_link },
             false,
           ),
         ],
@@ -244,6 +290,8 @@ export class IrBookingEngine {
         promo_key: booking_store.bookingAvailabilityParams.coupon || '',
         is_in_agent_mode: !!booking_store.bookingAvailabilityParams.agent || false,
         agent_id: booking_store.bookingAvailabilityParams.agent || 0,
+        is_in_affiliate_mode: !!app_store.app_data.affiliate,
+        affiliate_id: app_store.app_data.affiliate ? app_store.app_data.affiliate.id : null,
       },
       identifier: this.identifier,
       mode: 'default',
@@ -253,7 +301,7 @@ export class IrBookingEngine {
   renderScreens() {
     switch (app_store.currentPage) {
       case 'booking':
-        return <ir-booking-page adultCount={this.adultCount} childrenCount={this.childrenCount} fromDate={this.fromDate} toDate={this.toDate}></ir-booking-page>;
+        return <ir-booking-page adultCount={this.adults} childrenCount={this.child} fromDate={this.checkin} toDate={this.checkout}></ir-booking-page>;
       case 'checkout':
         return <ir-checkout-page></ir-checkout-page>;
       case 'invoice':
@@ -264,7 +312,7 @@ export class IrBookingEngine {
             footerShown={false}
             propertyId={this.propertyId}
             perma_link={this.perma_link}
-            aName={this.aName}
+            aName={this.p}
             language={this.language}
             baseUrl={this.baseUrl}
             email={app_store.invoice.email}
@@ -281,9 +329,9 @@ export class IrBookingEngine {
             showAllBookings={false}
             headerShown={false}
             footerShown={false}
-            propertyid={this.propertyId}
+            propertyid={app_store.app_data.property_id}
             perma_link={this.perma_link}
-            aName={this.aName}
+            aName={this.p}
             be={true}
             baseUrl={this.baseUrl}
             aff={this.aff}
@@ -314,12 +362,30 @@ export class IrBookingEngine {
 
   render() {
     if (this.isLoading) {
-      return null;
+      return <ir-home-loader></ir-home-loader>;
     }
+
     return (
       <main class="relative  flex w-full flex-col space-y-5 ">
+        {/* <ir-button
+          label="click"
+          isLoading={isRequestPending('/Get_Exposed_Applicable_Policies')}
+          onClick={async () => {
+            const paymentService = new PaymentService();
+            paymentService.setToken(app_store.app_data.token);
+            //   {
+            //     "booking_nbr": "67655772762",
+            //     "currency_id": 4,
+            //     "language": "en",
+            //     "property_id": 42,
+            //     "rate_plan_id": 3929,
+            //     "room_type_id": 2352
+            // }
+            await paymentService.fetchCancelationMessage({ id: 3929, roomTypeId: 2352, bookingNbr: '33168125670' });
+          }}
+        ></ir-button> */}
         <ir-interceptor></ir-interceptor>
-        <section class="sticky top-0 z-50 m-0 w-full p-0 ">
+        <section class={`${this.injected ? '' : 'sticky top-0 z-50'}  m-0 w-full p-0 `}>
           <ir-nav
             class={'m-0 p-0'}
             website={app_store.property?.space_theme.website}

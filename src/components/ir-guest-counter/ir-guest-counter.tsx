@@ -55,7 +55,7 @@ export class IrGuestCounter {
 
   render() {
     return (
-      <div class="counter-container">
+      <div class="counter-container p-4">
         {/* Adult Counter */}
         <div class="counter-item">
           <div>

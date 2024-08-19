@@ -4,7 +4,7 @@ import { BookingListingService } from '@/services/api/booking_listing.service';
 import { CommonService } from '@/services/api/common.service';
 import { PropertyService } from '@/services/api/property.service';
 import { BookingListingAppService } from '@/services/app/booking-listing.service';
-import { cn, formatAmount, runScriptAndRemove } from '@/utils/utils';
+import { cn, formatAmount, formatFullLocation, runScriptAndRemove } from '@/utils/utils';
 import { differenceInCalendarDays, format } from 'date-fns';
 import app_store from '@/stores/app.store';
 import { PaymentService } from '@/services/api/payment.service';
@@ -33,6 +33,8 @@ export class IrBookingOverview {
   @State() selectedBooking: Booking | null;
   @State() selectedMenuIds: Record<string, number> = {};
   @State() hoveredBooking = null;
+  @State() cancelationMessage: string;
+  @State() amountToBePayed: number;
 
   @Event() bl_routing: EventEmitter<{
     route: 'booking' | 'booking-details';
@@ -146,7 +148,16 @@ export class IrBookingOverview {
       }
     }
   }
-  private handleBookingCancelation() {
+  async fetchCancelationMessage(id: number, roomTypeId: number) {
+    const { data, message } = await this.paymentService.fetchCancelationMessage({ id, roomTypeId, bookingNbr: this.selectedBooking.booking_nbr, showCancelation: false });
+    const cancelationBrackets = data.find(d => d.type === 'cancelation' && d.brackets);
+    if (cancelationBrackets?.brackets) {
+      this.amountToBePayed = this.paymentService.findClosestDate(cancelationBrackets?.brackets)?.gross_amount || null;
+    }
+    this.cancelationMessage = message;
+  }
+  private async handleBookingCancelation() {
+    await this.fetchCancelationMessage(0, 0);
     this.bookingCancelation.openDialog();
   }
   private handleMenuItemChange(e: CustomEvent) {
@@ -184,18 +195,19 @@ export class IrBookingOverview {
       console.error('Invalid payment method');
       return;
     }
-    const { amount } = await this.paymentService.GetExposedApplicablePolicies({
-      book_date: new Date(this.selectedBooking.booked_on.date),
-      token: app_store.app_data.token,
-      params: {
-        booking_nbr: this.selectedBooking.booking_nbr,
-        property_id: app_store.app_data.property_id,
-        room_type_id: 0,
-        rate_plan_id: 0,
-        currency_id: this.selectedBooking.currency.id,
-        language: app_store.userPreferences.language_id,
-      },
-    });
+    // const { amount } = await this.paymentService.GetExposedApplicablePolicies({
+    //   book_date: new Date(this.selectedBooking.booked_on.date),
+    //   token: app_store.app_data.token,
+    //   params: {
+    //     booking_nbr: this.selectedBooking.booking_nbr,
+    //     property_id: app_store.app_data.property_id,
+    //     room_type_id: 0,
+    //     rate_plan_id: 0,
+    //     currency_id: this.selectedBooking.currency.id,
+    //     language: app_store.userPreferences.language_id,
+    //   },
+    // });
+    const { amount } = await this.paymentService.getBookingPrepaymentAmount(this.selectedBooking);
     if (amount || Number(prePaymentAmount.value) > 0) {
       await this.paymentService.GeneratePaymentCaller({
         token: app_store.app_data.token,
@@ -234,12 +246,12 @@ export class IrBookingOverview {
       return (
         <div class="flex h-screen w-full flex-col place-content-center">
           <div class=" flex h-screen flex-col gap-4 md:hidden">
-            {[...Array(5)].map(p => (
-              <div key={p} class="block h-64 w-full animate-pulse rounded-md bg-gray-200"></div>
+            {[...Array(5)].map((_, idx) => (
+              <ir-skeleton key={idx} class="h-80 w-full"></ir-skeleton>
             ))}
           </div>
-          <div class="hidden h-screen flex-col  md:flex">
-            <div class="block h-[50vh] w-full animate-pulse rounded-md  bg-gray-200"></div>
+          <div class="hidden h-screen flex-col md:flex">
+            <ir-skeleton class="h-[80vh] w-full"></ir-skeleton>
           </div>
         </div>
       );
@@ -295,8 +307,8 @@ export class IrBookingOverview {
                             key={booking.booking_nbr}
                             data-state={this.hoveredBooking === booking.booking_nbr ? 'hovered' : ''}
                           >
-                            <th class="ir-table-cell" colSpan={7}>
-                              {booking.property.name}
+                            <th class="ir-table-cell" data-state="affiliate" colSpan={7}>
+                              {booking.property.name} <span class={'property-location'}>{formatFullLocation(booking.property)}</span>
                             </th>
                           </tr>
                         )}
@@ -309,15 +321,25 @@ export class IrBookingOverview {
                           key={booking.booking_nbr}
                           data-state={this.hoveredBooking === booking.booking_nbr ? 'hovered' : ''}
                         >
-                          <td class="ir-table-cell">{<ir-badge label={booking.status.description} variant={this.getBadgeVariant(booking.status.code)}></ir-badge>}</td>
-                          <td class="ir-table-cell">{booking.booking_nbr}</td>
-                          <td class="ir-table-cell md:hidden lg:table-cell">{format(new Date(booking.booked_on.date), 'dd-MMM-yyyy')}</td>
-                          <td class="ir-table-cell">{format(new Date(booking.from_date), 'dd-MMM-yyyy')}</td>
-                          <td class="ir-table-cell">
+                          <td class="ir-table-cell" data-state={this.aff ? 'booking-affiliate' : ''}>
+                            {<ir-badge label={booking.status.description} variant={this.getBadgeVariant(booking.status.code)}></ir-badge>}
+                          </td>
+                          <td class="ir-table-cell" data-state={this.aff ? 'booking-affiliate' : ''}>
+                            {booking.booking_nbr}
+                          </td>
+                          <td class="ir-table-cell  md:hidden lg:table-cell" data-state={this.aff ? 'booking-affiliate' : ''}>
+                            {format(new Date(booking.booked_on.date), 'dd-MMM-yyyy')}
+                          </td>
+                          <td class="ir-table-cell" data-state={this.aff ? 'booking-affiliate' : ''}>
+                            {format(new Date(booking.from_date), 'dd-MMM-yyyy')}
+                          </td>
+                          <td class="ir-table-cell" data-state={this.aff ? 'booking-affiliate' : ''}>
                             {totalNights} {totalNights > 1 ? 'nights' : 'night'}
                           </td>
-                          <td class="ir-table-cell">{formatAmount(booking.total, booking.currency.code)}</td>
-                          <td class="ir-table-cell">
+                          <td class="ir-table-cell" data-state={this.aff ? 'booking-affiliate' : ''}>
+                            {formatAmount(booking.total, booking.currency.code)}
+                          </td>
+                          <td class="ir-table-cell" data-state={this.aff ? 'booking-affiliate' : ''}>
                             {payment.show || cancel.show ? (
                               <div class={'ct-menu-container'}>
                                 <button
@@ -327,7 +349,7 @@ export class IrBookingOverview {
                                   }}
                                   class="ct-menu-button"
                                 >
-                                  {menuItems.find(p => p.id === this.selectedMenuIds[booking.booking_nbr] ?? menuItems[0].id)?.item}
+                                  {menuItems.find(p => p.id === this.selectedMenuIds[booking.booking_nbr])?.item}
                                 </button>
                                 <ir-menu
                                   onMenuItemClick={e => {
@@ -394,8 +416,10 @@ export class IrBookingOverview {
 
           <ir-booking-cancelation
             ref={el => (this.bookingCancelation = el)}
+            booking={this.selectedBooking}
             booking_nbr={this.selectedBooking?.booking_nbr}
-            cancelation={this.selectedBooking?.rooms[0].rateplan.cancelation}
+            currency={{ code: this.selectedBooking?.currency.code, id: this.selectedBooking?.currency.id }}
+            cancelation={this.cancelationMessage || this.selectedBooking?.rooms[0].rateplan.cancelation}
             onCancelationResult={e => {
               e.stopImmediatePropagation();
               e.stopPropagation();

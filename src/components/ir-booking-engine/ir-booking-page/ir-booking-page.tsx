@@ -1,6 +1,6 @@
 import { Component, Event, EventEmitter, Host, Listen, Prop, State, h } from '@stencil/core';
 import { Locale } from 'date-fns';
-import { ICurrency, IExposedLanguages, pages } from '@/models/common';
+import { ICurrency, IExposedLanguages, pages } from '@/models/commun';
 import { IExposedProperty } from '@/models/property';
 import booking_store, { calculateTotalCost } from '@/stores/booking';
 import app_store, { onAppDataChange } from '@/stores/app.store';
@@ -79,7 +79,8 @@ export class IrBookingPage {
                 if (
                   !roomType.is_active ||
                   (app_store.app_data.roomtype_id && roomType.id !== app_store.app_data.roomtype_id) ||
-                  !roomType.rateplans.some(rp => rp.is_booking_engine_enabled)
+                  !roomType.rateplans.some(rp => rp.is_booking_engine_enabled) ||
+                  (!!booking_store.bookingAvailabilityParams.agent && roomType.rateplans.filter(rp => !rp.is_targeting_travel_agency).length === 0)
                 ) {
                   return null;
                 }

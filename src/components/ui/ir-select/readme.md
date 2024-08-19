@@ -7,14 +7,16 @@
 
 ## Properties
 
-| Property    | Attribute   | Description | Type                                                                             | Default     |
-| ----------- | ----------- | ----------- | -------------------------------------------------------------------------------- | ----------- |
-| `data`      | --          |             | `{ id: string \| number; value: string; disabled?: boolean; html?: boolean; }[]` | `undefined` |
-| `icon`      | `icon`      |             | `boolean`                                                                        | `undefined` |
-| `label`     | `label`     |             | `string`                                                                         | `undefined` |
-| `select_id` | `select_id` |             | `string`                                                                         | `v4()`      |
-| `value`     | `value`     |             | `number \| string`                                                               | `undefined` |
-| `variant`   | `variant`   |             | `"default" \| "double-line"`                                                     | `'default'` |
+| Property         | Attribute         | Description | Type                                                                             | Default     |
+| ---------------- | ----------------- | ----------- | -------------------------------------------------------------------------------- | ----------- |
+| `containerStyle` | `container-style` |             | `string`                                                                         | `''`        |
+| `customStyles`   | `custom-styles`   |             | `string`                                                                         | `''`        |
+| `data`           | --                |             | `{ id: string \| number; value: string; disabled?: boolean; html?: boolean; }[]` | `undefined` |
+| `icon`           | `icon`            |             | `boolean`                                                                        | `undefined` |
+| `label`          | `label`           |             | `string`                                                                         | `undefined` |
+| `select_id`      | `select_id`       |             | `string`                                                                         | `v4()`      |
+| `value`          | `value`           |             | `number \| string`                                                               | `undefined` |
+| `variant`        | `variant`         |             | `"default" \| "double-line"`                                                     | `'default'` |
 
 
 ## Events

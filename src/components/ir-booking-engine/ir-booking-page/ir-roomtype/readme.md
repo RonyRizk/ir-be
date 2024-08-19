@@ -32,17 +32,18 @@ graph TD;
   ir-roomtype --> ir-rateplan
   ir-property-gallery --> ir-icons
   ir-property-gallery --> ir-gallery
-  ir-property-gallery --> ir-accomodations
   ir-property-gallery --> ir-carousel
-  ir-property-gallery --> ir-button
   ir-property-gallery --> ir-dialog
+  ir-property-gallery --> ir-button
   ir-property-gallery --> ir-room-type-amenities
-  ir-accomodations --> ir-icons
-  ir-button --> ir-icons
   ir-dialog --> ir-button
+  ir-button --> ir-icons
   ir-room-type-amenities --> ir-icons
-  ir-rateplan --> ir-select
+  ir-accomodations --> ir-icons
   ir-rateplan --> ir-tooltip
+  ir-rateplan --> ir-skeleton
+  ir-rateplan --> ir-select
+  ir-rateplan --> ir-button
   ir-booking-page --> ir-roomtype
   style ir-roomtype fill:#f9f,stroke:#333,stroke-width:4px
 ```

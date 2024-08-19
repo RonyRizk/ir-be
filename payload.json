@@ -7,13 +7,13 @@
   "promo_key": null,
   "booking": {
     "booking_nbr": "",
-    "from_date": "2024-06-18",
-    "to_date": "2024-06-19",
+    "from_date": "2024-07-25",
+    "to_date": "2024-07-26",
     "remark": null,
     "property": {
       "id": 42
     },
-    "source": "webiste",
+    "source": null,
     "referrer_site": "www.igloorooms.com",
     "currency": {
       "code": "USD",
@@ -24,13 +24,14 @@
       "code": "001"
     },
     "guest": {
-      "email": "test@gmail.com",
+      "email": "estest.test@gmail.com",
       "first_name": "test",
-      "last_name": "test",
-      "country_id": 2,
+      "last_name": "test2",
+      "country_id": 486,
       "city": null,
-      "mobile": "+96112321321",
+      "mobile": "12345678",
       "address": "",
+      "country_phone_prefix": "+501",
       "dob": null,
       "subscribe_to_news_letter": true,
       "cci": null
@@ -42,18 +43,23 @@
           "amenities": [
             {
               "amenity_type": "room",
-              "code": "amenities",
-              "description": "Welcome amenities"
+              "code": "jacuzzi",
+              "description": "Jacuzzi"
             },
             {
               "amenity_type": "room",
-              "code": "viewslopes",
-              "description": "Slopes view"
+              "code": "view",
+              "description": "Scenic view"
             },
             {
               "amenity_type": "room",
-              "code": "soundproof",
-              "description": "Soundproof"
+              "code": "terracegrass",
+              "description": "Terrace with grass"
+            },
+            {
+              "amenity_type": "room",
+              "code": "bathroomshared",
+              "description": "Shared bathroom"
             }
           ],
           "availabilities": null,
@@ -62,166 +68,179 @@
               "code": "kingsizebed",
               "count": 1,
               "name": "King size bed"
-            },
-            {
-              "code": "singlebed",
-              "count": 1,
-              "name": "Single bed"
             }
           ],
-          "description": "Our Modern and Classic Rooms averages 322 square feet with custom furnishings,every room in Hotel High Season includes the finest attention to detail, from the triple-sheeted 300 thread count sheets to the one-touch “Goodnight” button.Each room will be everything you are looking for in a Lebanon hotel, and drastically more than you thought possible and our custom beds by will make you want to snooze through your morning plans.When you enter our Modern and Classic Room, you’ll only have one thought: this is what all hotels at Lebanon should be like. ",
+          "description": "Large room with sitting area and Jacuzzi",
           "exposed_inventory": null,
-          "id": 110,
+          "id": 111,
           "images": [
             {
-              "tooltip": "Standard Rooms",
+              "tooltip": "Premium Suites",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_221.jpg"
+            },
+            {
+              "tooltip": "Premium Suites",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_222.jpg"
+            },
+            {
+              "tooltip": "Premium Suites",
               "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_223.jpg"
             },
             {
-              "tooltip": "Standard Rooms",
+              "tooltip": "Premium Suites",
               "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_224.jpg"
             },
             {
-              "tooltip": "Standard Rooms",
+              "tooltip": "Premium Suites",
               "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_225.jpg"
             },
             {
-              "tooltip": "Standard Rooms",
+              "tooltip": "Premium Suites",
               "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_226.jpg"
             },
             {
-              "tooltip": "Standard Rooms",
+              "tooltip": "Premium Suites",
               "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_229.jpg"
             },
             {
-              "tooltip": "Standard Rooms",
+              "tooltip": "Premium Suites",
               "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_231.jpg"
             },
             {
-              "tooltip": "Standard Rooms",
+              "tooltip": "Premium Suites",
               "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_234.jpg"
             },
             {
-              "tooltip": "Standard Rooms",
-              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_235.jpg"
-            },
-            {
-              "tooltip": "Standard Rooms",
-              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_236.jpg"
-            },
-            {
-              "tooltip": "Standard Rooms",
-              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_241.jpg"
-            },
-            {
-              "tooltip": "Standard Rooms",
+              "tooltip": "Premium Suites",
               "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_251.jpg"
-            },
-            {
-              "tooltip": "Standard Rooms",
-              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_271.jpg"
             }
           ],
-          "inventory": 5,
+          "inventory": 1,
           "is_active": true,
           "is_bed_configuration_enabled": false,
           "main_image": {
-            "tooltip": "Standard Rooms",
-            "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_235.jpg"
+            "tooltip": "Premium Suites",
+            "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_221.jpg"
           },
-          "name": "Standard Rooms",
+          "name": "Premium Suites",
           "occupancy_default": {
             "adult_nbr": 2,
             "children_nbr": 0,
             "infant_nbr": null
           },
           "occupancy_max": {
-            "adult_nbr": 2,
+            "adult_nbr": 5,
             "children_nbr": 0,
             "infant_nbr": 0
           },
           "physicalrooms": null,
-          "pre_payment_amount": 18.8831,
+          "pre_payment_amount": null,
           "rate": null,
           "rateplans": null,
-          "size": 25,
+          "size": 50,
           "smoking_option": {
             "allowed_smoking_options": [
+              {
+                "code": "",
+                "description": "No preferences"
+              },
+              {
+                "code": "001",
+                "description": "Smoking"
+              },
               {
                 "code": "002",
                 "description": "Non-smoking"
               }
             ],
-            "code": "003",
-            "description": "Non smoking"
+            "code": "001",
+            "description": "Ask"
           }
         },
         "rateplan": {
           "assignable_units": null,
-          "cancelation": "<u><b>Cancellation</b></u>: 100% of the total price will be charged if cancelled after Tuesday, 4 Jun 2024, 22:00 or in case of no show.\r\n",
-          "custom_text": "",
+          "cancelation": "<u><b>Cancellation</b></u>: 100% of the total price will be charged if cancelled after Monday, 15 Jul 2024, 22:00 or in case of no show.\r\n",
+          "custom_text": null,
           "guarantee": "<u><b>Guarantee</b></u>: First night from your booking will be charged.",
-          "id": 3882,
+          "id": 3755,
           "is_active": true,
           "is_booking_engine_enabled": true,
           "is_channel_enabled": false,
           "is_closed": false,
           "is_non_refundable": false,
           "is_targeting_travel_agency": false,
-          "name": "Standard Rooms/Bed-only",
+          "name": "Premium Suites/Half-board",
           "rate_restrictions": null,
-          "selected_variation": null,
+          "selected_variation": {
+            "IS_MLS_VIOLATED": false,
+            "MLS_ALERT": null,
+            "adult_child_offering": "2 adults",
+            "adult_nbr": 2,
+            "amount": 102,
+            "amount_per_night": 102,
+            "child_nbr": 0,
+            "discount_pct": 15,
+            "is_lmd": false,
+            "nights_nbr": 1,
+            "total_before_discount": 120
+          },
           "sell_mode": {
             "code": "001",
             "description": "Per Room"
           },
-          "short_name": "Bed-only",
+          "short_name": "Half-board",
           "variations": [
             {
               "adult_child_offering": "2 adults",
               "adult_nbr": 2,
-              "amount": 66.6133,
-              "amount_per_night": 66.6133,
+              "amount": 102,
               "child_nbr": 0,
+              "amount_per_night": "102",
               "discount_pct": 15,
               "is_lmd": false,
               "nights_nbr": 1,
-              "total_before_discount": 78.36859
+              "total_before_discount": 120,
+              "is_calculated": true,
+              "MLS_ALERT": null,
+              "IS_MLS_VIOLATED": false
             },
             {
               "adult_child_offering": "1 adult",
               "adult_nbr": 1,
-              "amount": 66.6133,
-              "amount_per_night": 66.6133,
+              "amount": null,
               "child_nbr": 0,
-              "discount_pct": 15,
-              "is_lmd": false,
+              "amount_per_night": "0",
+              "discount_pct": 0,
+              "is_lmd": null,
               "nights_nbr": 1,
-              "total_before_discount": 78.36859
+              "total_before_discount": 0,
+              "is_calculated": false,
+              "MLS_ALERT": null,
+              "IS_MLS_VIOLATED": false
             }
           ]
         },
         "unit": null,
         "occupancy": {
-          "adult_nbr": 1,
+          "adult_nbr": 2,
           "children_nbr": 0,
           "infant_nbr": null
         },
         "bed_preference": null,
-        "from_date": "2024-06-18",
-        "to_date": "2024-06-19",
+        "from_date": "2024-07-25",
+        "to_date": "2024-07-26",
         "notes": null,
         "days": [
           {
-            "date": "2024-06-18",
-            "amount": 66.6133,
+            "date": "2024-07-25",
+            "amount": 102,
             "cost": null
           }
         ],
         "guest": {
           "email": null,
           "first_name": "test",
-          "last_name": "test",
+          "last_name": "test2",
           "country_id": null,
           "city": null,
           "mobile": null,
@@ -237,6 +256,10 @@
     {
       "key": "payment_code",
       "value": "NetCommerce"
+    },
+    {
+      "key": "prepayment_amount",
+      "value": 102
     }
   ],
   "pickup_info": null

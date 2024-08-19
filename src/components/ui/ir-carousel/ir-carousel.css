@@ -26,8 +26,8 @@
 }
 
 .swiper {
-  border-radius: min(var(--radius, 8px), 12px);
-  background: var(--gray-300, #d0d5dd);
+  border-radius: min(var(--radius, 0.5rem), 1rem);
+  /* background: var(--gray-300, #d0d5dd); */
   overflow: hidden;
   margin: 0;
   padding: 0;
@@ -63,6 +63,14 @@
 .swiper:hover {
   --ir-carousel-opacity: 1;
 }
+.swiper-slide[data-swipable] img {
+  cursor: grab;
+  object-fit: contain;
+}
+.swiper-slide[data-swipable] img:active {
+  cursor: grabbing;
+}
+
 /* .swiper:hover .swiper-slide-active {
   transform: scale(1.1);
 } */

@@ -10,14 +10,14 @@
 | Property    | Attribute | Description | Type                                                                                                                                                                                                                                                            | Default |
 | ----------- | --------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
 | `be`        | `be`      |             | `boolean`                                                                                                                                                                                                                                                       | `true`  |
-| `user_data` | --        |             | `{ address?: string; city?: string; country_id?: number; dob?: string; email?: string; first_name?: string; id?: number; last_name?: string; mobile?: number; subscribe_to_news_letter?: boolean; country_phone_prefix?: string; alternative_email?: string; }` | `{}`    |
+| `user_data` | --        |             | `{ address?: string; id?: number; email?: string; first_name?: string; last_name?: string; country_id?: number; country_phone_prefix?: string; city?: string; dob?: string; mobile?: number; subscribe_to_news_letter?: boolean; alternative_email?: string; }` | `{}`    |
 
 
 ## Dependencies
 
 ### Used by
 
- - [ir-booking-engine](../..)
+ - [ir-be](../..)
  - [ir-booking-listing](../../ir-booking-listing)
  - [ir-nav](..)
 
@@ -39,7 +39,7 @@ graph TD;
   ir-user-profile --> ir-button
   ir-phone-input --> ir-icons
   ir-button --> ir-icons
-  ir-booking-engine --> ir-user-profile
+  ir-be --> ir-user-profile
   ir-booking-listing --> ir-user-profile
   ir-nav --> ir-user-profile
   style ir-user-profile fill:#f9f,stroke:#333,stroke-width:4px

@@ -1,5 +1,5 @@
 /* Styles for the ir-booking-details component */
-
+@import url('../../../gloabls.css');
 .container {
   width: 100%;
 }

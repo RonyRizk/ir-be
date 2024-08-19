@@ -1,5 +1,6 @@
 import BeLogoFooter from '@/assets/be_logo_footer';
 import app_store from '@/stores/app.store';
+import { renderPropertyLocation } from '@/utils/utils';
 import { Component, h, Prop } from '@stencil/core';
 
 @Component({
@@ -28,9 +29,12 @@ export class IrFooter {
   }
 
   renderPropertyEmail() {
-    const { email } = app_store.property?.contacts?.find(c => c.type === 'booking');
+    let { email } = app_store.property?.contacts?.find(c => c.type === 'booking');
     if (!email) {
       return null;
+    }
+    if (app_store.app_data.affiliate) {
+      email = app_store.app_data.affiliate.email;
     }
     return (
       <div class="contact-info">
@@ -41,17 +45,25 @@ export class IrFooter {
       </div>
     );
   }
-
+  getPhoneNumber() {
+    let country_prefix = app_store.property?.country?.phone_prefix || '';
+    let mobile = app_store.property?.phone;
+    if (app_store.app_data.affiliate) {
+      country_prefix = app_store.app_data.affiliate.country.phone_prefix;
+      mobile = app_store.app_data.affiliate.phone;
+    }
+    return [country_prefix, mobile];
+  }
   render() {
     return (
       <footer class="footer">
         <ul class="footer-list">
           <li class="footer-item">
-            <p class="footer-text">{app_store.property?.name}</p>
+            <p class="footer-text">{app_store.app_data.affiliate ? app_store.app_data.affiliate.name : app_store.property?.name}</p>
             <span>-</span>
             <ir-button onButtonClick={() => this.contactDialog.openModal()} buttonStyles={{ padding: '0' }} variants="link" label="Contact"></ir-button>
             <span>-</span>
-            <ir-privacy-policy label="Policy"></ir-privacy-policy>
+            <ir-privacy-policy label="privacy policy" policyTriggerStyle={{ textTransform: 'capitalize' }}></ir-privacy-policy>
           </li>
           <li class="social-media">
             {app_store.property?.social_media.map(media => {
@@ -83,19 +95,14 @@ export class IrFooter {
               <span>
                 <label>Address:</label>
               </span>
-              <div>
-                {this.renderLocationField(app_store.property?.city.name, false)}
-                {this.renderLocationField(app_store.property?.area)}
-                {this.renderLocationField(app_store.property?.postal)}
-                {this.renderLocationField(app_store.property?.country.name)}
-              </div>
+              <div>{renderPropertyLocation()}</div>
             </div>
             <div class="contact-info">
               <span>
                 <label>Phone:</label>
               </span>
-              <a class="contact-link" href={`tel:${app_store.property?.phone}`}>
-                {app_store.property?.country?.phone_prefix || ''} {app_store.property?.phone}
+              <a class="contact-link" href={`tel:${this.getPhoneNumber().join('')}`}>
+                {this.getPhoneNumber().join(' ')}
               </a>
             </div>
             {this.renderPropertyEmail()}

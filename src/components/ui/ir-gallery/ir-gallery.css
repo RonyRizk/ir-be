@@ -50,7 +50,7 @@
   bottom: 8px;
   z-index: 90;
   padding: 8px 10px;
-  border-radius: min(var(--radius, 8px), 12px);
+  border-radius: min(var(--radius, 0.5rem), 1rem);
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(8px);
   color: white;
@@ -94,9 +94,8 @@
   object-fit: cover;
   margin: 0;
   padding: 0;
-  border-radius: min(var(--radius, 8px), 12px);
+  border-radius: min(var(--radius, 0.5rem), 1rem);
   transition: transform 0.3s ease-in-out;
-  cursor: pointer;
 }
 /* .gallery-item img:hover {
   transform: scale(1.1);
@@ -104,9 +103,25 @@
 .gallery-item:nth-last-child(-n + 4) {
   display: none;
 }
+.gallery[data-images='1'] .gallery-item img {
+  cursor: default;
+}
+.swiper-slide img[data-disabled] {
+  cursor: default;
+}
+.swiper-slide[data-swipable] img {
+  cursor: grab;
+}
+.swiper-slide[data-swipable] img:active {
+  cursor: grabbing;
+}
+
 @media only screen and (min-width: 640px) {
   .swiper {
     display: none;
+  }
+  .gallery-item img {
+    cursor: pointer;
   }
   .gallery {
     display: grid;
@@ -114,6 +129,7 @@
     grid-auto-rows: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
+
   .gallery-item:first-child {
     grid-column: span 2;
     grid-row: span 2;
@@ -123,7 +139,26 @@
     grid-column: span 1;
     grid-row: span 1;
   }
+
   .gallery-item:nth-last-child(-n + 2) {
+    display: none;
+  }
+  .gallery[data-images='2'],
+  .gallery[data-images='1'] {
+    display: flex;
+    align-items: center;
+  }
+  .gallery[data-images='1'] .gallery-item,
+  .gallery[data-images='2'] .gallery-item,
+  .gallery[data-images='3'] .gallery-item,
+  .gallery[data-images='4'] .gallery-item {
+    display: block;
+  }
+  .gallery[data-images='1'] .gallery-item {
+    width: 100%;
+    aspect-ratio: 16/5;
+  }
+  .gallery[data-images='4'] .gallery-item:last-child {
     display: none;
   }
 }
@@ -137,6 +172,10 @@
   }
   .gallery-item:nth-last-child(-n + 2) {
     display: block;
+  }
+  .gallery[data-images='3'],
+  .gallery[data-images='4'] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

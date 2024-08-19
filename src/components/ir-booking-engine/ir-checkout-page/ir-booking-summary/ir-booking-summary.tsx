@@ -1,7 +1,8 @@
-import { pages } from '@/models/common';
+import { CheckoutErrors, pages } from '@/models/commun';
 import app_store from '@/stores/app.store';
 import booking_store, { calculateTotalCost } from '@/stores/booking';
 import { checkout_store } from '@/stores/checkout.store';
+import { isRequestPending } from '@/stores/ir-interceptor.store';
 import localizedWords from '@/stores/localization.store';
 import { formatAmount, getDateDifference } from '@/utils/utils';
 import { Component, Host, h, Event, EventEmitter, Prop } from '@stencil/core';
@@ -13,17 +14,26 @@ import { format } from 'date-fns';
   shadow: true,
 })
 export class IrBookingSummary {
-  @Prop() isLoading = false;
+  @Prop() prepaymentAmount = null;
+
   @Event() routing: EventEmitter<pages>;
   @Event() bookingClicked: EventEmitter<null>;
-  @Prop() error: boolean;
+  @Prop() error: CheckoutErrors;
   handleBooking() {
     this.bookingClicked.emit(null);
   }
 
   render() {
     const total_nights = getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date());
-    const { prePaymentAmount, totalAmount } = calculateTotalCost();
+    const { totalAmount } = calculateTotalCost(true);
+    console.log(booking_store.ratePlanSelections);
+    if (isRequestPending('/Get_Setup_Entries_By_TBL_NAME_MULTI')) {
+      return (
+        <div>
+          <p>Loading</p>
+        </div>
+      );
+    }
     return (
       <Host>
         <div class="w-full rounded-md bg-gray-100  text-sm md:max-w-sm">
@@ -77,24 +87,26 @@ export class IrBookingSummary {
                     {formatAmount(totalAmount + (checkout_store.pickup.location ? Number(checkout_store.pickup.due_upon_booking) : 0), app_store.userPreferences.currency_id)}
                   </span>
                 </li>
-                {prePaymentAmount > 0 && (
+                {this.prepaymentAmount > 0 && (
                   <li class={'flex w-full items-center justify-between pt-1'}>
                     <span>{localizedWords.entries.Lcz_PayNow}</span>
-                    <span class="text-base">{formatAmount(prePaymentAmount, app_store.userPreferences.currency_id)}</span>
+                    <span class="text-base">{formatAmount(this.prepaymentAmount, app_store.userPreferences.currency_id)}</span>
                   </li>
                 )}
               </ul>
             </div>
-            <ir-payment-view class="w-full"></ir-payment-view>
+            <ir-payment-view class="w-full" errors={this.error && this.error.cause === 'payment' ? this.error.issues : undefined}></ir-payment-view>
             <div class="w-full space-y-1">
               <div class={'flex w-full items-center gap-1'}>
                 <ir-checkbox label="I agree to the" checked={checkout_store.agreed_to_services} onCheckChange={e => (checkout_store.agreed_to_services = e.detail)}></ir-checkbox>
-                <ir-privacy-policy label="privacy policy." policyTriggerStyle={{ color: 'inherit' }} id="checkout-policy"></ir-privacy-policy>
+                <ir-privacy-policy label="privacy policy." policyTriggerStyle={{ color: 'inherit', textDecoration: 'underline' }} id="checkout-policy"></ir-privacy-policy>
               </div>
-              {this.error && !checkout_store.agreed_to_services && <p class="text-sm text-red-500">{localizedWords.entries.Lcz_YouMustAcceptPrivacyPolicy}</p>}
+              {this.error?.cause === 'booking-summary' && !checkout_store.agreed_to_services && (
+                <p class="text-sm text-red-500">{localizedWords.entries.Lcz_YouMustAcceptPrivacyPolicy}//you must first</p>
+              )}
             </div>
             <ir-button
-              isLoading={this.isLoading}
+              isLoading={isRequestPending('/DoReservation')}
               size="md"
               class="w-full"
               label={localizedWords.entries.Lcz_ConfirmBooking}
