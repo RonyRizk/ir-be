@@ -9,6 +9,7 @@
 
 | Property         | Attribute        | Description | Type                      | Default     |
 | ---------------- | ---------------- | ----------- | ------------------------- | ----------- |
+| `display`        | `display`        |             | `"default" \| "grid"`     | `'default'` |
 | `property_state` | `property_state` |             | `"carousel" \| "gallery"` | `'gallery'` |
 | `roomType`       | --               |             | `RoomType`                | `undefined` |
 

@@ -199,12 +199,16 @@ export function validateAgentCode(code: string) {
   }
   let isValidCode = false;
   const agent = app_store.property?.agents.find(a => a.code.toLowerCase() === code.trim().toLowerCase());
-  console.log(agent);
   if (agent) {
     isValidCode = true;
     booking_store.bookingAvailabilityParams = {
       ...booking_store.bookingAvailabilityParams,
       agent: agent.id,
+      agent_code: code,
+    };
+    app_store.app_data = {
+      ...app_store.app_data,
+      isAgentMode: true,
     };
   }
   return isValidCode;

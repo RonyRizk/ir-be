@@ -40,6 +40,7 @@ export interface IBookinAvailabilityParams {
   coupon?: string;
   agent?: number;
   loyalty?: boolean;
+  agent_code?: string;
 }
 interface BookingStore {
   tax_statement: { message: string } | null;
@@ -131,6 +132,7 @@ onRoomTypeChange('roomTypes', (newValue: RoomType[]) => {
             };
     });
   });
+  // console.log(ratePlanSelections);
   booking_store.ratePlanSelections = ratePlanSelections;
   booking_store.resetBooking = false;
 });
@@ -236,7 +238,7 @@ export function modifyBookingStore(key: keyof BookingStore, value: any) {
   booking_store[key] = value;
 }
 
-export function calculateTotalCost(gross:boolean=false): { totalAmount: number; prePaymentAmount: number } {
+export function calculateTotalCost(gross: boolean = false): { totalAmount: number; prePaymentAmount: number } {
   let prePaymentAmount = 0;
   let totalAmount = 0;
   const calculateCost = (ratePlan: IRatePlanSelection, isPrePayment: boolean = false) => {
@@ -244,9 +246,9 @@ export function calculateTotalCost(gross:boolean=false): { totalAmount: number; 
       if (isPrePayment) {
         return ratePlan.reserved * ratePlan.ratePlan.pre_payment_amount || 0;
       }
-      return ratePlan.checkoutVariations.reduce((sum, variation) => sum + (Number(variation[gross?"amount_gross":"amount"])), 0);
+      return ratePlan.checkoutVariations.reduce((sum, variation) => sum + Number(variation[gross ? 'amount_gross' : 'amount']), 0);
     } else if (ratePlan.reserved > 0) {
-      const amount = isPrePayment ? ratePlan.ratePlan.pre_payment_amount ?? 0 : ratePlan.selected_variation?.variation[gross?"amount_gross":"amount"];
+      const amount = isPrePayment ? ratePlan.ratePlan.pre_payment_amount ?? 0 : ratePlan.selected_variation?.variation[gross ? 'amount_gross' : 'amount'];
       return ratePlan.reserved * (amount ?? 0);
     }
     return 0;

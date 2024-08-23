@@ -12,7 +12,7 @@
   padding: 1rem;
 }
 @media (min-width: 768px) {
-  .room-type-container {
+  :host([display='default']) .room-type-container {
     flex-direction: row;
   }
 }

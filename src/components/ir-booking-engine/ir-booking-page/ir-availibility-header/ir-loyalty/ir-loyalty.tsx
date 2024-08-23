@@ -17,7 +17,7 @@ export class IrLoyalty {
       coupon: null,
       loyalty: value,
     });
-    this.resetBooking.emit('discountOnly');
+    this.resetBooking.emit('partialReset');
   }
   render() {
     const show_loyalty = app_store.property?.promotions?.some(p => p.is_loyalty);

@@ -412,19 +412,17 @@ export class IrInvoice {
                     </div>
                   </section>
                 )}
-                {this.payment_option && (
-                  <section class="space-y-2">
-                    <div class={'flex items-center gap-4'}>
-                      <ir-icons name="credit_card"></ir-icons>
-                      <h3 class={'booking-details-header'}>{localizedWords.entries.Lcz_PaymentDetails}</h3>
-                    </div>
-                    <p class="total-payment">
-                      {localizedWords.entries.Lcz_Total}{' '}
-                      <span class="payment_amount text-green-600">{formatAmount(this.booking.financial.gross_total, this.booking.currency.code)}</span>
-                    </p>
-                    {this.renderPaymentText(this.payment_option)}
-                  </section>
-                )}
+                <section class="space-y-2">
+                  <div class={'flex items-center gap-4'}>
+                    <ir-icons name="credit_card"></ir-icons>
+                    <h3 class={'booking-details-header'}>{localizedWords.entries.Lcz_PaymentDetails}</h3>
+                  </div>
+                  <p class="total-payment">
+                    {localizedWords.entries.Lcz_Total}{' '}
+                    <span class="payment_amount text-green-600">{formatAmount(this.booking.financial.gross_total, this.booking.currency.code)}</span>
+                  </p>
+                  {this.payment_option && this.renderPaymentText(this.payment_option)}
+                </section>
 
                 <section class="space-y-2">
                   <div class="flex items-center gap-4">

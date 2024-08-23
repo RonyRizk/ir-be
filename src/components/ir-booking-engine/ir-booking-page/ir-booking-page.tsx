@@ -21,9 +21,11 @@ export class IrBookingPage {
   @State() property: IExposedProperty;
   @State() currencies: ICurrency[];
   @State() languages: IExposedLanguages[];
+
   @Event() routing: EventEmitter<pages>;
-  checkoutContainerRef: HTMLDivElement;
-  roomTypeSectionRef: HTMLElement;
+
+  private checkoutContainerRef: HTMLDivElement;
+  private roomTypeSectionRef: HTMLElement;
 
   componentWillLoad() {
     this.property = { ...app_store.property };
@@ -31,6 +33,7 @@ export class IrBookingPage {
       this.property = { ...newValue };
     });
   }
+
   @Listen('animateBookingButton')
   handleBookingAnimation(e: CustomEvent) {
     e.stopImmediatePropagation();
@@ -42,6 +45,7 @@ export class IrBookingPage {
       });
     }
   }
+
   @Listen('scrollToRoomType')
   handleScrolling(e: CustomEvent) {
     e.stopImmediatePropagation();
@@ -51,14 +55,29 @@ export class IrBookingPage {
       window.scrollBy(0, -30);
     }, 500);
   }
-  renderTotalNights() {
+
+  private renderTotalNights() {
     const diff = getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date());
     return `${diff} ${diff > 1 ? localizedWords.entries.Lcz_Nights : localizedWords.entries.Lcz_night}`;
   }
+  // private checkMaxAmount() {
+  //   if (!booking_store.enableBooking) {
+  //     return;
+  //   }
+  //   return booking_store.roomTypes.some(rt => {
+  //     return rt?.rateplans.some(rp =>
+  //       rp?.variations.some(v => {
+  //         console.log(v.total_before_discount); // Debugging line
+  //         return v.total_before_discount.toString().length > 8;
+  //       }),
+  //     );
+  //   });
+  // }
   render() {
     if (!this.property) {
       return null;
     }
+    // console.log(this.checkMaxAmount());
     const { totalAmount } = calculateTotalCost();
     const isInjected = app_store.app_data.injected;
     return (
@@ -73,18 +92,18 @@ export class IrBookingPage {
             <ir-availibility-header fromDate={this.fromDate} toDate={this.toDate} adultCount={this.adultCount} childrenCount={this.childrenCount}></ir-availibility-header>
           </div>
 
-          <section class="relative justify-between gap-4 rounded-md " ref={el => (this.roomTypeSectionRef = el)}>
-            <div class=" flex-1 py-2">
+          <section class={app_store.app_data.displayMode === 'default' ? 'relative justify-between gap-4 rounded-md ' : ''} ref={el => (this.roomTypeSectionRef = el)}>
+            <div class={app_store.app_data.displayMode === 'default' ? ' flex-1 py-2' : 'grid-container'}>
               {booking_store.roomTypes?.map(roomType => {
                 if (
                   !roomType.is_active ||
                   (app_store.app_data.roomtype_id && roomType.id !== app_store.app_data.roomtype_id) ||
                   !roomType.rateplans.some(rp => rp.is_booking_engine_enabled) ||
-                  (!!booking_store.bookingAvailabilityParams.agent && roomType.rateplans.filter(rp => !rp.is_targeting_travel_agency).length === 0)
+                  (!!booking_store.bookingAvailabilityParams.agent && roomType.rateplans.filter(rp => rp.is_targeting_travel_agency).length === 0)
                 ) {
                   return null;
                 }
-                return <ir-roomtype roomtype={roomType} key={roomType.id}></ir-roomtype>;
+                return <ir-roomtype display={app_store.app_data.displayMode} roomtype={roomType} key={roomType.id}></ir-roomtype>;
               })}
             </div>
           </section>

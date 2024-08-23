@@ -56,6 +56,7 @@ export class PropertyService extends Token {
     app_store.app_data.property_id = result.My_Result.id;
     if (initTheme) {
       this.colors.initTheme(result.My_Result);
+      // app_store.app_data.displayMode = 'grid';
     }
     return result.My_Result;
   }

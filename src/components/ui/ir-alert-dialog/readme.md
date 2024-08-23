@@ -5,6 +5,13 @@
 <!-- Auto Generated Below -->
 
 
+## Events
+
+| Event        | Description | Type                   |
+| ------------ | ----------- | ---------------------- |
+| `openChange` |             | `CustomEvent<boolean>` |
+
+
 ## Methods
 
 ### `closeModal() => Promise<void>`

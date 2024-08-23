@@ -34,24 +34,24 @@
   border-bottom-right-radius: 0 !important;
 }
 @media (min-width: 768px) {
-  .gallery-img {
+  :host([display='default']) .gallery-img {
     min-height: 200px;
   }
-  .gallery-img.icon {
+  :host([display='default']) .gallery-img.icon {
     max-height: 200px;
     color: white;
     background-color: rgb(209 213 219);
   }
-  .capacity-container {
+  :host([display='default']) .capacity-container {
     border-bottom-right-radius: min(var(--radius, 8px), 1rem);
     border-bottom-left-radius: min(var(--radius, 8px), 1rem);
   }
 }
 @media (min-width: 1280px) {
-  .gallery-img {
+  :host([display='default']) .gallery-img {
     min-height: 250px;
   }
-  .gallery-img.icon {
+  :host([display='default']) .gallery-img.icon {
     max-height: 250px;
   }
 }

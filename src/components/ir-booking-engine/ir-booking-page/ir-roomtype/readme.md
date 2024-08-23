@@ -7,9 +7,10 @@
 
 ## Properties
 
-| Property   | Attribute | Description | Type       | Default     |
-| ---------- | --------- | ----------- | ---------- | ----------- |
-| `roomtype` | --        |             | `RoomType` | `undefined` |
+| Property   | Attribute | Description | Type                  | Default     |
+| ---------- | --------- | ----------- | --------------------- | ----------- |
+| `display`  | `display` |             | `"default" \| "grid"` | `'default'` |
+| `roomtype` | --        |             | `RoomType`            | `undefined` |
 
 
 ## Dependencies

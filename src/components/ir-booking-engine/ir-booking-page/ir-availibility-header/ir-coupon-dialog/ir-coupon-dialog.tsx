@@ -25,7 +25,7 @@ export class IrCouponDialog {
     }
     this.isValid = true;
     this.validationMessage = { error: false, message: this.coupon };
-    this.resetBooking.emit('discountOnly');
+    this.resetBooking.emit('partialReset');
     this.coupon = null;
     this.dialogRef.closeModal();
   }
@@ -38,7 +38,7 @@ export class IrCouponDialog {
       coupon: null,
       loyalty: false,
     });
-    this.resetBooking.emit('discountOnly');
+    this.resetBooking.emit('partialReset');
   }
 
   render() {

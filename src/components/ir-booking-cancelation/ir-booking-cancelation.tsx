@@ -82,7 +82,14 @@ export class IrBookingCancelation {
     const isPending = isRequestPending('/Get_Exposed_Cancelation_Due_Amount');
     return (
       <div>
-        <ir-alert-dialog ref={el => (this.alertDialog = el)}>
+        <ir-alert-dialog
+          ref={el => (this.alertDialog = el)}
+          onOpenChange={e => {
+            if (!e.detail && this.isOpen) {
+              this.isOpen = false;
+            }
+          }}
+        >
           <h2 slot="modal-title" class="text-lg font-medium">
             Booking Cancellation
           </h2>

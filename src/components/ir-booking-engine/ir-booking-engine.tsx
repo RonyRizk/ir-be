@@ -138,6 +138,7 @@ export class IrBookingEngine {
     this.commonService.setToken(this.token);
     this.propertyService.setToken(this.token);
     app_store.app_data = {
+      displayMode: 'default',
       isFromGhs: checkGhs(this.source?.code, this.stag),
       token: this.token,
       property_id: this.propertyId,
@@ -251,9 +252,9 @@ export class IrBookingEngine {
     }
   }
 
-  async resetBooking(resetType: 'discountOnly' | 'completeReset' = 'completeReset') {
+  async resetBooking(resetType: 'partialReset' | 'completeReset' = 'completeReset') {
     let queries = [];
-    if (resetType === 'discountOnly' && app_store.fetchedBooking) {
+    if (resetType === 'partialReset' && app_store.fetchedBooking) {
       queries.push(this.checkAvailability());
     } else if (resetType === 'completeReset') {
       queries = [

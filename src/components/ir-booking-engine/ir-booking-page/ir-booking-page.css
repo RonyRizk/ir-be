@@ -37,6 +37,12 @@
   overflow-wrap: break-word;
   word-break: break-word;
 }
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(21.875rem, 1fr));
+  grid-auto-rows: minmax(auto, max-content);
+  gap: 1rem;
+}
 
 @keyframes bounce {
   0%,

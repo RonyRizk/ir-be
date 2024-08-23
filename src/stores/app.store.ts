@@ -36,6 +36,8 @@ export interface IAppStore {
     hideGoogleSignIn: boolean;
     isFromGhs: boolean;
     stag: string | null;
+    displayMode: 'default' | 'grid';
+    isAgentMode?: boolean;
   };
   property: IExposedProperty;
   setup_entries: {
@@ -66,6 +68,7 @@ const initialState: IAppStore = {
   },
   invoice: null,
   app_data: {
+    displayMode: 'default',
     affiliate: null,
     stag: null,
     token: '',
@@ -76,6 +79,7 @@ const initialState: IAppStore = {
     source: null,
     hideGoogleSignIn: false,
     isFromGhs: false,
+    isAgentMode: false,
   },
   property: undefined,
   setup_entries: undefined,

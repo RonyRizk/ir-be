@@ -15,6 +15,7 @@ import { PaymentService } from '@/services/api/payment.service';
   shadow: true,
 })
 export class IrRateplan {
+  @Prop({ reflect: true }) display: 'grid' | 'default' = 'default';
   @Prop() ratePlan: RatePlan;
   @Prop() visibleInventory?:
     | IRatePlanSelection
@@ -104,6 +105,13 @@ export class IrRateplan {
     this.cancelationMessage = (await this.paymentService.fetchCancelationMessage({ id, roomTypeId })).message;
   }
   render() {
+    // if (!this.ratePlan.is_targeting_travel_agency && booking_store.bookingAvailabilityParams.agent) {
+    //   return null;
+    // }
+    console.log(this.ratePlan.name, this.ratePlan.is_targeting_travel_agency, booking_store.booking?.agent);
+    if (this.ratePlan.is_targeting_travel_agency && !app_store.app_data.isAgentMode) {
+      return null;
+    }
     return (
       <div class="rateplan-container">
         <div class={`rateplan-header ${this.isRatePlanAvailable ? 'available' : 'not-available'}`}>

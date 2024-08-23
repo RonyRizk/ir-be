@@ -102,7 +102,10 @@
   font-size: 0.875rem;
   color: #475467;
 }
-
+.booking-code {
+  color: var(--gray-600, #475467);
+  padding: 0rem 1rem;
+}
 .ir-burger-menu {
   display: flex;
   align-items: center;

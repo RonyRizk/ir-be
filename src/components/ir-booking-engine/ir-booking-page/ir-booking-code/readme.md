@@ -7,9 +7,10 @@
 
 ## Events
 
-| Event         | Description | Type                |
-| ------------- | ----------- | ------------------- |
-| `closeDialog` |             | `CustomEvent<null>` |
+| Event          | Description | Type                  |
+| -------------- | ----------- | --------------------- |
+| `closeDialog`  |             | `CustomEvent<null>`   |
+| `resetBooking` |             | `CustomEvent<string>` |
 
 
 ## Dependencies

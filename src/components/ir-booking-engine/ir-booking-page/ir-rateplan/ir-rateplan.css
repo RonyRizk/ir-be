@@ -81,6 +81,17 @@
   font-weight: 400;
   color: #ef4444;
 }
+.rateplan-container .no-availability {
+  flex: 1 1 0%;
+  text-align: end;
+  width: 100%;
+}
+.rateplan-header.not-available {
+  width: 100% !important;
+}
+.rateplan-header.not-available .rateplan-details-wrapper {
+  width: 100% !important;
+}
 .rateplan-amount-per-night {
   font-size: 0.75rem;
   font-weight: 400;
@@ -93,15 +104,15 @@
 
 /* sm	640px	 */
 @media (min-width: 640px) {
-  .rateplan-pricing-mobile,
-  .rateplan-description .rateplan-tooltip {
+  :host([display='default']) .rateplan-pricing-mobile,
+  :host([display='default']) .rateplan-description .rateplan-tooltip {
     display: none;
   }
-  .rateplan-name .rateplan-tooltip {
+  :host([display='default']) .rateplan-name .rateplan-tooltip {
     display: block;
   }
-  .rateplan-details .rateplan-pricing,
-  .rateplan-details .rateplan-final-pricing {
+  :host([display='default']) .rateplan-details .rateplan-pricing,
+  :host([display='default']) .rateplan-details .rateplan-final-pricing {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -118,16 +129,16 @@
     grid-template-columns: repeat(12, 1fr);
     gap: 1rem;
   } */
-  .rateplan-header {
+  :host([display='default']) .rateplan-header {
     flex-direction: column;
     align-items: flex-start;
     width: 40%;
     /* grid-column: span 5 / span 5; */
   }
-  .rateplan-container {
+  :host([display='default']) .rateplan-container {
     flex-direction: row;
   }
-  .rateplan-details {
+  :host([display='default']) .rateplan-details {
     gap: 2rem;
     justify-content: space-between;
     flex: 1 1 0%;
@@ -136,25 +147,25 @@
     grid-column: span 7 / span 7; 
     grid-template-columns: repeat(12, 1fr); */
   }
-  .rateplan-details .rateplan-travelers {
+  :host([display='default']) .rateplan-details .rateplan-travelers {
     /* grid-column: span 5 / span 5; */
     max-width: 40%;
   }
-  .rateplan-details .rateplan-select-rooms {
+  :host([display='default']) .rateplan-details .rateplan-select-rooms {
     flex: 0;
     /* grid-column: span 2 / span 2; */
   }
-  .rateplan-details .rateplan-pricing,
-  .rateplan-details .rateplan-final-pricing {
+  :host([display='default']) .rateplan-details .rateplan-pricing,
+  :host([display='default']) .rateplan-details .rateplan-final-pricing {
     grid-column: span 2 / span 2;
   }
-  .rateplan-details .rateplan-final-pricing[data-style='full-width'] {
+  :host([display='default']) .rateplan-details .rateplan-final-pricing[data-style='full-width'] {
     grid-column: span 4 / span 4;
   }
-  .triggerStyle {
+  :host([display='default']) .triggerStyle {
     width: fit-content !important;
   }
-  .selectStyle {
+  :host([display='default']) .selectStyle {
     width: 3.5rem !important;
     padding-inline-end: 1.75rem !important;
   }

@@ -39,7 +39,7 @@ export class IrBookingSummary {
         <div class="w-full rounded-md bg-gray-100  text-sm md:max-w-sm">
           {app_store.property?.space_theme.background_image && (
             <div class="aspect-[1/1] max-h-32 w-full lg:aspect-[16/9]">
-              <img class="h-full w-full rounded-t-md object-cover" src={app_store.property?.space_theme.background_image} alt="" />
+              <img class="h-full w-full rounded-t-md object-cover" src={app_store.property?.images[0].url} alt={app_store.property?.images[0].tooltip} />
             </div>
           )}
           <section class="flex flex-col items-center space-y-4 p-4 lg:p-6">

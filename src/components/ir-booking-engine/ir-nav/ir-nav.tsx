@@ -6,6 +6,7 @@ import { cn, renderPropertyLocation } from '@/utils/utils';
 import localizedWords from '@/stores/localization.store';
 import { AuthService } from '@/services/api/auth.service';
 import { checkout_store } from '@/stores/checkout.store';
+import booking_store from '@/stores/booking';
 
 @Component({
   tag: 'ir-nav',
@@ -30,6 +31,7 @@ export class IrNav {
 
   private dialogRef: HTMLIrDialogElement;
   private sheetRef: HTMLIrSheetElement;
+  private bookingCodeRef: HTMLIrBookingCodeElement;
   modalRef: HTMLIrModalElement;
 
   componentWillLoad() {
@@ -63,7 +65,7 @@ export class IrNav {
       case 'language':
         return <ir-language-picker slot="modal-body" currencies={this.currencies} languages={this.languages}></ir-language-picker>;
       case 'booking_code':
-        return <ir-booking-code slot="modal-body"></ir-booking-code>;
+        return <ir-booking-code ref={el => (this.bookingCodeRef = el)} slot="modal-body"></ir-booking-code>;
       case 'map':
         return <ir-google-maps slot="modal-body"></ir-google-maps>;
       case 'profile':
@@ -224,12 +226,27 @@ export class IrNav {
 
               {this.showAgentCode() && (
                 <li>
-                  <ir-button
-                    variants="ghost"
-                    label={localizedWords.entries.Lcz_BookingCode}
-                    name="booking_code"
-                    onButtonClick={e => this.handleButtonClick(e, 'booking_code')}
-                  ></ir-button>
+                  {!!booking_store.bookingAvailabilityParams.agent ? (
+                    <div class={'flex items-center'}>
+                      <p>{booking_store.bookingAvailabilityParams.agent_code}</p>
+                      <button
+                        title="Clear"
+                        class={'ir-language-trigger'}
+                        onClick={() => {
+                          this.bookingCodeRef.clearAgent();
+                        }}
+                      >
+                        <ir-icons name="xmark"></ir-icons>
+                      </button>
+                    </div>
+                  ) : (
+                    <ir-button
+                      variants="ghost"
+                      label={localizedWords.entries.Lcz_BookingCode}
+                      name="booking_code"
+                      onButtonClick={e => this.handleButtonClick(e, 'booking_code')}
+                    ></ir-button>
+                  )}
                 </li>
               )}
               {this.showCurrency && <li>{this.renderLanguageTrigger()}</li>}
@@ -306,14 +323,29 @@ export class IrNav {
             </li>
             {this.showAgentCode() && (
               <li>
-                <ir-button
-                  class="ir-sheet-button"
-                  buttonClassName="justify-start"
-                  variants="ghost"
-                  label="Booking code"
-                  name="booking_code"
-                  onButtonClick={e => this.handleButtonClick(e, 'booking_code')}
-                ></ir-button>
+                {!!booking_store.bookingAvailabilityParams.agent ? (
+                  <div class={'booking-code flex items-center gap-1.5'}>
+                    <p class={'text-sm '}>{booking_store.bookingAvailabilityParams.agent_code}</p>
+                    <div>
+                      <button
+                        title="Clear"
+                        class={'ir-language-trigger'}
+                        onClick={() => {
+                          this.bookingCodeRef.clearAgent();
+                        }}
+                      >
+                        <ir-icons name="xmark"></ir-icons>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <ir-button
+                    variants="ghost"
+                    label={localizedWords.entries.Lcz_BookingCode}
+                    name="booking_code"
+                    onButtonClick={e => this.handleButtonClick(e, 'booking_code')}
+                  ></ir-button>
+                )}
               </li>
             )}
           </ul>

@@ -1,6 +1,6 @@
 import { DataStructure } from '@/models/commun';
 import { TPickupFormData } from '@/models/pickup';
-import { RoomType } from '@/models/property';
+import { RatePlan, RoomType } from '@/models/property';
 import { MissingTokenError } from '@/models/Token';
 import booking_store, { modifyBookingStore } from '@/stores/booking';
 import axios from 'axios';
@@ -134,7 +134,6 @@ export class PropertyHelpers {
     }
     if (result) {
       const { isInFreeCancelationZone } = this.paymentService.processAlicablePolicies(result.data, new Date());
-      console.log(result, isInFreeCancelationZone);
       booking_store.isInFreeCancelationZone = isInFreeCancelationZone;
     }
   }
@@ -149,34 +148,58 @@ export class PropertyHelpers {
         ...rt,
         inventory: newRoomtype.inventory,
         pre_payment_amount: newRoomtype.pre_payment_amount,
-        rateplans: rt.rateplans.reduce((updatedRatePlans, rp) => {
-          const newRatePlan = newRoomtype.rateplans.find(newRP => newRP.id === rp.id);
-          if (!newRatePlan || !newRatePlan.is_active || !newRatePlan.is_booking_engine_enabled) {
-            return updatedRatePlans;
-          }
-          updatedRatePlans.push({
-            ...newRatePlan,
-            variations: rp.variations,
-            // variations: rp.variations.map(v => {
-            //   if (!newRatePlan.variations) {
-            //     return v;
-            //   }
-            //   if (v.adult_child_offering === newRatePlan.variations[0].adult_child_offering) {
-            //     return newRatePlan.variations[0];
-            //   }
-            //   return v;
-            // }),
-            selected_variation: newRatePlan.variations ? newRatePlan.variations[0] : null,
-            // selected_variation: newRatePlan.variations ? rp.variations.find(v => v.adult_child_offering === newRatePlan.variations[0].adult_child_offering) : null,
-          });
-          return updatedRatePlans;
-        }, []),
+        rateplans: this.updateRatePlan(rt.rateplans, newRoomtype),
       };
+      console.log(updatedRoomtype.rateplans);
       updatedRoomtypes.push(updatedRoomtype);
       return updatedRoomtypes;
     }, []);
   }
+  // private updateRatePlan(ratePlans: RatePlan[], newRoomtype: RoomType) {
+  //   return ratePlans.reduce((updatedRatePlans, rp) => {
+  //     const newRatePlan = newRoomtype.rateplans.find(newRP => newRP.id === rp.id);
+  //     if (!newRatePlan || !newRatePlan.is_active || !newRatePlan.is_booking_engine_enabled) {
+  //       return updatedRatePlans;
+  //     }
+  //     updatedRatePlans.push({
+  //       ...newRatePlan,
+  //       is_targeting_travel_agency: newRatePlan.is_targeting_travel_agency,
+  //       variations: rp.variations,
+  //       // variations: rp.variations.map(v => {
+  //       //   if (!newRatePlan.variations) {
+  //       //     return v;
+  //       //   }
+  //       //   if (v.adult_child_offering === newRatePlan.variations[0].adult_child_offering) {
+  //       //     return newRatePlan.variations[0];
+  //       //   }
+  //       //   return v;
+  //       // }),
+  //       selected_variation: newRatePlan.variations ? newRatePlan.variations[0] : null,
+  //       // selected_variation: newRatePlan.variations ? rp.variations.find(v => v.adult_child_offering === newRatePlan.variations[0].adult_child_offering) : null,
+  //     });
+  //     return updatedRatePlans;
+  //   }, []);
+  // }
+  private updateRatePlan(ratePlans: RatePlan[], newRoomtype: RoomType): RatePlan[] {
+    const agentExists = !!booking_store.bookingAvailabilityParams.agent;
 
+    return ratePlans.reduce((updatedRatePlans: RatePlan[], rp: RatePlan) => {
+      const newRatePlan = agentExists ? newRoomtype.rateplans?.find(newRP => newRP.id === rp.id) : ratePlans.find(newRP => newRP.id === rp.id);
+
+      if (!newRatePlan || !newRatePlan.is_active || !newRatePlan.is_booking_engine_enabled) {
+        return updatedRatePlans;
+      }
+
+      updatedRatePlans.push({
+        ...newRatePlan,
+        is_targeting_travel_agency: newRatePlan.is_targeting_travel_agency,
+        variations: agentExists ? newRatePlan.variations : rp.variations,
+        selected_variation: newRatePlan.variations ? newRatePlan.variations[0] : null,
+      });
+
+      return updatedRatePlans;
+    }, []);
+  }
   private sortRoomTypes(roomTypes: RoomType[], userCriteria: { adult_nbr: number; child_nbr: number }): RoomType[] {
     return roomTypes.sort((a, b) => {
       // Move room types with zero inventory to the end
@@ -184,23 +207,27 @@ export class PropertyHelpers {
       if (a.inventory !== 0 && b.inventory === 0) return -1;
 
       // Check for variations where is_calculated is true and amount is 0
-      const zeroCalculatedA = a.rateplans.some(plan => plan.variations.some(variation => variation.is_calculated && (variation.amount === 0 || variation.amount === null)));
-      const zeroCalculatedB = b.rateplans.some(plan => plan.variations.some(variation => variation.is_calculated && (variation.amount === 0 || variation.amount === null)));
+      const zeroCalculatedA = a.rateplans?.some(plan => plan?.variations?.some(variation => variation.is_calculated && (variation.amount === 0 || variation.amount === null)));
+      const zeroCalculatedB = b.rateplans?.some(plan => plan?.variations?.some(variation => variation.is_calculated && (variation.amount === 0 || variation.amount === null)));
 
       // Prioritize these types to be before inventory 0 but after all others
       if (zeroCalculatedA && !zeroCalculatedB) return 1;
       if (!zeroCalculatedA && zeroCalculatedB) return -1;
 
       // Check for exact matching variations
-      const matchA = a.rateplans.some(plan => plan.variations.some(variation => variation.adult_nbr === userCriteria.adult_nbr && variation.child_nbr === userCriteria.child_nbr));
-      const matchB = b.rateplans.some(plan => plan.variations.some(variation => variation.adult_nbr === userCriteria.adult_nbr && variation.child_nbr === userCriteria.child_nbr));
+      const matchA = a.rateplans?.some(plan =>
+        plan.variations?.some(variation => variation.adult_nbr === userCriteria.adult_nbr && variation.child_nbr === userCriteria.child_nbr),
+      );
+      const matchB = b.rateplans?.some(plan =>
+        plan.variations?.some(variation => variation.adult_nbr === userCriteria.adult_nbr && variation.child_nbr === userCriteria.child_nbr),
+      );
 
       if (matchA && !matchB) return -1;
       if (!matchA && matchB) return 1;
 
       // Sort by the highest variation in any attribute, for example `amount`
-      const maxVariationA = Math.max(...a.rateplans.flatMap(plan => plan.variations.map(variation => variation.amount)));
-      const maxVariationB = Math.max(...b.rateplans.flatMap(plan => plan.variations.map(variation => variation.amount)));
+      const maxVariationA = Math.max(...a.rateplans.flatMap(plan => plan?.variations?.map(variation => variation.amount)));
+      const maxVariationB = Math.max(...b.rateplans.flatMap(plan => plan?.variations?.map(variation => variation.amount)));
 
       if (maxVariationA < maxVariationB) return -1;
       if (maxVariationA > maxVariationB) return 1;

@@ -30,8 +30,8 @@
   display: inline-flex;
   align-items: center;
   padding: 0px 0.875rem;
-  /* min-width: 12.8rem; */
-  min-width: max-content;
+  /* min-width: max-content; */
+  min-width: 12.8rem;
   line-height: 1;
   color: var(--gray-700, #344054);
   cursor: pointer;

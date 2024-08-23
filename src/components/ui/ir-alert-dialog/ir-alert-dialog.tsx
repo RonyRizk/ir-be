@@ -1,5 +1,5 @@
 import { addOverlay, removeOverlay } from '@/stores/overlay.store';
-import { Component, Host, h, Element, Listen, State, Method } from '@stencil/core';
+import { Component, Host, h, Element, Listen, State, Method, Event, EventEmitter } from '@stencil/core';
 
 @Component({
   tag: 'ir-alert-dialog',
@@ -8,10 +8,12 @@ import { Component, Host, h, Element, Listen, State, Method } from '@stencil/cor
 })
 export class IrAlertDialog {
   @Element() el: HTMLElement;
-  private firstFocusableElement: HTMLElement;
-  private lastFocusableElement: HTMLElement;
 
   @State() isOpen = false;
+
+  @Event() openChange: EventEmitter<boolean>;
+  private firstFocusableElement: HTMLElement;
+  private lastFocusableElement: HTMLElement;
 
   componentDidLoad() {
     this.prepareFocusTrap();
@@ -22,12 +24,14 @@ export class IrAlertDialog {
     this.isOpen = true;
     addOverlay();
     this.prepareFocusTrap();
+    this.openChange.emit(this.isOpen);
   }
 
   @Method()
   async closeModal() {
     removeOverlay();
     this.isOpen = false;
+    this.openChange.emit(this.isOpen);
   }
 
   prepareFocusTrap() {
