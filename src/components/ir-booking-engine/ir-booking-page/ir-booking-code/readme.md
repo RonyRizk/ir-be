@@ -13,6 +13,19 @@
 | `resetBooking` |             | `CustomEvent<string>` |
 
 
+## Methods
+
+### `clearAgent() => Promise<void>`
+
+
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
+
 ## Dependencies
 
 ### Used by

@@ -26,6 +26,7 @@ export interface IExposedProperty {
   max_nights: number;
   name: string;
   parking_offering: ParkingOffering;
+  be_listing_mode: 'list' | 'grid';
   pets_acceptance: PetsAcceptance;
   phone: string;
   postal: string;
