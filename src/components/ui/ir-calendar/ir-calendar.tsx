@@ -35,6 +35,7 @@ export class IrCalendar {
   @Prop() maxSpanDays: number = 90;
   @Prop() showPrice = false;
   @Prop({ reflect: true }) locale: Locale = enUS;
+  @Prop() date: Date = new Date();
   @State() selectedDate: Date = null;
   @State() displayedDays: { month: Date; days: Date[] };
   @State() hoveredDate: Date | null = null;
@@ -42,11 +43,20 @@ export class IrCalendar {
   @Event({ bubbles: true, composed: true }) dateChange: EventEmitter<Date>;
 
   @State() weekdays: string[] = [];
+
   componentWillLoad() {
     this.weekdays = getAbbreviatedWeekdays(this.locale);
     this.resetHours();
     const currentMonth = this.fromDate ?? new Date();
+    console.log('currentMonth', currentMonth);
     this.displayedDays = { ...this.getMonthDays(currentMonth) };
+    this.selectedDate = this.date;
+  }
+  @Watch('date')
+  handleDateChange(newDate: Date, oldDate: Date) {
+    if (!isSameDay(newDate, oldDate)) {
+      this.selectedDate = newDate;
+    }
   }
   @Watch('locale')
   handleLocale(newValue: Locale, oldLocale: Locale) {
@@ -121,10 +131,10 @@ export class IrCalendar {
     this.minDate.setHours(0, 0, 0, 0);
     this.maxDate.setHours(0, 0, 0, 0);
     if (this.fromDate) {
-      this.toDate.setHours(0, 0, 0, 0);
+      this.fromDate.setHours(0, 0, 0, 0);
     }
     if (this.toDate) {
-      this.fromDate.setHours(0, 0, 0, 0);
+      this.toDate.setHours(0, 0, 0, 0);
     }
   }
   handleMouseEnter(day: Date) {

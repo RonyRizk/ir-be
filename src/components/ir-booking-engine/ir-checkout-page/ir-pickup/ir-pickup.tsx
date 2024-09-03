@@ -1,6 +1,7 @@
 import { PickupFormData, TAllowedOptions } from '@/models/pickup';
 import { PickupService } from '@/services/app/pickup.service';
 import app_store, { onAppDataChange } from '@/stores/app.store';
+import booking_store from '@/stores/booking';
 import { checkout_store, onCheckoutDataChange, updatePartialPickupFormData, updatePickupFormData } from '@/stores/checkout.store';
 import localizedWords from '@/stores/localization.store';
 import { formatAmount } from '@/utils/utils';
@@ -47,6 +48,7 @@ export class IrPickup {
   componentWillLoad() {
     this.oldCurrencyValue = app_store.userPreferences.currency_id;
     this.updateCurrency();
+    updatePickupFormData('arrival_date', format(booking_store.bookingAvailabilityParams?.from_date, 'yyyy-MM-dd'));
     onAppDataChange('userPreferences', newValue => {
       if (newValue.currency_id !== this.oldCurrencyValue) {
         this.updateCurrency();
@@ -186,11 +188,11 @@ export class IrPickup {
         {checkout_store.pickup.location && (
           <div class={'flex items-center  justify-between'}>
             <div class="flex-1 space-y-5">
-              <div class={'flex items-center gap-4 sm:flex-col lg:flex-row'}>
+              <div class={'pickup-header-container'}>
                 <ir-popover ref={el => (this.popover = el)} class="w-fit sm:w-full lg:w-fit">
                   {this.dateTrigger()}
                   <div slot="popover-content" class="date-range-container w-full border-0 p-2 shadow-none sm:w-auto sm:border sm:shadow-sm md:p-4 ">
-                    <ir-calendar></ir-calendar>
+                    <ir-calendar date={new Date(checkout_store.pickup.arrival_date)} fromDate={booking_store.bookingAvailabilityParams?.from_date}></ir-calendar>
                   </div>
                 </ir-popover>
                 <ir-input
@@ -221,11 +223,9 @@ export class IrPickup {
                     if (target.hasAttribute('data-state')) target.removeAttribute('data-state');
                   }}
                 />
-                <div class="hidden flex-1  lg:block">
-                  <p class="text-end text-base font-medium xl:text-xl">
-                    {formatAmount(checkout_store.pickup.location ? Number(checkout_store.pickup.due_upon_booking) : 0, app_store.userPreferences.currency_id)}
-                  </p>
-                </div>
+                <p class="pickup-amount">
+                  {formatAmount(checkout_store.pickup.location ? Number(checkout_store.pickup.due_upon_booking) : 0, app_store.userPreferences.currency_id)}
+                </p>
               </div>
               <div>
                 <ir-input

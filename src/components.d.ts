@@ -188,6 +188,7 @@ export namespace Components {
         "variants": 'default' | 'outline' | 'secondary' | 'destructive' | 'ghost' | 'link' | 'icon' | 'ghost-primary' | 'outline-primary' | 'icon-primary';
     }
     interface IrCalendar {
+        "date": Date;
         "dateModifiers": IDateModifiers;
         "fromDate": Date | null;
         "locale": Locale;
@@ -1942,6 +1943,7 @@ declare namespace LocalJSX {
         "variants"?: 'default' | 'outline' | 'secondary' | 'destructive' | 'ghost' | 'link' | 'icon' | 'ghost-primary' | 'outline-primary' | 'icon-primary';
     }
     interface IrCalendar {
+        "date"?: Date;
         "dateModifiers"?: IDateModifiers;
         "fromDate"?: Date | null;
         "locale"?: Locale;

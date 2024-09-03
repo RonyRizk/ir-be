@@ -9,6 +9,7 @@
 
 | Property        | Attribute       | Description | Type             | Default                     |
 | --------------- | --------------- | ----------- | ---------------- | --------------------------- |
+| `date`          | --              |             | `Date`           | `new Date()`                |
 | `dateModifiers` | --              |             | `IDateModifiers` | `undefined`                 |
 | `fromDate`      | --              |             | `Date`           | `null`                      |
 | `locale`        | --              |             | `Locale`         | `enUS`                      |

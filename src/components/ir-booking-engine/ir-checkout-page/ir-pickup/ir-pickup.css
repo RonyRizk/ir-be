@@ -53,3 +53,37 @@
   font-weight: 400;
   font-size: 1rem;
 }
+.pickup-header-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.pickup-amount {
+  display: none;
+  flex: 1 1 0%;
+  text-align: end;
+  font-size: 1rem /* 16px */;
+  line-height: 1.5rem /* 24px */;
+  font-weight: 500;
+}
+/*sm*/
+@media (min-width: 640px) {
+  .pickup-header-container {
+    flex-direction: column;
+  }
+}
+/*lg*/
+@media (min-width: 1024px) {
+  .pickup-header-container {
+    flex-direction: row;
+  }
+  .pickup-amount {
+    display: block;
+  }
+}
+@media (min-width: 1280px) {
+  .pickup-amount {
+    font-size: 1.25rem /* 20px */;
+    line-height: 1.75rem /* 28px */;
+  }
+}
