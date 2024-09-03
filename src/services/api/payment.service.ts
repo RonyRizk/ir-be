@@ -6,7 +6,7 @@ import booking_store from '@/stores/booking';
 import axios from 'axios';
 import { isBefore, parseISO } from 'date-fns';
 
-type TExposedApplicablePolicies = { data: IExposedApplicablePolicies[]; amount: number };
+type TExposedApplicablePolicies = { data: IExposedApplicablePolicies[]; amount: number; room_type_id?: number; rate_plan_id?: number };
 interface FetchCancelationMessageWithData {
   data: IExposedApplicablePolicies[];
   showCancelation?: boolean;
@@ -105,7 +105,7 @@ export class PaymentService extends Token {
       throw new Error(data.ExceptionMsg);
     }
     const result = data['My_Result'] as IExposedApplicablePolicies[];
-    return { data: result, amount: this.processAlicablePolicies(result, book_date).amount };
+    return { data: result, amount: this.processAlicablePolicies(result, book_date).amount, room_type_id: params.room_type_id, rate_plan_id: params.rate_plan_id };
   }
   public processAlicablePolicies(policies: IExposedApplicablePolicies[], book_date: Date) {
     let isInFreeCancelationZone = false;

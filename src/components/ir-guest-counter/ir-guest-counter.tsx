@@ -1,4 +1,4 @@
-import { Component, Event, EventEmitter, Prop, State, h } from '@stencil/core';
+import { Component, Event, EventEmitter, Prop, State, Watch, h } from '@stencil/core';
 
 @Component({
   tag: 'ir-guest-counter',
@@ -12,6 +12,8 @@ export class IrGuestCounter {
   @Prop() minChildrenCount: number = 0;
   @Prop() maxChildrenCount: number = 5;
   @Prop() childMaxAge: number = 17;
+  @Prop() child: number;
+  @Prop() adults: number;
 
   // Local state
   @State() adultCount: number = this.minAdultCount;
@@ -21,6 +23,23 @@ export class IrGuestCounter {
   @Event() updateCounts: EventEmitter;
   @Event() closeGuestCounter: EventEmitter;
 
+  componentWillLoad() {
+    this.adultCount = this.adults || this.minAdultCount;
+    this.childrenCount = this.child || this.minAdultCount;
+  }
+
+  @Watch('adults')
+  handleAdultsChange(newValue, oldValue) {
+    if (newValue !== oldValue && newValue !== this.adultCount) {
+      this.adultCount = newValue;
+    }
+  }
+  @Watch('child')
+  handleChildChange(newValue, oldValue) {
+    if (newValue !== oldValue && newValue !== this.childrenCount) {
+      this.childrenCount = newValue;
+    }
+  }
   incrementAdultCount() {
     if (this.adultCount < this.maxAdultCount) {
       this.adultCount++;

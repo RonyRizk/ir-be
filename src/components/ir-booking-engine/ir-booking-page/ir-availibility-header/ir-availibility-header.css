@@ -135,12 +135,14 @@
   .availability-container {
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 4rem;
+    gap: 2rem;
   }
   .availability-container.promotions {
     justify-content: flex-start;
   }
 }
-/* @media (min-width: 1280px) {
- 
-} */
+@media (min-width: 1280px) {
+  .availability-container {
+    gap: 4rem;
+  }
+}

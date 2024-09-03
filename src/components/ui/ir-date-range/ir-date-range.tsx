@@ -19,6 +19,7 @@ import {
 import { IDateModifiers, IDateModifierOptions } from './ir-date-range.types';
 import { enUS } from 'date-fns/locale';
 import { getAbbreviatedWeekdays } from '@/utils/utils';
+import localizedWords from '@/stores/localization.store';
 
 @Component({
   tag: 'ir-date-range',
@@ -300,7 +301,7 @@ export class IrDateRange {
                                 this.selectDay(day);
                               }}
                               aria-label={`${format(day, 'EEEE, MMMM do yyyy', { locale: this.locale })} ${
-                                isBefore(day, this.minDate) || isAfter(day, this.maxDate) ? 'Not available' : ''
+                                isBefore(day, this.minDate) || isAfter(day, this.maxDate) ? localizedWords.entries.Lcz_NotAvailable : ''
                               }`}
                               aria-disabled={isBefore(day, this.minDate) || isAfter(day, this.maxDate) || checkedDate?.disabled ? 'true' : 'false'}
                               aria-selected={

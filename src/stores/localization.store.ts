@@ -7,6 +7,7 @@ export interface ILocale {
 export type TLocaleLocalizedWordsEntries = {
   Lcz_AcceptedCreditCards: string;
   Lcz_Activities: string;
+  Lcz_Address: string;
   Lcz_Adult: string;
   Lcz_Adults: string;
   Lcz_Age: string;
@@ -22,8 +23,11 @@ export type TLocaleLocalizedWordsEntries = {
   Lcz_Balance: string;
   Lcz_Before: string;
   Lcz_BookedBy: string;
+  Lcz_BookedOn: string;
   Lcz_BookingCode: string;
+  Lcz_BookingDetails: string;
   Lcz_BookingPreference: string;
+  Lcz_BookingReference: string;
   Lcz_BookNow: string;
   Lcz_Cancel: string;
   Lcz_CancelBooking: string;
@@ -35,11 +39,14 @@ export type TLocaleLocalizedWordsEntries = {
   Lcz_CheckOut: string;
   Lcz_Child: string;
   Lcz_Children: string;
+  Lcz_Clear: string;
   Lcz_Close: string;
   Lcz_CompleteYourAccount: string;
+  Lcz_CompleteYourBooking: string;
   Lcz_Conditions: string;
   Lcz_ConfirmBooking: string;
   Lcz_Contact: string;
+  Lcz_ContactInformation: string;
   Lcz_ContinueWithFacebook: string;
   Lcz_ContinueWithGoogle: string;
   Lcz_Country: string;
@@ -50,7 +57,10 @@ export type TLocaleLocalizedWordsEntries = {
   Lcz_Done: string;
   Lcz_DontHaveAnAccount: string;
   Lcz_DueAmountNow: string;
+  Lcz_Duration: string;
+  Lcz_Email: string;
   Lcz_EmailAddress: string;
+  Lcz_EnterYourBookingBumber: string;
   Lcz_EnterYourCouponCode: string;
   Lcz_EnterYourEmail: string;
   Lcz_EnterYourFirstName: string;
@@ -62,6 +72,7 @@ export type TLocaleLocalizedWordsEntries = {
   Lcz_FlightDetails: string;
   Lcz_FoodAndbeverage: string;
   Lcz_ForgotPassword: string;
+  Lcz_FreeCancellation: string;
   Lcz_FreeInternet: string;
   Lcz_From: string;
   Lcz_GetDirections: string;
@@ -69,9 +80,12 @@ export type TLocaleLocalizedWordsEntries = {
   Lcz_GuestFullName: string;
   Lcz_GuestName: string;
   Lcz_Guests: string;
+  Lcz_GuestService_ContactUs: string;
   Lcz_HaveAgentorCoporate: string;
   Lcz_HaveCoupon: string;
+  Lcz_Home: string;
   Lcz_IAgreePrivacyPolicy: string;
+  Lcz_IAgreeToThe: string;
   Lcz_IAmBooklingForSomeoneElse: string;
   Lcz_IfICancel: string;
   Lcz_ImportantInformation: string;
@@ -84,28 +98,36 @@ export type TLocaleLocalizedWordsEntries = {
   Lcz_MessageProperty: string;
   Lcz_MobileNumber: string;
   Lcz_MoreDetails: string;
+  Lcz_MyBookings: string;
   Lcz_NameOnCard: string;
   Lcz_NeedPickup: string;
+  Lcz_Next: string;
   Lcz_night: string;
   Lcz_Nights: string;
   Lcz_NonRefundable: string;
   Lcz_NoOfVehicles: string;
   Lcz_NoThankYou: string;
   Lcz_Or: string;
+  Lcz_PageOf: string;
   Lcz_PaidInternet: string;
   Lcz_PaymentDetails: string;
   Lcz_PayNow: string;
   Lcz_Person: string;
+  Lcz_PersonalProfile: string;
   Lcz_Persons: string;
   Lcz_Phone: string;
   Lcz_PickupFee: string;
   Lcz_Policy: string;
+  Lcz_Previous: string;
+  Lcz_PrivacyPolicy: string;
   Lcz_PropertyFacilities: string;
   Lcz_PublicAreas: string;
+  Lcz_RegisterForExclusiveDeals: string;
   Lcz_RequiredCapacity: string;
   Lcz_RetryPayment: string;
   Lcz_Room: string;
   Lcz_Rooms: string;
+  Lcz_save: string;
   Lcz_Search: string;
   Lcz_SecurityCode: string;
   Lcz_SecurityCodeHint: string;
@@ -115,7 +137,10 @@ export type TLocaleLocalizedWordsEntries = {
   Lcz_SiginIntToYourAccount: string;
   Lcz_SignIn: string;
   Lcz_SignInOrCreateToBookFaster: string;
+  Lcz_SignInToYourBooking: string;
+  Lcz_SignOut: string;
   Lcz_SignUp: string;
+  Lcz_ThisBookingIs: string;
   Lcz_Total: string;
   Lcz_Travelers: string;
   Lcz_ViewConditions: string;
@@ -124,12 +149,19 @@ export type TLocaleLocalizedWordsEntries = {
   Lcz_YouHavePaid: string;
   Lcz_YouMustAcceptPrivacyPolicy: string;
   Lcz_YourArrivalTime: string;
-  Lcz_YourCardWillBeCharged: string;
-  Lcz_YourBookingIsNotGuaranteed: string;
   Lcz_YourBookingIsGuaranteed: string;
-  Lcz_GuestService_ContactUs: string;
+  Lcz_YourBookingIsNotGuaranteed: string;
+  Lcz_YourCardWillBeCharged: string;
+  Lcz_More: string;
+  Lcz_NotAvailable: string;
+  Lcz_Totalprice: string;
+  Lcz_status: string;
+  Lcz_NoPenalityIsApplied: string;
+  Lcz_BookingCancellation: string;
+  Lcz_AcceptAndConfirm: string;
+  Lcz_BookingDate: string;
+  Lcz_SomethingWentWrong: string;
 };
-
 const initialState: ILocale = {
   entries: null,
   direction: 'ltr',

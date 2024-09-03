@@ -253,7 +253,6 @@ export class PropertyHelpers {
       throw new Error('Invalid New Rateplan');
     }
     const newVariation = newRatePlan.variations.find(v => v.adult_child_offering === props.adultChildConstraint);
-    console.log(newRatePlan.variations, props.adultChildConstraint);
     if (!newVariation) {
       throw new Error('Missing variation');
     }

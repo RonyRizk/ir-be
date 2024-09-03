@@ -3,6 +3,7 @@ import { CommonService } from '@/services/api/common.service';
 import { PropertyService } from '@/services/api/property.service';
 import app_store from '@/stores/app.store';
 import { checkout_store } from '@/stores/checkout.store';
+import localizedWords from '@/stores/localization.store';
 import { checkAffiliate, getUserPrefernce } from '@/utils/utils';
 import { Component, Fragment, Host, Listen, Prop, State, Watch, h } from '@stencil/core';
 import axios from 'axios';
@@ -173,7 +174,7 @@ export class IrBookingListing {
                 }}
                 iconName={app_store.dir === 'RTL' ? 'angle_right' : ('angle_left' as any)}
               ></ir-button>
-              <p class="header-title">My bookings</p>
+              <p class="header-title">{localizedWords.entries.Lcz_MyBookings}</p>
             </div>
             <ir-invoice
               locationShown={false}

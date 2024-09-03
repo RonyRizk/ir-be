@@ -21,7 +21,7 @@ export class IrAvailibilityHeader {
   @Prop() childrenCount: string;
 
   @State() exposedBookingAvailabiltyParams: TExposedBookingAvailability = {
-    adult_nbr: 0,
+    adult_nbr: 2,
     child_nbr: 0,
     currency_ref: 'USD',
     language: 'en',

@@ -264,6 +264,8 @@ export namespace Components {
     interface IrGoogleMaps {
     }
     interface IrGuestCounter {
+        "adults": number;
+        "child": number;
         "childMaxAge": number;
         "maxAdultCount": number;
         "maxChildrenCount": number;
@@ -2044,6 +2046,8 @@ declare namespace LocalJSX {
     interface IrGoogleMaps {
     }
     interface IrGuestCounter {
+        "adults"?: number;
+        "child"?: number;
         "childMaxAge"?: number;
         "maxAdultCount"?: number;
         "maxChildrenCount"?: number;

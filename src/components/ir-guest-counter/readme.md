@@ -7,13 +7,15 @@
 
 ## Properties
 
-| Property           | Attribute            | Description | Type     | Default |
-| ------------------ | -------------------- | ----------- | -------- | ------- |
-| `childMaxAge`      | `child-max-age`      |             | `number` | `17`    |
-| `maxAdultCount`    | `max-adult-count`    |             | `number` | `5`     |
-| `maxChildrenCount` | `max-children-count` |             | `number` | `5`     |
-| `minAdultCount`    | `min-adult-count`    |             | `number` | `1`     |
-| `minChildrenCount` | `min-children-count` |             | `number` | `0`     |
+| Property           | Attribute            | Description | Type     | Default     |
+| ------------------ | -------------------- | ----------- | -------- | ----------- |
+| `adults`           | `adults`             |             | `number` | `undefined` |
+| `child`            | `child`              |             | `number` | `undefined` |
+| `childMaxAge`      | `child-max-age`      |             | `number` | `17`        |
+| `maxAdultCount`    | `max-adult-count`    |             | `number` | `5`         |
+| `maxChildrenCount` | `max-children-count` |             | `number` | `5`         |
+| `minAdultCount`    | `min-adult-count`    |             | `number` | `1`         |
+| `minChildrenCount` | `min-children-count` |             | `number` | `0`         |
 
 
 ## Events

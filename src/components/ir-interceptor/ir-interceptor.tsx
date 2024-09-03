@@ -2,6 +2,7 @@ import { Component, Host, Prop, State, h } from '@stencil/core';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 // import { IToast } from '../ir-toast/toast';
 import interceptor_requests from '@/stores/ir-interceptor.store';
+import localizedWords from '@/stores/localization.store';
 
 @Component({
   tag: 'ir-interceptor',
@@ -81,7 +82,7 @@ export class IrInterceptor {
         <ir-alert-dialog ref={el => (this.alertRef = el)}>
           <div slot="modal-title" class={'flex items-center gap-4 pb-2'}>
             <ir-icons name="danger" class={'text-red-500'} svgClassName="size-6"></ir-icons>
-            <h1 class={'text-lg font-semibold'}>Something went wrong!</h1>
+            <h1 class={'text-lg font-semibold'}>{localizedWords?.entries?.Lcz_SomethingWentWrong ?? 'Something went wrong'}!</h1>
           </div>
           <p slot="modal-body">{this.errorMessage}</p>
           <div slot="modal-footer">

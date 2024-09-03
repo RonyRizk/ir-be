@@ -186,20 +186,23 @@ export class IrPickup {
         {checkout_store.pickup.location && (
           <div class={'flex items-center  justify-between'}>
             <div class="flex-1 space-y-5">
-              <div class={'flex items-center gap-4'}>
-                <ir-popover ref={el => (this.popover = el)} class="w-fit">
+              <div class={'flex items-center gap-4 sm:flex-col lg:flex-row'}>
+                <ir-popover ref={el => (this.popover = el)} class="w-fit sm:w-full lg:w-fit">
                   {this.dateTrigger()}
                   <div slot="popover-content" class="date-range-container w-full border-0 p-2 shadow-none sm:w-auto sm:border sm:shadow-sm md:p-4 ">
                     <ir-calendar></ir-calendar>
                   </div>
                 </ir-popover>
                 <ir-input
+                  class={'w-full'}
                   onTextChanged={e => updatePickupFormData('arrival_time', e.detail)}
                   label={localizedWords.entries.Lcz_ArrivalHour}
                   placeholder="HH:MM"
                   mask={this.time_mask}
                   type="text"
                   id="time-input"
+                  data-state={this.errors && this.errors.arrival_time ? 'error' : ''}
+                  aria-invalid={this.errors && this.errors.arrival_time ? 'true' : 'false'}
                   onInputBlur={e => {
                     const firstNameSchema = PickupFormData.pick({ arrival_time: true });
                     const firstNameValidation = firstNameSchema.safeParse({ arrival_time: checkout_store.pickup?.arrival_time });
@@ -218,7 +221,7 @@ export class IrPickup {
                     if (target.hasAttribute('data-state')) target.removeAttribute('data-state');
                   }}
                 />
-                <div class="hidden flex-1  md:block">
+                <div class="hidden flex-1  lg:block">
                   <p class="text-end text-base font-medium xl:text-xl">
                     {formatAmount(checkout_store.pickup.location ? Number(checkout_store.pickup.due_upon_booking) : 0, app_store.userPreferences.currency_id)}
                   </p>

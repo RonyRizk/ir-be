@@ -108,10 +108,11 @@ export class IrRateplan {
     // if (!this.ratePlan.is_targeting_travel_agency && booking_store.bookingAvailabilityParams.agent) {
     //   return null;
     // }
-    console.log(this.ratePlan.name, this.ratePlan.is_targeting_travel_agency, booking_store.booking?.agent);
     if (this.ratePlan.is_targeting_travel_agency && !app_store.app_data.isAgentMode) {
       return null;
     }
+    const isInventoryFull =
+      this.visibleInventory?.visibleInventory === 0 || Object.values(booking_store.ratePlanSelections[this.roomTypeId]).some(f => f.visibleInventory === f.reserved);
     return (
       <div class="rateplan-container">
         <div class={`rateplan-header ${this.isRatePlanAvailable ? 'available' : 'not-available'}`}>
@@ -120,15 +121,15 @@ export class IrRateplan {
               <span class="rateplan-short-name">{this.ratePlan.short_name}</span>
               {this.ratePlan.is_non_refundable ? (
                 <p class="rateplan-tooltip text-xs" style={{ color: 'var(--ir-green)' }}>
-                  Non refundable
+                  {localizedWords.entries.Lcz_NonRefundable}
                 </p>
               ) : (
                 <ir-tooltip
                   labelColors={booking_store.isInFreeCancelationZone ? 'green' : 'default'}
                   class={`rateplan-tooltip`}
                   open_behavior="click"
-                  label={booking_store.isInFreeCancelationZone ? 'Free cancellation' : 'If I cancel?'}
-                  message={(this.cancelationMessage || this.ratePlan.cancelation) + this.ratePlan.guarantee}
+                  label={booking_store.isInFreeCancelationZone ? localizedWords.entries.Lcz_FreeCancellation : localizedWords.entries.Lcz_IfICancel}
+                  message={`${this.cancelationMessage || this.ratePlan.cancelation} ${this.ratePlan.guarantee ?? ''}`}
                   onTooltipOpenChange={e => {
                     if (e.detail) {
                       this.fetchCancelationMessage(this.ratePlan.id, this.roomTypeId);
@@ -155,7 +156,7 @@ export class IrRateplan {
                     </div>
                   )
                 ) : (
-                  <p class="no-availability">Not available</p>
+                  <p class="no-availability">{localizedWords.entries.Lcz_NotAvailable}</p>
                 )}
               </Fragment>
             )}
@@ -163,15 +164,15 @@ export class IrRateplan {
           <div class="rateplan-description">
             {this.ratePlan.is_non_refundable ? (
               <p class="rateplan-tooltip text-xs" style={{ color: 'var(--ir-green)' }}>
-                Non refundable
+                {localizedWords.entries.Lcz_NonRefundable}
               </p>
             ) : (
               <ir-tooltip
                 labelColors={booking_store.isInFreeCancelationZone ? 'green' : 'default'}
                 class={`rateplan-tooltip`}
                 open_behavior="click"
-                label={booking_store.isInFreeCancelationZone ? 'Free cancellation' : 'If I cancel?'}
-                message={(this.cancelationMessage || this.ratePlan.cancelation) + this.ratePlan.guarantee}
+                label={booking_store.isInFreeCancelationZone ? localizedWords.entries.Lcz_FreeCancellation : localizedWords.entries.Lcz_IfICancel}
+                message={`${(this.cancelationMessage ?? '') || (this.ratePlan.cancelation ?? '')} ${this.ratePlan.guarantee ?? ''}`}
                 onTooltipOpenChange={e => {
                   if (e.detail) {
                     this.fetchCancelationMessage(this.ratePlan.id, this.roomTypeId);
@@ -179,7 +180,7 @@ export class IrRateplan {
                 }}
               ></ir-tooltip>
             )}
-            <p class="rateplan-custom-text">{this.ratePlan.custom_text}</p>
+            <p class="rateplan-custom-text" innerHTML={this.ratePlan.custom_text}></p>
           </div>
         </div>
         {this.isRatePlanAvailable && (
@@ -247,9 +248,10 @@ export class IrRateplan {
                       ></ir-select>
                     ) : (
                       <ir-button
+                        disabled={isInventoryFull}
                         class="rateplan-select-rooms"
-                        buttonStyles={{ background: 'white', width: '100%' }}
-                        label="Select"
+                        buttonStyles={{ background: 'white', width: '100%', opacity: isInventoryFull ? '0.5' : '1' }}
+                        label={localizedWords.entries.Lcz_Select.replace('…', '')}
                         variants="outline-primary"
                         onButtonClick={() => {
                           reserveRooms(this.roomTypeId, this.ratePlan.id, 1);

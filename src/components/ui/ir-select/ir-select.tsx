@@ -41,16 +41,10 @@ export class IrSelect {
           </div>
         )}
         <select
-          innerHTML="<span>u</span>"
           onInput={e => this.valueChange.emit((e.target as HTMLSelectElement).value)}
           id={this.select_id}
           data-stid={this.select_id}
           class={`select-el ${this.variant} ${this.customStyles} ${this.icon ? 'icon' : ''}`}
-          // class={cn(`h-full w-full rounded-md bg-white pe-7  text-gray-900`, this.variant, this.customStyles, {
-          //   'ps-9': this.icon,
-          //   'px-[0.875rem] py-1 text-sm': this.variant === 'default',
-          //   'px-[0.875rem] py-[0.625rem] text-[1rem]': this.variant === 'double-line',
-          // })}
         >
           {this.data?.map(d => {
             if (d.html) {
@@ -58,7 +52,7 @@ export class IrSelect {
             }
             return (
               <option value={d.id} disabled={d.disabled} selected={d.id === this.value}>
-                <span>{d.value}</span>
+                {d.value}
               </option>
             );
           })}

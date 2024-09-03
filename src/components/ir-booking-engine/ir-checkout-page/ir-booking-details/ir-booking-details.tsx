@@ -294,7 +294,7 @@ export class IrBookingDetails {
                             <div class="flex flex-row items-center gap-3 ">
                               <h3 class="font-semibold">{r.roomtype.name}</h3>
                               {r.ratePlan.is_non_refundable ? (
-                                <p class="text-xs text-[var(--ir-green)]">Non refundable</p>
+                                <p class="text-xs text-[var(--ir-green)]">{localizedWords.entries.Lcz_NonRefundable}</p>
                               ) : (
                                 <div class={'inline-flex  h-6 items-center justify-center pt-0.5'}>
                                   <ir-button

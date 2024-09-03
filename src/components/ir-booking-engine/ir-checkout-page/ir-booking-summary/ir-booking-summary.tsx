@@ -98,7 +98,11 @@ export class IrBookingSummary {
             <ir-payment-view class="w-full" errors={this.error && this.error.cause === 'payment' ? this.error.issues : undefined}></ir-payment-view>
             <div class="w-full space-y-1">
               <div class={'flex w-full items-center gap-1'}>
-                <ir-checkbox label="I agree to the" checked={checkout_store.agreed_to_services} onCheckChange={e => (checkout_store.agreed_to_services = e.detail)}></ir-checkbox>
+                <ir-checkbox
+                  label={localizedWords.entries.Lcz_IAgreeToThe}
+                  checked={checkout_store.agreed_to_services}
+                  onCheckChange={e => (checkout_store.agreed_to_services = e.detail)}
+                ></ir-checkbox>
                 <ir-privacy-policy label="privacy policy." policyTriggerStyle={{ color: 'inherit', textDecoration: 'underline' }} id="checkout-policy"></ir-privacy-policy>
               </div>
               {this.error?.cause === 'booking-summary' && !checkout_store.agreed_to_services && (

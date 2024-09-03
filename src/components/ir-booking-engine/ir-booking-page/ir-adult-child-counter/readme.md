@@ -9,7 +9,7 @@
 
 | Property           | Attribute            | Description | Type     | Default |
 | ------------------ | -------------------- | ----------- | -------- | ------- |
-| `adultCount`       | `adult-count`        |             | `number` | `0`     |
+| `adultCount`       | `adult-count`        |             | `number` | `2`     |
 | `childMaxAge`      | `child-max-age`      |             | `number` | `0`     |
 | `childrenCount`    | `children-count`     |             | `number` | `0`     |
 | `maxAdultCount`    | `max-adult-count`    |             | `number` | `10`    |

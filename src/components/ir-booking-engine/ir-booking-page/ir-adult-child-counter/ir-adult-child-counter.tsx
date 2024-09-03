@@ -1,5 +1,5 @@
 import localizedWords from '@/stores/localization.store';
-import { Component, Prop, h, Event, EventEmitter, State } from '@stencil/core';
+import { Component, Prop, h, Event, EventEmitter, State, Fragment } from '@stencil/core';
 
 @Component({
   tag: 'ir-adult-child-counter',
@@ -7,7 +7,7 @@ import { Component, Prop, h, Event, EventEmitter, State } from '@stencil/core';
   shadow: true,
 })
 export class IrAdultChildCounter {
-  @Prop({ reflect: true, mutable: true }) adultCount = 0;
+  @Prop({ reflect: true, mutable: true }) adultCount = 2;
   @Prop({ mutable: true, reflect: true }) childrenCount = 0;
   @Prop() minAdultCount = 0;
   @Prop() minChildrenCount = 0;
@@ -58,21 +58,22 @@ export class IrAdultChildCounter {
   guestTrigger() {
     return (
       <div class="popover-trigger w-full sm:w-fit" slot="trigger" data-state={this.isPopoverOpen ? 'opened' : 'closed'}>
-        <ir-icons name="user" svgClassName="size-[18px]"></ir-icons>
+        <ir-icons name="user" svgClassName="size-[1.125rem]"></ir-icons>
         <div class="flex h-[3rem] flex-1 flex-col justify-center gap-0.5">
           <p class="label">{localizedWords.entries.Lcz_Guests}</p>
           <p class={'guests'}>
-            {this.adultCount > 0 && (
-              <span>
-                {this.adultCount} {this.adultCount === 1 ? localizedWords.entries.Lcz_Adult : localizedWords.entries.Lcz_Adults}
-              </span>
+            {this.adultCount > 0 ? (
+              <Fragment>
+                <span class={'lowercase'}>
+                  {this.adultCount} {this.adultCount === 1 ? localizedWords.entries.Lcz_Adult : localizedWords.entries.Lcz_Adults}
+                </span>
+                <span class={'lowercase'}>
+                  , {this.childrenCount} {this.childrenCount === 1 ? localizedWords.entries.Lcz_Child : localizedWords.entries.Lcz_Children}
+                </span>
+              </Fragment>
+            ) : (
+              <span class="">{localizedWords.entries.Lcz_Select}</span>
             )}
-            {this.childrenCount > 0 && (
-              <span>
-                , {this.childrenCount} {this.childrenCount === 1 ? localizedWords.entries.Lcz_Child : localizedWords.entries.Lcz_Children}
-              </span>
-            )}
-            {this.adultCount === 0 && <span class="">{localizedWords.entries.Lcz_Select}</span>}
           </p>
         </div>
       </div>

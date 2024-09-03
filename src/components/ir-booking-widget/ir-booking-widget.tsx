@@ -31,7 +31,7 @@ export class IrBookingWidget {
     to_date: null,
   };
   @State() guests: { adultCount: number; childrenCount: number } = {
-    adultCount: 0,
+    adultCount: 2,
     childrenCount: 0,
   };
 
@@ -137,17 +137,18 @@ export class IrBookingWidget {
       <div class="guests-trigger" slot="trigger">
         <ir-icons name="user" svgClassName="size-4"></ir-icons>
         <p class={'guests'}>
-          {adultCount > 0 && (
-            <span>
-              {adultCount} {adultCount === 1 ? localizedWords.entries.Lcz_Adult : localizedWords.entries.Lcz_Adults}
-            </span>
+          {adultCount > 0 ? (
+            <Fragment>
+              <span class="lowercase">
+                {adultCount} {adultCount === 1 ? localizedWords.entries.Lcz_Adult : localizedWords.entries.Lcz_Adults}
+              </span>
+              <span class="lowercase">
+                , {childrenCount} {childrenCount === 1 ? localizedWords.entries.Lcz_Child : localizedWords.entries.Lcz_Children}
+              </span>
+            </Fragment>
+          ) : (
+            <span>Guests</span>
           )}
-          {childrenCount > 0 && (
-            <span>
-              , {childrenCount} {childrenCount === 1 ? localizedWords.entries.Lcz_Child : localizedWords.entries.Lcz_Children}
-            </span>
-          )}
-          {adultCount === 0 && <span>Guests</span>}
         </p>
       </div>
     );
@@ -207,6 +208,8 @@ export class IrBookingWidget {
 
             <ir-guest-counter
               slot="popover-content"
+              adults={this.guests?.adultCount}
+              child={this.guests?.childrenCount}
               minAdultCount={0}
               maxAdultCount={app_store?.property?.adult_child_constraints.adult_max_nbr}
               maxChildrenCount={app_store?.property?.adult_child_constraints.child_max_nbr}

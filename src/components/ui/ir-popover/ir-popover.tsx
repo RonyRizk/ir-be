@@ -79,6 +79,7 @@ export class IrPopover {
             name: 'offset',
             options: {
               offset: [0, 3],
+              adaptive: true,
             },
           },
         ],

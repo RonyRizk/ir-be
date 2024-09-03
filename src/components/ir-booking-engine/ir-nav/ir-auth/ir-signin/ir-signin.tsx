@@ -4,6 +4,7 @@ import { ZodError } from 'zod';
 import { AuthService } from '@/services/api/auth.service';
 import app_store, { onAppDataChange } from '@/stores/app.store';
 import { TAuthNavigation } from '../auth.types';
+import localizedWords from '@/stores/localization.store';
 
 @Component({
   tag: 'ir-signin',
@@ -107,7 +108,7 @@ export class IrSignin {
   render() {
     return (
       <Host>
-        <h1 class="title">Sign in to your booking</h1>
+        <h1 class="title">{localizedWords.entries.Lcz_SignInToYourBooking}</h1>
         <form onSubmit={this.handleSignIn.bind(this)}>
           {this.formState?.cause === 'auth' && this.formState?.errors && (
             <div class="error">
@@ -120,7 +121,7 @@ export class IrSignin {
               onTextChanged={e => this.modifySignInParams({ email: e.detail })}
               autofocus
               inputId="email"
-              label="Enter your email"
+              label={localizedWords.entries.Lcz_EnterYourEmail}
               onInputBlur={e => {
                 const firstNameSchema = SignInValidtor.pick({ email: true });
                 const firstNameValidation = firstNameSchema.safeParse({ email: this.signInParams.email });
@@ -146,7 +147,7 @@ export class IrSignin {
               onTextChanged={e => this.modifySignInParams({ booking_nbr: e.detail })}
               inputId="booking_nbr"
               type="number"
-              label="Enter your booking number"
+              label={localizedWords.entries.Lcz_EnterYourBookingBumber}
               onInputBlur={e => {
                 const firstNameSchema = SignInValidtor.pick({ booking_nbr: true });
                 const firstNameValidation = firstNameSchema.safeParse({ booking_nbr: this.signInParams.booking_nbr });
@@ -168,12 +169,12 @@ export class IrSignin {
           </fieldset>
           <button type="submit" class="button-default ir-button" data-size={'md'}>
             {this.isLoading && <span class="loader"></span>}
-            Sign in
+            {localizedWords.entries.Lcz_SignIn}
           </button>
           {!app_store.app_data.hideGoogleSignIn && (
             <div class="divider">
               <div class="divider-line"></div>
-              <span class="divider-text">OR</span>
+              <span class="divider-text">{localizedWords.entries.Lcz_Or}</span>
               <div class="divider-line"></div>
             </div>
           )}

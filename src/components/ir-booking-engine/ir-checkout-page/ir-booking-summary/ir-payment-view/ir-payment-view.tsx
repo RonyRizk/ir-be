@@ -184,7 +184,13 @@ export class IrPaymentView {
         <div class="flex w-full gap-4">
           <div class="flex-1 space-y-1.5">
             <p>{method.description}</p>
-            <p class="text-xs text-gray-700">{method.data?.map(d => <span key={d.key}>{d.value}</span>)}</p>
+            <p
+              class="text-xs text-gray-700"
+              innerHTML={
+                method.localizables?.find(d => d.language.code.toLowerCase() === app_store.userPreferences.language_id.toLowerCase())?.description ||
+                method.localizables?.find(d => d.language.code.toLowerCase() === 'en')?.description
+              }
+            ></p>
           </div>
         </div>
       );

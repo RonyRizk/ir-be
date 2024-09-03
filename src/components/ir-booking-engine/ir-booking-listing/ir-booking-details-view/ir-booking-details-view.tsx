@@ -81,13 +81,13 @@ export class IrBookingDetailsView {
               }}
               iconName={app_store.dir === 'RTL' ? 'angle_right' : ('angle_left' as any)}
             ></ir-button>
-            <p class="header-title">My bookings</p>
+            <p class="header-title">{localizedWords.entries.Lcz_MyBookings}</p>
           </div>
           {cancel && <ir-button label="Cancel Request" class="cancel-button" onButtonClick={() => this.bookingCancelation.openDialog()}></ir-button>}
         </div>
 
         <h2 class="section-title">
-          Booking reference {this.booking.booking_nbr} - {app_store.property.name}
+          {localizedWords.entries.Lcz_BookingReference} {this.booking.booking_nbr} - {app_store.property.name}
         </h2>
         <section class="detail-container">
           <div class="details-section">

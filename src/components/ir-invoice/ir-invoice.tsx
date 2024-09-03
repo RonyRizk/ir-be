@@ -286,7 +286,7 @@ export class IrInvoice {
               </div>
             ) : (
               <div class={this.be ? '' : 'invoice-container'}>
-                <p class={'text-xl font-medium '}>This booking is {this.booking.status.description}</p>
+                <p class={'text-xl font-medium '}>{localizedWords.entries.Lcz_ThisBookingIs.replace('%1', this.booking.status.description)}</p>
               </div>
             )}
             <div class={`flex  ${this.locationShown ? 'w-full' : 'w-full'} gap-16 `}>
@@ -300,7 +300,7 @@ export class IrInvoice {
                     this.payment_option.is_payment_gateway && <ir-button variants="outline" label="Retry Payment" onButtonClick={() => this.processPayment()}></ir-button>
                   )}
                   <a href={this.getPropertyEmail()} target="_blank" class={cn(`button-outline`, 'flex items-center justify-center')} data-size="sm">
-                    Message property
+                    {localizedWords.entries.Lcz_MessageProperty}
                   </a>
                   {cancel.show && (
                     <ir-button

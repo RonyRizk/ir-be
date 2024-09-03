@@ -4,6 +4,7 @@ import { PaymentService, TBookingInfo } from '@/services/api/payment.service';
 import app_store from '@/stores/app.store';
 import { formatAmount } from '@/utils/utils';
 import { Booking } from '@/models/booking.dto';
+import localizedWords from '@/stores/localization.store';
 
 @Component({
   tag: 'ir-booking-cancelation',
@@ -91,7 +92,7 @@ export class IrBookingCancelation {
           }}
         >
           <h2 slot="modal-title" class="text-lg font-medium">
-            Booking Cancellation
+            {localizedWords.entries.Lcz_BookingCancellation}
           </h2>
           <div class="py-3" slot="modal-body">
             {isPending ? (
@@ -103,7 +104,7 @@ export class IrBookingCancelation {
                 {this.paymentAmount > 0 ? (
                   <p class="mb-2.5 font-semibold">{`If you cancel now, the penalty will be ${formatAmount(this.paymentAmount, this.currency?.code || 'usd')}.`}</p>
                 ) : (
-                  <p class="mb-2.5 font-semibold">No penalty is applied if you cancel now.</p>
+                  <p class="mb-2.5 font-semibold">{localizedWords.entries.Lcz_NoPenalityIsApplied}</p>
                 )}
                 <button
                   onClick={() => {
@@ -111,7 +112,7 @@ export class IrBookingCancelation {
                   }}
                   class="flex w-full items-center justify-between rounded-md  py-1 "
                 >
-                  <p>More details</p>
+                  <p>{localizedWords.entries.Lcz_MoreDetails}</p>
                   <ir-icons name={this.isOpen ? 'angle_up' : 'angle_down'} svgClassName="h-3"></ir-icons>
                 </button>
                 {this.isOpen && (
@@ -134,7 +135,7 @@ export class IrBookingCancelation {
 
           <div slot="modal-footer">
             <ir-button
-              label="Cancel"
+              label={localizedWords.entries.Lcz_Cancel}
               variants="outline"
               onButtonClick={() => {
                 this.closeAlertDialog();
@@ -144,7 +145,7 @@ export class IrBookingCancelation {
             <ir-button
               disabled={isPending}
               size="md"
-              label="Accept & Confirm"
+              label={localizedWords.entries.Lcz_AcceptAndConfirm}
               isLoading={isRequestPending('/Request_Booking_Cancelation')}
               onButtonClick={async () => {
                 try {

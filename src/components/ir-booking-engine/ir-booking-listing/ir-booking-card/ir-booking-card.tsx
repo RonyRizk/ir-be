@@ -1,5 +1,6 @@
 import { Booking } from '@/models/booking.dto';
 import { BookingListingAppService } from '@/services/app/booking-listing.service';
+import localizedWords from '@/stores/localization.store';
 import { formatAmount, formatFullLocation } from '@/utils/utils';
 import { Component, Event, EventEmitter, Prop, Watch, h } from '@stencil/core';
 import { differenceInCalendarDays, format } from 'date-fns';
@@ -54,19 +55,21 @@ export class IrBookingCard {
           </div>
         )}
         <div class="flex items-center justify-between text-base">
-          <h3 class=" font-semibold leading-none tracking-tight">Booking reference: {this.booking.booking_nbr}</h3>
+          <h3 class=" font-semibold leading-none tracking-tight">
+            {localizedWords.entries.Lcz_BookingReference}: {this.booking.booking_nbr}
+          </h3>
           <p class={'font-semibold'}>{formatAmount(this.booking.total, this.booking.currency.code)}</p>
         </div>
         <p>
-          <span class="font-medium">Booked on: </span>
+          <span class="font-medium">{localizedWords.entries.Lcz_BookedOn}: </span>
           {format(new Date(this.booking.booked_on.date), 'dd-MMM-yyyy')}
         </p>
         <p>
-          <span class="font-medium">Check-in: </span>
+          <span class="font-medium">{localizedWords.entries.Lcz_CheckIn}: </span>
           {format(new Date(this.booking.from_date), 'EEE, dd MMM yyyy')}
         </p>
         <p>
-          <span class="font-medium">Duration: </span>
+          <span class="font-medium">{localizedWords.entries.Lcz_Duration}: </span>
           {this.totalNights} {this.totalNights > 1 ? 'nights' : 'night'}
         </p>
         <p class="flex items-center">

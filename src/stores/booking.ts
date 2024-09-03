@@ -93,7 +93,6 @@ onRoomTypeChange('roomTypes', (newValue: RoomType[]) => {
 
     roomType.rateplans.forEach(ratePlan => {
       if (!ratePlan.is_active || !ratePlan?.variations?.length) return;
-
       let lastVariation = ratePlan.variations[ratePlan.variations.length - 1];
       lastVariation = ratePlan.selected_variation ?? lastVariation;
       const currentRatePlanSelection = currentSelections[roomType.id]?.[ratePlan.id];
@@ -192,7 +191,6 @@ export function reserveRooms(roomTypeId: number, ratePlanId: number, rooms: numb
     throw new Error('Invalid rate plan');
   }
   if (!booking_store.ratePlanSelections[roomTypeId][ratePlanId]) {
-    console.log('prepayment_amount', roomType.pre_payment_amount);
     booking_store.ratePlanSelections[roomTypeId][ratePlanId] = {
       guestName: null,
       reserved: 0,

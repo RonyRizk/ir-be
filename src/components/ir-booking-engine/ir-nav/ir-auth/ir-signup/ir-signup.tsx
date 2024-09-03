@@ -3,6 +3,7 @@ import { SignUpValidtor, TSignUpAuthTrigger, TSignUpValidator } from '@/validato
 import { ZodError } from 'zod';
 import IntegrationIcons from '@/assets/integration_icons';
 import { TAuthNavigation } from '../auth.types';
+import localizedWords from '@/stores/localization.store';
 
 @Component({
   tag: 'ir-signup',
@@ -55,16 +56,16 @@ export class IrSignup {
         <h1 class="title mb-6">Create an account</h1>
         <form onSubmit={this.handleSignUp.bind(this)} class="mb-6 space-y-3">
           <fieldset>
-            <ir-input error={!!this.formState?.errors?.first_name} inputId="first_name" label="Enter your first name"></ir-input>
+            <ir-input error={!!this.formState?.errors?.first_name} inputId="first_name" label={localizedWords.entries.Lcz_EnterYourFirstName}></ir-input>
           </fieldset>
           <fieldset>
-            <ir-input error={!!this.formState?.errors?.last_name} inputId="last_name" label="Enter your last name"></ir-input>
+            <ir-input error={!!this.formState?.errors?.last_name} inputId="last_name" label={localizedWords.entries.Lcz_EnterYourLastName}></ir-input>
           </fieldset>
           <fieldset>
             <ir-input error={!!this.formState?.errors?.email} inputId="email" label="Enter your email"></ir-input>
           </fieldset>
           <fieldset>
-            <ir-input error={!!this.formState?.errors?.password} inputId="password" type="password" label="Enter your password"></ir-input>
+            <ir-input error={!!this.formState?.errors?.password} inputId="password" type="password" label={localizedWords.entries.Lcz_EnterYourPassword}></ir-input>
           </fieldset>
           <ir-button type="submit" class="mt-4 w-full" label="Sign up" size="md"></ir-button>
         </form>

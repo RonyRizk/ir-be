@@ -1,5 +1,6 @@
 import BeLogoFooter from '@/assets/be_logo_footer';
 import app_store from '@/stores/app.store';
+import localizedWords from '@/stores/localization.store';
 import { renderPropertyLocation } from '@/utils/utils';
 import { Component, h, Prop } from '@stencil/core';
 
@@ -38,7 +39,7 @@ export class IrFooter {
     }
     return (
       <div class="contact-info">
-        <label>Email:</label>
+        <label>{localizedWords.entries.Lcz_Email}:</label>
         <a href={`mailto:${email}`} class="contact-link">
           {email}
         </a>
@@ -61,9 +62,9 @@ export class IrFooter {
           <li class="footer-item">
             <p class="footer-text">{app_store.app_data.affiliate ? app_store.app_data.affiliate.name : app_store.property?.name}</p>
             <span>-</span>
-            <ir-button onButtonClick={() => this.contactDialog.openModal()} buttonStyles={{ padding: '0' }} variants="link" label="Contact"></ir-button>
+            <ir-button onButtonClick={() => this.contactDialog.openModal()} buttonStyles={{ padding: '0' }} variants="link" label={localizedWords.entries.Lcz_Contact}></ir-button>
             <span>-</span>
-            <ir-privacy-policy label="privacy policy" policyTriggerStyle={{ textTransform: 'capitalize' }}></ir-privacy-policy>
+            <ir-privacy-policy label={localizedWords.entries.Lcz_PrivacyPolicy} policyTriggerStyle={{ textTransform: 'capitalize' }}></ir-privacy-policy>
           </li>
           <li class="social-media">
             {app_store.property?.social_media.map(media => {
@@ -90,16 +91,16 @@ export class IrFooter {
         </ul>
         <ir-dialog closeButton ref={el => (this.contactDialog = el)} style={{ '--ir-dialog-max-width': '25rem' }}>
           <div class="dialog-body" slot="modal-body">
-            <h1 class="dialog-title">Contact information</h1>
+            <h1 class="dialog-title">{localizedWords.entries.Lcz_ContactInformation}</h1>
             <div class="contact-info">
               <span>
-                <label>Address:</label>
+                <label>{localizedWords.entries.Lcz_Address}:</label>
               </span>
               <div>{renderPropertyLocation()}</div>
             </div>
             <div class="contact-info">
               <span>
-                <label>Phone:</label>
+                <label>{localizedWords.entries.Lcz_Phone}</label>
               </span>
               <a class="contact-link" href={`tel:${this.getPhoneNumber().join('')}`}>
                 {this.getPhoneNumber().join(' ')}

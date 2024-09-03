@@ -46,15 +46,16 @@ export class PropertyService extends Token {
         }
       });
     }
+
     if (!app_store.fetchedBooking) {
       booking_store.roomTypes = [...result.My_Result.roomtypes];
     }
     if (params.aname || params.perma_link) {
       app_store.app_data = { ...app_store.app_data, property_id: result.My_Result.id };
     }
+    app_store.app_data.displayMode = result.My_Result.be_listing_mode === 'grid' ? 'grid' : 'default';
     app_store.property = { ...result.My_Result };
     app_store.app_data.property_id = result.My_Result.id;
-    app_store.app_data.displayMode = result.My_Result.be_listing_mode === 'grid' ? 'grid':'default';
     if (initTheme) {
       this.colors.initTheme(result.My_Result);
       // app_store.app_data.displayMode = 'grid';

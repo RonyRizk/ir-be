@@ -1,3 +1,4 @@
+import localizedWords from '@/stores/localization.store';
 import { Component, Event, EventEmitter, Host, Prop, h } from '@stencil/core';
 
 @Component({
@@ -41,12 +42,16 @@ export class IrPagination {
 
     return (
       <Host>
-        <ir-button disabled={this.current === 1} onButtonClick={() => this.pageChange.emit(this.current - 1)} variants="outline" label="Previous" haveLeftIcon>
-          <ir-icons name="arrow_left" slot="left-icon" svgClassName="size-3"></ir-icons>
+        <ir-button
+          disabled={this.current === 1}
+          onButtonClick={() => this.pageChange.emit(this.current - 1)}
+          variants="outline"
+          label={localizedWords.entries.Lcz_Previous}
+          haveLeftIcon
+        >
+          <ir-icons class="ir-icons" name={localizedWords.direction === 'rtl' ? 'arrow_left' : 'arrow_left'} slot="left-icon" svgClassName="size-3"></ir-icons>
         </ir-button>
-        <p class="current-page-info">
-          Page {this.current} of {this.total}
-        </p>
+        <p class="current-page-info">{localizedWords.entries.Lcz_PageOf.replace('%1', this.current.toString()).replace('%2', this.total.toString())}</p>
         <ul>
           {pages.map(page =>
             typeof page === 'number' ? (
@@ -60,8 +65,14 @@ export class IrPagination {
             ),
           )}
         </ul>
-        <ir-button disabled={this.current === this.total} onButtonClick={() => this.pageChange.emit(this.current + 1)} variants="outline" label="Next" haveRightIcon>
-          <ir-icons name="arrow_right" slot="right-icon" svgClassName="size-3"></ir-icons>
+        <ir-button
+          disabled={this.current === this.total}
+          onButtonClick={() => this.pageChange.emit(this.current + 1)}
+          variants="outline"
+          label={localizedWords.entries.Lcz_Next}
+          haveRightIcon
+        >
+          <ir-icons class="ir-icons" name={'arrow_right'} slot="right-icon" svgClassName="size-3"></ir-icons>
         </ir-button>
       </Host>
     );

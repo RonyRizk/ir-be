@@ -8,6 +8,7 @@ import { cn, formatAmount, formatFullLocation, runScriptAndRemove } from '@/util
 import { differenceInCalendarDays, format } from 'date-fns';
 import app_store from '@/stores/app.store';
 import { PaymentService } from '@/services/api/payment.service';
+import localizedWords from '@/stores/localization.store';
 
 @Component({
   tag: 'ir-booking-overview',
@@ -268,12 +269,12 @@ export class IrBookingOverview {
               <table class="ir-table">
                 <thead>
                   <tr class="ir-table-header">
-                    <th class="ir-table-head">Status</th>
-                    <th class="ir-table-head">Booking reference</th>
-                    <th class="ir-table-head md:hidden lg:table-cell">Booking date</th>
-                    <th class="ir-table-head">Check-in</th>
-                    <th class="ir-table-head">Duration</th>
-                    <th class="ir-table-head">Total price</th>
+                    <th class="ir-table-head capitalize">{localizedWords.entries.Lcz_status}</th>
+                    <th class="ir-table-head">{localizedWords.entries.Lcz_BookingReference}</th>
+                    <th class="ir-table-head md:hidden lg:table-cell">{localizedWords.entries.Lcz_BookingDate}</th>
+                    <th class="ir-table-head">{localizedWords.entries.Lcz_CheckIn}</th>
+                    <th class="ir-table-head">{localizedWords.entries.Lcz_Duration}</th>
+                    <th class="ir-table-head">{localizedWords.entries.Lcz_Totalprice}</th>
                     <th class="ir-table-head sr-only">pay now</th>
                   </tr>
                 </thead>
@@ -374,7 +375,7 @@ export class IrBookingOverview {
                                     });
                                   }}
                                 >
-                                  Booking details
+                                  {localizedWords.entries.Lcz_BookingDetails}
                                 </button>
                               )
                             )}

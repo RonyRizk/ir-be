@@ -74,7 +74,7 @@ export class IrPropertyGallery {
           {renderRoomSize()}
           {showMoreTag && (
             <div class="flex items-center gap-1.5">
-              <span>More</span>
+              <span>{localizedWords.entries.Lcz_More}</span>
               <span>
                 <ir-icons name="arrow-up-right-from-square" svgClassName="size-3"></ir-icons>
               </span>
@@ -100,7 +100,7 @@ export class IrPropertyGallery {
         {renderRoomSize()}
         {showMoreTag && (
           <div class="flex items-center gap-1.5">
-            <span>More</span>
+            <span>{localizedWords.entries.Lcz_More}</span>
             <span>
               <ir-icons name="arrow-up-right-from-square" svgClassName="size-3"></ir-icons>
             </span>

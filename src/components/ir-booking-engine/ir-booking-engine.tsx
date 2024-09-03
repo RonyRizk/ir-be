@@ -4,16 +4,14 @@ import { Component, Listen, Prop, State, Watch, h } from '@stencil/core';
 import { format, Locale } from 'date-fns';
 import { ICurrency, IExposedLanguages } from '@/models/commun';
 import axios from 'axios';
-import { IExposedProperty, Variation } from '@/models/property';
-import booking_store, { modifyBookingStore, updateRoomParams } from '@/stores/booking';
+import { IExposedProperty } from '@/models/property';
+import booking_store, { modifyBookingStore } from '@/stores/booking';
 import app_store, { changeLocale, TSource, updateUserPreference } from '@/stores/app.store';
 import { checkAffiliate, checkGhs, getUserPrefernce, matchLocale, setDefaultLocale, validateAgentCode, validateCoupon } from '@/utils/utils';
 import Stack from '@/models/stack';
 import { v4 } from 'uuid';
 import { AvailabiltyService } from '@/services/app/availability.service';
 import { checkout_store } from '@/stores/checkout.store';
-// import { PaymentService } from '@/services/api/payment.service';
-// import { isRequestPending } from '@/stores/ir-interceptor.store';
 
 @Component({
   tag: 'ir-be',
@@ -34,7 +32,7 @@ export class IrBookingEngine {
   @Prop() checkin: string;
   @Prop() checkout: string;
   @Prop() language: string;
-  @Prop() adults: string;
+  @Prop() adults: string = '2';
   @Prop() child: string;
   @Prop() cur: string;
   @Prop() aff: string;
@@ -120,11 +118,11 @@ export class IrBookingEngine {
     }
   }
 
-  setSource(newSource: TSource) {
+  private setSource(newSource: TSource) {
     app_store.app_data = { ...app_store.app_data, source: newSource };
   }
 
-  modifyLanguage(code: string) {
+  private modifyLanguage(code: string) {
     if (!this.languages) {
       return;
     }
@@ -134,7 +132,7 @@ export class IrBookingEngine {
     });
   }
 
-  initializeApp() {
+  private initializeApp() {
     this.commonService.setToken(this.token);
     this.propertyService.setToken(this.token);
     app_store.app_data = {
@@ -153,7 +151,7 @@ export class IrBookingEngine {
     this.initRequest();
   }
 
-  async initRequest() {
+  private async initRequest() {
     this.isLoading = true;
     const p = JSON.parse(localStorage.getItem('user_preference'));
     let requests = [
@@ -191,7 +189,7 @@ export class IrBookingEngine {
     };
     this.isLoading = false;
   }
-  checkAndApplyDiscounts() {
+  private checkAndApplyDiscounts() {
     if (this.coupon) {
       validateCoupon(this.coupon);
     }
@@ -202,16 +200,16 @@ export class IrBookingEngine {
       validateAgentCode(this.agent_code);
     }
   }
-  handleVariationChange(e: CustomEvent, variations: Variation[], rateplanId: number, roomTypeId: number) {
-    e.stopImmediatePropagation();
-    e.stopPropagation();
-    const value = e.detail;
-    const selectedVariation = variations.find(variation => variation.adult_child_offering === value);
-    if (!selectedVariation) {
-      return;
-    }
-    updateRoomParams({ params: { selected_variation: { variation: selectedVariation, state: 'modified' } }, ratePlanId: rateplanId, roomTypeId });
-  }
+  // private handleVariationChange(e: CustomEvent, variations: Variation[], rateplanId: number, roomTypeId: number) {
+  //   e.stopImmediatePropagation();
+  //   e.stopPropagation();
+  //   const value = e.detail;
+  //   const selectedVariation = variations.find(variation => variation.adult_child_offering === value);
+  //   if (!selectedVariation) {
+  //     return;
+  //   }
+  //   updateRoomParams({ params: { selected_variation: { variation: selectedVariation, state: 'modified' } }, ratePlanId: rateplanId, roomTypeId });
+  // }
   private modifyLoyalty() {
     modifyBookingStore('bookingAvailabilityParams', {
       ...booking_store.bookingAvailabilityParams,
@@ -219,6 +217,7 @@ export class IrBookingEngine {
       loyalty: this.loyalty,
     });
   }
+
   @Listen('routing')
   handleNavigation(e: CustomEvent) {
     e.stopImmediatePropagation();
@@ -252,7 +251,7 @@ export class IrBookingEngine {
     }
   }
 
-  async resetBooking(resetType: 'partialReset' | 'completeReset' = 'completeReset') {
+  private async resetBooking(resetType: 'partialReset' | 'completeReset' = 'completeReset') {
     let queries = [];
     if (resetType === 'partialReset' && app_store.fetchedBooking) {
       queries.push(this.checkAvailability());
@@ -274,7 +273,7 @@ export class IrBookingEngine {
     await Promise.all(queries);
   }
 
-  async checkAvailability() {
+  private async checkAvailability() {
     this.identifier = v4();
     this.availabiltyService.initSocket(this.identifier);
     await this.propertyService.getExposedBookingAvailability({
@@ -299,7 +298,7 @@ export class IrBookingEngine {
     });
   }
 
-  renderScreens() {
+  private renderScreens() {
     switch (app_store.currentPage) {
       case 'booking':
         return <ir-booking-page adultCount={this.adults} childrenCount={this.child} fromDate={this.checkin} toDate={this.checkout}></ir-booking-page>;
@@ -365,26 +364,8 @@ export class IrBookingEngine {
     if (this.isLoading) {
       return <ir-home-loader></ir-home-loader>;
     }
-
     return (
       <main class="relative  flex w-full flex-col space-y-5 ">
-        {/* <ir-button
-          label="click"
-          isLoading={isRequestPending('/Get_Exposed_Applicable_Policies')}
-          onClick={async () => {
-            const paymentService = new PaymentService();
-            paymentService.setToken(app_store.app_data.token);
-            //   {
-            //     "booking_nbr": "67655772762",
-            //     "currency_id": 4,
-            //     "language": "en",
-            //     "property_id": 42,
-            //     "rate_plan_id": 3929,
-            //     "room_type_id": 2352
-            // }
-            await paymentService.fetchCancelationMessage({ id: 3929, roomTypeId: 2352, bookingNbr: '33168125670' });
-          }}
-        ></ir-button> */}
         <ir-interceptor></ir-interceptor>
         <section class={`${this.injected ? '' : 'sticky top-0 z-50'}  m-0 w-full p-0 `}>
           <ir-nav

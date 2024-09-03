@@ -10,6 +10,7 @@ import app_store from '@/stores/app.store';
 import booking_store, { IRatePlanSelection, validateBooking } from '@/stores/booking';
 import { checkout_store } from '@/stores/checkout.store';
 import { isRequestPending } from '@/stores/ir-interceptor.store';
+import localizedWords from '@/stores/localization.store';
 import { destroyBookingCookie, getDateDifference, runScriptAndRemove } from '@/utils/utils';
 import { ZCreditCardSchemaWithCvc } from '@/validators/checkout.validator';
 import { Component, Host, Listen, State, h, Event, EventEmitter } from '@stencil/core';
@@ -78,7 +79,17 @@ export class IrCheckoutPage {
         }),
       ),
     );
-    this.prepaymentAmount = requests.reduce((prev, curr) => prev + curr.amount, 0);
+    this.prepaymentAmount = requests.reduce((prev, curr) => {
+      let total = 1;
+      const roomtype = booking_store.ratePlanSelections[curr.room_type_id];
+      if (roomtype) {
+        const ratePlan = roomtype[curr.rate_plan_id];
+        if (ratePlan) {
+          total = ratePlan.reserved;
+        }
+      }
+      return (prev + curr.amount) * total;
+    }, 0);
     console.log(requests);
   }
   @Listen('bookingClicked')
@@ -302,7 +313,7 @@ export class IrCheckoutPage {
                 }}
                 iconName={app_store.dir === 'RTL' ? 'angle_right' : ('angle_left' as any)}
               ></ir-button>
-              <p class="text-2xl font-semibold">Complete your booking</p>
+              <p class="text-2xl font-semibold">{localizedWords.entries.Lcz_CompleteYourBooking}</p>
             </div>
             {!app_store.is_signed_in && !app_store.app_data.hideGoogleSignIn && (
               <div>

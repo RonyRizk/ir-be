@@ -118,7 +118,7 @@ export class IrNav {
     e.stopImmediatePropagation();
     e.stopPropagation();
     if (app_store.app_data.injected) {
-      return (window.location.href = `https://${app_store.property.perma_link}.bookingmystay.com/bookings`);
+      return (window.location.href = `https://${app_store.property.perma_link}.bookingmystay.com/signin`);
     }
     this.currentPage = 'auth';
     this.modalRef.openModal();
@@ -178,7 +178,7 @@ export class IrNav {
                         fill="currentColor"
                         d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"
                       />
-                      <title>Location</title>
+                      <title>{localizedWords.entries.Lcz_Location}</title>
                     </svg>
                   </button>
                 </div>
@@ -199,9 +199,9 @@ export class IrNav {
                 this.menuShown && (
                   <ir-menu
                     data={[
-                      { id: 1, item: 'My bookings' },
-                      { id: 3, item: 'Personal profile' },
-                      { id: 2, item: 'Sign out' },
+                      { id: 1, item: localizedWords.entries.Lcz_MyBookings },
+                      { id: 3, item: localizedWords.entries.Lcz_PersonalProfile },
+                      { id: 2, item: localizedWords.entries.Lcz_SignOut },
                     ]}
                     onMenuItemClick={this.handleItemSelect.bind(this)}
                   >
@@ -215,11 +215,11 @@ export class IrNav {
             <ul class={cn('ir-nav-links', { 'ir-nav-links-injected': isInjected })}>
               {!isInjected && currentPage !== 'checkout' && (
                 <li>
-                  <ir-button variants="ghost" haveLeftIcon title="home" onButtonClick={() => window.open(`https://${this.website}`, '_blank')}>
+                  <ir-button variants="ghost" haveLeftIcon title={localizedWords.entries.Lcz_Home} onButtonClick={() => window.open(`https://${this.website}`, '_blank')}>
                     <p slot="left-icon" class="sr-only">
                       home
                     </p>
-                    <ir-icons slot="left-icon" name="home" svgClassName="ir-icon-size"></ir-icons>
+                    <ir-icons slot="left-icon" name={'home'} svgClassName="ir-icon-size"></ir-icons>
                   </ir-button>
                 </li>
               )}
@@ -230,7 +230,7 @@ export class IrNav {
                     <div class={'flex items-center'}>
                       <p>{booking_store.bookingAvailabilityParams.agent_code}</p>
                       <button
-                        title="Clear"
+                        title={localizedWords.entries.Lcz_Clear}
                         class={'ir-language-trigger'}
                         onClick={() => {
                           this.bookingCodeRef.clearAgent();
@@ -259,9 +259,9 @@ export class IrNav {
                   <li>
                     <ir-menu
                       data={[
-                        { id: 1, item: 'My bookings' },
-                        { id: 3, item: 'Personal profile' },
-                        { id: 2, item: 'Sign out' },
+                        { id: 1, item: localizedWords.entries.Lcz_MyBookings },
+                        { id: 3, item: localizedWords.entries.Lcz_PersonalProfile },
+                        { id: 2, item: localizedWords.entries.Lcz_SignOut },
                       ]}
                       onMenuItemClick={this.handleItemSelect.bind(this)}
                     >
@@ -284,7 +284,7 @@ export class IrNav {
                   class="ir-sheet-button"
                   buttonClassName="justify-start"
                   variants="ghost"
-                  label="Home"
+                  label={localizedWords.entries.Lcz_Home}
                   name="home"
                 ></ir-button>
               </li>
@@ -328,7 +328,7 @@ export class IrNav {
                     <p class={'text-sm '}>{booking_store.bookingAvailabilityParams.agent_code}</p>
                     <div>
                       <button
-                        title="Clear"
+                        title={localizedWords.entries.Lcz_Clear}
                         class={'ir-language-trigger'}
                         onClick={() => {
                           this.bookingCodeRef.clearAgent();
