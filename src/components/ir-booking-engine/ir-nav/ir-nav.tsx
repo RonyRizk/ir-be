@@ -22,6 +22,7 @@ export class IrNav {
   @Prop() showBookingCode: boolean = true;
   @Prop() showCurrency: boolean = true;
   @Prop() menuShown: boolean = true;
+  @Prop() logoOnly: boolean = false;
 
   @Event() routing: EventEmitter<pages>;
   @Event({ bubbles: true, composed: true }) signOut: EventEmitter<null>;
@@ -168,76 +169,189 @@ export class IrNav {
                     class="ir-nav-logo"
                   ></img>
                 </a>
-                <div class="ir-nav-property-details">
-                  <h3 class="ir-property-name">{app_store.property?.name}</h3>
-                  <button onClick={() => this.handleButtonClick(undefined, 'map')} class="ir-property-location">
-                    {renderPropertyLocation()}
-                    <span class={'mx-1'}></span>
-                    <svg slot="btn-icon" xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 384 512">
-                      <path
-                        fill="currentColor"
-                        d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"
-                      />
-                      <title>{localizedWords.entries.Lcz_Location}</title>
-                    </svg>
-                  </button>
-                </div>
+                {!this.logoOnly && (
+                  <div class="ir-nav-property-details">
+                    <h3 class="ir-property-name">{app_store.property?.name}</h3>
+                    <button onClick={() => this.handleButtonClick(undefined, 'map')} class="ir-property-location">
+                      {renderPropertyLocation()}
+                      <span class={'mx-1'}></span>
+                      <svg slot="btn-icon" xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 384 512">
+                        <path
+                          fill="currentColor"
+                          d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"
+                        />
+                        <title>{localizedWords.entries.Lcz_Location}</title>
+                      </svg>
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
-            <div class={`ir-burger-menu ${isInjected ? 'ir-nav-injected' : ''}`}>
-              {!app_store.is_signed_in ? (
-                <Fragment>
-                  <div class="hidden md:block">
-                    <ir-button class="ir-sheet-button" variants="ghost" label="Sign in" name="auth" onButtonClick={this.handleSignIn.bind(this)}></ir-button>
-                  </div>
-                  <div class="md:hidden">
-                    <ir-button class="ir-sheet-button" variants="icon" iconName="circle-user" label="Sign in" name="auth" onButtonClick={this.handleSignIn.bind(this)}></ir-button>
-                  </div>
-                </Fragment>
-              ) : (
-                this.menuShown && (
-                  <ir-menu
-                    data={[
-                      { id: 1, item: localizedWords.entries.Lcz_MyBookings },
-                      { id: 3, item: localizedWords.entries.Lcz_PersonalProfile },
-                      { id: 2, item: localizedWords.entries.Lcz_SignOut },
-                    ]}
-                    onMenuItemClick={this.handleItemSelect.bind(this)}
-                  >
-                    <ir-user-avatar slot="menu-trigger"></ir-user-avatar>
-                  </ir-menu>
-                )
-              )}
-              {this.showBookingCode && this.showCurrency && <ir-button variants="icon" iconName="burger_menu" onClick={() => this.sheetRef.openSheet()}></ir-button>}
-            </div>
+            {!this.logoOnly && (
+              <div class={`ir-burger-menu ${isInjected ? 'ir-nav-injected' : ''}`}>
+                {!app_store.is_signed_in ? (
+                  <Fragment>
+                    <div class="hidden md:block">
+                      <ir-button class="ir-sheet-button" variants="ghost" label="Sign in" name="auth" onButtonClick={this.handleSignIn.bind(this)}></ir-button>
+                    </div>
+                    <div class="md:hidden">
+                      <ir-button
+                        class="ir-sheet-button"
+                        variants="icon"
+                        iconName="circle-user"
+                        label="Sign in"
+                        name="auth"
+                        onButtonClick={this.handleSignIn.bind(this)}
+                      ></ir-button>
+                    </div>
+                  </Fragment>
+                ) : (
+                  this.menuShown && (
+                    <ir-menu
+                      data={[
+                        { id: 1, item: localizedWords.entries.Lcz_MyBookings },
+                        { id: 3, item: localizedWords.entries.Lcz_PersonalProfile },
+                        { id: 2, item: localizedWords.entries.Lcz_SignOut },
+                      ]}
+                      onMenuItemClick={this.handleItemSelect.bind(this)}
+                    >
+                      <ir-user-avatar slot="menu-trigger"></ir-user-avatar>
+                    </ir-menu>
+                  )
+                )}
+                {this.showBookingCode && this.showCurrency && <ir-button variants="icon" iconName="burger_menu" onClick={() => this.sheetRef.openSheet()}></ir-button>}
+              </div>
+            )}
 
-            <ul class={cn('ir-nav-links', { 'ir-nav-links-injected': isInjected })}>
-              {!isInjected && currentPage !== 'checkout' && (
+            {!this.logoOnly && (
+              <ul class={cn('ir-nav-links', { 'ir-nav-links-injected': isInjected })}>
+                {!isInjected && currentPage !== 'checkout' && (
+                  <li>
+                    <ir-button variants="ghost" haveLeftIcon title={localizedWords.entries.Lcz_Home} onButtonClick={() => window.open(`https://${this.website}`, '_blank')}>
+                      <p slot="left-icon" class="sr-only">
+                        home
+                      </p>
+                      <ir-icons slot="left-icon" name={'home'} svgClassName="ir-icon-size"></ir-icons>
+                    </ir-button>
+                  </li>
+                )}
+
+                {this.showAgentCode() && (
+                  <li>
+                    {!!booking_store.bookingAvailabilityParams.agent ? (
+                      <div class={'flex items-center'}>
+                        <p>{booking_store.bookingAvailabilityParams.agent_code}</p>
+                        <button
+                          title={localizedWords.entries.Lcz_Clear}
+                          class={'ir-language-trigger'}
+                          onClick={() => {
+                            this.bookingCodeRef.clearAgent();
+                          }}
+                        >
+                          <ir-icons name="xmark"></ir-icons>
+                        </button>
+                      </div>
+                    ) : (
+                      <ir-button
+                        variants="ghost"
+                        label={localizedWords.entries.Lcz_BookingCode}
+                        name="booking_code"
+                        onButtonClick={e => this.handleButtonClick(e, 'booking_code')}
+                      ></ir-button>
+                    )}
+                  </li>
+                )}
+                {this.showCurrency && <li>{this.renderLanguageTrigger()}</li>}
+                {!app_store.is_signed_in ? (
+                  <li>
+                    <ir-button variants="ghost" label={localizedWords.entries.Lcz_SignIn} name="auth" onButtonClick={this.handleSignIn.bind(this)}></ir-button>
+                  </li>
+                ) : (
+                  this.menuShown && (
+                    <li>
+                      <ir-menu
+                        data={[
+                          { id: 1, item: localizedWords.entries.Lcz_MyBookings },
+                          { id: 3, item: localizedWords.entries.Lcz_PersonalProfile },
+                          { id: 2, item: localizedWords.entries.Lcz_SignOut },
+                        ]}
+                        onMenuItemClick={this.handleItemSelect.bind(this)}
+                      >
+                        <ir-user-avatar slot="menu-trigger"></ir-user-avatar>
+                      </ir-menu>
+                    </li>
+                  )
+                )}
+              </ul>
+            )}
+          </div>
+        </nav>
+
+        {!this.logoOnly && (
+          <ir-sheet ref={el => (this.sheetRef = el)}>
+            <ul slot="sheet-content" class="ir-sheet-content">
+              {/* <li>{this.renderLanguageTrigger()}</li> */}
+              {!isInjected && (
                 <li>
-                  <ir-button variants="ghost" haveLeftIcon title={localizedWords.entries.Lcz_Home} onButtonClick={() => window.open(`https://${this.website}`, '_blank')}>
-                    <p slot="left-icon" class="sr-only">
-                      home
-                    </p>
-                    <ir-icons slot="left-icon" name={'home'} svgClassName="ir-icon-size"></ir-icons>
-                  </ir-button>
+                  <ir-button
+                    onButtonClick={() => window.open(`https://${this.website}`)}
+                    class="ir-sheet-button"
+                    buttonClassName="justify-start"
+                    variants="ghost"
+                    label={localizedWords.entries.Lcz_Home}
+                    name="home"
+                  ></ir-button>
                 </li>
               )}
-
+              {!app_store.is_signed_in && (
+                <li>
+                  <ir-button
+                    buttonClassName="justify-start"
+                    class="ir-sheet-button"
+                    variants="ghost"
+                    label="Sign in"
+                    name="auth"
+                    onButtonClick={this.handleSignIn.bind(this)}
+                  ></ir-button>
+                </li>
+              )}
+              <li>
+                <ir-button
+                  class="ir-sheet-button"
+                  onButtonClick={() => this.handleButtonClick(undefined, 'language')}
+                  buttonClassName="justify-start"
+                  variants="ghost"
+                  label={this.preferences.currency}
+                  name="home"
+                ></ir-button>
+              </li>
+              <li>
+                <ir-button
+                  class="ir-sheet-button"
+                  onButtonClick={() => this.handleButtonClick(undefined, 'language')}
+                  buttonClassName="justify-start"
+                  variants="ghost"
+                  label={this.preferences.language}
+                  name="home"
+                ></ir-button>
+              </li>
               {this.showAgentCode() && (
                 <li>
                   {!!booking_store.bookingAvailabilityParams.agent ? (
-                    <div class={'flex items-center'}>
-                      <p>{booking_store.bookingAvailabilityParams.agent_code}</p>
-                      <button
-                        title={localizedWords.entries.Lcz_Clear}
-                        class={'ir-language-trigger'}
-                        onClick={() => {
-                          this.bookingCodeRef.clearAgent();
-                        }}
-                      >
-                        <ir-icons name="xmark"></ir-icons>
-                      </button>
+                    <div class={'booking-code flex items-center gap-1.5'}>
+                      <p class={'text-sm '}>{booking_store.bookingAvailabilityParams.agent_code}</p>
+                      <div>
+                        <button
+                          title={localizedWords.entries.Lcz_Clear}
+                          class={'ir-language-trigger'}
+                          onClick={() => {
+                            this.bookingCodeRef.clearAgent();
+                          }}
+                        >
+                          <ir-icons name="xmark"></ir-icons>
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <ir-button
@@ -249,107 +363,9 @@ export class IrNav {
                   )}
                 </li>
               )}
-              {this.showCurrency && <li>{this.renderLanguageTrigger()}</li>}
-              {!app_store.is_signed_in ? (
-                <li>
-                  <ir-button variants="ghost" label={localizedWords.entries.Lcz_SignIn} name="auth" onButtonClick={this.handleSignIn.bind(this)}></ir-button>
-                </li>
-              ) : (
-                this.menuShown && (
-                  <li>
-                    <ir-menu
-                      data={[
-                        { id: 1, item: localizedWords.entries.Lcz_MyBookings },
-                        { id: 3, item: localizedWords.entries.Lcz_PersonalProfile },
-                        { id: 2, item: localizedWords.entries.Lcz_SignOut },
-                      ]}
-                      onMenuItemClick={this.handleItemSelect.bind(this)}
-                    >
-                      <ir-user-avatar slot="menu-trigger"></ir-user-avatar>
-                    </ir-menu>
-                  </li>
-                )
-              )}
             </ul>
-          </div>
-        </nav>
-
-        <ir-sheet ref={el => (this.sheetRef = el)}>
-          <ul slot="sheet-content" class="ir-sheet-content">
-            {/* <li>{this.renderLanguageTrigger()}</li> */}
-            {!isInjected && (
-              <li>
-                <ir-button
-                  onButtonClick={() => window.open(`https://${this.website}`)}
-                  class="ir-sheet-button"
-                  buttonClassName="justify-start"
-                  variants="ghost"
-                  label={localizedWords.entries.Lcz_Home}
-                  name="home"
-                ></ir-button>
-              </li>
-            )}
-            {!app_store.is_signed_in && (
-              <li>
-                <ir-button
-                  buttonClassName="justify-start"
-                  class="ir-sheet-button"
-                  variants="ghost"
-                  label="Sign in"
-                  name="auth"
-                  onButtonClick={this.handleSignIn.bind(this)}
-                ></ir-button>
-              </li>
-            )}
-            <li>
-              <ir-button
-                class="ir-sheet-button"
-                onButtonClick={() => this.handleButtonClick(undefined, 'language')}
-                buttonClassName="justify-start"
-                variants="ghost"
-                label={this.preferences.currency}
-                name="home"
-              ></ir-button>
-            </li>
-            <li>
-              <ir-button
-                class="ir-sheet-button"
-                onButtonClick={() => this.handleButtonClick(undefined, 'language')}
-                buttonClassName="justify-start"
-                variants="ghost"
-                label={this.preferences.language}
-                name="home"
-              ></ir-button>
-            </li>
-            {this.showAgentCode() && (
-              <li>
-                {!!booking_store.bookingAvailabilityParams.agent ? (
-                  <div class={'booking-code flex items-center gap-1.5'}>
-                    <p class={'text-sm '}>{booking_store.bookingAvailabilityParams.agent_code}</p>
-                    <div>
-                      <button
-                        title={localizedWords.entries.Lcz_Clear}
-                        class={'ir-language-trigger'}
-                        onClick={() => {
-                          this.bookingCodeRef.clearAgent();
-                        }}
-                      >
-                        <ir-icons name="xmark"></ir-icons>
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <ir-button
-                    variants="ghost"
-                    label={localizedWords.entries.Lcz_BookingCode}
-                    name="booking_code"
-                    onButtonClick={e => this.handleButtonClick(e, 'booking_code')}
-                  ></ir-button>
-                )}
-              </li>
-            )}
-          </ul>
-        </ir-sheet>
+          </ir-sheet>
+        )}
         {!app_store.is_signed_in && <ir-modal ref={el => (this.modalRef = el)} style={{ '--ir-modal-max-width': '32rem' }}></ir-modal>}
         <ir-dialog ref={el => (this.dialogRef = el)} style={{ '--ir-dialog-max-width': this.currentPage === 'map' ? '80%' : '32rem' }}>
           {this.renderDialogBody()}

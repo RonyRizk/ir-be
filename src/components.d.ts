@@ -372,6 +372,7 @@ export namespace Components {
         "isBookingListing": boolean;
         "languages": IExposedLanguages[];
         "logo": string;
+        "logoOnly": boolean;
         "menuShown": boolean;
         "showBookingCode": boolean;
         "showCurrency": boolean;
@@ -2172,6 +2173,7 @@ declare namespace LocalJSX {
         "isBookingListing"?: boolean;
         "languages"?: IExposedLanguages[];
         "logo"?: string;
+        "logoOnly"?: boolean;
         "menuShown"?: boolean;
         "onRouting"?: (event: IrNavCustomEvent<pages>) => void;
         "onScreenChanged"?: (event: IrNavCustomEvent<pages>) => void;

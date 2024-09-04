@@ -80,10 +80,20 @@ export class IrBookingListing {
     this.currentPage = screen === 'booking-listing' ? 'bookings' : 'user-profile';
   }
 
+  private async fetchGuest() {
+    try {
+      this.isLoading = true;
+      await this.propertyService.getExposedGuest();
+    } catch (error) {
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
   async initializeApp() {
     try {
       this.isLoading = true;
-      let requests: any = [this.propertyService.getExposedGuest()];
+      let requests: any = [];
       if (!this.be) {
         requests = [
           ...requests,
@@ -97,6 +107,9 @@ export class IrBookingListing {
           }),
         ];
       }
+      if (this.token) {
+        requests = [...requests, this.propertyService.getExposedGuest()];
+      }
       await Promise.all(requests);
       this.isAffiliate = checkAffiliate(this.aff?.toLowerCase().trim()) !== null;
     } catch (error) {
@@ -106,8 +119,9 @@ export class IrBookingListing {
     }
   }
   initializeServices() {
-    this.propertyService.setToken(this.token);
-    this.commonService.setToken(this.token);
+    console.log(this.token);
+    this.propertyService.setToken(this.token ?? app_store.app_data.token);
+    this.commonService.setToken(this.token ?? app_store.app_data.token);
   }
   @Listen('authFinish')
   handleAuthFinish(e: CustomEvent) {
@@ -125,7 +139,7 @@ export class IrBookingListing {
       }
       this.token = token;
       this.initializeServices();
-      this.initializeApp();
+      this.fetchGuest();
     }
   }
   @Listen('signOut')
@@ -226,9 +240,34 @@ export class IrBookingListing {
     }
   }
   private renderAuthScreen() {
+    if (this.isLoading) {
+      return (
+        <main class="flex min-h-screen flex-col">
+          <div class="flex h-14 p-4">
+            <ir-skeleton class=" h-10 w-56 "></ir-skeleton>
+          </div>
+          <div class="mx-auto flex h-full w-full max-w-md flex-1 flex-col gap-4 px-4 py-4 ">
+            <ir-skeleton class="mb-2 h-6 w-56 self-center"></ir-skeleton>
+            <ir-skeleton class="h-12 w-full"></ir-skeleton>
+            <ir-skeleton class="h-12 w-full"></ir-skeleton>
+            <ir-skeleton class="h-10 w-full rounded-full"></ir-skeleton>
+          </div>
+        </main>
+      );
+    }
+
     return (
-      <main class="flex h-screen flex-col  justify-center">
-        <div class="mx-auto w-full max-w-md px-4">
+      <main class="flex min-h-screen flex-col">
+        <ir-nav
+          isBookingListing
+          showBookingCode={false}
+          showCurrency={false}
+          website={app_store.property?.space_theme.website}
+          logo={app_store.property?.space_theme?.logo}
+          menuShown={false}
+          logoOnly
+        ></ir-nav>
+        <div class="mx-auto flex h-full  w-full max-w-md flex-1 flex-col px-4 py-4 ">
           <ir-auth enableSignUp={false}></ir-auth>
         </div>
       </main>

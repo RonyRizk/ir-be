@@ -188,9 +188,10 @@ graph TD;
   ir-booking-listing --> ir-button
   ir-booking-listing --> ir-invoice
   ir-booking-listing --> ir-user-profile
+  ir-booking-listing --> ir-skeleton
+  ir-booking-listing --> ir-nav
   ir-booking-listing --> ir-auth
   ir-booking-listing --> ir-interceptor
-  ir-booking-listing --> ir-nav
   ir-booking-listing --> ir-footer
   ir-booking-overview --> ir-skeleton
   ir-booking-overview --> ir-booking-header

@@ -18,6 +18,7 @@
 ### Used by
 
  - [ir-booking-cancelation](../../ir-booking-cancelation)
+ - [ir-booking-listing](../../ir-booking-engine/ir-booking-listing)
  - [ir-booking-overview](../../ir-booking-engine/ir-booking-listing/ir-booking-overview)
  - [ir-home-loader](../../ir-home-loader)
  - [ir-invoice](../../ir-invoice)
@@ -27,6 +28,7 @@
 ```mermaid
 graph TD;
   ir-booking-cancelation --> ir-skeleton
+  ir-booking-listing --> ir-skeleton
   ir-booking-overview --> ir-skeleton
   ir-home-loader --> ir-skeleton
   ir-invoice --> ir-skeleton

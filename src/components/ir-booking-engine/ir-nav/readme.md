@@ -13,6 +13,7 @@
 | `isBookingListing` | `is-booking-listing` |             | `boolean`             | `false`     |
 | `languages`        | --                   |             | `IExposedLanguages[]` | `undefined` |
 | `logo`             | `logo`               |             | `string`              | `undefined` |
+| `logoOnly`         | `logo-only`          |             | `boolean`             | `false`     |
 | `menuShown`        | `menu-shown`         |             | `boolean`             | `true`      |
 | `showBookingCode`  | `show-booking-code`  |             | `boolean`             | `true`      |
 | `showCurrency`     | `show-currency`      |             | `boolean`             | `true`      |
