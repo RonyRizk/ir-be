@@ -42,6 +42,7 @@
 - [ir-auth](../ir-nav/ir-auth)
 - [ir-interceptor](../../ir-interceptor)
 - [ir-footer](../ir-footer)
+- [ir-privacy-policy](../ir-privacy-policy)
 
 ### Graph
 ```mermaid
@@ -55,6 +56,7 @@ graph TD;
   ir-booking-listing --> ir-auth
   ir-booking-listing --> ir-interceptor
   ir-booking-listing --> ir-footer
+  ir-booking-listing --> ir-privacy-policy
   ir-booking-overview --> ir-skeleton
   ir-booking-overview --> ir-booking-header
   ir-booking-overview --> ir-badge
@@ -76,6 +78,7 @@ graph TD;
   ir-invoice --> ir-icons
   ir-invoice --> ir-button
   ir-invoice --> ir-footer
+  ir-invoice --> ir-privacy-policy
   ir-invoice --> ir-booking-cancelation
   ir-invoice --> ir-skeleton
   ir-interceptor --> ir-alert-dialog
@@ -116,7 +119,6 @@ graph TD;
   ir-signup --> ir-button
   ir-dialog --> ir-button
   ir-footer --> ir-button
-  ir-footer --> ir-privacy-policy
   ir-footer --> ir-icons
   ir-footer --> ir-dialog
   ir-privacy-policy --> ir-button

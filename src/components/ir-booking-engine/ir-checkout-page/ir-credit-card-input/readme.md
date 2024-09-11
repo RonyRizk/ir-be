@@ -14,9 +14,9 @@
 
 ## Events
 
-| Event              | Description | Type                  |
-| ------------------ | ----------- | --------------------- |
-| `creditCardChange` |             | `CustomEvent<string>` |
+| Event              | Description | Type                                                                                |
+| ------------------ | ----------- | ----------------------------------------------------------------------------------- |
+| `creditCardChange` |             | `CustomEvent<{ value: string; cardType: "" \| "AMEX" \| "VISA" \| "Mastercard"; }>` |
 
 
 ## Dependencies
