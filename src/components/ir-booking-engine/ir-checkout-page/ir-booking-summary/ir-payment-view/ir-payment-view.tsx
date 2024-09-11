@@ -13,6 +13,7 @@ import { ZodIssue } from 'zod';
 export class IrPaymentView {
   @Prop() errors: Record<string, ZodIssue>;
   @State() selectedPaymentMethod: string;
+  @State() cardType: string = '';
 
   componentWillLoad() {
     this.selectedPaymentMethod = app_store.property?.allowed_payment_methods[0].code;
@@ -88,7 +89,9 @@ export class IrPaymentView {
             <ir-credit-card-input
               data-state={this.errors?.cardNumber ? 'error' : ''}
               onCreditCardChange={e => {
-                checkout_store.payment = { ...checkout_store.payment, cardNumber: e.detail } as ICardProcessingWithoutCVC | ICardProcessingWithCVC;
+                const { cardType, value } = e.detail;
+                this.cardType = cardType;
+                checkout_store.payment = { ...checkout_store.payment, cardNumber: value } as ICardProcessingWithoutCVC | ICardProcessingWithCVC;
               }}
             ></ir-credit-card-input>
             <div class="flex flex-col gap-2.5 sm:flex-row sm:items-center">
@@ -215,7 +218,7 @@ export class IrPaymentView {
           label={localizedWords.entries.Lcz_SelectYourPaymentMethod}
           data={app_store.property?.allowed_payment_methods.map(apm => ({
             id: apm.code,
-            value: apm.is_payment_gateway ? `Card payment with ${apm.description}` : apm.description,
+            value: apm.is_payment_gateway ? `${localizedWords.entries.Lcz_CardPaymentWith} ${apm.description}` : apm.description,
           }))}
           onValueChange={this.handlePaymentSelectionChange.bind(this)}
         ></ir-select>
@@ -223,7 +226,7 @@ export class IrPaymentView {
     }
     const paymentOption = app_store.property.allowed_payment_methods[0];
     if (paymentOption.is_payment_gateway) {
-      return <p class="text-center">Card payment with {paymentOption.description} </p>;
+      return <p class="text-center">{paymentOption.description} </p>;
     }
     return null;
   }
@@ -233,6 +236,12 @@ export class IrPaymentView {
       <div class="w-full space-y-4 rounded-md border border-solid bg-white  p-4">
         {this.renderPaymentOptions()}
         {this.renderPaymentMethod()}
+        {this.cardType !== '' && !app_store.property.allowed_cards.find(c => c.name.toLowerCase().includes(this.cardType?.toLowerCase())) && (
+          <p class={'text-red-500'}>
+            {localizedWords.entries.Lcz_CardTypeNotSupport}:{' '}
+            {app_store.property?.allowed_cards?.map((c, i) => `${c.name}${i < app_store.property?.allowed_cards.length - 1 ? ', ' : ''}`)}
+          </p>
+        )}
       </div>
     );
   }

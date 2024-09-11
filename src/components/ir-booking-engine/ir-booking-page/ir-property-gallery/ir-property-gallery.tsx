@@ -66,7 +66,7 @@ export class IrPropertyGallery {
 
     if (maxNumber > 4) {
       return (
-        <div class="capacity-container pointer-events-none absolute -bottom-0 z-40 flex w-full items-center justify-between bg-white/80 px-2 py-1 pb-2 text-sm">
+        <div class="capacity-container pointer-events-none absolute -bottom-0 z-10 flex w-full items-center justify-between bg-white/80 px-2 py-1 pb-2 text-sm">
           <div class="flex items-center gap-2">
             <p>{localizedWords.entries.Lcz_Maximum}</p>
             {renderOccupancy()}
@@ -74,7 +74,7 @@ export class IrPropertyGallery {
           {renderRoomSize()}
           {showMoreTag && (
             <div class="flex items-center gap-1.5">
-              <span>{localizedWords.entries.Lcz_More}</span>
+              <span>{localizedWords.entries.Lcz_MoreDetails}</span>
               <span>
                 <ir-icons name="arrow-up-right-from-square" svgClassName="size-3"></ir-icons>
               </span>
@@ -85,7 +85,7 @@ export class IrPropertyGallery {
     }
 
     return (
-      <div class="capacity-container pointer-events-none absolute -bottom-0 z-40 flex w-full items-center justify-between bg-white/80 px-2 py-1 pb-2 text-sm">
+      <div class="capacity-container pointer-events-none absolute -bottom-0 z-10 flex w-full items-center justify-between bg-white/80 px-2 py-1 pb-2 text-sm">
         <div class="flex items-center gap-2">
           <p>{localizedWords.entries.Lcz_Maximum}</p>
           <div class="flex items-center">
@@ -100,7 +100,7 @@ export class IrPropertyGallery {
         {renderRoomSize()}
         {showMoreTag && (
           <div class="flex items-center gap-1.5">
-            <span>{localizedWords.entries.Lcz_More}</span>
+            <span>{localizedWords.entries.Lcz_MoreDetails}</span>
             <span>
               <ir-icons name="arrow-up-right-from-square" svgClassName="size-3"></ir-icons>
             </span>

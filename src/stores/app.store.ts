@@ -26,6 +26,7 @@ export interface IAppStore {
   selectedLocale: Locale;
   userPreferences: UserPreference;
   app_data: {
+    override_rp?: boolean;
     token: string;
     property_id: number;
     injected: boolean;
@@ -38,6 +39,8 @@ export interface IAppStore {
     stag: string | null;
     displayMode: 'default' | 'grid';
     isAgentMode?: boolean;
+    aName: string;
+    perma_link: string;
   };
   property: IExposedProperty;
   setup_entries: {
@@ -68,6 +71,7 @@ const initialState: IAppStore = {
   },
   invoice: null,
   app_data: {
+    override_rp: false,
     displayMode: 'default',
     affiliate: null,
     stag: null,
@@ -80,6 +84,8 @@ const initialState: IAppStore = {
     hideGoogleSignIn: false,
     isFromGhs: false,
     isAgentMode: false,
+    aName: null,
+    perma_link: null,
   },
   property: undefined,
   setup_entries: undefined,

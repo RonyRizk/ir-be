@@ -67,12 +67,14 @@ export class IrAdultChildCounter {
                 <span class={'lowercase'}>
                   {this.adultCount} {this.adultCount === 1 ? localizedWords.entries.Lcz_Adult : localizedWords.entries.Lcz_Adults}
                 </span>
-                <span class={'lowercase'}>
-                  , {this.childrenCount} {this.childrenCount === 1 ? localizedWords.entries.Lcz_Child : localizedWords.entries.Lcz_Children}
-                </span>
+                {this.childMaxAge > 0 && (
+                  <span class={'lowercase'}>
+                    , {this.childrenCount} {this.childrenCount === 1 ? localizedWords.entries.Lcz_Child : localizedWords.entries.Lcz_Children}
+                  </span>
+                )}
               </Fragment>
             ) : (
-              <span class="">{localizedWords.entries.Lcz_Select}</span>
+              <span class="">{localizedWords.entries.Lcz_Select}...</span>
             )}
           </p>
         </div>
@@ -138,7 +140,7 @@ export class IrAdultChildCounter {
               <div>
                 <p class="main-text">{localizedWords.entries.Lcz_Children}</p>
                 <p class="secondary-text">
-                  {localizedWords.entries.Lcz_Ages} 1-{this.childMaxAge}
+                  {localizedWords.entries.Lcz_Age} 1-{this.childMaxAge}
                 </p>
               </div>
               <div class="counter-buttons-group" role="group">

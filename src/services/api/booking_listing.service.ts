@@ -2,7 +2,7 @@ import { MissingTokenError, Token } from '@/models/Token';
 import axios from 'axios';
 
 export class BookingListingService extends Token {
-  public async getExposedGuestBookings(params: { property_id: string | number; start_row: number; end_row: number; total_count: number }) {
+  public async getExposedGuestBookings(params: { property_id: string | number; start_row: number; end_row: number; total_count: number; language: string }) {
     const token = this.getToken();
     if (!token) {
       throw new MissingTokenError();

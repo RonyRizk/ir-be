@@ -38,6 +38,7 @@ export class IrBookingListing {
 
   private commonService = new CommonService();
   private propertyService = new PropertyService();
+  private privacyPolicyRef: HTMLIrPrivacyPolicyElement;
 
   async componentWillLoad() {
     axios.defaults.baseURL = this.baseUrl;
@@ -79,7 +80,6 @@ export class IrBookingListing {
     }
     this.currentPage = screen === 'booking-listing' ? 'bookings' : 'user-profile';
   }
-
   private async fetchGuest() {
     try {
       this.isLoading = true;
@@ -94,6 +94,9 @@ export class IrBookingListing {
     try {
       this.isLoading = true;
       let requests: any = [];
+      app_store.app_data.aName = this.aName;
+      app_store.app_data.perma_link = this.perma_link;
+      app_store.app_data.property_id = this.propertyid;
       if (!this.be) {
         requests = [
           ...requests,
@@ -158,7 +161,14 @@ export class IrBookingListing {
     this.currentPage = route;
     this.selectedBooking = params.booking ? { email: params?.booking.guest.email, booking_nbr: params.booking.booking_nbr } : null;
   }
-
+  @Listen('openPrivacyPolicy')
+  async openPrivacyPolicy(e: CustomEvent) {
+    e.stopImmediatePropagation();
+    e.stopPropagation();
+    if (this.privacyPolicyRef) {
+      this.privacyPolicyRef.openModal();
+    }
+  }
   private renderPages() {
     switch (this.currentPage) {
       case 'bookings':
@@ -299,6 +309,7 @@ export class IrBookingListing {
         )}
         <div class={`mx-auto max-w-6xl `}>{this.renderPages()}</div>
         {this.footerShown && <ir-footer version={this.version}></ir-footer>}
+        {this.footerShown && <ir-privacy-policy hideTrigger ref={el => (this.privacyPolicyRef = el)}></ir-privacy-policy>}
       </Fragment>
     );
   }

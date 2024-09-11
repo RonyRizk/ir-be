@@ -25,8 +25,8 @@ export class IrUserForm {
   render() {
     if (!app_store.setup_entries) {
       return (
-        <div>
-          <p>Loading</p>
+        <div class={'flex h-72 flex-col'}>
+          <ir-checkout-skeleton></ir-checkout-skeleton>
         </div>
       );
     }
@@ -144,7 +144,7 @@ export class IrUserForm {
                 onValueChange={e => updateUserFormData('arrival_time', e.detail)}
                 data={app_store.setup_entries.arrivalTime.map(entry => ({
                   id: entry.CODE_NAME,
-                  value: entry.CODE_VALUE_EN,
+                  value: entry[`CODE_VALUE_${app_store.userPreferences.language_id.toUpperCase()}`],
                 }))}
                 class="user-form-input"
               ></ir-select>

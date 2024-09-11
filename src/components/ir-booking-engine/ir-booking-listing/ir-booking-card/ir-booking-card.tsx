@@ -4,6 +4,7 @@ import localizedWords from '@/stores/localization.store';
 import { formatAmount, formatFullLocation } from '@/utils/utils';
 import { Component, Event, EventEmitter, Prop, Watch, h } from '@stencil/core';
 import { differenceInCalendarDays, format } from 'date-fns';
+import localization_store from '@/stores/app.store';
 
 @Component({
   tag: 'ir-booking-card',
@@ -62,15 +63,15 @@ export class IrBookingCard {
         </div>
         <p>
           <span class="font-medium">{localizedWords.entries.Lcz_BookedOn}: </span>
-          {format(new Date(this.booking.booked_on.date), 'dd-MMM-yyyy')}
+          {format(new Date(this.booking.booked_on.date), 'dd-MMM-yyyy', { locale: localization_store.selectedLocale })}
         </p>
         <p>
           <span class="font-medium">{localizedWords.entries.Lcz_CheckIn}: </span>
-          {format(new Date(this.booking.from_date), 'EEE, dd MMM yyyy')}
+          {format(new Date(this.booking.from_date), 'EEE, dd MMM yyyy', { locale: localization_store.selectedLocale })}
         </p>
         <p>
-          <span class="font-medium">{localizedWords.entries.Lcz_Duration}: </span>
-          {this.totalNights} {this.totalNights > 1 ? 'nights' : 'night'}
+          <span class="font-medium lowercase">{localizedWords.entries.Lcz_Duration}: </span>
+          {this.totalNights} {this.totalNights > 1 ? localizedWords.entries.Lcz_Nights : localizedWords.entries.Lcz_night}
         </p>
         <p class="flex items-center">
           {<ir-badge backgroundShown={false} label={this.booking.status.description} variant={this.getBadgeVariant(this.booking.status.code)}></ir-badge>}

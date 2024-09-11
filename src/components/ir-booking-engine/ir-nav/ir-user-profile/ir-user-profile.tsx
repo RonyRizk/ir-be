@@ -129,7 +129,7 @@ export class IrUserProfile {
               }}
             ></ir-input>
             <ir-input
-              label={localizedWords.entries.Lcz_Email}
+              label={localizedWords.entries.Lcz_EmailAddress}
               placeholder=""
               value={this.user.email}
               onInputBlur={e => {

@@ -51,7 +51,7 @@ export class IrPagination {
         >
           <ir-icons class="ir-icons" name={localizedWords.direction === 'rtl' ? 'arrow_left' : 'arrow_left'} slot="left-icon" svgClassName="size-3"></ir-icons>
         </ir-button>
-        <p class="current-page-info">{localizedWords.entries.Lcz_PageOf.replace('%1', this.current.toString()).replace('%2', this.total.toString())}</p>
+        {/* <p class="current-page-info">{localizedWords.entries.Lcz_PageOf.replace('%1', this.current.toString()).replace('%2', this.total.toString())}</p> */}
         <ul>
           {pages.map(page =>
             typeof page === 'number' ? (

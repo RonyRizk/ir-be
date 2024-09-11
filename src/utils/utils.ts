@@ -216,11 +216,11 @@ export function validateAgentCode(code: string) {
 export function renderPropertyLocation() {
   const affiliate = app_store.app_data.affiliate;
   if (affiliate) {
-    return [app_store.app_data.affiliate?.address ?? null, app_store.app_data.affiliate.city ?? null, app_store.app_data.affiliate.country.name ?? null]
+    return [app_store.app_data.affiliate?.address || null, app_store.app_data.affiliate.city || null, app_store.app_data.affiliate.country.name || null]
       .filter(f => f !== null)
       .join(', ');
   }
-  return [app_store.property?.area ?? null, app_store.property?.city.name ?? null, app_store.property?.country.name ?? null].filter(f => f !== null).join(', ');
+  return [app_store.property?.area || null, app_store.property?.city.name || null, app_store.property?.country.name || null].filter(f => f !== null).join(', ');
 }
 function setBookingCookie() {
   const cookieName = 'ghs_booking';
@@ -246,4 +246,16 @@ export function checkGhs(source_code: string, stag: string) {
     return true;
   }
   return false;
+}
+export function detectCardType(value: string) {
+  const startsWith = (prefixes: string[]) => prefixes.some(prefix => value.startsWith(prefix));
+  if (startsWith(['4'])) {
+    return 'VISA';
+  } else if (startsWith(['5', '2'])) {
+    return 'Mastercard';
+  } else if (startsWith(['34', '37'])) {
+    return 'AMEX';
+  } else {
+    return '';
+  }
 }

@@ -21,7 +21,7 @@ export class IrCouponDialog {
   activateCoupon() {
     this.validationMessage = null;
     if (!validateCoupon(this.coupon)) {
-      return (this.validationMessage = { error: true, message: 'Invalid coupon' });
+      return (this.validationMessage = { error: true, message: localizedWords.entries.Lcz_InvalidAgentCode });
     }
     this.isValid = true;
     this.validationMessage = { error: false, message: this.coupon };

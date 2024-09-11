@@ -142,9 +142,11 @@ export class IrBookingWidget {
               <span class="lowercase">
                 {adultCount} {adultCount === 1 ? localizedWords.entries.Lcz_Adult : localizedWords.entries.Lcz_Adults}
               </span>
-              <span class="lowercase">
-                , {childrenCount} {childrenCount === 1 ? localizedWords.entries.Lcz_Child : localizedWords.entries.Lcz_Children}
-              </span>
+              {app_store.property.adult_child_constraints.child_max_age > 0 && (
+                <span class="lowercase">
+                  , {childrenCount} {childrenCount === 1 ? localizedWords.entries.Lcz_Child : localizedWords.entries.Lcz_Children}
+                </span>
+              )}
             </Fragment>
           ) : (
             <span>Guests</span>

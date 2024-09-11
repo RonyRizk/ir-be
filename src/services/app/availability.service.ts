@@ -23,6 +23,7 @@ interface IPAYLOAD {
   IS_CALCULATED: boolean;
   IS_MLS_VIOLATED: boolean;
   MLS_ALERT: string | null;
+  MLS_ALERT_VALUE: string | null;
 }
 
 class SocketManager {
@@ -205,7 +206,7 @@ export class AvailabiltyService {
         }
         let rateplan = roomType.rateplans[selectedRatePlanIndex];
         let oldVariation = rateplan.variations || [];
-
+        console.log(payload);
         const variation = {
           adult_child_offering: payload.ADULT_CHILD_OFFERING,
           adult_nbr: Number(payload.ADULTS_NBR ?? 0),
@@ -213,7 +214,7 @@ export class AvailabiltyService {
             const amount = this.validateNumberString((payload.ALLOT_RATE_V ?? 0)?.toString()) ?? 0;
             return amount === 0 ? null : amount;
           })(),
-          amount_gross:(() => {
+          amount_gross: (() => {
             const amount = this.validateNumberString((payload.ALLOT_RATE_V_GROSS ?? 0)?.toString()) ?? 0;
             return amount === 0 ? null : amount;
           })(),
@@ -226,6 +227,7 @@ export class AvailabiltyService {
           is_calculated: payload.IS_CALCULATED,
           MLS_ALERT: payload.MLS_ALERT,
           IS_MLS_VIOLATED: payload.IS_MLS_VIOLATED,
+          MLS_ALERT_VALUE: payload.MLS_ALERT_VALUE,
         };
         const variationIndex = oldVariation.findIndex(v => v.adult_child_offering === payload.ADULT_CHILD_OFFERING);
 

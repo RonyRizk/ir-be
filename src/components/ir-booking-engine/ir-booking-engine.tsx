@@ -59,6 +59,7 @@ export class IrBookingEngine {
   private propertyService = new PropertyService();
   private availabiltyService = new AvailabiltyService();
   private identifier: string;
+  private privacyPolicyRef: HTMLIrPrivacyPolicyElement;
 
   async componentWillLoad() {
     axios.defaults.withCredentials = true;
@@ -136,6 +137,8 @@ export class IrBookingEngine {
     this.commonService.setToken(this.token);
     this.propertyService.setToken(this.token);
     app_store.app_data = {
+      aName: this.p,
+      perma_link: this.perma_link,
       displayMode: 'default',
       isFromGhs: checkGhs(this.source?.code, this.stag),
       token: this.token,
@@ -229,6 +232,12 @@ export class IrBookingEngine {
     e.stopImmediatePropagation();
     e.stopPropagation();
     await this.resetBooking(e.detail ?? 'completeReset');
+  }
+  @Listen('openPrivacyPolicy')
+  async openPrivacyPolicy(e: CustomEvent) {
+    e.stopImmediatePropagation();
+    e.stopPropagation();
+    this.privacyPolicyRef.openModal();
   }
   @Listen('authStatus')
   handleAuthFinish(e: CustomEvent) {
@@ -367,7 +376,7 @@ export class IrBookingEngine {
     return (
       <main class="relative  flex w-full flex-col space-y-5 ">
         <ir-interceptor></ir-interceptor>
-        <section class={`${this.injected ? '' : 'sticky top-0 z-50'}  m-0 w-full p-0 `}>
+        <section class={`${this.injected ? '' : 'sticky top-0 z-20'}  m-0 w-full p-0 `}>
           <ir-nav
             class={'m-0 p-0'}
             website={app_store.property?.space_theme.website}
@@ -379,6 +388,7 @@ export class IrBookingEngine {
         <section class="flex-1 px-4 lg:px-6">
           <div class="mx-auto max-w-6xl">{this.renderScreens()}</div>
         </section>
+        <ir-privacy-policy ref={el => (this.privacyPolicyRef = el)} hideTrigger={true}></ir-privacy-policy>
         {!this.injected && <ir-footer version={this.version}></ir-footer>}
       </main>
     );

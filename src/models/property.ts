@@ -357,6 +357,7 @@ export interface Variation {
   IS_MLS_VIOLATED?: boolean;
   MLS_ALERT?: string;
   amount_gross: number;
+  MLS_ALERT_VALUE: string | null;
 }
 export interface Assignableunit {
   Is_Fully_Available: boolean;

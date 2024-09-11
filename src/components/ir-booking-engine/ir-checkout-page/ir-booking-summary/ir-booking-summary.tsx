@@ -7,7 +7,7 @@ import localizedWords from '@/stores/localization.store';
 import { formatAmount, getDateDifference } from '@/utils/utils';
 import { Component, Host, h, Event, EventEmitter, Prop } from '@stencil/core';
 import { format } from 'date-fns';
-
+import localization_store from '@/stores/app.store';
 @Component({
   tag: 'ir-booking-summary',
   styleUrl: 'ir-booking-summary.css',
@@ -18,6 +18,8 @@ export class IrBookingSummary {
 
   @Event() routing: EventEmitter<pages>;
   @Event() bookingClicked: EventEmitter<null>;
+  @Event() openPrivacyPolicy: EventEmitter<null>;
+
   @Prop() error: CheckoutErrors;
   handleBooking() {
     this.bookingClicked.emit(null);
@@ -48,7 +50,9 @@ export class IrBookingSummary {
               <div class="w-56 rounded-md border border-gray-300 bg-white p-2 text-center text-xs">
                 <p>{localizedWords.entries.Lcz_CheckIn}</p>
                 <p class="text-sm font-semibold">
-                  {format(booking_store.bookingAvailabilityParams?.from_date ? new Date(booking_store.bookingAvailabilityParams?.from_date) : new Date(), 'eee, dd MMM yyyy')}
+                  {format(booking_store.bookingAvailabilityParams?.from_date ? new Date(booking_store.bookingAvailabilityParams?.from_date) : new Date(), 'eee, dd MMM yyyy', {
+                    locale: localization_store.selectedLocale,
+                  })}
                 </p>
                 <p>
                   {localizedWords.entries.Lcz_From} {app_store.property?.time_constraints.check_in_from}
@@ -58,7 +62,9 @@ export class IrBookingSummary {
               <div class="w-56 rounded-md border border-gray-300 bg-white p-2 text-center text-xs">
                 <p>{localizedWords.entries.Lcz_CheckOut}</p>
                 <p class="text-sm font-semibold">
-                  {format(booking_store.bookingAvailabilityParams?.to_date ? new Date(booking_store.bookingAvailabilityParams?.to_date) : new Date(), 'eee, dd MMM yyyy')}
+                  {format(booking_store.bookingAvailabilityParams?.to_date ? new Date(booking_store.bookingAvailabilityParams?.to_date) : new Date(), 'eee, dd MMM yyyy', {
+                    locale: localization_store.selectedLocale,
+                  })}
                 </p>
                 <p>
                   {localizedWords.entries.Lcz_Before} {app_store.property?.time_constraints.check_out_till}
@@ -103,7 +109,16 @@ export class IrBookingSummary {
                   checked={checkout_store.agreed_to_services}
                   onCheckChange={e => (checkout_store.agreed_to_services = e.detail)}
                 ></ir-checkbox>
-                <ir-privacy-policy label="privacy policy." policyTriggerStyle={{ color: 'inherit', textDecoration: 'underline' }} id="checkout-policy"></ir-privacy-policy>
+
+                {/* <ir-privacy-policy
+                  class=" flex-1"
+                  label={`${localizedWords.entries.Lcz_PrivacyPolicy}.`}
+                  policyTriggerStyle={{ color: 'inherit', textDecoration: 'underline' }}
+                  id="checkout-policy"
+                ></ir-privacy-policy> */}
+                <span class={'flex-1 cursor-pointer underline'} onClick={() => this.openPrivacyPolicy.emit(null)}>
+                  {localizedWords.entries.Lcz_PrivacyPolicy}
+                </span>
               </div>
               {this.error?.cause === 'booking-summary' && !checkout_store.agreed_to_services && (
                 <p class="text-sm text-red-500">{localizedWords.entries.Lcz_YouMustAcceptPrivacyPolicy}//you must first</p>

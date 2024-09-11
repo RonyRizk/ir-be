@@ -1,5 +1,6 @@
 import { ICurrency, IExposedLanguages } from '@/models/commun';
 import app_store, { changeLocale, onAppDataChange, updateUserPreference } from '@/stores/app.store';
+import localizedWords from '@/stores/localization.store';
 import { cn, matchLocale } from '@/utils/utils';
 import { Component, h, Event, EventEmitter, Prop, State } from '@stencil/core';
 
@@ -17,6 +18,7 @@ export class IrLanguagePicker {
 
   @Event() closeDialog: EventEmitter<null>;
   @Event() resetBooking: EventEmitter<null>;
+  @Event() languageChanged: EventEmitter<string>;
 
   private langEl: HTMLButtonElement[] = [];
   private selectedIndex: number = 0;
@@ -38,7 +40,6 @@ export class IrLanguagePicker {
 
   init() {
     if (this.languages && this.currencies) {
-      console.log(this.languages, this.currencies);
       this.selectedLanguage = this.languages?.find(l => l.code.toLowerCase() === app_store.userPreferences.language_id.toLowerCase());
       this.selectedCurrency = this.currencies?.find(c => c.code.toLowerCase() === app_store.userPreferences.currency_id.toLowerCase());
     }
@@ -77,6 +78,7 @@ export class IrLanguagePicker {
         direction: this.selectedLanguage.direction,
       }),
     );
+    this.languageChanged.emit(this.selectedLanguage.code);
     if (app_store.currentPage === 'checkout') {
       this.resetBooking.emit(null);
     }
@@ -120,7 +122,7 @@ export class IrLanguagePicker {
   render() {
     return (
       <div class="picker-container">
-        <p class="picker-title">Display settings</p>
+        <p class="picker-title">{localizedWords.entries.Lcz_DisplaSettings}</p>
         <div role="radiogroup" aria-required="false" aria-label="booking engine language" onKeyDown={e => this.handleKeyDown(e)} class="language-grid" tabIndex={0}>
           {this.languages.map((language, i) => (
             <button
@@ -147,7 +149,7 @@ export class IrLanguagePicker {
           variant="double-line"
           value={this.selectedCurrency?.code}
           onValueChange={this.handleCurrencyChange.bind(this)}
-          label="Currency"
+          label={localizedWords.entries.Lcz_Currency}
           select_id="currency_selector"
           data={this.currencies.map(currency => ({
             id: currency.code,
@@ -155,8 +157,8 @@ export class IrLanguagePicker {
           }))}
         ></ir-select>
         <div class="actions-container">
-          <ir-button size="md" label="Confirm" class="confirm-button" onClick={this.handleConfirm.bind(this)}></ir-button>
-          <ir-button onButtonClick={() => this.closeDialog.emit(null)} size="md" label="Cancel" variants="outline" class="cancel-button"></ir-button>
+          <ir-button size="md" label={localizedWords.entries['Lcz_Confirm']} class="confirm-button" onClick={this.handleConfirm.bind(this)}></ir-button>
+          <ir-button onButtonClick={() => this.closeDialog.emit(null)} size="md" label={localizedWords.entries.Lcz_Cancel} variants="outline" class="cancel-button"></ir-button>
         </div>
       </div>
     );

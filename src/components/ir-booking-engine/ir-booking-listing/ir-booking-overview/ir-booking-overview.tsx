@@ -9,7 +9,7 @@ import { differenceInCalendarDays, format } from 'date-fns';
 import app_store from '@/stores/app.store';
 import { PaymentService } from '@/services/api/payment.service';
 import localizedWords from '@/stores/localization.store';
-
+import localization_store from '@/stores/app.store';
 @Component({
   tag: 'ir-booking-overview',
   styleUrl: 'ir-booking-overview.css',
@@ -88,7 +88,13 @@ export class IrBookingOverview {
       this.isLoading = true;
       const start_row = (this.currentPage - 1) * this.maxPages;
       const end_row = start_row + this.maxPages;
-      const { bookings, total_count } = await this.bookingListingService.getExposedGuestBookings({ property_id: this.propertyid, start_row, end_row, total_count: 0 });
+      const { bookings, total_count } = await this.bookingListingService.getExposedGuestBookings({
+        property_id: this.propertyid,
+        start_row,
+        end_row,
+        total_count: 0,
+        language: app_store.userPreferences.language_id,
+      });
       this.total_count = total_count;
       const newIds = {};
       bookings.forEach(b => {
@@ -148,6 +154,22 @@ export class IrBookingOverview {
         this.bookings = [this.booking];
       }
     }
+  }
+  @Listen('languageChanged', { target: 'body' })
+  async handleLanguageChanged(e: CustomEvent) {
+    e.stopImmediatePropagation();
+    e.stopPropagation();
+    const [bookings] = await Promise.all([
+      this.getBookings(),
+      this.commonService.getExposedLanguage(),
+      this.propertyService.getExposedProperty({
+        id: app_store.app_data.property_id,
+        language: e.detail,
+        aname: app_store.app_data.aName,
+        perma_link: app_store.app_data.perma_link,
+      }),
+    ]);
+    this.bookings = bookings;
   }
   async fetchCancelationMessage(id: number, roomTypeId: number) {
     const { data, message } = await this.paymentService.fetchCancelationMessage({ id, roomTypeId, bookingNbr: this.selectedBooking.booking_nbr, showCancelation: false });
@@ -329,13 +351,13 @@ export class IrBookingOverview {
                             {booking.booking_nbr}
                           </td>
                           <td class="ir-table-cell  md:hidden lg:table-cell" data-state={this.aff ? 'booking-affiliate' : ''}>
-                            {format(new Date(booking.booked_on.date), 'dd-MMM-yyyy')}
+                            {format(new Date(booking.booked_on.date), 'dd-MMM-yyyy', { locale: localization_store.selectedLocale })}
                           </td>
                           <td class="ir-table-cell" data-state={this.aff ? 'booking-affiliate' : ''}>
-                            {format(new Date(booking.from_date), 'dd-MMM-yyyy')}
+                            {format(new Date(booking.from_date), 'dd-MMM-yyyy', { locale: localization_store.selectedLocale })}
                           </td>
-                          <td class="ir-table-cell" data-state={this.aff ? 'booking-affiliate' : ''}>
-                            {totalNights} {totalNights > 1 ? 'nights' : 'night'}
+                          <td class="ir-table-cell lowercase" data-state={this.aff ? 'booking-affiliate' : ''}>
+                            {totalNights} {totalNights > 1 ? localizedWords.entries.Lcz_Nights : localizedWords.entries.Lcz_night}
                           </td>
                           <td class="ir-table-cell" data-state={this.aff ? 'booking-affiliate' : ''}>
                             {formatAmount(booking.total, booking.currency.code)}

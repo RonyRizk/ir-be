@@ -54,7 +54,11 @@ export class IrRoomTypeAmenities {
       </div>
     );
   }
+  private checkAmenity(code: string) {
+    return this.aminities.find(a => a.code === code);
+  }
   render() {
+    const freeWifi = this.checkAmenity('freewifi');
     return (
       <div class="space-y-3">
         <div class="flex flex-col gap-6 sm:flex-row sm:items-center">
@@ -70,11 +74,13 @@ export class IrRoomTypeAmenities {
                 </p>
               </div>
             )}{' '}
-            <div class="flex items-center gap-1">
-              <ir-icons name="wifi"></ir-icons>
-              <p>{this.aminities?.some(amenity => amenity.amenity_type === 'room' && amenity.code === 'freewifi') ? localizedWords.entries.Lcz_wifi : ''} </p>
-              {/* <p>Free Wifi</p> */}
-            </div>
+            {freeWifi && (
+              <div class="flex items-center gap-1">
+                <ir-icons name="wifi"></ir-icons>
+                <p>{freeWifi.description}</p>
+                {/* <p>Free Wifi</p> */}
+              </div>
+            )}
           </div>
 
           <div class="flex items-center gap-4">

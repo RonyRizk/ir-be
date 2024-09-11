@@ -2,7 +2,7 @@ import BeLogoFooter from '@/assets/be_logo_footer';
 import app_store from '@/stores/app.store';
 import localizedWords from '@/stores/localization.store';
 import { renderPropertyLocation } from '@/utils/utils';
-import { Component, h, Prop } from '@stencil/core';
+import { Component, Event, EventEmitter, h, Prop } from '@stencil/core';
 
 @Component({
   tag: 'ir-footer',
@@ -11,6 +11,8 @@ import { Component, h, Prop } from '@stencil/core';
 })
 export class IrFooter {
   @Prop() version: string;
+
+  @Event() openPrivacyPolicy: EventEmitter<null>;
   private socials = {
     '006': 'whatsapp',
     '002': 'instagram',
@@ -39,7 +41,7 @@ export class IrFooter {
     }
     return (
       <div class="contact-info">
-        <label>{localizedWords.entries.Lcz_Email}:</label>
+        <label>{localizedWords.entries.Lcz_EmailAddress}:</label>
         <a href={`mailto:${email}`} class="contact-link">
           {email}
         </a>
@@ -64,7 +66,13 @@ export class IrFooter {
             <span>-</span>
             <ir-button onButtonClick={() => this.contactDialog.openModal()} buttonStyles={{ padding: '0' }} variants="link" label={localizedWords.entries.Lcz_Contact}></ir-button>
             <span>-</span>
-            <ir-privacy-policy label={localizedWords.entries.Lcz_PrivacyPolicy} policyTriggerStyle={{ textTransform: 'capitalize' }}></ir-privacy-policy>
+            <ir-button
+              label={localizedWords.entries.Lcz_PrivacyPolicy}
+              buttonStyles={{ padding: '0', background: 'transparent' }}
+              variants="link"
+              onButtonClick={() => this.openPrivacyPolicy.emit(null)}
+            ></ir-button>
+            {/* <ir-privacy-policy label={localizedWords.entries.Lcz_PrivacyPolicy} policyTriggerStyle={{  }}></ir-privacy-policy> */}
           </li>
           <li class="social-media">
             {app_store.property?.social_media.map(media => {

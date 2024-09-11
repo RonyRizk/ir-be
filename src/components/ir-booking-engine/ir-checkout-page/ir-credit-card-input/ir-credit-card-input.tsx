@@ -1,4 +1,5 @@
 import localizedWords from '@/stores/localization.store';
+import { detectCardType } from '@/utils/utils';
 import { ZCreditCardSchemaWithCvc } from '@/validators/checkout.validator';
 import { Component, Host, h, Event, EventEmitter, State, Element, Prop } from '@stencil/core';
 import IMask from 'imask';
@@ -14,25 +15,12 @@ export class IrCreditCardInput {
   @State() cardType: '' | 'AMEX' | 'VISA' | 'Mastercard' = '';
   @State() error: boolean = false;
 
-  @Event() creditCardChange: EventEmitter<string>;
+  @Event() creditCardChange: EventEmitter<{ value: string; cardType: '' | 'AMEX' | 'VISA' | 'Mastercard' }>;
 
   @Element() el: HTMLElement;
 
   private mask: any;
   private input: HTMLInputElement;
-
-  private detectCardType(value: string) {
-    const startsWith = (prefixes: string[]) => prefixes.some(prefix => value.startsWith(prefix));
-    if (startsWith(['4'])) {
-      return 'VISA';
-    } else if (startsWith(['5', '2'])) {
-      return 'Mastercard';
-    } else if (startsWith(['34', '37'])) {
-      return 'AMEX';
-    } else {
-      return '';
-    }
-  }
 
   private applyMask(cardType: string) {
     if (this.mask) {
@@ -58,13 +46,13 @@ export class IrCreditCardInput {
   handleInput(e: Event) {
     const target = e.target as HTMLInputElement;
     const value = target.value;
-    this.creditCardChange.emit(value);
+    this.creditCardChange.emit({ value, cardType: this.cardType });
 
     if (value === '') {
       this.cardType = '';
       this.error = false;
     } else {
-      const detectedCardType = this.detectCardType(value);
+      const detectedCardType = detectCardType(value);
       if (this.cardType !== detectedCardType) {
         this.cardType = detectedCardType;
         this.applyMask(this.cardType);

@@ -9,9 +9,8 @@ import { PropertyService } from '@/services/api/property.service';
 import app_store from '@/stores/app.store';
 import booking_store, { IRatePlanSelection, validateBooking } from '@/stores/booking';
 import { checkout_store } from '@/stores/checkout.store';
-import { isRequestPending } from '@/stores/ir-interceptor.store';
 import localizedWords from '@/stores/localization.store';
-import { destroyBookingCookie, getDateDifference, runScriptAndRemove } from '@/utils/utils';
+import { destroyBookingCookie, detectCardType, getDateDifference, runScriptAndRemove } from '@/utils/utils';
 import { ZCreditCardSchemaWithCvc } from '@/validators/checkout.validator';
 import { Component, Host, Listen, State, h, Event, EventEmitter } from '@stencil/core';
 import { ZodError, ZodIssue } from 'zod';
@@ -115,9 +114,7 @@ export class IrCheckoutPage {
   private validatePayment(): boolean {
     const currentPayment = app_store.property.allowed_payment_methods.find(p => p.code === checkout_store.payment?.code);
     this.selectedPaymentMethod = currentPayment;
-    console.log(currentPayment);
     if (!currentPayment) {
-      console.log('no current payment');
       return false;
     }
     if (currentPayment.is_payment_gateway) {
@@ -130,6 +127,10 @@ export class IrCheckoutPage {
         expiryDate: (checkout_store.payment as any)?.expiry_month,
         cvc: (checkout_store.payment as any)?.cvc,
       });
+      const cardType = detectCardType((checkout_store.payment as any)?.cardNumber?.replace(/ /g, ''));
+      if (!app_store.property.allowed_cards.find(c => c.name.toLowerCase().includes(cardType?.toLowerCase()))) {
+        return false;
+      }
       return true;
     } catch (error) {
       if (error instanceof ZodError) {
@@ -236,22 +237,6 @@ export class IrCheckoutPage {
     }
   }
 
-  // private async checkPaymentOption(booking: Booking, token: string) {
-  //   const { amount } = await this.paymentService.GetExposedApplicablePolicies({
-  //     token,
-  //     params: {
-  //       booking_nbr: booking.booking_nbr,
-  //       property_id: app_store.app_data.property_id,
-  //       room_type_id: 0,
-  //       rate_plan_id: 0,
-  //       currency_id: booking.currency.id,
-  //       language: app_store.userPreferences.language_id,
-  //     },
-  //     book_date: new Date(),
-  //   });
-  //   return amount;
-  // }
-
   private modifyConversionTag(tag: string) {
     const booking = booking_store.booking;
     tag = tag.replace(/\$\$total_price\$\$/g, booking.financial.total_amount.toString());
@@ -291,7 +276,6 @@ export class IrCheckoutPage {
   }
 
   render() {
-    console.log(isRequestPending('/Get_Setup_Entries_By_TBL_NAME_MULTI'));
     if (this.isLoading) {
       return (
         <div class={'flex min-h-screen flex-col'}>
@@ -301,7 +285,7 @@ export class IrCheckoutPage {
     }
     return (
       <Host>
-        <main class="flex min-h-screen w-full  flex-col justify-between gap-4  md:flex-row md:items-start">
+        <main class="flex  w-full  flex-col justify-between gap-4   md:flex-row md:items-start">
           <section class="w-full space-y-4 md:max-w-4xl">
             <div class="flex items-center gap-2.5">
               <ir-button

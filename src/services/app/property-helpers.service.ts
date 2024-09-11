@@ -150,7 +150,6 @@ export class PropertyHelpers {
         pre_payment_amount: newRoomtype.pre_payment_amount,
         rateplans: this.updateRatePlan(rt.rateplans, newRoomtype),
       };
-      console.log(updatedRoomtype.rateplans);
       updatedRoomtypes.push(updatedRoomtype);
       return updatedRoomtypes;
     }, []);

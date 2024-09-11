@@ -1,4 +1,4 @@
-import { Component, Host, Prop, State, Watch, h } from '@stencil/core';
+import { Component, Host, Listen, Prop, State, Watch, h } from '@stencil/core';
 import { format, isBefore } from 'date-fns';
 import { cn, formatAmount, getDateDifference, runScriptAndRemove } from '@/utils/utils';
 import localizedWords from '@/stores/localization.store';
@@ -22,7 +22,7 @@ export class IrInvoice {
   @Prop({ mutable: true }) email: string;
   @Prop() propertyId: number;
   @Prop() baseUrl: string = 'https://gateway.igloorooms.com/IRBE';
-  @Prop() language: string = 'en';
+  @Prop() language: string;
   @Prop() bookingNbr: string;
   @Prop() status: 0 | 1 = 1;
   @Prop() perma_link: string = null;
@@ -51,7 +51,8 @@ export class IrInvoice {
   private bookingListingAppService = new BookingListingAppService();
   private payment_option: AllowedPaymentMethod = null;
   private amount: number = null;
-  bookingCancelation: HTMLIrBookingCancelationElement;
+  private bookingCancelation: HTMLIrBookingCancelationElement;
+  private privacyPolicyRef: HTMLIrPrivacyPolicyElement;
 
   async componentWillLoad() {
     if (!this.baseUrl) {
@@ -85,7 +86,7 @@ export class IrInvoice {
   @Watch('bookingNbr')
   async handleBookingNumberChange(newValue, oldValue) {
     if (newValue !== oldValue) {
-      this.booking = await this.propertyService.getExposedBooking({ booking_nbr: this.bookingNbr, language: this.language }, true);
+      this.booking = await this.propertyService.getExposedBooking({ booking_nbr: this.bookingNbr, language: this.language || app_store.userPreferences.language_id }, true);
     }
   }
   async init() {
@@ -95,19 +96,19 @@ export class IrInvoice {
     this.paymentService.setToken(this.token);
     app_store.app_data.token = this.token;
   }
-  async fetchData() {
+  async fetchData(language = this.language || app_store.userPreferences.language_id, resetLanguage = false) {
     if (!this.isAuthenticated) {
       this.token = await this.authService.login({ option: 'direct', params: { email: this.email, booking_nbr: this.bookingNbr } }, false);
       this.init();
     }
-    const requests: any[] = [this.propertyService.getExposedBooking({ booking_nbr: this.bookingNbr, language: this.language })];
-
-    if (!this.be) {
+    console.warn(this.be, resetLanguage);
+    const requests: any[] = [this.propertyService.getExposedBooking({ booking_nbr: this.bookingNbr, language })];
+    if (!this.be || resetLanguage) {
       requests.push(this.commonService.getExposedLanguage());
       requests.push(
         this.propertyService.getExposedProperty({
           id: this.propertyId,
-          language: this.language,
+          language,
           aname: this.aName,
           perma_link: this.perma_link,
         }),
@@ -124,6 +125,21 @@ export class IrInvoice {
     this.isLoading = false;
   }
 
+  @Listen('openPrivacyPolicy')
+  async openPrivacyPolicy(e: CustomEvent) {
+    e.stopImmediatePropagation();
+    e.stopPropagation();
+    if (this.privacyPolicyRef) {
+      this.privacyPolicyRef.openModal();
+    }
+  }
+  @Listen('languageChanged', { target: 'body' })
+  async handleLanguageChanged(e: CustomEvent) {
+    e.stopImmediatePropagation();
+    e.stopPropagation();
+    console.warn('request fetchData');
+    this.fetchData(e.detail, true);
+  }
   async setAmountAndCancelationPolicy() {
     if (this.amount || isBefore(new Date(this.booking.to_date), new Date())) {
       return;
@@ -139,7 +155,7 @@ export class IrInvoice {
           room_type_id: 0,
           rate_plan_id: 0,
           currency_id: this.booking.currency.id,
-          language: this.language,
+          language: this.language || app_store.userPreferences.language_id,
         },
       }),
     ]);
@@ -240,6 +256,7 @@ export class IrInvoice {
       });
     }
   }
+
   render() {
     if (!this.booking && !this.isLoading) {
       return null;
@@ -280,9 +297,9 @@ export class IrInvoice {
               <div class={this.be ? '' : 'invoice-container'}>
                 <p class={`flex items-center gap-4 text-xl font-medium ${this.status === 1 ? 'text-green-600' : 'text-red-500'} ${this.be ? '' : ''}`}>
                   <ir-icons name={this.status === 1 ? 'check' : 'xmark'} />
-                  <span> {this.status === 1 ? 'Your booking is now confirmed' : 'Payment unsuccessful'}</span>
+                  <span> {this.status === 1 ? localizedWords.entries.Lcz_YourBookingIsConfirmed : localizedWords.entries.Lcz_YourPaymentIsUnsuccesful}</span>
                 </p>
-                {this.status === 1 && <p>An email has been sent to {this.booking.guest.email}</p>}
+                {this.status === 1 && <p>{localizedWords.entries.Lcz_AnEmailHasBeenSent.replace('%1', this.booking.guest.email)}</p>}
               </div>
             ) : (
               <div class={this.be ? '' : 'invoice-container'}>
@@ -297,7 +314,9 @@ export class IrInvoice {
                       {localizedWords.entries.Lcz_GetDirections}
                     </a>
                   ) : (
-                    this.payment_option.is_payment_gateway && <ir-button variants="outline" label="Retry Payment" onButtonClick={() => this.processPayment()}></ir-button>
+                    this.payment_option.is_payment_gateway && (
+                      <ir-button variants="outline" label={localizedWords.entries.Lcz_RetryPayment} onButtonClick={() => this.processPayment()}></ir-button>
+                    )
                   )}
                   <a href={this.getPropertyEmail()} target="_blank" class={cn(`button-outline`, 'flex items-center justify-center')} data-size="sm">
                     {localizedWords.entries.Lcz_MessageProperty}
@@ -315,7 +334,7 @@ export class IrInvoice {
                 </section>
                 <section class="booking-info">
                   <p class="booking-info-text">
-                    {localizedWords.entries.Lcz_BookingPreference} <span>{this.booking.booking_nbr}</span>
+                    {localizedWords.entries.Lcz_BookingReference} <span>{this.booking.booking_nbr}</span>
                   </p>
                   <p class="booking-info-text">
                     {localizedWords.entries.Lcz_BookedBy}{' '}
@@ -340,7 +359,7 @@ export class IrInvoice {
                   </p>
                   {this.booking.remark && (
                     <p class="booking-info-text">
-                      Special request: <span>{this.booking.remark}</span>
+                      {localizedWords.entries.Lcz_SpecialRequest}: <span>{this.booking.remark}</span>
                     </p>
                   )}
                 </section>
@@ -372,8 +391,8 @@ export class IrInvoice {
                             {/* <span>{"- Non-smoking"}</span> */}
                           </span>
                         </p>
-                        {this.cancelation_message && <p class="room-info-text" innerHTML={`<b><u>Cancelation:</u></b>${this.cancelation_message}`}></p>}
-                        {this.guarantee_message && <p class="room-info-text" innerHTML={`<b><u>Guarantee:</u></b>${this.guarantee_message}`}></p>}
+                        {this.cancelation_message && <p class="room-info-text" innerHTML={`${localizedWords.entries.Lcz_Cancelation}: ${this.cancelation_message}`}></p>}
+                        {this.guarantee_message && <p class="room-info-text" innerHTML={`${localizedWords.entries.Lcz_Guarantee}: ${this.guarantee_message}`}></p>}
                       </div>
                     ))}
                   </div>
@@ -382,16 +401,16 @@ export class IrInvoice {
                   <section class="space-y-2">
                     <div class={'flex items-center gap-4'}>
                       <ir-icons name="taxi"></ir-icons>
-                      <h3 class={'booking-details-header'}>Pickup</h3>
+                      <h3 class={'booking-details-header'}>{localizedWords.entries.Lcz_Pickup}</h3>
                     </div>
                     <div class="room-info">
                       <div class="flex w-full items-center justify-between">
                         <p class="flex items-center gap-4">
                           <p class="room-info-text">
-                            {'Date:'} <span>{format(new Date(this.booking.pickup_info.date), 'eee, dd MMM yyyy')}</span>
+                            {`${localizedWords.entries.Lcz_Date}:`} <span>{format(new Date(this.booking.pickup_info.date), 'eee, dd MMM yyyy')}</span>
                           </p>
                           <p class="room-info-text">
-                            {'Time:'}{' '}
+                            {`${localizedWords.entries.Lcz_Time}:`}{' '}
                             <span>
                               {this.booking.pickup_info.hour}:{this.booking.pickup_info.minute}
                             </span>
@@ -400,10 +419,10 @@ export class IrInvoice {
                         <p class="text-lg font-medium text-green-600">{formatAmount(this.booking.pickup_info.total, this.booking.pickup_info.currency.code)}</p>
                       </div>
                       <p class="room-info-text">
-                        {'Flight details:'} <span>{this.booking.pickup_info.details}</span>
+                        {`${localizedWords.entries.Lcz_FlightDetails}:`} <span>{this.booking.pickup_info.details}</span>
                       </p>
                       <p class="room-info-text">
-                        {'No. of vehicles:'} <span>{this.booking.pickup_info.nbr_of_units}</span>
+                        {`${localizedWords.entries.Lcz_NoOfVehicles}:`} <span>{this.booking.pickup_info.nbr_of_units}</span>
                       </p>
                       <p class={'room-info-text text-xs'}>
                         {app_store.property.pickup_service.pickup_instruction.description}
@@ -477,6 +496,7 @@ export class IrInvoice {
             </div>
           </section>
           {this.footerShown && <ir-footer version={this.version}></ir-footer>}
+          {this.footerShown && <ir-privacy-policy hideTrigger ref={el => (this.privacyPolicyRef = el)}></ir-privacy-policy>}
           <ir-booking-cancelation
             cancelation_policies={this.cancelation_policies}
             ref={el => (this.bookingCancelation = el)}

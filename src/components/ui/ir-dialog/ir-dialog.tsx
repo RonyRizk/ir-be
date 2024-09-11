@@ -28,6 +28,7 @@ export class IrDialog {
       this.prepareFocusTrap();
     }, 10);
     this.openChange.emit(this.isOpen);
+    // document.body.appendChild(this.el);
   }
 
   @Method()
@@ -38,6 +39,7 @@ export class IrDialog {
     removeOverlay();
     this.isOpen = false;
     this.openChange.emit(this.isOpen);
+    // document.body.removeChild(this.el);
   }
 
   prepareFocusTrap() {
@@ -100,7 +102,7 @@ export class IrDialog {
                   }}
                   variants="icon"
                   title={localizedWords.entries.Lcz_Close}
-                  class="absolute right-3 top-3 z-50"
+                  class="dialog-close-btn"
                   iconName="xmark"
                 ></ir-button>
               )}

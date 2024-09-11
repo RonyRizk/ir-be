@@ -240,7 +240,7 @@ export class IrDateRange {
                         </svg>
                       </button>
                     )}
-                    <span>{format(month.month, 'MMMM yyyy', { locale: this.locale })}</span>
+                    <span class={'capitalize'}>{format(month.month, 'MMMM yyyy', { locale: this.locale })}</span>
                     {index === 0 && (
                       <button name="next month" class="navigation-buttons button-next" type="button" onClick={this.goToNextMonth.bind(this)}>
                         <p slot="icon" class="sr-only">
@@ -268,7 +268,7 @@ export class IrDateRange {
               <tr class="weekday-header" role="row">
                 {this.weekdays.map(weekday => (
                   <th class="weekday-name" key={weekday}>
-                    {weekday}
+                    {weekday.replace('.', '')}
                   </th>
                 ))}
               </tr>

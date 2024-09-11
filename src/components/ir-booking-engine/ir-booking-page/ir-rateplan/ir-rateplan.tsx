@@ -112,7 +112,9 @@ export class IrRateplan {
       return null;
     }
     const isInventoryFull =
-      this.visibleInventory?.visibleInventory === 0 || Object.values(booking_store.ratePlanSelections[this.roomTypeId]).some(f => f.visibleInventory === f.reserved);
+      this.visibleInventory?.visibleInventory === 0 ||
+      !this.visibleInventory?.selected_variation?.variation?.amount ||
+      Object.values(booking_store.ratePlanSelections[this.roomTypeId]).some(f => f.visibleInventory === f.reserved);
     return (
       <div class="rateplan-container">
         <div class={`rateplan-header ${this.isRatePlanAvailable ? 'available' : 'not-available'}`}>
@@ -195,7 +197,7 @@ export class IrRateplan {
                   {this.ratePlan.variations && (
                     <ir-select
                       class="rateplan-select-travelers"
-                      label={localizedWords.entries.Lcz_Travelers}
+                      label={'Travelers'}
                       value={this.ratePlan.variations
                         .findIndex(f => f.adult_child_offering === this.visibleInventory?.selected_variation?.variation.adult_child_offering)
                         .toString()}
@@ -211,20 +213,25 @@ export class IrRateplan {
                 </div>
                 {!this.visibleInventory?.selected_variation?.variation?.IS_MLS_VIOLATED ? (
                   <Fragment>
-                    {this.visibleInventory?.selected_variation?.variation?.discount_pct > 0 && (
-                      <div class="rateplan-pricing">
-                        <p class="rateplan-discounted-amount">
-                          {formatAmount(this.visibleInventory?.selected_variation?.variation?.total_before_discount, app_store.userPreferences.currency_id, 0)}
-                        </p>
-                        <p class="rateplan-discount">{`-${this.visibleInventory?.selected_variation?.variation?.discount_pct}%`}</p>
-                      </div>
+                    {this.visibleInventory?.selected_variation?.variation?.amount && (
+                      <Fragment>
+                        {this.visibleInventory?.selected_variation?.variation?.discount_pct > 0 && (
+                          <div class="rateplan-pricing">
+                            <p class="rateplan-discounted-amount">
+                              {formatAmount(this.visibleInventory?.selected_variation?.variation?.total_before_discount, app_store.userPreferences.currency_id, 0)}
+                            </p>
+                            <p class="rateplan-discount">{`-${this.visibleInventory?.selected_variation?.variation?.discount_pct}%`}</p>
+                          </div>
+                        )}
+                        <div class="rateplan-final-pricing" data-style={this.visibleInventory?.selected_variation?.variation?.discount_pct > 0 ? '' : 'full-width'}>
+                          <p class="rateplan-amount">{formatAmount(this.visibleInventory?.selected_variation?.variation?.amount, app_store.userPreferences.currency_id, 0)}</p>
+                          {getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date()) >
+                            1 && (
+                            <p class="rateplan-amount-per-night">{`${formatAmount(this.visibleInventory?.selected_variation?.variation?.amount_per_night, app_store.userPreferences.currency_id, 0)}/${localizedWords.entries.Lcz_night}`}</p>
+                          )}
+                        </div>
+                      </Fragment>
                     )}
-                    <div class="rateplan-final-pricing" data-style={this.visibleInventory?.selected_variation?.variation?.discount_pct > 0 ? '' : 'full-width'}>
-                      <p class="rateplan-amount">{formatAmount(this.visibleInventory?.selected_variation?.variation?.amount, app_store.userPreferences.currency_id, 0)}</p>
-                      {getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date()) > 1 && (
-                        <p class="rateplan-amount-per-night">{`${formatAmount(this.visibleInventory?.selected_variation?.variation?.amount_per_night, app_store.userPreferences.currency_id, 0)}/${localizedWords.entries.Lcz_night}`}</p>
-                      )}
-                    </div>
                     {this.visibleInventory?.reserved > 0 ? (
                       <ir-select
                         onValueChange={e => {
@@ -251,7 +258,7 @@ export class IrRateplan {
                         disabled={isInventoryFull}
                         class="rateplan-select-rooms"
                         buttonStyles={{ background: 'white', width: '100%', opacity: isInventoryFull ? '0.5' : '1' }}
-                        label={localizedWords.entries.Lcz_Select.replace('…', '')}
+                        label={localizedWords.entries.Lcz_Select}
                         variants="outline-primary"
                         onButtonClick={() => {
                           reserveRooms(this.roomTypeId, this.ratePlan.id, 1);
@@ -261,7 +268,7 @@ export class IrRateplan {
                     )}
                   </Fragment>
                 ) : (
-                  <p class="mls_alert">{this.visibleInventory.selected_variation?.variation?.MLS_ALERT}</p>
+                  <p class="mls_alert">{localizedWords.entries.Lcz_MLS_Alert.replace('{0}', this.visibleInventory.selected_variation?.variation?.MLS_ALERT_VALUE)}</p>
                 )}
               </Fragment>
             )}

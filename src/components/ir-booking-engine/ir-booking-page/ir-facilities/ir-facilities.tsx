@@ -15,13 +15,15 @@ export class IrFacilities {
         <div class="facilities-container space-y-5 bg-gray-100 p-6">
           <div class="flex  items-center gap-4">
             <ir-icons name="clock"></ir-icons>
-            <p>
-              {localizedWords.entries.Lcz_CheckInFromUntil.replace('%1', app_store.property?.time_constraints.check_in_from).replace(
-                '%2',
-                app_store.property?.time_constraints.check_in_till,
-              )}
-              {/* Check-in: from {app_store.property?.time_constraints.check_in_from} until {app_store.property?.time_constraints.check_in_till} */}
-            </p>
+            {app_store.property?.time_constraints.check_in_from && app_store.property?.time_constraints.check_in_till && (
+              <p>
+                {localizedWords.entries.Lcz_CheckInFromUntil.replace('%1', app_store.property?.time_constraints.check_in_from).replace(
+                  '%2',
+                  app_store.property?.time_constraints.check_in_till,
+                )}
+                {/* Check-in: from {app_store.property?.time_constraints.check_in_from} until {app_store.property?.time_constraints.check_in_till} */}
+              </p>
+            )}
             <p>
               {localizedWords.entries.Lcz_CheckOut}:{app_store.property?.time_constraints.check_out_till}
             </p>
@@ -43,8 +45,12 @@ export class IrFacilities {
             <div class="flex items-center gap-4">
               <ir-icons name="car"></ir-icons>
               <p>
-                {app_store.property?.parking_offering.title} {localizedWords.entries.Lcz_At}{' '}
-                {formatAmount(app_store.property?.parking_offering.pricing, app_store.userPreferences.currency_id)}
+                {app_store.property?.parking_offering.title}{' '}
+                {Number(app_store.property?.parking_offering.pricing) > 0 && (
+                  <span>
+                    {localizedWords.entries.Lcz_At} {formatAmount(app_store.property?.parking_offering.pricing, app_store.userPreferences.currency_id)}
+                  </span>
+                )}
               </p>
             </div>
           )}

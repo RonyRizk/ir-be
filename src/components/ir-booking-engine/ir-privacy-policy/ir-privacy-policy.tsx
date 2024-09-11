@@ -1,5 +1,6 @@
 import app_store from '@/stores/app.store';
-import { Component, Host, Prop, h } from '@stencil/core';
+import localizedWords from '@/stores/localization.store';
+import { Component, Host, Method, Prop, h } from '@stencil/core';
 
 @Component({
   tag: 'ir-privacy-policy',
@@ -8,6 +9,7 @@ import { Component, Host, Prop, h } from '@stencil/core';
 })
 export class IrPrivacyPolicy {
   @Prop() label = 'privacy policy';
+  @Prop() hideTrigger = false;
   @Prop() policyTriggerStyle: Partial<CSSStyleDeclaration>;
   dialogRef: HTMLIrDialogElement;
 
@@ -21,19 +23,29 @@ export class IrPrivacyPolicy {
     }
     return input;
   }
+  @Method()
+  async openModal() {
+    this.dialogRef.openModal();
+  }
+  @Method()
+  async closeModal() {
+    this.dialogRef.closeModal();
+  }
 
   render() {
     return (
       <Host>
-        <ir-button
-          label={this.label}
-          buttonStyles={{ padding: '0', background: 'transparent', ...this.policyTriggerStyle }}
-          variants="link"
-          onButtonClick={() => this.dialogRef.openModal()}
-        ></ir-button>
+        {!this.hideTrigger && (
+          <ir-button
+            label={this.label}
+            buttonStyles={{ padding: '0', background: 'transparent', ...this.policyTriggerStyle }}
+            variants="link"
+            onButtonClick={() => this.dialogRef.openModal()}
+          ></ir-button>
+        )}
         <ir-dialog ref={el => (this.dialogRef = el)}>
           <div class="max-h-[83vh] overflow-y-auto p-4  text-[var(--gray-600,#475467)] md:p-6" slot="modal-title">
-            <h1 class="mb-4 text-xl font-semibold text-[var(--gray-700,#344054)]">Privacy and policy</h1>
+            <h1 class="mb-4 text-xl font-semibold capitalize text-[var(--gray-700,#344054)]">{localizedWords.entries.Lcz_PrivacyPolicy}</h1>
             <div class="text-sm">
               <p
                 innerHTML={this.replaceStringByObjectValue(app_store.property?.privacy_policy, {

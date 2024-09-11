@@ -410,7 +410,10 @@ export namespace Components {
         "updatePosition": () => Promise<void>;
     }
     interface IrPrivacyPolicy {
+        "closeModal": () => Promise<void>;
+        "hideTrigger": boolean;
         "label": string;
+        "openModal": () => Promise<void>;
         "policyTriggerStyle": Partial<CSSStyleDeclaration>;
     }
     interface IrPropertyGallery {
@@ -624,6 +627,10 @@ export interface IrDialogCustomEvent<T> extends CustomEvent<T> {
 export interface IrDrawerCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLIrDrawerElement;
+}
+export interface IrFooterCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLIrFooterElement;
 }
 export interface IrGalleryCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -966,6 +973,7 @@ declare global {
     interface HTMLIrBookingSummaryElementEventMap {
         "routing": pages;
         "bookingClicked": null;
+        "openPrivacyPolicy": null;
     }
     interface HTMLIrBookingSummaryElement extends Components.IrBookingSummary, HTMLStencilElement {
         addEventListener<K extends keyof HTMLIrBookingSummaryElementEventMap>(type: K, listener: (this: HTMLIrBookingSummaryElement, ev: IrBookingSummaryCustomEvent<HTMLIrBookingSummaryElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -1091,7 +1099,7 @@ declare global {
         new (): HTMLIrCouponDialogElement;
     };
     interface HTMLIrCreditCardInputElementEventMap {
-        "creditCardChange": string;
+        "creditCardChange": { value: string; cardType: '' | 'AMEX' | 'VISA' | 'Mastercard' };
     }
     interface HTMLIrCreditCardInputElement extends Components.IrCreditCardInput, HTMLStencilElement {
         addEventListener<K extends keyof HTMLIrCreditCardInputElementEventMap>(type: K, listener: (this: HTMLIrCreditCardInputElement, ev: IrCreditCardInputCustomEvent<HTMLIrCreditCardInputElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -1186,7 +1194,18 @@ declare global {
         prototype: HTMLIrFacilitiesElement;
         new (): HTMLIrFacilitiesElement;
     };
+    interface HTMLIrFooterElementEventMap {
+        "openPrivacyPolicy": null;
+    }
     interface HTMLIrFooterElement extends Components.IrFooter, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLIrFooterElementEventMap>(type: K, listener: (this: HTMLIrFooterElement, ev: IrFooterCustomEvent<HTMLIrFooterElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLIrFooterElementEventMap>(type: K, listener: (this: HTMLIrFooterElement, ev: IrFooterCustomEvent<HTMLIrFooterElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLIrFooterElement: {
         prototype: HTMLIrFooterElement;
@@ -1279,6 +1298,7 @@ declare global {
     interface HTMLIrLanguagePickerElementEventMap {
         "closeDialog": null;
         "resetBooking": null;
+        "languageChanged": string;
     }
     interface HTMLIrLanguagePickerElement extends Components.IrLanguagePicker, HTMLStencilElement {
         addEventListener<K extends keyof HTMLIrLanguagePickerElementEventMap>(type: K, listener: (this: HTMLIrLanguagePickerElement, ev: IrLanguagePickerCustomEvent<HTMLIrLanguagePickerElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -1920,6 +1940,7 @@ declare namespace LocalJSX {
     interface IrBookingSummary {
         "error"?: CheckoutErrors;
         "onBookingClicked"?: (event: IrBookingSummaryCustomEvent<null>) => void;
+        "onOpenPrivacyPolicy"?: (event: IrBookingSummaryCustomEvent<null>) => void;
         "onRouting"?: (event: IrBookingSummaryCustomEvent<pages>) => void;
         "prepaymentAmount"?: any;
     }
@@ -1981,7 +2002,7 @@ declare namespace LocalJSX {
         "onResetBooking"?: (event: IrCouponDialogCustomEvent<string>) => void;
     }
     interface IrCreditCardInput {
-        "onCreditCardChange"?: (event: IrCreditCardInputCustomEvent<string>) => void;
+        "onCreditCardChange"?: (event: IrCreditCardInputCustomEvent<{ value: string; cardType: '' | 'AMEX' | 'VISA' | 'Mastercard' }>) => void;
         "value"?: string;
     }
     interface IrDatePopup {
@@ -2034,6 +2055,7 @@ declare namespace LocalJSX {
     interface IrFacilities {
     }
     interface IrFooter {
+        "onOpenPrivacyPolicy"?: (event: IrFooterCustomEvent<null>) => void;
         "version"?: string;
     }
     interface IrGallery {
@@ -2145,6 +2167,7 @@ declare namespace LocalJSX {
         "currencies"?: ICurrency[];
         "languages"?: IExposedLanguages[];
         "onCloseDialog"?: (event: IrLanguagePickerCustomEvent<null>) => void;
+        "onLanguageChanged"?: (event: IrLanguagePickerCustomEvent<string>) => void;
         "onResetBooking"?: (event: IrLanguagePickerCustomEvent<null>) => void;
     }
     interface IrLoyalty {
@@ -2217,6 +2240,7 @@ declare namespace LocalJSX {
         "reference"?: HTMLElement;
     }
     interface IrPrivacyPolicy {
+        "hideTrigger"?: boolean;
         "label"?: string;
         "policyTriggerStyle"?: Partial<CSSStyleDeclaration>;
     }

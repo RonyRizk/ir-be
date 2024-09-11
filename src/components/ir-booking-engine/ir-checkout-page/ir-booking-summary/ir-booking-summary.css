@@ -4,3 +4,7 @@
 .image-container {
   aspect-ratio: 16/9;
 }
+.ir-checkbox {
+  display: inline;
+  flex-shrink: 0; /* Prevents the checkbox from shrinking */
+}

@@ -24,10 +24,12 @@ export class IrNav {
   @Prop() menuShown: boolean = true;
   @Prop() logoOnly: boolean = false;
 
+  @State() currentPage: TTabsState = null;
+
   @Event() routing: EventEmitter<pages>;
   @Event({ bubbles: true, composed: true }) signOut: EventEmitter<null>;
   @Event({ bubbles: true, composed: true }) screenChanged: EventEmitter<pages>;
-  @State() currentPage: TTabsState = null;
+
   private preferences: { currency: string | null; language: string | null } = { currency: null, language: null };
 
   private dialogRef: HTMLIrDialogElement;
@@ -90,7 +92,7 @@ export class IrNav {
   }
 
   renderLanguageTrigger() {
-    if (this.isBookingListing) {
+    if (this.isBookingListing || app_store.currentPage === 'checkout') {
       return;
     }
     const currency = app_store.currencies.find(currency => currency.code.toString().toLowerCase() === app_store.userPreferences.currency_id.toLowerCase());
@@ -230,7 +232,7 @@ export class IrNav {
                   <li>
                     <ir-button variants="ghost" haveLeftIcon title={localizedWords.entries.Lcz_Home} onButtonClick={() => window.open(`https://${this.website}`, '_blank')}>
                       <p slot="left-icon" class="sr-only">
-                        home
+                        {localizedWords.entries.Lcz_Home}
                       </p>
                       <ir-icons slot="left-icon" name={'home'} svgClassName="ir-icon-size"></ir-icons>
                     </ir-button>
@@ -310,7 +312,7 @@ export class IrNav {
                     buttonClassName="justify-start"
                     class="ir-sheet-button"
                     variants="ghost"
-                    label="Sign in"
+                    label={localizedWords.entries.Lcz_SignIn}
                     name="auth"
                     onButtonClick={this.handleSignIn.bind(this)}
                   ></ir-button>
@@ -355,6 +357,8 @@ export class IrNav {
                     </div>
                   ) : (
                     <ir-button
+                      class="ir-sheet-button"
+                      buttonClassName="justify-start"
                       variants="ghost"
                       label={localizedWords.entries.Lcz_BookingCode}
                       name="booking_code"
