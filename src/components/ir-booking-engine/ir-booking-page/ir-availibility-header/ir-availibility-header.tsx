@@ -8,6 +8,7 @@ import app_store from '@/stores/app.store';
 import booking_store from '@/stores/booking';
 import { v4 } from 'uuid';
 import { AvailabiltyService } from '@/services/app/availability.service';
+import localizedWords from '@/stores/localization.store';
 
 @Component({
   tag: 'ir-availibility-header',
@@ -331,7 +332,7 @@ export class IrAvailibilityHeader {
                 this.handleCheckAvailability();
               }}
               size="md"
-              label="search"
+              label={localizedWords.entries.Lcz_Search}
               buttonStyles={{ width: '100%' }}
             ></ir-button>
           </div>

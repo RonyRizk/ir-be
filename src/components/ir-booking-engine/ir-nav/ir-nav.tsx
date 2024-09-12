@@ -121,7 +121,7 @@ export class IrNav {
     e.stopImmediatePropagation();
     e.stopPropagation();
     if (app_store.app_data.injected) {
-      return (window.location.href = `https://${app_store.property.perma_link}.bookingmystay.com/signin`);
+      return (window.location.href = `https://${app_store.property.perma_link}.bookingmystay.com/signin?lang=${app_store.userPreferences.language_id.toLowerCase()}`);
     }
     this.currentPage = 'auth';
     this.modalRef.openModal();

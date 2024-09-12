@@ -10,7 +10,7 @@
 | Property    | Attribute | Description | Type                                                                                                                                                                                                                                                            | Default |
 | ----------- | --------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
 | `be`        | `be`      |             | `boolean`                                                                                                                                                                                                                                                       | `true`  |
-| `user_data` | --        |             | `{ address?: string; id?: number; email?: string; first_name?: string; last_name?: string; country_id?: number; country_phone_prefix?: string; city?: string; dob?: string; mobile?: number; subscribe_to_news_letter?: boolean; alternative_email?: string; }` | `{}`    |
+| `user_data` | --        |             | `{ address?: string; city?: string; country_id?: number; dob?: string; email?: string; first_name?: string; id?: number; last_name?: string; mobile?: number; subscribe_to_news_letter?: boolean; country_phone_prefix?: string; alternative_email?: string; }` | `{}`    |
 
 
 ## Dependencies

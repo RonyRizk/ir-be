@@ -89,6 +89,9 @@ export function getUserPrefernce(lang: string | undefined = undefined) {
     updateUserPreference({
       language_id: lang || 'en',
     });
+    if (lang === 'ar') {
+      changeLocale('RTL', matchLocale(lang));
+    }
   }
 }
 export function runScriptAndRemove(scriptContent: string): void {

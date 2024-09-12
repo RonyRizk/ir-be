@@ -45,7 +45,7 @@ export class IrBookingListing {
     app_store.app_data.hideGoogleSignIn = this.hideGoogleSignIn;
     this.currentPage = this.startScreen.screen;
     this.selectedBooking = (this.startScreen.params as any) ?? null;
-    getUserPrefernce();
+    getUserPrefernce(this.language);
     const isAuthenticated = this.commonService.checkUserAuthState();
     if (isAuthenticated) {
       this.bookingNumber = isAuthenticated.params ? isAuthenticated.params.booking_nbr : null;
@@ -104,7 +104,7 @@ export class IrBookingListing {
           this.commonService.getCurrencies(),
           this.propertyService.getExposedProperty({
             id: this.propertyid,
-            language: app_store.userPreferences?.language_id || 'en',
+            language: app_store.userPreferences?.language_id || this.language || 'en',
             aname: this.aName,
             perma_link: this.perma_link,
           }),

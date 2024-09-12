@@ -15,11 +15,10 @@
 
 ## Events
 
-| Event             | Description | Type                  |
-| ----------------- | ----------- | --------------------- |
-| `closeDialog`     |             | `CustomEvent<null>`   |
-| `languageChanged` |             | `CustomEvent<string>` |
-| `resetBooking`    |             | `CustomEvent<null>`   |
+| Event          | Description | Type                |
+| -------------- | ----------- | ------------------- |
+| `closeDialog`  |             | `CustomEvent<null>` |
+| `resetBooking` |             | `CustomEvent<null>` |
 
 
 ## Dependencies

@@ -209,7 +209,7 @@ export class IrPaymentView {
   renderPaymentOptions() {
     const paymentLength = app_store.property.allowed_payment_methods.length;
     if (paymentLength === 0) {
-      return <p class="text-center">No deposit required</p>;
+      return <p class="text-center">{localizedWords.entries.Lcz_NoDepositRequired}</p>;
     }
     if (paymentLength > 1) {
       return (

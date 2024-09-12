@@ -46,15 +46,15 @@ export class IrPrivacyPolicy {
         <ir-dialog ref={el => (this.dialogRef = el)}>
           <div class="max-h-[83vh] overflow-y-auto p-4  text-[var(--gray-600,#475467)] md:p-6" slot="modal-title">
             <h1 class="mb-4 text-xl font-semibold capitalize text-[var(--gray-700,#344054)]">{localizedWords.entries.Lcz_PrivacyPolicy}</h1>
-            <div class="text-sm">
+            <div class="text-sm font-normal">
               <p
                 innerHTML={this.replaceStringByObjectValue(app_store.property?.privacy_policy, {
-                  '[AC_NAME]': app_store.property?.name,
-                  '[URL]': app_store.property?.space_theme.website,
-                  '[ADDRESS]': app_store.property?.address,
-                  '[AREA]': app_store.property?.area,
-                  '[LEVEL2]': app_store.property?.city.name,
-                  '[COUNTRY]': app_store.property?.country.name,
+                  '[AC_NAME]': app_store.property?.name ?? '',
+                  '[URL]': app_store.property?.space_theme.website ?? '',
+                  '[ADDRESS]': app_store.property?.address ?? '',
+                  '[AREA]': app_store.property?.area ?? '',
+                  '[LEVEL2]': app_store.property?.city.name ?? '',
+                  '[COUNTRY]': app_store.property?.country.name ?? '',
                 })}
               ></p>
             </div>
