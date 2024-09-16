@@ -385,6 +385,7 @@ export namespace Components {
     }
     interface IrPaymentView {
         "errors": Record<string, ZodIssue>;
+        "prepaymentAmount": number;
     }
     interface IrPhoneInput {
         "country_code": number;
@@ -398,6 +399,8 @@ export namespace Components {
     }
     interface IrPopover {
         "active": boolean;
+        "allowFlip": boolean;
+        "autoAdjust": boolean;
         "placement": Placement;
         "showCloseButton": boolean;
         "stopListeningForOutsideClicks": boolean;
@@ -2213,6 +2216,7 @@ declare namespace LocalJSX {
     }
     interface IrPaymentView {
         "errors"?: Record<string, ZodIssue>;
+        "prepaymentAmount"?: number;
     }
     interface IrPhoneInput {
         "country_code"?: number;
@@ -2229,6 +2233,8 @@ declare namespace LocalJSX {
     }
     interface IrPopover {
         "active"?: boolean;
+        "allowFlip"?: boolean;
+        "autoAdjust"?: boolean;
         "onOpenChange"?: (event: IrPopoverCustomEvent<boolean>) => void;
         "placement"?: Placement;
         "showCloseButton"?: boolean;

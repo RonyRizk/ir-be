@@ -69,7 +69,7 @@ export class IrFacilities {
           {app_store.property?.amenities.some(a => !['property', 'activity', 'service'].includes(a.amenity_type)) && (
             <div class="flex flex-col flex-wrap gap-4 md:flex-row md:items-start md:justify-between md:gap-8 lg:gap-10">
               {/* hotel */}
-              {app_store.property?.amenities.some(a => a.amenity_type !== 'property') && (
+              {app_store.property?.amenities.some(a => a.amenity_type === 'property') && (
                 <div class="flex gap-4 ">
                   <ir-icons name="home"></ir-icons>
                   <ul>
@@ -87,7 +87,7 @@ export class IrFacilities {
                   </ul>
                 </div>
               )}
-              {app_store.property?.amenities.some(a => a.amenity_type !== 'activity') && (
+              {app_store.property?.amenities.some(a => a.amenity_type === 'activity') && (
                 <div class="flex gap-4">
                   <ir-icons name="football"></ir-icons>
                   <ul>
@@ -105,7 +105,7 @@ export class IrFacilities {
                   </ul>
                 </div>
               )}
-              {app_store.property?.amenities.some(a => a.amenity_type !== 'service') && (
+              {app_store.property?.amenities.some(a => a.amenity_type === 'service') && (
                 <div class="flex gap-4 ">
                   <ir-icons name="bell"></ir-icons>
                   <ul>

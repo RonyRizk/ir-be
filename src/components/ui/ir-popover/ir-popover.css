@@ -3,7 +3,7 @@
   width: 100%;
 }
 .popover-content {
-  z-index: 99;
+  z-index: 9999;
   /* background: var(--background); */
 }
 .trigger {

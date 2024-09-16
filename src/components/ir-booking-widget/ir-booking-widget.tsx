@@ -5,7 +5,7 @@ import { CommonService } from '@/services/api/common.service';
 import { PropertyService } from '@/services/api/property.service';
 import axios from 'axios';
 import app_store from '@/stores/app.store';
-import { addDays, format } from 'date-fns';
+import { addDays, addYears, format } from 'date-fns';
 import localizedWords from '@/stores/localization.store';
 @Component({
   tag: 'ir-widget',
@@ -55,8 +55,8 @@ export class IrBookingWidget {
       language_id: this.language,
       currency_id: 'usd',
     };
-    this.commonService.setToken(this.token);
     this.propertyService.setToken(this.token);
+    this.commonService.setToken(this.token); 
     this.initProperty();
   }
   componentDidLoad() {
@@ -69,6 +69,7 @@ export class IrBookingWidget {
   async initProperty() {
     try {
       this.isLoading = true;
+      
       await Promise.all([
         this.propertyService.getExposedProperty({
           id: this.propertyId,
@@ -77,6 +78,13 @@ export class IrBookingWidget {
           perma_link: this.perma_link,
         }),
         this.commonService.getExposedLanguage(),
+        this.propertyService.getExposedNonBookableNights({
+          porperty_id: this.propertyId,
+          from_date: format(new Date(), 'yyyy-MM-dd'),
+          to_date: format(addYears(new Date(), 1), 'yyyy-MM-dd'),
+          perma_link: this.perma_link,
+          aname:this.p
+        }),
       ]);
     } catch (error) {
       console.log(error);
@@ -110,7 +118,18 @@ export class IrBookingWidget {
     const queryString = queryParams.filter(param => param !== '').join('&');
     window.open(`https://${currentDomain}?${queryString}`, '_blank');
   }
-
+private getDateModifiers() {
+  if (!Object.keys(app_store.nonBookableNights).length) {
+    return undefined;
+  }
+  const nights = {};
+  Object.keys(app_store?.nonBookableNights)?.forEach(nbn => {
+    nights[nbn] = {
+      disabled: true,
+    };
+  });
+  return nights;
+}
   private renderDateTrigger() {
     return (
       <div class="date-trigger" slot="trigger">
@@ -165,9 +184,11 @@ export class IrBookingWidget {
         <div class="booking-widget-container" style={this.contentContainerStyle}>
           <div class={'hovered-container'}></div>
           <ir-popover
+            autoAdjust={false}
+            allowFlip={false}
             class={'ir-popover'}
             showCloseButton={false}
-            placement="auto"
+            placement={this.position === 'fixed' ? 'top-start' : 'auto'}
             ref={el => (this.popover = el)}
             onOpenChange={e => {
               this.isPopoverOpen = e.detail;
@@ -184,6 +205,7 @@ export class IrBookingWidget {
             {this.renderDateTrigger()}
             <div slot="popover-content" class="popup-container w-full border-0 bg-white p-4 pb-6 shadow-none sm:w-auto sm:border sm:p-4 sm:shadow-sm md:p-6 ">
               <ir-date-range
+                dateModifiers={this.getDateModifiers()}
                 minDate={addDays(new Date(), -1)}
                 style={{ '--radius': 'var(--ir-widget-radius)' }}
                 fromDate={this.dates?.from_date}
@@ -205,7 +227,14 @@ export class IrBookingWidget {
               ></ir-date-range>
             </div>
           </ir-popover>
-          <ir-popover ref={el => (this.guestPopover = el)} class={'ir-popover'} showCloseButton={false} placement="auto">
+          <ir-popover
+            autoAdjust={false}
+            allowFlip={false}
+            ref={el => (this.guestPopover = el)}
+            class={'ir-popover'}
+            showCloseButton={false}
+            placement={this.position === 'fixed' ? 'top-start' : 'auto'}
+          >
             {this.renderAdultChildTrigger()}
 
             <ir-guest-counter

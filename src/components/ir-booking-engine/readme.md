@@ -45,6 +45,7 @@
 - [ir-home-loader](../ir-home-loader)
 - [ir-interceptor](../ir-interceptor)
 - [ir-nav](ir-nav)
+- [ir-privacy-policy](ir-privacy-policy)
 - [ir-footer](ir-footer)
 
 ### Graph
@@ -58,6 +59,7 @@ graph TD;
   ir-be --> ir-home-loader
   ir-be --> ir-interceptor
   ir-be --> ir-nav
+  ir-be --> ir-privacy-policy
   ir-be --> ir-footer
   ir-booking-page --> ir-property-gallery
   ir-booking-page --> ir-availibility-header
@@ -109,6 +111,7 @@ graph TD;
   ir-checkout-page --> ir-booking-summary
   ir-quick-auth --> ir-icons
   ir-quick-auth --> ir-button
+  ir-user-form --> ir-checkout-skeleton
   ir-user-form --> ir-input
   ir-user-form --> ir-phone-input
   ir-user-form --> ir-select
@@ -128,17 +131,15 @@ graph TD;
   ir-booking-summary --> ir-button
   ir-booking-summary --> ir-payment-view
   ir-booking-summary --> ir-checkbox
-  ir-booking-summary --> ir-privacy-policy
   ir-payment-view --> ir-input
   ir-payment-view --> ir-credit-card-input
   ir-payment-view --> ir-select
-  ir-privacy-policy --> ir-button
-  ir-privacy-policy --> ir-dialog
   ir-invoice --> ir-interceptor
   ir-invoice --> ir-nav
   ir-invoice --> ir-icons
   ir-invoice --> ir-button
   ir-invoice --> ir-footer
+  ir-invoice --> ir-privacy-policy
   ir-invoice --> ir-booking-cancelation
   ir-invoice --> ir-skeleton
   ir-interceptor --> ir-alert-dialog
@@ -177,9 +178,10 @@ graph TD;
   ir-signup --> ir-input
   ir-signup --> ir-button
   ir-footer --> ir-button
-  ir-footer --> ir-privacy-policy
   ir-footer --> ir-icons
   ir-footer --> ir-dialog
+  ir-privacy-policy --> ir-button
+  ir-privacy-policy --> ir-dialog
   ir-booking-cancelation --> ir-alert-dialog
   ir-booking-cancelation --> ir-skeleton
   ir-booking-cancelation --> ir-icons
@@ -193,6 +195,7 @@ graph TD;
   ir-booking-listing --> ir-auth
   ir-booking-listing --> ir-interceptor
   ir-booking-listing --> ir-footer
+  ir-booking-listing --> ir-privacy-policy
   ir-booking-overview --> ir-skeleton
   ir-booking-overview --> ir-booking-header
   ir-booking-overview --> ir-badge

@@ -7,9 +7,10 @@
 
 ## Properties
 
-| Property | Attribute | Description | Type                         | Default     |
-| -------- | --------- | ----------- | ---------------------------- | ----------- |
-| `errors` | --        |             | `{ [x: string]: ZodIssue; }` | `undefined` |
+| Property           | Attribute           | Description | Type                         | Default     |
+| ------------------ | ------------------- | ----------- | ---------------------------- | ----------- |
+| `errors`           | --                  |             | `{ [x: string]: ZodIssue; }` | `undefined` |
+| `prepaymentAmount` | `prepayment-amount` |             | `number`                     | `0`         |
 
 
 ## Dependencies

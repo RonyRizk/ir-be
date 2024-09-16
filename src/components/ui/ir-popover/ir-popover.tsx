@@ -1,6 +1,7 @@
 import { Component, h, Prop, State, Element, Method, Event, EventEmitter, Fragment, Listen } from '@stencil/core';
 import { createPopper, Placement } from '@popperjs/core';
 import localization_store from '@/stores/app.store';
+import app_store from '@/stores/app.store';
 
 @Component({
   tag: 'ir-popover',
@@ -11,10 +12,12 @@ export class IrPopover {
   @Element() el: HTMLElement;
 
   @Prop() active: boolean = false;
+  @Prop() autoAdjust: boolean = true;
   @Prop() trigger_label: string = '';
   @Prop() placement: Placement;
   @Prop() stopListeningForOutsideClicks: boolean = false;
   @Prop() showCloseButton: boolean = true;
+  @Prop() allowFlip: boolean = true;
 
   @State() isVisible: boolean = false;
   @State() isMobile: boolean = window.innerWidth < 640;
@@ -73,7 +76,7 @@ export class IrPopover {
   initializePopover() {
     if (this.triggerElement && this.contentElement) {
       this.popoverInstance = createPopper(this.triggerElement, this.contentElement, {
-        placement: this.placement || localization_store.dir === 'LTR' ? 'bottom-start' : 'bottom-end',
+        placement: this.placement?this.placement: localization_store.dir === 'LTR' ? 'bottom-start' : 'bottom-end',
         modifiers: [
           {
             name: 'offset',
@@ -81,6 +84,10 @@ export class IrPopover {
               offset: [0, 3],
               adaptive: true,
             },
+          },
+          {
+            name: 'flip',
+            enabled: app_store.app_data.injected ? false : this.allowFlip,
           },
         ],
       });
@@ -112,11 +119,28 @@ export class IrPopover {
           .then(() => {
             this.popoverInstance.update();
           });
+      } else if ( (this.popoverInstance.state.options.placement === 'top-start' && currentDir === 'rtl') ||
+      (this.popoverInstance.state.options.placement === 'top-end' && currentDir === 'ltr')) {
+        let newPlacement = this.popoverInstance.state.options.placement;
+        if (currentDir === 'rtl') {
+          newPlacement = newPlacement.replace('top-start', 'top-end');
+        } else {
+          newPlacement = newPlacement.replace('top-end', 'top-start');
+        }
+        this.popoverInstance
+          .setOptions({
+            placement: newPlacement,
+          })
+          .then(() => {
+            this.popoverInstance.update();
+          });
       } else {
         this.popoverInstance.update();
       }
     }
-    this.adjustPopoverPlacement();
+    if (!app_store.app_data.injected&&this.autoAdjust) {
+      this.adjustPopoverPlacement();
+    }
     this.openChange.emit(this.isVisible);
   }
   adjustPopoverPlacement() {

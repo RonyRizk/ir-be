@@ -6,6 +6,9 @@ export type UserPreference = {
   language_id: string;
   currency_id: string;
 };
+export type NonBookableNights = {
+  night: string;
+};
 interface IUserDefaultCountry {
   cities: [];
   currency: ICurrency;
@@ -20,6 +23,7 @@ export type TSource = {
 };
 
 export interface IAppStore {
+  nonBookableNights: Record<string, null>;
   currencies: TCurrency[];
   localizedWords: string[];
   dir: TDirection;
@@ -61,6 +65,7 @@ export interface IAppStore {
 }
 
 const initialState: IAppStore = {
+  nonBookableNights: null,
   currentPage: 'booking',
   dir: 'LTR',
   selectedLocale: enUS,

@@ -101,7 +101,11 @@ export class IrBookingSummary {
                 )}
               </ul>
             </div>
-            <ir-payment-view class="w-full" errors={this.error && this.error.cause === 'payment' ? this.error.issues : undefined}></ir-payment-view>
+            <ir-payment-view
+              class="w-full"
+              prepaymentAmount={this.prepaymentAmount}
+              errors={this.error && this.error.cause === 'payment' ? this.error.issues : undefined}
+            ></ir-payment-view>
             <div class="w-full space-y-1">
               <div class={'flex w-full items-center gap-1'}>
                 <ir-checkbox

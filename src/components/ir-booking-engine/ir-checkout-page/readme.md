@@ -41,6 +41,7 @@ graph TD;
   ir-button --> ir-icons
   ir-quick-auth --> ir-icons
   ir-quick-auth --> ir-button
+  ir-user-form --> ir-checkout-skeleton
   ir-user-form --> ir-input
   ir-user-form --> ir-phone-input
   ir-user-form --> ir-select
@@ -62,12 +63,9 @@ graph TD;
   ir-booking-summary --> ir-button
   ir-booking-summary --> ir-payment-view
   ir-booking-summary --> ir-checkbox
-  ir-booking-summary --> ir-privacy-policy
   ir-payment-view --> ir-input
   ir-payment-view --> ir-credit-card-input
   ir-payment-view --> ir-select
-  ir-privacy-policy --> ir-button
-  ir-privacy-policy --> ir-dialog
   ir-be --> ir-checkout-page
   style ir-checkout-page fill:#f9f,stroke:#333,stroke-width:4px
 ```

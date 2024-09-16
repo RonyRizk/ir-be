@@ -51,14 +51,16 @@
 .day-button:focus-visible {
   outline-color: hsl(var(--brand-600, 215, 87%, 51%));
 }
-.day-button:disabled {
+.day-button:disabled,
+.day-button[aria-unavailable='true'] {
   opacity: 0.3;
   cursor: default;
 }
-.day-button:disabled .day {
+.day-button:disabled .day,
+.day-button[aria-unavailable='true'] .day {
   text-decoration: line-through;
 }
-.day-button:disabled:hover::after {
+.day-button:disabled:hover::after .day-button[aria-unavailable='true']:hover::after {
   content: none;
 }
 .day-button .day,

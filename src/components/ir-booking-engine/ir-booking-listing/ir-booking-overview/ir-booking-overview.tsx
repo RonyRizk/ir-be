@@ -70,7 +70,7 @@ export class IrBookingOverview {
       this.isLoading = true;
       let requests = [];
       if (this.bookingNumber && this.page_mode === 'single') {
-        requests.unshift(this.propertyService.getExposedBooking({ booking_nbr: this.bookingNumber, language: this.language }, false));
+        requests.unshift(this.propertyService.getExposedBooking({ booking_nbr: this.bookingNumber, language: this.language,currency:null }, false));
       } else if (this.page_mode === 'multi') {
         requests.unshift(this.getBookings());
       }

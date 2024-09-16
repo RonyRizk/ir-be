@@ -12,6 +12,13 @@
 | `version` | `version` |             | `string` | `undefined` |
 
 
+## Events
+
+| Event               | Description | Type                |
+| ------------------- | ----------- | ------------------- |
+| `openPrivacyPolicy` |             | `CustomEvent<null>` |
+
+
 ## Dependencies
 
 ### Used by
@@ -23,7 +30,6 @@
 ### Depends on
 
 - [ir-button](../../ui/ir-button)
-- [ir-privacy-policy](../ir-privacy-policy)
 - [ir-icons](../../ui/ir-icons)
 - [ir-dialog](../../ui/ir-dialog)
 
@@ -31,12 +37,9 @@
 ```mermaid
 graph TD;
   ir-footer --> ir-button
-  ir-footer --> ir-privacy-policy
   ir-footer --> ir-icons
   ir-footer --> ir-dialog
   ir-button --> ir-icons
-  ir-privacy-policy --> ir-button
-  ir-privacy-policy --> ir-dialog
   ir-dialog --> ir-button
   ir-be --> ir-footer
   ir-booking-listing --> ir-footer

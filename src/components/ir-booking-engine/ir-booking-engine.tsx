@@ -1,7 +1,7 @@
 import { CommonService } from '@/services/api/common.service';
 import { PropertyService } from '@/services/api/property.service';
 import { Component, Listen, Prop, State, Watch, h } from '@stencil/core';
-import { format, Locale } from 'date-fns';
+import { addYears, format, Locale } from 'date-fns';
 import { ICurrency, IExposedLanguages } from '@/models/commun';
 import axios from 'axios';
 import { IExposedProperty } from '@/models/property';
@@ -163,6 +163,13 @@ export class IrBookingEngine {
       this.commonService.getExposedCountryByIp(),
       this.commonService.getExposedLanguage(),
       this.propertyService.getExposedProperty({ id: this.propertyId, language: app_store.userPreferences?.language_id || 'en', aname: this.p, perma_link: this.perma_link }),
+      this.propertyService.getExposedNonBookableNights({
+        porperty_id: this.propertyId,
+        from_date: format(new Date(), 'yyyy-MM-dd'),
+        to_date: format(addYears(new Date(), 1), 'yyyy-MM-dd'),
+        perma_link: this.perma_link,
+        aname:this.p
+      }),
     ];
     if (app_store.is_signed_in) {
       requests.push(this.propertyService.getExposedGuest());

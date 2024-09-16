@@ -24,10 +24,12 @@ interface CheckoutStore {
   modifiedGuestName: boolean;
   payment: TPayment | null;
   agreed_to_services: boolean;
+  prepaymentAmount: number;
 }
 
 const initialState: CheckoutStore = {
   userFormData: {},
+  prepaymentAmount: 0,
   modifiedGuestName: false,
   pickup: {
     arrival_date: format(new Date(), 'yyyy-MM-dd'),

@@ -138,6 +138,10 @@ export class IrDateRange {
   }
 
   selectDay(day: Date) {
+    const isDateDisabled = !!this.dateModifiers[format(day, 'yyyy-MM-dd')];
+    if (isDateDisabled && !this.selectedDates.start) {
+      return;
+    }
     if (isSameDay(new Date(this.selectedDates.start), new Date(day)) || isSameDay(new Date(this.selectedDates.end), new Date(day))) {
       this.selectedDates = { start: day, end: null };
     } else {
@@ -146,12 +150,17 @@ export class IrDateRange {
       } else {
         if (this.selectedDates.end === null) {
           if (isBefore(day, this.selectedDates.start)) {
+            if (isDateDisabled) {
+              return;
+            }
             this.selectedDates = { start: day, end: null };
           } else {
             this.selectedDates = { ...this.selectedDates, end: day };
           }
         } else {
-          this.selectedDates = { start: day, end: null };
+          if (!isDateDisabled) {
+            this.selectedDates = { start: day, end: null };
+          }
         }
       }
     }
@@ -292,7 +301,7 @@ export class IrDateRange {
                         <td class="day-cell" key={format(day, 'yyyy-MM-dd')} role="gridcell">
                           {isSameMonth(day, month.month) && (
                             <button
-                              disabled={isBefore(day, this.minDate) || isAfter(day, this.maxDate) || checkedDate?.disabled}
+                              disabled={isBefore(day, this.minDate) || isAfter(day, this.maxDate)}
                               onMouseEnter={() => this.handleMouseEnter(day)}
                               onMouseLeave={() => this.handleMouseLeave()}
                               onClick={e => {
@@ -300,6 +309,8 @@ export class IrDateRange {
                                 e.stopPropagation();
                                 this.selectDay(day);
                               }}
+                              title={checkedDate?.disabled ? localizedWords?.entries?.Lcz_NoAvailability??'No availability' : ''}
+                              aria-unavailable={checkedDate?.disabled ? 'true' : 'false'}
                               aria-label={`${format(day, 'EEEE, MMMM do yyyy', { locale: this.locale })} ${
                                 isBefore(day, this.minDate) || isAfter(day, this.maxDate) ? localizedWords.entries.Lcz_NotAvailable : ''
                               }`}

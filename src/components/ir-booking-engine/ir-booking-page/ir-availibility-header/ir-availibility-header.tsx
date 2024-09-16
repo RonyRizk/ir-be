@@ -9,6 +9,7 @@ import booking_store from '@/stores/booking';
 import { v4 } from 'uuid';
 import { AvailabiltyService } from '@/services/app/availability.service';
 import localizedWords from '@/stores/localization.store';
+import { QueryStringValidator } from '@/validators/querystring.validator';
 
 @Component({
   tag: 'ir-availibility-header',
@@ -34,7 +35,6 @@ export class IrAvailibilityHeader {
     agent_id: booking_store.bookingAvailabilityParams.agent || 0,
   };
   @State() target: HTMLElement = null;
-
   @State() errorCause: ('date' | 'adult_child')[] | null = null;
   @State() isLoading = false;
 
@@ -47,6 +47,7 @@ export class IrAvailibilityHeader {
 
   private propertyService = new PropertyService();
   private availabiltyService = new AvailabiltyService();
+  private validator = new QueryStringValidator();
 
   // private popperInstance: any;
   // private personCounter: HTMLIrAdultChildCounterElement;
@@ -55,12 +56,13 @@ export class IrAvailibilityHeader {
     const { token, property_id } = app_store.app_data;
     this.propertyService.setToken(token);
     this.availabiltyService.subscribe(() => this.disableLoading());
+    const validatedFromDate = this.validator.validateCheckin(this.fromDate);
     this.exposedBookingAvailabiltyParams = {
       ...this.exposedBookingAvailabiltyParams,
-      adult_nbr: +this.adultCount || 0,
-      child_nbr: +this.childrenCount || 0,
-      from_date: this.fromDate,
-      to_date: this.toDate,
+      adult_nbr: !this.validator.validateAdultCount(this.adultCount) ? +this.adultCount : 2,
+      child_nbr: !this.validator.validateChildrenCount(this.childrenCount) ? +this.childrenCount : 0,
+      from_date: validatedFromDate ? this.fromDate : null,
+      to_date: this.validator.validateCheckout(this.toDate, validatedFromDate) ? this.toDate : null,
     };
     if (booking_store.bookingAvailabilityParams.from_date) {
       this.exposedBookingAvailabiltyParams.from_date = format(booking_store.bookingAvailabilityParams.from_date, 'yyyy-MM-dd');
@@ -70,6 +72,7 @@ export class IrAvailibilityHeader {
       this.exposedBookingAvailabiltyParams.adult_nbr = booking_store.bookingAvailabilityParams.adult_nbr;
       this.exposedBookingAvailabiltyParams.child_nbr = booking_store.bookingAvailabilityParams.child_nbr;
     }
+    console.log(this.validator.getErrors());
     this.changeExposedAvailabilityParams({
       propertyid: property_id,
       language: app_store.userPreferences.language_id,
@@ -86,9 +89,7 @@ export class IrAvailibilityHeader {
         }
       } catch (error) {}
     });
-    if (this.fromDate && this.toDate && this.adultCount) {
-      this.checkAvailability();
-    }
+    this.recheckAvailability();
   }
 
   disableLoading() {
@@ -96,51 +97,67 @@ export class IrAvailibilityHeader {
       this.isLoading = false;
     }
   }
+  private recheckAvailability() {
+    if (!this.fromDate || !this.toDate || !this.adultCount) {
+      return;
+    }
+    const isValidFromDate = this.validator.validateCheckin(this.fromDate);
+    const isValidToDate = this.validator.validateCheckout(this.toDate, isValidFromDate);
+    const isValidAdultCount = this.validator.validateAdultCount(this.adultCount);
+    if (isValidAdultCount && isValidFromDate && isValidToDate) {
+      this.checkAvailability();
+    }
+  }
   @Watch('fromDate')
   handleFromDateChange(newValue: string, oldValue: string) {
     if (newValue !== oldValue) {
-      this.exposedBookingAvailabiltyParams = {
-        ...this.exposedBookingAvailabiltyParams,
-        from_date: newValue,
-      };
-      if (this.fromDate && this.toDate && this.adultCount) {
-        this.checkAvailability();
+      if (this.validator.validateCheckin(newValue)) {
+        this.exposedBookingAvailabiltyParams = {
+          ...this.exposedBookingAvailabiltyParams,
+          from_date: newValue,
+        };
+        if (this.fromDate && this.toDate && !this.validator.validateAdultCount(this.adultCount)) {
+          this.checkAvailability();
+        }
       }
     }
   }
   @Watch('toDate')
   handleToDateChange(newValue: string, oldValue: string) {
     if (newValue !== oldValue) {
-      this.exposedBookingAvailabiltyParams = {
-        ...this.exposedBookingAvailabiltyParams,
-        to_date: newValue,
-      };
-      if (this.fromDate && this.toDate && this.adultCount) {
-        this.checkAvailability();
+      const validatedFromDate = this.validator.validateCheckin(this.fromDate);
+      if (validatedFromDate) {
+        if (this.validator.validateCheckout(newValue, validatedFromDate)) {
+          this.exposedBookingAvailabiltyParams = {
+            ...this.exposedBookingAvailabiltyParams,
+            to_date: newValue,
+          };
+          this.recheckAvailability();
+        }
       }
     }
   }
   @Watch('childrenCount')
   handleChildrenCountChange(newValue: string, oldValue: string) {
     if (newValue !== oldValue) {
-      this.exposedBookingAvailabiltyParams = {
-        ...this.exposedBookingAvailabiltyParams,
-        child_nbr: +newValue,
-      };
-      if (this.fromDate && this.toDate && this.adultCount) {
-        this.checkAvailability();
+      if (!this.validator.validateChildrenCount(newValue)) {
+        this.exposedBookingAvailabiltyParams = {
+          ...this.exposedBookingAvailabiltyParams,
+          child_nbr: +newValue,
+        };
+        this.recheckAvailability();
       }
     }
   }
   @Watch('adultCount')
   handleAdultCountChange(newValue: string, oldValue: string) {
     if (newValue !== oldValue) {
-      this.exposedBookingAvailabiltyParams = {
-        ...this.exposedBookingAvailabiltyParams,
-        adult_nbr: +newValue,
-      };
-      if (this.fromDate && this.toDate && this.adultCount) {
-        this.checkAvailability();
+      if (!this.validator.validateAdultCount(newValue)) {
+        this.exposedBookingAvailabiltyParams = {
+          ...this.exposedBookingAvailabiltyParams,
+          adult_nbr: +newValue,
+        };
+        this.recheckAvailability();
       }
     }
   }

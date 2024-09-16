@@ -147,7 +147,8 @@ export class IrRateplan {
             ) : (
               <Fragment>
                 {this.isRatePlanAvailable ? (
-                  !this.visibleInventory?.selected_variation?.variation?.IS_MLS_VIOLATED && (
+                  !this.visibleInventory?.selected_variation?.variation?.IS_MLS_VIOLATED &&
+                  this.visibleInventory?.selected_variation?.variation?.amount && (
                     <div class="rateplan-pricing-mobile">
                       {this.visibleInventory?.selected_variation?.variation?.discount_pct > 0 && (
                         <p class="rateplan-discounted-amount">

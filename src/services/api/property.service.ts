@@ -5,7 +5,7 @@ import { Booking } from '@/models/booking.dto';
 import { DataStructure } from '@/models/commun';
 import { ISetupEntries } from '@/models/property';
 import app_store from '@/stores/app.store';
-import booking_store, { calculateTotalCost, IRatePlanSelection } from '@/stores/booking';
+import booking_store, { IRatePlanSelection } from '@/stores/booking';
 import { checkout_store, ICardProcessingWithCVC, ICardProcessingWithoutCVC, updateUserFormData } from '@/stores/checkout.store';
 import { getDateDifference, injectHTML } from '@/utils/utils';
 import axios from 'axios';
@@ -62,7 +62,22 @@ export class PropertyService extends Token {
     }
     return result.My_Result;
   }
-
+  public async getExposedNonBookableNights(params: { from_date: string; to_date: string; porperty_id: number; aname: string; perma_link: string }) {
+    const token = this.getToken();
+    if (!token) {
+      throw new MissingTokenError();
+    }
+    const { data } = await axios.post(`/Get_Exposed_Non_Bookable_Nights?Ticket=${token}`, params);
+    if (data.ExceptionMsg !== '') {
+      throw new Error(data.ExceptionMsg);
+    }
+    const nights = {};
+    data.My_Result?.forEach(nbn => {
+      nights[nbn.night] = true;
+    });
+    app_store.nonBookableNights = nights;
+    return data.My_Result;
+  }
   public async getExposedBookingAvailability(props: {
     params: TExposedBookingAvailability;
     identifier: string;
@@ -84,7 +99,7 @@ export class PropertyService extends Token {
     return data;
   }
 
-  public async getExposedBooking(params: { booking_nbr: string; language: string }, withExtras: boolean = true) {
+  public async getExposedBooking(params: { booking_nbr: string; language: string; currency: string }, withExtras: boolean = true) {
     const token = this.getToken();
     if (!token) {
       throw new MissingTokenError();
@@ -99,6 +114,7 @@ export class PropertyService extends Token {
               key: 'prepayment_amount',
               value: '',
             },
+            { key: 'payment_code', value: '' },
           ]
         : null,
     });
@@ -211,7 +227,7 @@ export class PropertyService extends Token {
   }
 
   public async bookUser() {
-    const { prePaymentAmount } = calculateTotalCost();
+    const prePaymentAmount = checkout_store.prepaymentAmount;
     try {
       const token = this.getToken();
       if (!token) {
@@ -248,21 +264,29 @@ export class PropertyService extends Token {
           },
           source: { code: app_store.app_data.isFromGhs ? 'ghs' : window.location.href, tag: app_store.app_data.stag, description: '' },
           referrer_site: app_store.app_data.affiliate ? `https://${app_store.app_data.affiliate.sites[0].url}` : 'www.igloorooms.com',
-          currency: app_store.property.currency,
+          currency: app_store.currencies.find(currency => currency.code.toString().toLowerCase() === app_store.userPreferences.currency_id.toLowerCase()),
           arrival: { code: checkout_store.userFormData.arrival_time },
           guest,
           rooms: this.filterRooms(),
         },
         extras: [
+          prePaymentAmount > 0
+            ? {
+                key: 'payment_code',
+                value: checkout_store.payment.code,
+              }
+            : null,
+          prePaymentAmount > 0
+            ? {
+                key: 'prepayment_amount',
+                value: prePaymentAmount,
+              }
+            : null,
           {
             key: 'payment_code',
-            value: checkout_store.payment.code,
+            value: app_store.userPreferences.currency_id,
           },
-          {
-            key: 'prepayment_amount',
-            value: prePaymentAmount,
-          },
-        ],
+        ].filter(f => f !== null),
         pickup_info: checkout_store.pickup.location ? this.propertyHelpers.convertPickup(checkout_store.pickup) : null,
       };
       const { data } = await axios.post(`/DoReservation?Ticket=${token}`, body);

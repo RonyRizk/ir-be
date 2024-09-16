@@ -17,7 +17,7 @@
 | `footerShown`        | `footer-shown`         |             | `boolean` | `true`                                  |
 | `headerMessageShown` | `header-message-shown` |             | `boolean` | `true`                                  |
 | `headerShown`        | `header-shown`         |             | `boolean` | `true`                                  |
-| `language`           | `language`             |             | `string`  | `'en'`                                  |
+| `language`           | `language`             |             | `string`  | `undefined`                             |
 | `locationShown`      | `location-shown`       |             | `boolean` | `true`                                  |
 | `perma_link`         | `perma_link`           |             | `string`  | `null`                                  |
 | `propertyId`         | `property-id`          |             | `number`  | `undefined`                             |
@@ -39,6 +39,7 @@
 - [ir-icons](../ui/ir-icons)
 - [ir-button](../ui/ir-button)
 - [ir-footer](../ir-booking-engine/ir-footer)
+- [ir-privacy-policy](../ir-booking-engine/ir-privacy-policy)
 - [ir-booking-cancelation](../ir-booking-cancelation)
 - [ir-skeleton](../ui/ir-skeleton)
 
@@ -50,6 +51,7 @@ graph TD;
   ir-invoice --> ir-icons
   ir-invoice --> ir-button
   ir-invoice --> ir-footer
+  ir-invoice --> ir-privacy-policy
   ir-invoice --> ir-booking-cancelation
   ir-invoice --> ir-skeleton
   ir-interceptor --> ir-alert-dialog
@@ -91,7 +93,6 @@ graph TD;
   ir-signup --> ir-button
   ir-dialog --> ir-button
   ir-footer --> ir-button
-  ir-footer --> ir-privacy-policy
   ir-footer --> ir-icons
   ir-footer --> ir-dialog
   ir-privacy-policy --> ir-button

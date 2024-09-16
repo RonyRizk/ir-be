@@ -89,7 +89,8 @@ export class IrCheckoutPage {
       }
       return (prev + curr.amount) * total;
     }, 0);
-    console.log(requests);
+    // this.prepaymentAmount = 0;
+    checkout_store.prepaymentAmount = this.prepaymentAmount;
   }
   @Listen('bookingClicked')
   async handleBooking(e: CustomEvent) {
@@ -112,12 +113,16 @@ export class IrCheckoutPage {
   }
 
   private validatePayment(): boolean {
+    if (this.prepaymentAmount === 0) {
+      return true;
+    }
     const currentPayment = app_store.property.allowed_payment_methods.find(p => p.code === checkout_store.payment?.code);
     this.selectedPaymentMethod = currentPayment;
+
     if (!currentPayment) {
       return false;
     }
-    if (currentPayment.is_payment_gateway) {
+    if (currentPayment.is_payment_gateway || currentPayment.code === '000' || currentPayment.code === '005') {
       return true;
     }
     try {
@@ -203,6 +208,7 @@ export class IrCheckoutPage {
   private async processBooking() {
     try {
       const result = await this.propertyService.bookUser();
+
       booking_store.booking = result;
       const conversionTag = app_store.property?.tags.find(t => t.key === 'conversion');
       if (conversionTag && conversionTag.value) {

@@ -2,7 +2,7 @@ import app_store from '@/stores/app.store';
 import { checkout_store, ICardProcessingWithCVC, ICardProcessingWithoutCVC } from '@/stores/checkout.store';
 import localizedWords from '@/stores/localization.store';
 import { ZCreditCardSchemaWithCvc } from '@/validators/checkout.validator';
-import { Component, Prop, State, h } from '@stencil/core';
+import { Component, Prop, State, Watch, h } from '@stencil/core';
 import IMask from 'imask';
 import { ZodIssue } from 'zod';
 @Component({
@@ -11,19 +11,43 @@ import { ZodIssue } from 'zod';
   shadow: true,
 })
 export class IrPaymentView {
+  @Prop() prepaymentAmount: number = 0;
   @Prop() errors: Record<string, ZodIssue>;
   @State() selectedPaymentMethod: string;
   @State() cardType: string = '';
 
   componentWillLoad() {
-    this.selectedPaymentMethod = app_store.property?.allowed_payment_methods[0].code;
-    console.log(this.selectedPaymentMethod);
+    this.setPaymentMethod();
     if (!checkout_store.payment) {
       checkout_store.payment = {
         code: this.selectedPaymentMethod,
       };
     }
   }
+  @Watch('prepaymentAmount')
+  handlePrePaymentAmount(newValue, oldValue) {
+    if (newValue === 0) {
+      this.selectedPaymentMethod = null;
+    } else if (newValue !== oldValue) {
+      this.setPaymentMethod();
+    }
+  }
+
+  private setPaymentMethod() {
+    if (this.prepaymentAmount === 0) {
+      return;
+    }
+    const paymentMethods = app_store.property?.allowed_payment_methods.filter(pm => pm.is_active) || [];
+    let selectedMethodCode = null;
+
+    if (paymentMethods.length > 0) {
+      const [firstMethod, secondMethod] = paymentMethods;
+      selectedMethodCode = firstMethod.code === '000' && secondMethod ? secondMethod.code : firstMethod.code;
+    }
+
+    this.selectedPaymentMethod = selectedMethodCode;
+  }
+
   private getExpiryMask() {
     const currentYear = new Date().getFullYear() % 100;
     return {
@@ -48,11 +72,15 @@ export class IrPaymentView {
       placeholderChar: '_',
     };
   }
+
   renderPaymentMethod() {
     if (app_store.property.allowed_payment_methods.length === 0) {
       return;
     }
     const method = app_store.property?.allowed_payment_methods.find(apm => apm.code === this.selectedPaymentMethod);
+    if (this.selectedPaymentMethod === '000') {
+      return <p class="text-center">{localizedWords.entries.Lcz_NoDepositRequired}</p>;
+    }
     if (this.selectedPaymentMethod === '001' || this.selectedPaymentMethod === '004')
       return (
         <form class="flex w-full gap-4" key={method.code}>
@@ -207,19 +235,27 @@ export class IrPaymentView {
     checkout_store.payment.code = payment_code;
   }
   renderPaymentOptions() {
-    const paymentLength = app_store.property.allowed_payment_methods.length;
-    if (paymentLength === 0) {
+    const paymentLength = app_store.property.allowed_payment_methods.filter(p => p.is_active).length;
+    if (paymentLength === 0 || this.prepaymentAmount === 0 || (paymentLength === 1 && this.selectedPaymentMethod === '000')) {
       return <p class="text-center">{localizedWords.entries.Lcz_NoDepositRequired}</p>;
     }
     if (paymentLength > 1) {
       return (
         <ir-select
           variant="double-line"
+          value={this.selectedPaymentMethod.toString()}
           label={localizedWords.entries.Lcz_SelectYourPaymentMethod}
-          data={app_store.property?.allowed_payment_methods.map(apm => ({
-            id: apm.code,
-            value: apm.is_payment_gateway ? `${localizedWords.entries.Lcz_CardPaymentWith} ${apm.description}` : apm.description,
-          }))}
+          data={app_store.property?.allowed_payment_methods
+            .map(apm => {
+              if (!apm.is_active) {
+                return null;
+              }
+              return {
+                id: apm.code,
+                value: apm.is_payment_gateway ? `${localizedWords.entries.Lcz_CardPaymentWith} ${apm.description}` : apm.description,
+              };
+            })
+            .filter(p => p !== null)}
           onValueChange={this.handlePaymentSelectionChange.bind(this)}
         ></ir-select>
       );
@@ -235,13 +271,14 @@ export class IrPaymentView {
     return (
       <div class="w-full space-y-4 rounded-md border border-solid bg-white  p-4">
         {this.renderPaymentOptions()}
-        {this.renderPaymentMethod()}
-        {this.cardType !== '' && !app_store.property.allowed_cards.find(c => c.name.toLowerCase().includes(this.cardType?.toLowerCase())) && (
-          <p class={'text-red-500'}>
-            {localizedWords.entries.Lcz_CardTypeNotSupport}:{' '}
-            {app_store.property?.allowed_cards?.map((c, i) => `${c.name}${i < app_store.property?.allowed_cards.length - 1 ? ', ' : ''}`)}
-          </p>
-        )}
+        {this.prepaymentAmount > 0 && this.renderPaymentMethod()}
+        {this.cardType !== '' &&
+          !app_store.property.allowed_cards.find(c => c.name.toLowerCase().includes(this.cardType === 'AMEX' ? 'american express' : this.cardType?.toLowerCase())) && (
+            <p class={'text-red-500'}>
+              {localizedWords.entries.Lcz_CardTypeNotSupport}{' '}
+              {app_store.property?.allowed_cards?.map((c, i) => `${c.name}${i < app_store.property?.allowed_cards.length - 1 ? ', ' : ''}`)}
+            </p>
+          )}
       </div>
     );
   }

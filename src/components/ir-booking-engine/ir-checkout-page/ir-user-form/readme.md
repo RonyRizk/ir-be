@@ -27,6 +27,7 @@
 
 ### Depends on
 
+- [ir-checkout-skeleton](../ir-checkout-skeleton)
 - [ir-input](../../../ui/ir-input)
 - [ir-phone-input](../../../ui/ir-phone-input)
 - [ir-select](../../../ui/ir-select)
@@ -36,6 +37,7 @@
 ### Graph
 ```mermaid
 graph TD;
+  ir-user-form --> ir-checkout-skeleton
   ir-user-form --> ir-input
   ir-user-form --> ir-phone-input
   ir-user-form --> ir-select

@@ -86,7 +86,7 @@ export class IrInvoice {
   @Watch('bookingNbr')
   async handleBookingNumberChange(newValue, oldValue) {
     if (newValue !== oldValue) {
-      this.booking = await this.propertyService.getExposedBooking({ booking_nbr: this.bookingNbr, language: this.language || app_store.userPreferences.language_id }, true);
+      this.booking = await this.propertyService.getExposedBooking({ booking_nbr: this.bookingNbr, language: this.language || app_store.userPreferences.language_id,currency:null }, true);
     }
   }
   async init() {
@@ -102,7 +102,7 @@ export class IrInvoice {
       this.init();
     }
     console.warn(this.be, resetLanguage);
-    const requests: any[] = [this.propertyService.getExposedBooking({ booking_nbr: this.bookingNbr, language })];
+    const requests: any[] = [this.propertyService.getExposedBooking({ booking_nbr: this.bookingNbr, language ,currency:null})];
     if (!this.be || resetLanguage) {
       requests.push(this.commonService.getExposedLanguage());
       requests.push(
@@ -215,7 +215,14 @@ export class IrInvoice {
           <p class="total-payment text-sm">
             {localizedWords.entries.Lcz_DueAmountNow} <span>{formatAmount(this.booking.financial.due_amount, this.booking.currency.code)}</span>
           </p>
-          <p>{paymentOption.description}</p>
+          {/* <p>{paymentOption.description}</p> */}
+          <p
+            class="mt-1.5 text-xs text-gray-700"
+            innerHTML={
+              paymentOption.localizables?.find(d => d.language.code.toLowerCase() === app_store.userPreferences.language_id.toLowerCase())?.description ||
+              paymentOption.localizables?.find(d => d.language.code.toLowerCase() === 'en')?.description
+            }
+          ></p>
         </div>
       );
     }
@@ -263,11 +270,6 @@ export class IrInvoice {
     }
     if (this.isLoading) {
       return (
-        // <div >
-        //   {[...new Array(10)].map((_, i) => (
-        //     <div key={i} class="h-72 w-full animate-pulse rounded-md bg-gray-200"></div>
-        //   ))}
-        // </div>
         <div class="flex  flex-col gap-4 ">
           <InvoiceSkeleton />
         </div>
@@ -294,7 +296,7 @@ export class IrInvoice {
           )}
           <section class={`flex-1 ${this.be ? '' : 'invoice-container mx-auto w-full max-w-6xl'}`}>
             {this.headerMessageShown && isBefore(new Date(), new Date(this.booking.to_date)) ? (
-              <div class={this.be ? '' : 'invoice-container'}>
+              <div class={'invoice-container'}>
                 <p class={`flex items-center gap-4 text-xl font-medium ${this.status === 1 ? 'text-green-600' : 'text-red-500'} ${this.be ? '' : ''}`}>
                   <ir-icons name={this.status === 1 ? 'check' : 'xmark'} />
                   <span> {this.status === 1 ? localizedWords.entries.Lcz_YourBookingIsConfirmed : localizedWords.entries.Lcz_YourPaymentIsUnsuccesful}</span>
@@ -302,7 +304,7 @@ export class IrInvoice {
                 {this.status === 1 && <p>{localizedWords.entries.Lcz_AnEmailHasBeenSent.replace('%1', this.booking.guest.email)}</p>}
               </div>
             ) : (
-              <div class={this.be ? '' : 'invoice-container'}>
+              <div class={'invoice-container'}>
                 <p class={'text-xl font-medium '}>{localizedWords.entries.Lcz_ThisBookingIs.replace('%1', this.booking.status.description)}</p>
               </div>
             )}

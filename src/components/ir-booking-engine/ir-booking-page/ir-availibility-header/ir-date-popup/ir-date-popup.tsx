@@ -1,3 +1,4 @@
+import app_store from '@/stores/app.store';
 import localization_store from '@/stores/app.store';
 import localizedWords from '@/stores/localization.store';
 import { Component, Host, h, Element, Prop, Watch, State, Event, EventEmitter } from '@stencil/core';
@@ -80,10 +81,29 @@ export class IrDatePopup {
         >
           {this.dateTrigger()}
           <div slot="popover-content" class="date-range-container w-full border-0 p-4 pb-6 shadow-none sm:w-auto sm:border sm:p-4 sm:shadow-sm md:p-6 ">
-            <ir-date-range fromDate={this.dates.start} toDate={this.dates.end} locale={localization_store.selectedLocale} maxSpanDays={5} minDate={this.minDate}></ir-date-range>
+            <ir-date-range
+              dateModifiers={this.getDateModifiers()}
+              fromDate={this.dates.start}
+              toDate={this.dates.end}
+              locale={localization_store.selectedLocale}
+              maxSpanDays={5}
+              minDate={this.minDate}
+            ></ir-date-range>
           </div>
         </ir-popover>
       </Host>
     );
+  }
+  private getDateModifiers() {
+    if (!Object.keys(app_store.nonBookableNights).length) {
+      return undefined;
+    }
+    const nights = {};
+    Object.keys(app_store?.nonBookableNights)?.forEach(nbn => {
+      nights[nbn] = {
+        disabled: true,
+      };
+    });
+    return nights;
   }
 }

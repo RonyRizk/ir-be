@@ -98,6 +98,7 @@ export interface AllowedCard {
 }
 
 export interface AllowedPaymentMethod {
+  is_active: boolean;
   code: string;
   description: string;
   icon_class_name: any;
