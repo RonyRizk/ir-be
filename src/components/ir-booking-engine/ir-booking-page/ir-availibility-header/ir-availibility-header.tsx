@@ -104,7 +104,7 @@ export class IrAvailibilityHeader {
     const isValidFromDate = this.validator.validateCheckin(this.fromDate);
     const isValidToDate = this.validator.validateCheckout(this.toDate, isValidFromDate);
     const isValidAdultCount = this.validator.validateAdultCount(this.adultCount);
-    if (isValidAdultCount && isValidFromDate && isValidToDate) {
+    if (!isValidAdultCount && isValidFromDate && isValidToDate) {
       this.checkAvailability();
     }
   }
