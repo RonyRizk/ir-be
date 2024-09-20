@@ -57,21 +57,28 @@ export class Colors {
     return shades;
   }
   public initTheme(property: IExposedProperty) {
+    let base_theme_color = '#e93e57';
+    let radius = null;
     if (property.space_theme) {
-      const root = document.documentElement;
-      const shades = this.generateColorShades(property.space_theme.button_bg_color);
-      let shade_number = 900;
-      shades.forEach((shade: any, index) => {
-        root.style.setProperty(`--brand-${shade_number}`, `${shade.h}, ${shade.s}%, ${shade.l}%`);
-        if (index === 9) {
-          shade_number = 25;
-        } else if (index === 8) {
-          shade_number = 50;
-        } else {
-          shade_number = shade_number - 100;
-        }
-      });
-      root.style.setProperty('--radius', property.space_theme.button_border_radius + 'px');
+      base_theme_color = property.space_theme.button_bg_color;
+      radius = property.space_theme.button_border_radius;
     }
+    const root = document.documentElement;
+    const shades = this.generateColorShades(base_theme_color);
+    let shade_number = 900;
+    shades.forEach((shade: any, index) => {
+      root.style.setProperty(`--brand-${shade_number}`, `${shade.h}, ${shade.s}%, ${shade.l}%`);
+      if (index === 9) {
+        shade_number = 25;
+      } else if (index === 8) {
+        shade_number = 50;
+      } else {
+        shade_number = shade_number - 100;
+      }
+    });
+    if (!radius) {
+      return;
+    }
+    root.style.setProperty('--radius', radius + 'px');
   }
 }

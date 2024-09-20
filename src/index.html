@@ -81,7 +81,7 @@
 
 
   <!-- not injected mode -->
-  <ir-be cur="eur" checkin="2024-10-17" checkout="2024-10-21" adults="2"></ir-be>
+  <ir-be cur="eur" checkin="2024-11-12" checkout="2024-11-15"></ir-be>
   <!-- aff="AF6" a-name='A286' -->
 
   <!-- Injected mode -->
@@ -91,12 +91,12 @@
     const testCmp = document.querySelector('ir-be');
     async function init() {
       testCmp.propertyId = getId()
+      testCmp.p = "A228"
       // testCmp.propertyId = 60 || getId()
       // testCmp.p = "a237"
       // testCmp.p = "A506"
       //Valentinos appartments
       // testCmp.p = 'A19'
-      // testCmp.p = 'A228'
 
     }
     init()

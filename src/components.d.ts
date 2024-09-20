@@ -105,7 +105,6 @@ export namespace Components {
         "source": TSource | null;
         "stag": string | null;
         "token": string;
-        "version": string;
     }
     interface IrBookingCancelation {
         "booking": Booking;
@@ -1868,7 +1867,6 @@ declare namespace LocalJSX {
         "source"?: TSource | null;
         "stag"?: string | null;
         "token"?: string;
-        "version"?: string;
     }
     interface IrBookingCancelation {
         "booking"?: Booking;

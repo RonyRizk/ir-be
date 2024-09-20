@@ -56,7 +56,7 @@ export class IrBookingWidget {
       currency_id: 'usd',
     };
     this.propertyService.setToken(this.token);
-    this.commonService.setToken(this.token); 
+    this.commonService.setToken(this.token);
     this.initProperty();
   }
   componentDidLoad() {
@@ -69,7 +69,7 @@ export class IrBookingWidget {
   async initProperty() {
     try {
       this.isLoading = true;
-      
+
       await Promise.all([
         this.propertyService.getExposedProperty({
           id: this.propertyId,
@@ -83,7 +83,7 @@ export class IrBookingWidget {
           from_date: format(new Date(), 'yyyy-MM-dd'),
           to_date: format(addYears(new Date(), 1), 'yyyy-MM-dd'),
           perma_link: this.perma_link,
-          aname:this.p
+          aname: this.p,
         }),
       ]);
     } catch (error) {
@@ -118,18 +118,18 @@ export class IrBookingWidget {
     const queryString = queryParams.filter(param => param !== '').join('&');
     window.open(`https://${currentDomain}?${queryString}`, '_blank');
   }
-private getDateModifiers() {
-  if (!Object.keys(app_store.nonBookableNights).length) {
-    return undefined;
+  private getDateModifiers() {
+    if (!Object.keys(app_store.nonBookableNights).length) {
+      return undefined;
+    }
+    const nights = {};
+    Object.keys(app_store?.nonBookableNights)?.forEach(nbn => {
+      nights[nbn] = {
+        disabled: true,
+      };
+    });
+    return nights;
   }
-  const nights = {};
-  Object.keys(app_store?.nonBookableNights)?.forEach(nbn => {
-    nights[nbn] = {
-      disabled: true,
-    };
-  });
-  return nights;
-}
   private renderDateTrigger() {
     return (
       <div class="date-trigger" slot="trigger">
@@ -203,7 +203,7 @@ private getDateModifiers() {
             }}
           >
             {this.renderDateTrigger()}
-            <div slot="popover-content" class="popup-container w-full border-0 bg-white p-4 pb-6 shadow-none sm:w-auto sm:border sm:p-4 sm:shadow-sm md:p-6 ">
+            <div slot="popover-content" class="popup-container w-full border-0 bg-white p-4 pb-6 shadow-none sm:w-auto sm:border sm:p-4  md:p-6 ">
               <ir-date-range
                 dateModifiers={this.getDateModifiers()}
                 minDate={addDays(new Date(), -1)}

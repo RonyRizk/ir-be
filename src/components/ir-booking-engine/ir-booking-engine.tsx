@@ -39,7 +39,6 @@ export class IrBookingEngine {
   @Prop() stag: string | null;
   @Prop() property: IExposedProperty | null = null;
   @Prop() source: TSource | null = null;
-  @Prop() version: string = '2.0';
   @Prop() hideGoogleSignIn: boolean = true;
 
   //discount properties
@@ -54,6 +53,7 @@ export class IrBookingEngine {
   @State() router = new Stack<HTMLElement>();
   @State() bookingListingScreenOptions: { screen: 'bookings' | 'booking-details'; params: unknown } = { params: null, screen: 'bookings' };
 
+  private version: string = '2.9';
   private baseUrl: string = 'https://gateway.igloorooms.com/IRBE';
   private commonService = new CommonService();
   private propertyService = new PropertyService();
@@ -62,6 +62,7 @@ export class IrBookingEngine {
   private privacyPolicyRef: HTMLIrPrivacyPolicyElement;
 
   async componentWillLoad() {
+    console.log(`version:${this.version}`);
     axios.defaults.withCredentials = true;
     axios.defaults.baseURL = this.baseUrl;
     getUserPrefernce(this.language);
@@ -168,7 +169,7 @@ export class IrBookingEngine {
         from_date: format(new Date(), 'yyyy-MM-dd'),
         to_date: format(addYears(new Date(), 1), 'yyyy-MM-dd'),
         perma_link: this.perma_link,
-        aname:this.p
+        aname: this.p,
       }),
     ];
     if (app_store.is_signed_in) {
