@@ -45,6 +45,7 @@ export interface IAppStore {
     isAgentMode?: boolean;
     aName: string;
     perma_link: string;
+    origin: string | null;
   };
   property: IExposedProperty;
   setup_entries: {
@@ -76,6 +77,7 @@ const initialState: IAppStore = {
   },
   invoice: null,
   app_data: {
+    origin: null,
     override_rp: false,
     displayMode: 'default',
     affiliate: null,

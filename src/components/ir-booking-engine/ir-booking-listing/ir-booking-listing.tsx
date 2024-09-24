@@ -254,7 +254,7 @@ export class IrBookingListing {
       return (
         <main class="flex min-h-screen flex-col">
           <div class="flex h-14 p-4">
-            <ir-skeleton class=" h-10 w-56 "></ir-skeleton>
+            <ir-skeleton class=" mx-auto h-10 w-80 "></ir-skeleton>
           </div>
           <div class="mx-auto flex h-full w-full max-w-md flex-1 flex-col gap-4 px-4 py-4 ">
             <ir-skeleton class="mb-2 h-6 w-56 self-center"></ir-skeleton>
@@ -268,15 +268,31 @@ export class IrBookingListing {
 
     return (
       <main class="flex min-h-screen flex-col">
-        <ir-nav
-          isBookingListing
-          showBookingCode={false}
-          showCurrency={false}
-          website={app_store.property?.space_theme.website}
-          logo={app_store.property?.space_theme?.logo}
-          menuShown={false}
-          logoOnly
-        ></ir-nav>
+        <nav class="ir-auth-nav">
+          <div class="ir-auth-nav-container relative">
+            <div class={'flex w-full items-center gap-4'}>
+              <ir-button
+                class={'absolute'}
+                variants="icon"
+                iconName="angle_left"
+                onButtonClick={() => (window.location.href = `https://${app_store.property.perma_link}.bookingmystay.com`)}
+              ></ir-button>
+              <div class={'flex w-full flex-1 justify-center '}>
+                <a
+                  aria-label="home"
+                  target="_blank"
+                  href={`https://${app_store.app_data.affiliate ? app_store.app_data.affiliate.sites[0]?.url : app_store.property?.space_theme.website}`}
+                >
+                  <img
+                    src={app_store.app_data?.affiliate ? app_store.app_data?.affiliate.sites[0]?.logo : app_store.property?.space_theme?.logo}
+                    alt={`${app_store.property?.name}, ${app_store.property?.country.name}`}
+                    class="ir-nav-logo aspect-1"
+                  ></img>
+                </a>
+              </div>
+            </div>
+          </div>
+        </nav>
         <div class="mx-auto flex h-full  w-full max-w-md flex-1 flex-col px-4 py-4 ">
           <ir-auth enableSignUp={false}></ir-auth>
         </div>

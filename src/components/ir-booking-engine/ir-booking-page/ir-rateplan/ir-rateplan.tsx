@@ -188,7 +188,7 @@ export class IrRateplan {
         </div>
         {this.isRatePlanAvailable && (
           <div class={`rateplan-details ${this.ratePlan.custom_text ? 'rateplan-details-no-custom-text' : ''}`}>
-            {this.isLoading ? (
+            {this.isLoading || this.ratePlan.variations?.length === 0 ? (
               <div class="col-span-6 w-full ">
                 <ir-skeleton class="block h-12 w-full"></ir-skeleton>
               </div>

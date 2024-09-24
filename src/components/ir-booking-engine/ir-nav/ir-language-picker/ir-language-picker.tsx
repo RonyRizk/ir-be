@@ -1,7 +1,7 @@
 import { ICurrency, IExposedLanguages } from '@/models/commun';
 import app_store, { changeLocale, onAppDataChange, updateUserPreference } from '@/stores/app.store';
 import localizedWords from '@/stores/localization.store';
-import { cn, matchLocale } from '@/utils/utils';
+import { cn, matchLocale, modifyQueryParam } from '@/utils/utils';
 import { Component, h, Event, EventEmitter, Prop, State } from '@stencil/core';
 
 @Component({
@@ -28,6 +28,8 @@ export class IrLanguagePicker {
     onAppDataChange('userPreferences', newValue => {
       this.selectedLanguage = this.languages.find(l => l.code.toLowerCase() === newValue.language_id.toLowerCase());
       this.selectedCurrency = this.currencies.find(c => c.code.toLowerCase() === newValue.currency_id.toLowerCase());
+      modifyQueryParam('lang', newValue.language_id.toLowerCase());
+      modifyQueryParam('cur', newValue.currency_id.toLowerCase());
     });
   }
 

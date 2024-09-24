@@ -25,25 +25,27 @@ export class IrPaymentView {
     }
   }
   @Watch('prepaymentAmount')
-  handlePrePaymentAmount(newValue, oldValue) {
-    if (newValue === 0) {
-      this.selectedPaymentMethod = null;
-    } else if (newValue !== oldValue) {
+  handlePrePaymentAmount(newValue: number, oldValue: number) {
+    if (newValue !== oldValue) {
       this.setPaymentMethod();
     }
   }
 
   private setPaymentMethod() {
-    if (this.prepaymentAmount === 0) {
-      return;
-    }
     const paymentMethods = app_store.property?.allowed_payment_methods.filter(pm => pm.is_active) || [];
     let selectedMethodCode = null;
+    if (
+      (this.prepaymentAmount === 0 && paymentMethods.length === 1 && paymentMethods[0].is_payment_gateway) ||
+      (this.prepaymentAmount === 0 && !paymentMethods.some(pm => !pm.is_payment_gateway))
+    ) {
+      return null;
+    }
 
     if (paymentMethods.length > 0) {
       const [firstMethod, secondMethod] = paymentMethods;
       selectedMethodCode = firstMethod.code === '000' && secondMethod ? secondMethod.code : firstMethod.code;
     }
+    console.log('selectedMethodCode', selectedMethodCode);
 
     this.selectedPaymentMethod = selectedMethodCode;
   }
@@ -197,7 +199,8 @@ export class IrPaymentView {
                   class="w-full"
                   rightIcon
                 >
-                  <svg slot="right-icon" width="20" height="16" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg class={'cursor-pointer'} slot="right-icon" width="20" height="16" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <title>{localizedWords.entries.Lcz_SecurityCodeHint}</title>
                     <path d="M0 3C0 1.34315 1.34315 0 3 0H17C18.6569 0 20 1.34315 20 3V13C20 14.6569 18.6569 16 17 16H3C1.34315 16 0 14.6569 0 13V3Z" fill="#EAECF0" />
                     <path d="M2 8C2 7.44772 2.44772 7 3 7H17C17.5523 7 18 7.44772 18 8C18 8.55228 17.5523 9 17 9H3C2.44772 9 2 8.55228 2 8Z" fill="#8B8B8B" />
                     <path d="M2 4C2 3.44772 2.44772 3 3 3H5C5.55228 3 6 3.44772 6 4C6 4.55228 5.55228 5 5 5H3C2.44772 5 2 4.55228 2 4Z" fill="white" />
@@ -235,10 +238,13 @@ export class IrPaymentView {
     checkout_store.payment.code = payment_code;
   }
   renderPaymentOptions() {
-    const paymentLength = app_store.property.allowed_payment_methods.filter(p => p.is_active).length;
-
-    console.log(paymentLength, paymentLength === 0 || this.prepaymentAmount === 0 || (paymentLength === 1 && this.selectedPaymentMethod === '000'));
-    if (paymentLength === 0 || this.prepaymentAmount === 0 || (paymentLength === 1 && this.selectedPaymentMethod === '000')) {
+    const paymentMethods = app_store.property.allowed_payment_methods.filter(p => p.is_active) ?? [];
+    const paymentLength = paymentMethods.length;
+    if (
+      paymentLength === 0 ||
+      (paymentLength === 1 && this.selectedPaymentMethod === '000') ||
+      (this.prepaymentAmount === 0 && !paymentMethods.some(pm => !pm.is_payment_gateway))
+    ) {
       return <p class="text-center">{localizedWords.entries.Lcz_NoDepositRequired}</p>;
     }
     if (paymentLength > 1) {
@@ -250,6 +256,9 @@ export class IrPaymentView {
           data={app_store.property?.allowed_payment_methods
             .map(apm => {
               if (!apm.is_active) {
+                return null;
+              }
+              if (apm.is_payment_gateway && this.prepaymentAmount === 0) {
                 return null;
               }
               return {
@@ -267,6 +276,9 @@ export class IrPaymentView {
       );
     }
     const paymentOption = app_store.property.allowed_payment_methods[0];
+    if (this.prepaymentAmount === 0 && paymentOption.is_payment_gateway) {
+      return <p class="text-center">{localizedWords.entries.Lcz_NoDepositRequired}</p>;
+    }
     if (paymentOption.is_payment_gateway) {
       return <p class="text-center">{`${localizedWords.entries[`Lcz_Pay_${paymentOption.code}`] ?? localizedWords.entries.Lcz_PayByCard}`} </p>;
     }
@@ -277,7 +289,7 @@ export class IrPaymentView {
     return (
       <div class="w-full space-y-4 rounded-md border border-solid bg-white  p-4">
         {this.renderPaymentOptions()}
-        {this.prepaymentAmount > 0 && this.renderPaymentMethod()}
+        {this.renderPaymentMethod()}
         {this.cardType !== '' &&
           !app_store.property.allowed_cards.find(c => c.name.toLowerCase().includes(this.cardType === 'AMEX' ? 'american express' : this.cardType?.toLowerCase())) && (
             <p class={'text-red-500'}>

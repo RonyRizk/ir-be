@@ -13,10 +13,34 @@
   -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 4px), #000 0);
   animation: l13 1s infinite linear;
 }
+.ir-auth-nav {
+  width: 100%;
+  background-color: white;
+}
+
+.ir-auth-nav-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 72rem;
+  min-height: 3.5rem;
+  padding: 0 1rem;
+  margin: 0 auto;
+}
 .ir-table-cell,
 .ir-table-head {
   padding: 0.75rem 0.2rem;
   width: max-content !important;
+}
+.ir-nav-logo {
+  /* height: 2.5rem;
+  width: auto;
+  */
+  /* width: 40px; */
+  /* max-height: 5rem; */
+  max-height: 4.2rem;
+  padding: 0.5rem;
+  object-fit: contain;
 }
 .main-container {
   display: flex;

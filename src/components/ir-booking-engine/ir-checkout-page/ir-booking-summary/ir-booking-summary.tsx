@@ -28,6 +28,7 @@ export class IrBookingSummary {
   render() {
     const total_nights = getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date());
     const { totalAmount } = calculateTotalCost(true);
+    console.log(totalAmount);
     console.log(booking_store.ratePlanSelections);
     if (isRequestPending('/Get_Setup_Entries_By_TBL_NAME_MULTI')) {
       return (
@@ -93,12 +94,10 @@ export class IrBookingSummary {
                     {formatAmount(totalAmount + (checkout_store.pickup.location ? Number(checkout_store.pickup.due_upon_booking) : 0), app_store.userPreferences.currency_id)}
                   </span>
                 </li>
-                {this.prepaymentAmount > 0 && (
-                  <li class={'flex w-full items-center justify-between pt-1'}>
-                    <span>{localizedWords.entries.Lcz_PayNow}</span>
-                    <span class="text-base">{formatAmount(this.prepaymentAmount, app_store.userPreferences.currency_id)}</span>
-                  </li>
-                )}
+                <li class={'flex w-full items-center justify-between pt-1'}>
+                  <span>{localizedWords.entries.Lcz_PayNow}</span>
+                  <span class="text-base">{formatAmount(this.prepaymentAmount, app_store.userPreferences.currency_id)}</span>
+                </li>
               </ul>
             </div>
             <ir-payment-view

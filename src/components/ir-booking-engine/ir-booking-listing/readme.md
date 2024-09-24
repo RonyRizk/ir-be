@@ -38,9 +38,9 @@
 - [ir-invoice](../../ir-invoice)
 - [ir-user-profile](../ir-nav/ir-user-profile)
 - [ir-skeleton](../../ui/ir-skeleton)
-- [ir-nav](../ir-nav)
 - [ir-auth](../ir-nav/ir-auth)
 - [ir-interceptor](../../ir-interceptor)
+- [ir-nav](../ir-nav)
 - [ir-footer](../ir-footer)
 - [ir-privacy-policy](../ir-privacy-policy)
 
@@ -52,9 +52,9 @@ graph TD;
   ir-booking-listing --> ir-invoice
   ir-booking-listing --> ir-user-profile
   ir-booking-listing --> ir-skeleton
-  ir-booking-listing --> ir-nav
   ir-booking-listing --> ir-auth
   ir-booking-listing --> ir-interceptor
+  ir-booking-listing --> ir-nav
   ir-booking-listing --> ir-footer
   ir-booking-listing --> ir-privacy-policy
   ir-booking-overview --> ir-skeleton

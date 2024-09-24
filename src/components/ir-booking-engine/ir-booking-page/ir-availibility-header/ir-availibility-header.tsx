@@ -10,6 +10,7 @@ import { v4 } from 'uuid';
 import { AvailabiltyService } from '@/services/app/availability.service';
 import localizedWords from '@/stores/localization.store';
 import { QueryStringValidator } from '@/validators/querystring.validator';
+import { modifyQueryParam } from '@/utils/utils';
 
 @Component({
   tag: 'ir-availibility-header',
@@ -51,7 +52,20 @@ export class IrAvailibilityHeader {
 
   // private popperInstance: any;
   // private personCounter: HTMLIrAdultChildCounterElement;
-
+  private setDefaultAdultCount() {
+    if (this.validator.validateAdultCount(this.adultCount)) {
+      return 2;
+    }
+    const adCountNumber = Number(this.adultCount);
+    return adCountNumber > app_store.property.adult_child_constraints.adult_max_nbr ? app_store.property.adult_child_constraints.adult_max_nbr : adCountNumber;
+  }
+  private setDefaultChildCount() {
+    if (this.validator.validateChildrenCount(this.childrenCount)) {
+      return 0;
+    }
+    const childCountNumber = Number(this.childrenCount);
+    return childCountNumber > app_store.property.adult_child_constraints.child_max_nbr ? app_store.property.adult_child_constraints.child_max_nbr : childCountNumber;
+  }
   componentWillLoad() {
     const { token, property_id } = app_store.app_data;
     this.propertyService.setToken(token);
@@ -59,8 +73,8 @@ export class IrAvailibilityHeader {
     const validatedFromDate = this.validator.validateCheckin(this.fromDate);
     this.exposedBookingAvailabiltyParams = {
       ...this.exposedBookingAvailabiltyParams,
-      adult_nbr: !this.validator.validateAdultCount(this.adultCount) ? +this.adultCount : 2,
-      child_nbr: !this.validator.validateChildrenCount(this.childrenCount) ? +this.childrenCount : 0,
+      adult_nbr: this.setDefaultAdultCount(),
+      child_nbr: this.setDefaultChildCount(),
       from_date: validatedFromDate ? this.fromDate : null,
       to_date: this.validator.validateCheckout(this.toDate, validatedFromDate) ? this.toDate : null,
     };
@@ -259,6 +273,8 @@ export class IrAvailibilityHeader {
     } else {
       this.changeExposedAvailabilityParams({ from_date: format(start, 'yyyy-MM-dd') });
     }
+    modifyQueryParam('checkin', this.exposedBookingAvailabiltyParams.from_date);
+    modifyQueryParam('checkout', this.exposedBookingAvailabiltyParams.to_date);
   }
 
   @Listen('addAdultsAndChildren')
@@ -266,6 +282,8 @@ export class IrAvailibilityHeader {
     e.stopPropagation();
     e.stopImmediatePropagation();
     this.changeExposedAvailabilityParams({ ...e.detail });
+    modifyQueryParam('adults', this.exposedBookingAvailabiltyParams.adult_nbr?.toString());
+    modifyQueryParam('children', this.exposedBookingAvailabiltyParams.child_nbr?.toString());
   }
 
   disconnectedCallback() {

@@ -40,6 +40,7 @@ export class IrBookingEngine {
   @Prop() property: IExposedProperty | null = null;
   @Prop() source: TSource | null = null;
   @Prop() hideGoogleSignIn: boolean = true;
+  @Prop() origin: string | null = null;
 
   //discount properties
   @Prop() coupon: string;
@@ -139,6 +140,7 @@ export class IrBookingEngine {
     this.propertyService.setToken(this.token);
     app_store.app_data = {
       aName: this.p,
+      origin: this.origin,
       perma_link: this.perma_link,
       displayMode: 'default',
       isFromGhs: checkGhs(this.source?.code, this.stag),

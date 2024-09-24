@@ -96,6 +96,7 @@ export namespace Components {
         "injected": boolean;
         "language": string;
         "loyalty": boolean;
+        "origin": string | null;
         "p": string;
         "perma_link": string;
         "property": IExposedProperty | null;
@@ -1858,6 +1859,7 @@ declare namespace LocalJSX {
         "injected"?: boolean;
         "language"?: string;
         "loyalty"?: boolean;
+        "origin"?: string | null;
         "p"?: string;
         "perma_link"?: string;
         "property"?: IExposedProperty | null;

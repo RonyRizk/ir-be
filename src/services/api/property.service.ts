@@ -283,7 +283,7 @@ export class PropertyService extends Token {
               }
             : null,
           {
-            key: 'payment_code',
+            key: 'selected_currency',
             value: app_store.userPreferences.currency_id,
           },
         ].filter(f => f !== null),

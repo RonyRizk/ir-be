@@ -101,7 +101,6 @@ export class IrCheckoutPage {
     if (!this.validateUserForm() || !this.validateBookingDetails() || !this.validatePickupForm() || !this.validatePayment() || this.validatePolicyAcceptance()) {
       return;
     }
-
     await this.processBooking();
   }
   private validatePolicyAcceptance(): boolean {
@@ -113,13 +112,10 @@ export class IrCheckoutPage {
   }
 
   private validatePayment(): boolean {
-    if (this.prepaymentAmount === 0) {
-      return true;
-    }
     const currentPayment = app_store.property.allowed_payment_methods.find(p => p.code === checkout_store.payment?.code);
     this.selectedPaymentMethod = currentPayment;
 
-    if (!currentPayment) {
+    if (!currentPayment && this.prepaymentAmount > 0) {
       return false;
     }
     if (currentPayment.is_payment_gateway || currentPayment.code === '000' || currentPayment.code === '005') {
@@ -140,6 +136,9 @@ export class IrCheckoutPage {
     } catch (error) {
       if (error instanceof ZodError) {
         console.log(error.issues);
+        if (error.issues.length === 4 && this.prepaymentAmount === 0) {
+          return true;
+        }
         this.handleError('payment', error);
       }
       return false;

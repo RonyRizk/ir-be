@@ -244,7 +244,10 @@ export function calculateTotalCost(gross: boolean = false): { totalAmount: numbe
       if (isPrePayment) {
         return ratePlan.reserved * ratePlan.ratePlan.pre_payment_amount || 0;
       }
-      return ratePlan.checkoutVariations.reduce((sum, variation) => sum + Number(variation[gross ? 'amount_gross' : 'amount']), 0);
+      return ratePlan.checkoutVariations.reduce((sum, variation) => {
+        console.log(gross, variation['amount_gross'], variation['amount'], variation);
+        return sum + Number(variation[gross ? 'amount_gross' : 'amount']);
+      }, 0);
     } else if (ratePlan.reserved > 0) {
       const amount = isPrePayment ? ratePlan.ratePlan.pre_payment_amount ?? 0 : ratePlan.selected_variation?.variation[gross ? 'amount_gross' : 'amount'];
       return ratePlan.reserved * (amount ?? 0);

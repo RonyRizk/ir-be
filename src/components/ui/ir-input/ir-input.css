@@ -11,6 +11,7 @@
   display: flex;
   align-items: center;
   padding: 0 !important;
+  cursor: default;
 }
 .placeholder {
   position: absolute;
@@ -19,6 +20,9 @@
   color: var(--gray-500, #667085);
   margin: 0;
   padding: 0;
+}
+.placeholder[title] {
+  cursor: pointer;
 }
 input {
   width: 100%;
@@ -41,6 +45,10 @@ input:focus + .placeholder,
 .input-container:focus-within {
   outline: none;
   border-color: black;
+}
+:host([tooltip]) .right-icon {
+  z-index: 10;
+  pointer-events: all;
 }
 .input-container:focus-within .placeholder {
   color: black;

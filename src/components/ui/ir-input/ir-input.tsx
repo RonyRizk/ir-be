@@ -52,12 +52,12 @@ export class IrInput {
   @Prop({ reflect: true }) autofocus: boolean;
   @Prop({ reflect: true }) size: number;
   @Prop({ reflect: true }) multiple: boolean;
+  @Prop({ reflect: true }) tooltip: string;
   @Prop() label: string;
   @Prop() error: boolean = false;
   @Prop() mask: Record<string, unknown>;
   @Prop() labelBackground: string;
   @Prop() mode: 'double-line' | 'default' = 'double-line';
-  @Prop() tooltip: string;
 
   @Event({ bubbles: true, composed: true }) textChanged: EventEmitter<string>;
   @Event({ bubbles: true, composed: true }) inputFocus: EventEmitter<FocusEvent>;
