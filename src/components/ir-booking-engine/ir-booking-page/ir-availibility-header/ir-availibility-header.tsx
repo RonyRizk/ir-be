@@ -219,13 +219,13 @@ export class IrAvailibilityHeader {
       identifier: this.identifier,
       mode: 'default',
     });
+    app_store.fetchedBooking = true;
   }
 
   async handleCheckAvailability() {
     try {
       this.isLoading = true;
       await this.checkAvailability();
-      app_store.fetchedBooking = true;
     } catch (error) {
       if (error instanceof ZodError) {
         console.log(error.errors);

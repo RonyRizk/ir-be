@@ -24,30 +24,25 @@ export class IrLoyalty {
     if (!show_loyalty || booking_store.bookingAvailabilityParams.coupon) {
       return null;
     }
-
+    if (booking_store.bookingAvailabilityParams.loyalty) {
+      return (
+        <div class="flex items-center  text-sm text-[hsl(var(--brand-600))]">
+          <p onClick={() => this.toggleLoyalty(false)}>{localizedWords.entries.Lcz_LoyaltyApplied}</p>
+          <ir-button
+            aria-label={'remove loyalty'}
+            variants="icon"
+            iconName="xmark"
+            svgClassName="text-[hsl(var(--brand-600))]"
+            onButtonClick={() => this.toggleLoyalty(false)}
+          ></ir-button>
+        </div>
+      );
+    }
     return (
       <Host>
-        <div class="flex w-full items-center justify-center gap-4">
-          <ir-button
-            class={cn('w-full', {
-              'w-fit': booking_store.bookingAvailabilityParams.loyalty,
-            })}
-            onButtonClick={() => this.toggleLoyalty(true)}
-            variants="outline"
-            label={localizedWords.entries.Lcz_GetLoyaltyDiscount}
-            haveLeftIcon
-          >
-            <ir-icons slot="left-icon" name="heart"></ir-icons>
-          </ir-button>
-          {booking_store.bookingAvailabilityParams.loyalty && (
-            <div class="flex items-center  text-sm text-[hsl(var(--brand-600))]">
-              <p onClick={() => this.toggleLoyalty(false)}>{localizedWords.entries.Lcz_LoyaltyApplied}</p>
-              <ir-button aria-label={'remove loyalty'} variants="icon" iconName="xmark" svgClassName="text-[hsl(var(--brand-600))]" onButtonClick={() => this.toggleLoyalty(false)}>
-                {/* <ir-icons title="remove loyalty" slot="btn-icon"  ></ir-icons> */}
-              </ir-button>
-            </div>
-          )}
-        </div>
+        <ir-button class={cn('w-full')} onButtonClick={() => this.toggleLoyalty(true)} variants="outline" label={localizedWords.entries.Lcz_GetLoyaltyDiscount} haveLeftIcon>
+          <ir-icons slot="left-icon" name="heart"></ir-icons>
+        </ir-button>
       </Host>
     );
   }

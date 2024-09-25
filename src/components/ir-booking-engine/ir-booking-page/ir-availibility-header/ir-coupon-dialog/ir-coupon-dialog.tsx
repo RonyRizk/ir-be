@@ -46,37 +46,36 @@ export class IrCouponDialog {
     if (!showCoupon || booking_store.bookingAvailabilityParams.loyalty) {
       return null;
     }
+    if (!!booking_store.bookingAvailabilityParams.coupon) {
+      return (
+        <div class="coupon-applied">
+          <p onClick={this.removeCoupon.bind(this)}>{localizedWords.entries.Lcz_DiscountApplied}</p>
+          <ir-button
+            aria-label="remove coupon"
+            iconName="xmark"
+            variants="icon"
+            class="icon-remove"
+            svgClassName="text-[hsl(var(--brand-600))]"
+            onButtonClick={this.removeCoupon.bind(this)}
+          >
+            {/* <ir-icons slot="btn-icon" title="remove coupon" name="xmark" ></ir-icons> */}
+          </ir-button>
+        </div>
+      );
+    }
     return (
       <Fragment>
-        <div class="coupon-container">
-          <ir-button
-            class={cn('coupon-button', {
-              'coupon-button-wide': !!booking_store.bookingAvailabilityParams.coupon,
-            })}
-            onButtonClick={() => this.dialogRef.openModal()}
-            variants="outline"
-            label={localizedWords.entries.Lcz_HaveCoupon}
-            haveLeftIcon
-          >
-            <ir-icons slot="left-icon" name="coupon"></ir-icons>
-          </ir-button>
-          {!!booking_store.bookingAvailabilityParams.coupon && (
-            <div class="coupon-applied">
-              <p onClick={this.removeCoupon.bind(this)}>{localizedWords.entries.Lcz_DiscountApplied}</p>
-              <ir-button
-                aria-label="remove coupon"
-                iconName="xmark"
-                variants="icon"
-                class="icon-remove"
-                svgClassName="text-[hsl(var(--brand-600))]"
-                onButtonClick={this.removeCoupon.bind(this)}
-              >
-                {/* <ir-icons slot="btn-icon" title="remove coupon" name="xmark" ></ir-icons> */}
-              </ir-button>
-            </div>
-          )}
-        </div>
-
+        <ir-button
+          class={cn('coupon-button', {
+            'coupon-button-wide': !!booking_store.bookingAvailabilityParams.coupon,
+          })}
+          onButtonClick={() => this.dialogRef.openModal()}
+          variants="outline"
+          label={localizedWords.entries.Lcz_HaveCoupon}
+          haveLeftIcon
+        >
+          <ir-icons slot="left-icon" name="coupon"></ir-icons>
+        </ir-button>
         <ir-dialog
           ref={el => (this.dialogRef = el)}
           onOpenChange={e => {
@@ -84,6 +83,7 @@ export class IrCouponDialog {
             e.stopPropagation();
             if (!e.detail) {
               this.coupon = '';
+              this.validationMessage = null;
             }
           }}
         >
