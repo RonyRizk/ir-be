@@ -54,7 +54,7 @@ export class IrBookingEngine {
   @State() router = new Stack<HTMLElement>();
   @State() bookingListingScreenOptions: { screen: 'bookings' | 'booking-details'; params: unknown } = { params: null, screen: 'bookings' };
 
-  private version: string = '2.10';
+  private version: string = '2.11';
   private baseUrl: string = 'https://gateway.igloorooms.com/IRBE';
   private commonService = new CommonService();
   private propertyService = new PropertyService();
@@ -163,7 +163,11 @@ export class IrBookingEngine {
     let requests = [
       this.commonService.getCurrencies(),
       this.commonService.getExposedLanguages(),
-      this.commonService.getExposedCountryByIp(),
+      this.commonService.getExposedCountryByIp({
+        id: this.propertyId.toString(),
+        perma_link: this.perma_link,
+        aname: this.p,
+      }),
       this.commonService.getExposedLanguage(),
       this.propertyService.getExposedProperty({ id: this.propertyId, language: app_store.userPreferences?.language_id || 'en', aname: this.p, perma_link: this.perma_link }),
       this.propertyService.getExposedNonBookableNights({

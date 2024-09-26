@@ -50,6 +50,22 @@ export class PropertyService extends Token {
     if (!app_store.fetchedBooking) {
       booking_store.roomTypes = [...result.My_Result.roomtypes];
     }
+    // } else {
+    //   const oldBookingStoreRoomTypes = [...booking_store.roomTypes];
+    //   booking_store.roomTypes = result.My_Result.roomtypes?.map(rt => {
+    //     const selectedRt = oldBookingStoreRoomTypes.find(r => r.id === rt.id);
+    //     return {
+    //       ...rt,
+    //       rateplans: rt.rateplans.map(rp => {
+    //         const currentRp = selectedRt.rateplans.find(s => s.id === rp.id);
+    //         if (currentRp) {
+    //           return { ...currentRp, short_name: rp.short_name };
+    //         }
+    //         return null;
+    //       }),
+    //     };
+    //   });
+    // }
     if (params.aname || params.perma_link) {
       app_store.app_data = { ...app_store.app_data, property_id: result.My_Result.id };
     }

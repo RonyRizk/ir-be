@@ -257,7 +257,7 @@ export class IrRateplan {
                     ) : (
                       <ir-button
                         disabled={isInventoryFull}
-                        class="rateplan-select-rooms"
+                        // class="rateplan-select-rooms"
                         buttonStyles={{ background: 'white', width: '100%', opacity: isInventoryFull ? '0.5' : '1' }}
                         label={localizedWords.entries.Lcz_Select}
                         variants="outline-primary"

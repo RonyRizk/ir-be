@@ -184,7 +184,7 @@ export class AvailabiltyService {
 
   private async processPayloads(payloads: IPAYLOAD[]): Promise<void> {
     try {
-      console.log('payload', payloads);
+      // console.log('payload', payloads);
       if (!booking_store.enableBooking) {
         booking_store.enableBooking = true;
       }
@@ -206,7 +206,6 @@ export class AvailabiltyService {
         }
         let rateplan = roomType.rateplans[selectedRatePlanIndex];
         let oldVariation = rateplan.variations || [];
-        console.log(payload);
         const variation = {
           adult_child_offering: payload.ADULT_CHILD_OFFERING,
           adult_nbr: Number(payload.ADULTS_NBR ?? 0),

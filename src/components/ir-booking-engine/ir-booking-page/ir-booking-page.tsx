@@ -50,10 +50,9 @@ export class IrBookingPage {
   handleScrolling(e: CustomEvent) {
     e.stopImmediatePropagation();
     e.stopPropagation();
-    this.roomTypeSectionRef.scrollIntoView({ behavior: 'smooth' });
-    window.setTimeout(() => {
-      window.scrollBy(0, -30);
-    }, 500);
+    setTimeout(() => {
+      this.roomTypeSectionRef.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   }
 
   private renderTotalNights() {

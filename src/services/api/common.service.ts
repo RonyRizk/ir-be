@@ -39,7 +39,7 @@ export class CommonService extends Token {
       throw new Error(error);
     }
   }
-  public async getUserDefaultCountry() {
+  public async getUserDefaultCountry(params: { id: string; aname: string; perma_link: string }) {
     try {
       const token = this.getToken();
       if (!token) {
@@ -47,6 +47,7 @@ export class CommonService extends Token {
       }
       const { data } = await axios.post(`/Get_Country_By_IP?Ticket=${token}`, {
         IP: '',
+        ...params,
       });
       if (data.ExceptionMsg !== '') {
         throw new Error(data.ExceptionMsg);
@@ -57,7 +58,7 @@ export class CommonService extends Token {
       throw new Error(error);
     }
   }
-  public async getExposedCountryByIp() {
+  public async getExposedCountryByIp(params: { id: string; aname: string; perma_link: string }) {
     try {
       const token = this.getToken();
       if (!token) {
@@ -67,6 +68,7 @@ export class CommonService extends Token {
       const { data } = await axios.post(`/Get_Exposed_Country_By_IP?Ticket=${token}`, {
         IP: '',
         lang: 'en',
+        ...params,
       });
       if (data.ExceptionMsg !== '') {
         throw new Error(data.ExceptionMsg);

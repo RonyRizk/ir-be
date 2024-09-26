@@ -36,7 +36,11 @@ export class IrUserProfile {
     if (this.be) {
       return;
     }
-    await this.commonService.getExposedCountryByIp();
+    await this.commonService.getExposedCountryByIp({
+      id: app_store.app_data.property_id.toString(),
+      aname: app_store.app_data.aName,
+      perma_link: app_store.app_data.perma_link,
+    });
   }
 
   updateUserData(key: keyof TGuest, value: unknown) {

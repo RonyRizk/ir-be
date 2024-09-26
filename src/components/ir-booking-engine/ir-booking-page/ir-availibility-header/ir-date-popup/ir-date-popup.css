@@ -16,6 +16,7 @@
   border-radius: 0.5rem;
   z-index: 99999999;
   background: white;
+  height: 90vh;
   border: 1px solid var(--gray-100, #f2f4f7);
   box-shadow:
     0 16px 12px -4px rgba(16, 24, 40, 0.08),
@@ -54,6 +55,7 @@
   border-color: var(--gray-700, 206, 100%, 76%);
   color: var(--gray-700, #344054);
 }
+
 .popover-trigger p {
   margin: 0;
   padding: 0;
@@ -81,4 +83,9 @@
   line-height: 1.25rem;
   padding-inline-end: 0.75rem;
   text-align: start;
+}
+@media (min-width: 768px) {
+  .date-range-container {
+    height: auto;
+  }
 }

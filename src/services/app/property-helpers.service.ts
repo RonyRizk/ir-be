@@ -144,6 +144,7 @@ export class PropertyHelpers {
       if (!newRoomtype) {
         return updatedRoomtypes;
       }
+      console.log('new roomtypes', newRoomtypes);
       const updatedRoomtype = {
         ...rt,
         inventory: newRoomtype.inventory,
@@ -183,14 +184,15 @@ export class PropertyHelpers {
     const agentExists = !!booking_store.bookingAvailabilityParams.agent;
 
     return ratePlans.reduce((updatedRatePlans: RatePlan[], rp: RatePlan) => {
+      const newRP = newRoomtype.rateplans?.find(newRP => newRP.id === rp.id);
       const newRatePlan = agentExists ? newRoomtype.rateplans?.find(newRP => newRP.id === rp.id) : ratePlans.find(newRP => newRP.id === rp.id);
 
-      if (!newRatePlan || !newRatePlan.is_active || !newRatePlan.is_booking_engine_enabled) {
+      if (!newRatePlan || !newRP || !newRatePlan.is_active || !newRatePlan.is_booking_engine_enabled) {
         return updatedRatePlans;
       }
-
       updatedRatePlans.push({
         ...newRatePlan,
+        short_name: newRP.short_name,
         is_targeting_travel_agency: newRatePlan.is_targeting_travel_agency,
         variations: agentExists ? newRatePlan.variations : rp.variations,
         selected_variation: newRatePlan.variations ? newRatePlan.variations[0] : null,

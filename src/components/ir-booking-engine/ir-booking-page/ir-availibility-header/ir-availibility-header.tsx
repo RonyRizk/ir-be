@@ -203,9 +203,7 @@ export class IrAvailibilityHeader {
       adult_nbr: params.adult_nbr,
       child_nbr: params.child_nbr,
     };
-    if (window.innerWidth < 640) {
-      this.scrollToRoomType.emit(null);
-    }
+    this.scrollToRoomType.emit(null);
     await this.propertyService.getExposedBookingAvailability({
       params: {
         ...this.exposedBookingAvailabiltyParams,

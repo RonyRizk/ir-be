@@ -11,6 +11,13 @@
   background-color: hsl(220, 14%, 96%);
   padding: 1rem;
 }
+.rp-container-grid {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  /* justify-content: space-between; */
+  flex: 1 1 0%;
+}
 @media (min-width: 768px) {
   :host([display='default']) .room-type-container {
     flex-direction: row;

@@ -107,7 +107,11 @@ export class IrPhoneInput {
   }
 
   async setUpUserDefaultCountry() {
-    this.user_country = await this.commonService.getUserDefaultCountry();
+    this.user_country = await this.commonService.getUserDefaultCountry({
+      id: app_store.app_data.property_id.toString(),
+      aname: app_store.app_data.aName,
+      perma_link: app_store.app_data.perma_link,
+    });
   }
 
   initializePopover() {
