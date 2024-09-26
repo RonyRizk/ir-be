@@ -54,7 +54,7 @@ export class IrBookingEngine {
   @State() router = new Stack<HTMLElement>();
   @State() bookingListingScreenOptions: { screen: 'bookings' | 'booking-details'; params: unknown } = { params: null, screen: 'bookings' };
 
-  private version: string = '2.11';
+  private version: string = '2.12';
   private baseUrl: string = 'https://gateway.igloorooms.com/IRBE';
   private commonService = new CommonService();
   private propertyService = new PropertyService();
@@ -164,7 +164,7 @@ export class IrBookingEngine {
       this.commonService.getCurrencies(),
       this.commonService.getExposedLanguages(),
       this.commonService.getExposedCountryByIp({
-        id: this.propertyId.toString(),
+        id: this.propertyId?.toString(),
         perma_link: this.perma_link,
         aname: this.p,
       }),

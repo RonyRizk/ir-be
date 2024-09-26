@@ -71,6 +71,12 @@
 .rateplan-details .rateplan-select-rooms {
   flex: 1 1 0%;
 }
+:host([display='grid']) .rateplan-select-rooms-btn {
+  flex: 0;
+}
+:host([display='default']) .rateplan-select-rooms-btn {
+  flex: 1 1 0%;
+}
 .rateplan-details .rateplan-pricing,
 .rateplan-details .rateplan-final-pricing {
   display: none;
@@ -124,6 +130,10 @@
 }
 /* lg	1024px */
 @media (min-width: 1024px) {
+  :host([display='default']) .rateplan-travelers {
+    max-width: 300px;
+  }
+
   /* .rateplan-container {
     display: grid;
     grid-template-columns: repeat(12, 1fr);

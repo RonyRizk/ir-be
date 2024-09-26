@@ -83,6 +83,18 @@ function setSelectedVariation(lastVariation: Variation, variations: Variation[],
   }
   return currentVariation;
 }
+// function setSelectedVariation(lastVariation: Variation, variations: Variation[], currentVariation: ISelectedVariation): ISelectedVariation {
+//   if (currentVariation?.state === 'default' || !currentVariation || booking_store.resetBooking) {
+//     const variationWithAmount = variations.find(v => v.amount > 0);
+//     return { state: 'default', variation: variationWithAmount ?? lastVariation };
+//   }
+//   const currentVariationIdx = variations.findIndex(v => v.adult_child_offering === currentVariation.variation.adult_child_offering);
+//   if (currentVariationIdx === -1) {
+//     const variationWithAmount = variations.find(v => v.amount > 0);
+//     return { state: 'default', variation: variationWithAmount ?? lastVariation };
+//   }
+//   return currentVariation;
+// }
 onRoomTypeChange('roomTypes', (newValue: RoomType[]) => {
   // console.log('hellow', newValue);
   const currentSelections = booking_store.ratePlanSelections;
