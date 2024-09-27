@@ -240,37 +240,46 @@ export class IrPaymentView {
   renderPaymentOptions() {
     const paymentMethods = app_store.property.allowed_payment_methods.filter(p => p.is_active) ?? [];
     const paymentLength = paymentMethods.length;
-    if (
-      paymentLength === 0 ||
-      (paymentLength === 1 && this.selectedPaymentMethod === '000') ||
-      (this.prepaymentAmount === 0 && !paymentMethods.some(pm => !pm.is_payment_gateway))
-    ) {
+    if ((this.prepaymentAmount === 0 && !paymentMethods.some(pm => !pm.is_payment_gateway)) || paymentLength === 0) {
       return <p class="text-center">{localizedWords.entries.Lcz_NoDepositRequired}</p>;
     }
+    if (paymentLength === 1 && paymentMethods[0].is_payment_gateway) {
+      return <p class={'text-center'}>{`${localizedWords.entries[`Lcz_Pay_${paymentMethods[0].code}`] ?? localizedWords.entries.Lcz_PayByCard}`}</p>;
+    }
     if (paymentLength > 1) {
+      const filteredMap = app_store.property?.allowed_payment_methods
+        .map(apm => {
+          if (!apm.is_active) {
+            return null;
+          }
+          if (apm.code === '000') {
+            return null;
+          }
+          if (apm.is_payment_gateway && this.prepaymentAmount === 0) {
+            return null;
+          }
+          return {
+            id: apm.code,
+            value: apm.is_payment_gateway
+              ? `${localizedWords.entries[`Lcz_Pay_${apm.code}`] ?? localizedWords.entries.Lcz_PayByCard}`
+              : apm.code === '001' || apm.code === '004'
+                ? localizedWords.entries.Lcz_SecureByCard
+                : apm.description,
+          };
+        })
+        .filter(p => p !== null);
+      if (filteredMap.length === 0) {
+        return <p class="text-center">{localizedWords.entries.Lcz_NoDepositRequired}</p>;
+      } else if (filteredMap.length === 1 && filteredMap[0].id === '005') {
+        return null;
+      }
+
       return (
         <ir-select
           variant="double-line"
           value={this.selectedPaymentMethod.toString()}
           label={localizedWords.entries.Lcz_SelectYourPaymentMethod}
-          data={app_store.property?.allowed_payment_methods
-            .map(apm => {
-              if (!apm.is_active) {
-                return null;
-              }
-              if (apm.is_payment_gateway && this.prepaymentAmount === 0) {
-                return null;
-              }
-              return {
-                id: apm.code,
-                value: apm.is_payment_gateway
-                  ? `${localizedWords.entries[`Lcz_Pay_${apm.code}`] ?? localizedWords.entries.Lcz_PayByCard}`
-                  : apm.code === '001' || apm.code === '004'
-                    ? localizedWords.entries.Lcz_SecureByCard
-                    : apm.description,
-              };
-            })
-            .filter(p => p !== null)}
+          data={filteredMap}
           onValueChange={this.handlePaymentSelectionChange.bind(this)}
         ></ir-select>
       );

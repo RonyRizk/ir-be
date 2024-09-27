@@ -17,7 +17,7 @@ export interface ICardProcessingWithCVC extends ICardProcessing {
   cvc: string;
 }
 
-export type TPayment = ICardProcessingWithoutCVC | ICardProcessingWithCVC | { code: string };
+export type TPayment = ICardProcessingWithCVC | { code: string };
 interface CheckoutStore {
   userFormData: TUserFormData;
   pickup: TPickupFormData;

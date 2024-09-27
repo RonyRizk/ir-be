@@ -184,7 +184,7 @@ export class AvailabiltyService {
 
   private async processPayloads(payloads: IPAYLOAD[]): Promise<void> {
     try {
-      // console.log('payload', payloads);
+      console.log('payload', payloads);
       if (!booking_store.enableBooking) {
         booking_store.enableBooking = true;
       }

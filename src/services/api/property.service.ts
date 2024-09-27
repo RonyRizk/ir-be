@@ -6,7 +6,7 @@ import { DataStructure } from '@/models/commun';
 import { ISetupEntries } from '@/models/property';
 import app_store from '@/stores/app.store';
 import booking_store, { IRatePlanSelection } from '@/stores/booking';
-import { checkout_store, ICardProcessingWithCVC, ICardProcessingWithoutCVC, updateUserFormData } from '@/stores/checkout.store';
+import { checkout_store, ICardProcessingWithCVC, updateUserFormData } from '@/stores/checkout.store';
 import { getDateDifference, injectHTML } from '@/utils/utils';
 import axios from 'axios';
 import { format } from 'date-fns';
@@ -206,18 +206,7 @@ export class PropertyService extends Token {
                 address: null,
                 dob: null,
                 subscribe_to_news_letter: null,
-                cci: ['001', '004'].includes(checkout_store.payment?.code)
-                  ? () => {
-                      const payment = checkout_store.payment as ICardProcessingWithoutCVC | ICardProcessingWithCVC;
-                      return {
-                        nbr: payment?.cardNumber,
-                        holder_name: payment?.cardHolderName,
-                        expiry_month: payment?.expiry_month.split('/')[0],
-                        expiry_year: payment?.expiry_year.split('/')[1],
-                        cvc: payment?.code === '001' ? payment.cvc : null,
-                      };
-                    }
-                  : null,
+                cci: null,
               },
             });
           });
@@ -249,6 +238,7 @@ export class PropertyService extends Token {
       if (!token) {
         throw new MissingTokenError();
       }
+      console.log('payment', checkout_store.payment);
       let guest: any = {
         email: checkout_store.userFormData.email,
         first_name: checkout_store.userFormData.firstName,
@@ -260,7 +250,16 @@ export class PropertyService extends Token {
         country_phone_prefix: checkout_store.userFormData.country_phone_prefix,
         dob: null,
         subscribe_to_news_letter: true,
-        cci: null,
+        cci:
+          checkout_store.payment?.code === '001'
+            ? {
+                nbr: (checkout_store.payment as ICardProcessingWithCVC)?.cardNumber.replace(/ /g, ''),
+                holder_name: (checkout_store.payment as ICardProcessingWithCVC)?.cardHolderName,
+                expiry_month: (checkout_store.payment as ICardProcessingWithCVC)?.expiry_month.split('/')[0],
+                expiry_year: (checkout_store.payment as ICardProcessingWithCVC)?.expiry_year.split('/')[1],
+                cvc: (checkout_store.payment as ICardProcessingWithCVC).cvc,
+              }
+            : null,
       };
       const body = {
         assign_units: false,
@@ -305,6 +304,7 @@ export class PropertyService extends Token {
         ].filter(f => f !== null),
         pickup_info: checkout_store.pickup.location ? this.propertyHelpers.convertPickup(checkout_store.pickup) : null,
       };
+      console.log('body');
       const { data } = await axios.post(`/DoReservation?Ticket=${token}`, body);
       if (data.ExceptionMsg !== '') {
         throw new Error(data.ExceptionMsg);
