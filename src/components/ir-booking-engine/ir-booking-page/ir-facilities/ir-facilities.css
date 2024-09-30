@@ -5,3 +5,25 @@
 .facilities-container {
   border-radius: min(var(--radius, 0.5rem), 0.75rem);
 }
+.property_amenities {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+@media (min-width: 768px) {
+  .property_amenities {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+  .property_amenities[data-total='2'] {
+    justify-content: flex-start;
+  }
+}
+@media (min-width: 1024px) {
+  .property_amenities {
+    gap: 2.5rem /* 40px */;
+  }
+}

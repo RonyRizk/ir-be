@@ -87,10 +87,10 @@ export function getUserPrefernce(lang: string | undefined = undefined) {
     });
   } else {
     updateUserPreference({
-      language_id: lang || 'en',
+      language_id: lang?.toLowerCase() || 'en',
     });
-    if (lang === 'ar') {
-      changeLocale('RTL', matchLocale(lang));
+    if (lang?.toLowerCase() === 'ar') {
+      changeLocale('RTL', matchLocale(lang?.toLowerCase()));
     }
   }
 }

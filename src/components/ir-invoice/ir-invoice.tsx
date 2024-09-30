@@ -1,6 +1,6 @@
 import { Component, Host, Listen, Prop, State, Watch, h } from '@stencil/core';
 import { format, isBefore } from 'date-fns';
-import { cn, formatAmount, getDateDifference, runScriptAndRemove } from '@/utils/utils';
+import { cn, formatAmount, getDateDifference, getUserPrefernce, runScriptAndRemove } from '@/utils/utils';
 import localizedWords from '@/stores/localization.store';
 import app_store from '@/stores/app.store';
 import { Booking } from '@/models/booking.dto';
@@ -61,6 +61,9 @@ export class IrInvoice {
     axios.defaults.baseURL = this.baseUrl;
     axios.defaults.withCredentials = true;
     this.isLoading = true;
+    if (!this.be) {
+      getUserPrefernce(this.language);
+    }
     const isAuthenticated = this.commonService.checkUserAuthState();
     console.log(isAuthenticated);
     if (isAuthenticated) {
@@ -86,7 +89,10 @@ export class IrInvoice {
   @Watch('bookingNbr')
   async handleBookingNumberChange(newValue, oldValue) {
     if (newValue !== oldValue) {
-      this.booking = await this.propertyService.getExposedBooking({ booking_nbr: this.bookingNbr, language: this.language || app_store.userPreferences.language_id,currency:null }, true);
+      this.booking = await this.propertyService.getExposedBooking(
+        { booking_nbr: this.bookingNbr, language: this.language || app_store.userPreferences.language_id, currency: null },
+        true,
+      );
     }
   }
   async init() {
@@ -96,13 +102,12 @@ export class IrInvoice {
     this.paymentService.setToken(this.token);
     app_store.app_data.token = this.token;
   }
-  async fetchData(language = this.language || app_store.userPreferences.language_id, resetLanguage = false) {
+  async fetchData(language = this.language?.toLowerCase() || app_store.userPreferences.language_id, resetLanguage = false) {
     if (!this.isAuthenticated) {
       this.token = await this.authService.login({ option: 'direct', params: { email: this.email, booking_nbr: this.bookingNbr } }, false);
       this.init();
     }
-    console.warn(this.be, resetLanguage);
-    const requests: any[] = [this.propertyService.getExposedBooking({ booking_nbr: this.bookingNbr, language ,currency:null})];
+    const requests: any[] = [this.propertyService.getExposedBooking({ booking_nbr: this.bookingNbr, language, currency: null })];
     if (!this.be || resetLanguage) {
       requests.push(this.commonService.getExposedLanguage());
       requests.push(
@@ -474,7 +479,7 @@ export class IrInvoice {
                 <div class="property_info sticky top-[20%]">
                   {app_store.property?.space_theme.background_image && (
                     <div class="lg:aspect9-[16/9] aspect-[1/1] max-h-32 w-full">
-                      <img class="property_img h-full w-full object-cover" src={app_store.property?.space_theme.background_image} alt="" />
+                      <img loading="lazy" class="property_img h-full w-full object-cover" src={app_store.property?.space_theme.background_image} alt="" />
                     </div>
                   )}
                   <a class="mapLink" target="_blank" href={google_maps_url}>

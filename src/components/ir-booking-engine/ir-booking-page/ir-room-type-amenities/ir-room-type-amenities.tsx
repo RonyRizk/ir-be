@@ -68,7 +68,7 @@ export class IrRoomTypeAmenities {
                 <ir-icons name="dimensions"></ir-icons>
                 <p>
                   {this.roomType.size}{' '}
-                  <span class="ordinal">
+                  <span>
                     m<sup>2</sup>
                   </span>
                 </p>

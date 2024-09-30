@@ -138,7 +138,10 @@ export class IrDateRange {
   }
 
   selectDay(day: Date) {
-    const isDateDisabled = !!this.dateModifiers[format(day, 'yyyy-MM-dd')];
+    let isDateDisabled = false;
+    if (this.dateModifiers) {
+      isDateDisabled = !!this.dateModifiers[format(day, 'yyyy-MM-dd')];
+    }
     if (isDateDisabled && !this.selectedDates.start) {
       return;
     }
@@ -309,7 +312,7 @@ export class IrDateRange {
                                 e.stopPropagation();
                                 this.selectDay(day);
                               }}
-                              title={checkedDate?.disabled ? localizedWords?.entries?.Lcz_NoAvailability??'No availability' : ''}
+                              title={checkedDate?.disabled ? localizedWords?.entries?.Lcz_NoAvailability ?? 'No availability' : ''}
                               aria-unavailable={checkedDate?.disabled ? 'true' : 'false'}
                               aria-label={`${format(day, 'EEEE, MMMM do yyyy', { locale: this.locale })} ${
                                 isBefore(day, this.minDate) || isAfter(day, this.maxDate) ? localizedWords.entries.Lcz_NotAvailable : ''

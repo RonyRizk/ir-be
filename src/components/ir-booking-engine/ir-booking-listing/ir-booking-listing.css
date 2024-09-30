@@ -32,6 +32,9 @@
   padding: 0.75rem 0.2rem;
   width: max-content !important;
 }
+.bl-back-btn:dir(rtl) {
+  transform: rotate(180deg);
+}
 .ir-nav-logo {
   /* height: 2.5rem;
   width: auto;

@@ -271,7 +271,7 @@ export class IrPhoneInput {
             >
               {this.selectedItem ? (
                 <Fragment>
-                  <img src={this.selectedItem?.flag} alt={this.selectedItem?.name} class="flag-icon" />
+                  <img loading="lazy" src={this.selectedItem?.flag} alt={this.selectedItem?.name} class="flag-icon" />
                   <span>{this.selectedItem?.phone_prefix}</span>
                 </Fragment>
               ) : (
@@ -332,7 +332,7 @@ export class IrPhoneInput {
                   }}
                 >
                   <div class="combobox-item-content">
-                    <img src={value.flag} alt={value.name} class="flag-icon" />
+                    <img loading="lazy" src={value.flag} alt={value.name} class="flag-icon" />
                     <span>{value.name}</span>
                     <span>({value.phone_prefix})</span>
                   </div>

@@ -136,7 +136,7 @@ export class IrGallery {
               <button class="absolute">
                 <p class="sr-only">open gallery</p>
               </button>
-              <img onClick={() => this.handleOpenGallery(idx)} src={image.url} alt={image.alt} />
+              <img loading="lazy" onClick={() => this.handleOpenGallery(idx)} src={image.url} alt={image.alt} />
             </figure>
           ))}
         </div>

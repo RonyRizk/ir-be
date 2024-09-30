@@ -272,7 +272,7 @@ export class IrBookingListing {
           <div class="ir-auth-nav-container relative">
             <div class={'flex w-full items-center gap-4'}>
               <ir-button
-                class={'absolute'}
+                class={'bl-back-btn absolute'}
                 variants="icon"
                 iconName="angle_left"
                 onButtonClick={() => (window.location.href = `https://${app_store.property.perma_link}.bookingmystay.com`)}
@@ -284,6 +284,7 @@ export class IrBookingListing {
                   href={`https://${app_store.app_data.affiliate ? app_store.app_data.affiliate.sites[0]?.url : app_store.property?.space_theme.website}`}
                 >
                   <img
+                    loading="lazy"
                     src={app_store.app_data?.affiliate ? app_store.app_data?.affiliate.sites[0]?.logo : app_store.property?.space_theme?.logo}
                     alt={`${app_store.property?.name}, ${app_store.property?.country.name}`}
                     class="ir-nav-logo aspect-1"

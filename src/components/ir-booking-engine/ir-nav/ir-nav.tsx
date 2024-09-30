@@ -166,6 +166,7 @@ export class IrNav {
               <div class="ir-nav-left">
                 <a aria-label="home" target="_blank" href={`https://${this.website}`}>
                   <img
+                    loading="lazy"
                     src={app_store.app_data?.affiliate ? app_store.app_data?.affiliate.sites[0]?.logo : this.logo}
                     alt={`${app_store.property?.name}, ${app_store.property?.country.name}`}
                     class="ir-nav-logo"

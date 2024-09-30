@@ -9,6 +9,16 @@ import { Component, Host, h } from '@stencil/core';
   shadow: true,
 })
 export class IrFacilities {
+  private getTotalAmenities() {
+    const set = new Set<string>();
+    app_store.property?.amenities?.forEach(a => {
+      console.log(a.amenity_type);
+      if (a.amenity_type !== 'room') {
+        set.add(a.amenity_type);
+      }
+    });
+    return set.size;
+  }
   render() {
     return (
       <Host>
@@ -67,7 +77,7 @@ export class IrFacilities {
             </div>
           )}
           {app_store.property?.amenities.some(a => !['property', 'activity', 'service'].includes(a.amenity_type)) && (
-            <div class="flex flex-col flex-wrap gap-4 md:flex-row md:items-start md:justify-between md:gap-8 lg:gap-10">
+            <div class="property_amenities" data-total={this.getTotalAmenities()}>
               {/* hotel */}
               {app_store.property?.amenities.some(a => a.amenity_type === 'property') && (
                 <div class="flex gap-4 ">

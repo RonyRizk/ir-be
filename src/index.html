@@ -8,6 +8,7 @@
   <script type="module" src="/build/iglooroom.esm.js"></script>
   <script nomodule src="/build/iglooroom.js"></script>
   <script src="index.js"></script>
+  <!-- <script src="https://cdn.tailwindcss.com"></script> -->
   <style>
     :root {
       --background: black;
@@ -81,7 +82,7 @@
 
 
   <!-- not injected mode -->
-  <ir-be cur="eur" checkin="2024-10-22" checkout="2024-10-26"></ir-be>
+  <ir-be cur="eur"></ir-be>
   <!-- aff="AF6" a-name='A286' -->
 
   <!-- Injected mode -->
@@ -91,12 +92,8 @@
     const testCmp = document.querySelector('ir-be');
     async function init() {
       testCmp.propertyId = getId()
-      // testCmp.propertyId = 526
       // testCmp.propertyId = 60 || getId()
       // testCmp.p = "a237"
-      // testCmp.p = "A314"
-      // testCmp.p = "A456"
-
       // testCmp.p = "A506"
       //Valentinos appartments
       // testCmp.p = 'A19'

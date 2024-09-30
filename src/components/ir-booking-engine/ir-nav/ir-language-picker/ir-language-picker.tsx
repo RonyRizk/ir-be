@@ -140,7 +140,7 @@ export class IrLanguagePicker {
                 'language-button-selected': this.selectedLanguage?.code === language.code,
               })}
             >
-              <img src={language['flag']} alt={language.code} class="language-flag"></img>
+              <img loading="lazy" src={language['flag']} alt={language.code} class="language-flag"></img>
               <span>{language.description}</span>
               <input type="radio" aria-hidden="true" tabIndex={-1} checked={this.selectedLanguage?.code === language.code} value={language.code} class="hidden-radio"></input>
             </button>
