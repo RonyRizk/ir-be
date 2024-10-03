@@ -7,10 +7,11 @@
 
 ## Properties
 
-| Property           | Attribute           | Description | Type                                                                                                                                                  | Default     |
-| ------------------ | ------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `error`            | --                  |             | `{ cause: "booking-details" \| "booking-summary"; issues: string; } \| { cause: "user" \| "pickup" \| "payment"; issues: Record<string, ZodIssue>; }` | `undefined` |
-| `prepaymentAmount` | `prepayment-amount` |             | `any`                                                                                                                                                 | `null`      |
+| Property             | Attribute              | Description | Type                                                                                                                                                  | Default     |
+| -------------------- | ---------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `error`              | --                     |             | `{ cause: "booking-details" \| "booking-summary"; issues: string; } \| { cause: "user" \| "pickup" \| "payment"; issues: Record<string, ZodIssue>; }` | `undefined` |
+| `isBookingConfirmed` | `is-booking-confirmed` |             | `boolean`                                                                                                                                             | `false`     |
+| `prepaymentAmount`   | `prepayment-amount`    |             | `any`                                                                                                                                                 | `null`      |
 
 
 ## Events

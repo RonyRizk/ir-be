@@ -82,7 +82,7 @@
 
 
   <!-- not injected mode -->
-  <ir-be cur="eur"></ir-be>
+  <ir-be cur="eur" checkin="2024-10-03" checkout="2024-10-20" adults="4" child="2"></ir-be>
   <!-- aff="AF6" a-name='A286' -->
 
   <!-- Injected mode -->
@@ -92,6 +92,8 @@
     const testCmp = document.querySelector('ir-be');
     async function init() {
       testCmp.propertyId = getId()
+      // testCmp.p = "A237"
+      testCmp.p = "A487"
       // testCmp.propertyId = 60 || getId()
       // testCmp.p = "a237"
       // testCmp.p = "A506"

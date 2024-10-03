@@ -25,6 +25,7 @@ export class IrCheckoutPage {
   @State() error: CheckoutErrors;
   @State() selectedPaymentMethod: AllowedPaymentMethod | null = null;
   @State() prepaymentAmount: number;
+  @State() isBookingConfirmed = false;
 
   @Event() routing: EventEmitter<pages>;
 
@@ -113,13 +114,19 @@ export class IrCheckoutPage {
   }
 
   private validatePayment(): boolean {
+    if (!app_store.property.allowed_payment_methods.some(p => p.is_active)) {
+      return true;
+    }
     const currentPayment = app_store.property.allowed_payment_methods.find(p => p.code === checkout_store.payment?.code);
     this.selectedPaymentMethod = currentPayment;
 
     if (!currentPayment && this.prepaymentAmount > 0) {
       return false;
     }
-    if (currentPayment.is_payment_gateway || currentPayment.code === '000' || currentPayment.code === '005') {
+    if (!currentPayment && this.prepaymentAmount === 0) {
+      return true;
+    }
+    if (currentPayment?.is_payment_gateway || currentPayment?.code === '000' || currentPayment?.code === '005') {
       return true;
     }
     try {
@@ -208,14 +215,14 @@ export class IrCheckoutPage {
   private async processBooking() {
     try {
       const result = await this.propertyService.bookUser();
-
+      this.isBookingConfirmed = true;
       booking_store.booking = result;
       const conversionTag = app_store.property?.tags.find(t => t.key === 'conversion');
       if (conversionTag && conversionTag.value) {
         this.modifyConversionTag(conversionTag.value);
       }
 
-      if (!this.selectedPaymentMethod || !this.selectedPaymentMethod?.is_payment_gateway) {
+      if (!this.selectedPaymentMethod || !this.selectedPaymentMethod?.is_payment_gateway || this.prepaymentAmount === 0) {
         app_store.invoice = {
           email: booking_store.booking.guest.email,
           booking_number: booking_store.booking.booking_nbr,
@@ -326,7 +333,7 @@ export class IrCheckoutPage {
             </div>
           </section>
           <section class="w-full md:sticky  md:top-20  md:flex md:max-w-md md:justify-end">
-            <ir-booking-summary prepaymentAmount={this.prepaymentAmount} error={this.error}></ir-booking-summary>
+            <ir-booking-summary isBookingConfirmed={this.isBookingConfirmed} prepaymentAmount={this.prepaymentAmount} error={this.error}></ir-booking-summary>
           </section>
         </main>
       </Host>

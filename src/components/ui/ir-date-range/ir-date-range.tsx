@@ -176,7 +176,6 @@ export class IrDateRange {
       this.fromDate.setHours(0, 0, 0, 0);
     }
     if (this.toDate) {
-      console.log(this.toDate);
       this.toDate.setHours(0, 0, 0, 0);
     }
   }
@@ -312,6 +311,7 @@ export class IrDateRange {
                                 e.stopPropagation();
                                 this.selectDay(day);
                               }}
+                              style={checkedDate?.disabled && this.selectedDates.start && { cursor: 'pointer' }}
                               title={checkedDate?.disabled ? localizedWords?.entries?.Lcz_NoAvailability ?? 'No availability' : ''}
                               aria-unavailable={checkedDate?.disabled ? 'true' : 'false'}
                               aria-label={`${format(day, 'EEEE, MMMM do yyyy', { locale: this.locale })} ${

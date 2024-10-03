@@ -19,7 +19,6 @@ export class QueryStringValidator {
     }
 
     const checkinDate = parseISO(checkinStr);
-    console.log(checkinDate);
     const today = new Date();
 
     if (!isValid(checkinDate)) {

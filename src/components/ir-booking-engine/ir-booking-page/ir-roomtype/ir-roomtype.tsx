@@ -27,7 +27,7 @@ export class IrRoomtype {
           <div class={this.display === 'default' ? 'md:hidden' : ''}>
             <ir-property-gallery display={this.display} property_state="carousel" roomType={this.roomtype}></ir-property-gallery>
           </div>
-          <div class={`p-4 pt-2 ${this.display === 'default' ? 'md:p-0' : 'rp-container-grid justify-between'}`}>
+          <div class={`p-4 pt-2 ${this.display === 'default' ? 'md:p-0' : 'rp-container-grid '}`}>
             <div>
               <h3 class={`text-start  text-lg font-medium text-slate-900 ${this.display === 'default' ? 'md:hidden' : ''} `}>{this.roomtype.name}</h3>
               <div class={`flex  flex-wrap  gap-2 py-2 text-sm font-normal text-gray-700 ${this.display === 'default' ? 'md:hidden' : '  '}`}>
@@ -72,7 +72,7 @@ export class IrRoomtype {
                   );
                 })
               ) : (
-                <div class="app_container flex w-full flex-1 flex-col justify-between space-y-1 rounded-md bg-gray-100  text-sm md:flex-row">
+                <div class="app_container flex w-full  flex-col justify-between space-y-1 rounded-md bg-gray-100  text-sm md:flex-row">
                   <p>{this.roomtype.description}</p>
                 </div>
               )}

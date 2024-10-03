@@ -25,7 +25,8 @@ export class IrBookingPage {
   @Event() routing: EventEmitter<pages>;
 
   private checkoutContainerRef: HTMLDivElement;
-  private roomTypeSectionRef: HTMLElement;
+  roomTypeSectionRef: HTMLElement;
+  private availabiltyHeaderRef: HTMLIrAvailibilityHeaderElement;
 
   componentWillLoad() {
     this.property = { ...app_store.property };
@@ -50,9 +51,8 @@ export class IrBookingPage {
   handleScrolling(e: CustomEvent) {
     e.stopImmediatePropagation();
     e.stopPropagation();
-    setTimeout(() => {
-      this.roomTypeSectionRef.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+    // this.roomTypeSectionRef.scrollIntoView({ behavior: 'smooth' });
+    this.availabiltyHeaderRef.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
   }
 
   private renderTotalNights() {
@@ -88,7 +88,13 @@ export class IrBookingPage {
             </div>
           )}
           <div>
-            <ir-availibility-header fromDate={this.fromDate} toDate={this.toDate} adultCount={this.adultCount} childrenCount={this.childrenCount}></ir-availibility-header>
+            <ir-availibility-header
+              ref={el => (this.availabiltyHeaderRef = el)}
+              fromDate={this.fromDate}
+              toDate={this.toDate}
+              adultCount={this.adultCount}
+              childrenCount={this.childrenCount}
+            ></ir-availibility-header>
           </div>
 
           <section class={app_store.app_data.displayMode === 'default' ? 'relative justify-between gap-4 rounded-md ' : ''} ref={el => (this.roomTypeSectionRef = el)}>

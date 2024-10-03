@@ -79,7 +79,7 @@ export class IrInvoice {
     if (!this.booking.extras) {
       return null;
     }
-    const code = this.booking.extras.find(e => e.key === 'payment_code').value;
+    const code = this.booking.extras.find(e => e.key === 'payment_code')?.value;
     if (!code) {
       return null;
     }
@@ -479,7 +479,7 @@ export class IrInvoice {
                 <div class="property_info sticky top-[20%]">
                   {app_store.property?.space_theme.background_image && (
                     <div class="lg:aspect9-[16/9] aspect-[1/1] max-h-32 w-full">
-                      <img loading="lazy" class="property_img h-full w-full object-cover" src={app_store.property?.space_theme.background_image} alt="" />
+                      <img loading="lazy" class="property_img h-full w-full object-cover" src={app_store.property?.images[0].url} alt="" />
                     </div>
                   )}
                   <a class="mapLink" target="_blank" href={google_maps_url}>

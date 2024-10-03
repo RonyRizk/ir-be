@@ -15,7 +15,7 @@ import localization_store from '@/stores/app.store';
 })
 export class IrBookingSummary {
   @Prop() prepaymentAmount = null;
-
+  @Prop() isBookingConfirmed = false;
   @Event() routing: EventEmitter<pages>;
   @Event() bookingClicked: EventEmitter<null>;
   @Event() openPrivacyPolicy: EventEmitter<null>;
@@ -128,6 +128,7 @@ export class IrBookingSummary {
               )}
             </div>
             <ir-button
+              disabled={isRequestPending('/DoReservation') || this.isBookingConfirmed}
               isLoading={isRequestPending('/DoReservation')}
               size="md"
               class="w-full"

@@ -70,7 +70,7 @@ export class IrDatePopup {
       <Host>
         <ir-popover
           showCloseButton={false}
-          placement="auto"
+          placement="bottom-start"
           ref={el => (this.popover = el)}
           onOpenChange={e => {
             this.isPopoverOpen = e.detail;

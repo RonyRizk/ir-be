@@ -246,6 +246,9 @@ export class IrPaymentView {
     if (paymentLength === 1 && paymentMethods[0].is_payment_gateway) {
       return <p class={'text-center'}>{`${localizedWords.entries[`Lcz_Pay_${paymentMethods[0].code}`] ?? localizedWords.entries.Lcz_PayByCard}`}</p>;
     }
+    if (paymentLength === 1 && paymentMethods[0].code === '001') {
+      return <p>{localizedWords.entries.Lcz_SecureByCard}</p>;
+    }
     if (paymentLength > 1) {
       const filteredMap = app_store.property?.allowed_payment_methods
         .map(apm => {

@@ -66,7 +66,7 @@ export class IrPropertyGallery {
 
     if (maxNumber > 4) {
       return (
-        <div class="capacity-container pointer-events-none absolute -bottom-0 z-10 flex w-full items-center justify-between bg-white/80 px-2 py-1 pb-2 text-sm">
+        <div class="capacity-container pointer-events-none absolute -bottom-0 z-10 flex w-full items-center justify-between bg-white/80 px-2 py-2 text-sm">
           <div class="flex items-center gap-2">
             <p>{localizedWords.entries.Lcz_Maximum}</p>
             {renderOccupancy()}
@@ -85,7 +85,7 @@ export class IrPropertyGallery {
     }
 
     return (
-      <div class="capacity-container pointer-events-none absolute -bottom-0 z-10 flex w-full items-center justify-between bg-white/80 px-2 py-1 pb-2 text-sm">
+      <div class="capacity-container pointer-events-none absolute -bottom-0 z-10 flex w-full items-center justify-between bg-white/80 px-2 py-2  text-sm">
         <div class="flex items-center gap-2">
           <p>{localizedWords.entries.Lcz_Maximum}</p>
           <div class="flex items-center">

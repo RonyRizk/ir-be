@@ -166,6 +166,7 @@ export namespace Components {
     }
     interface IrBookingSummary {
         "error": CheckoutErrors;
+        "isBookingConfirmed": boolean;
         "prepaymentAmount": any;
     }
     interface IrButton {
@@ -1942,6 +1943,7 @@ declare namespace LocalJSX {
     }
     interface IrBookingSummary {
         "error"?: CheckoutErrors;
+        "isBookingConfirmed"?: boolean;
         "onBookingClicked"?: (event: IrBookingSummaryCustomEvent<null>) => void;
         "onOpenPrivacyPolicy"?: (event: IrBookingSummaryCustomEvent<null>) => void;
         "onRouting"?: (event: IrBookingSummaryCustomEvent<pages>) => void;

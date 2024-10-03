@@ -1,8 +1,8 @@
 import { RoomType } from '@/models/property';
 import { Queue } from '@/models/queue';
 import booking_store from '@/stores/booking';
-import { io, Socket } from 'socket.io-client';
 import { z } from 'zod';
+import SocketManager from './SocketManager';
 
 interface IPAYLOAD {
   ROOM_CATEGORY_ID: number;
@@ -25,56 +25,6 @@ interface IPAYLOAD {
   MLS_ALERT: string | null;
   MLS_ALERT_VALUE: string | null;
 }
-
-class SocketManager {
-  private static instance: SocketManager;
-  public socket: Socket;
-  public isConnected: boolean = false;
-
-  private constructor() {
-    this.initializeSocket();
-  }
-
-  private initializeSocket() {
-    this.socket = io('https://realtime.igloorooms.com/', {
-      reconnectionAttempts: 5,
-      reconnectionDelay: 2000,
-    });
-
-    this.socket.on('connect', () => {
-      console.log('Connected to the socket server');
-      this.isConnected = true;
-    });
-
-    this.socket.on('connect_error', error => {
-      console.error('Connection error:', error);
-    });
-
-    this.socket.on('disconnect', reason => {
-      console.log('Disconnected:', reason);
-      this.isConnected = false;
-      // this.reconnect();
-    });
-  }
-
-  public static getInstance(): SocketManager {
-    if (!SocketManager.instance) {
-      SocketManager.instance = new SocketManager();
-    }
-    return SocketManager.instance;
-  }
-
-  public reconnect() {
-    console.log('Attempting to reconnect...');
-    this.initializeSocket();
-  }
-
-  public close() {
-    this.socket.close();
-  }
-}
-
-export default SocketManager;
 
 export class AvailabiltyService {
   private socketManager: SocketManager;
@@ -153,6 +103,7 @@ export class AvailabiltyService {
     this.subscribers.forEach(callback => callback(false));
   }
   private resetVariations() {
+    console.log('reseting the variations');
     booking_store.resetBooking = true;
     this.roomTypes = [...booking_store.roomTypes];
     this.roomTypes = this.roomTypes.map(rt => {
@@ -190,9 +141,6 @@ export class AvailabiltyService {
       }
 
       payloads.forEach(payload => {
-        if (payload.ROOM_CATEGORY_ID === 2345) {
-          console.log(payload);
-        }
         const selectedRoomTypeIndex = this.roomTypes.findIndex(rt => rt.id === payload.ROOM_CATEGORY_ID);
         if (selectedRoomTypeIndex === -1) {
           console.error('Invalid room type');
@@ -242,10 +190,10 @@ export class AvailabiltyService {
 
         rateplan = { ...rateplan, variations: oldVariation };
         roomType.rateplans[selectedRatePlanIndex] = rateplan;
-
         this.roomTypes[selectedRoomTypeIndex] = { ...roomType, inventory: 1 };
       });
       booking_store.resetBooking = true;
+      console.log('roomtypes', this.roomTypes);
       booking_store.roomTypes = [...this.roomTypes];
     } catch (error) {
       console.error('Error processing payloads:', error);

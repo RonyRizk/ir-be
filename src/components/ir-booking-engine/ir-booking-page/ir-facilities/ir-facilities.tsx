@@ -12,7 +12,6 @@ export class IrFacilities {
   private getTotalAmenities() {
     const set = new Set<string>();
     app_store.property?.amenities?.forEach(a => {
-      console.log(a.amenity_type);
       if (a.amenity_type !== 'room') {
         set.add(a.amenity_type);
       }
