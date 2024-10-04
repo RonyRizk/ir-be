@@ -232,6 +232,7 @@ export class IrDateRange {
   }
 
   render() {
+    const maxSpanDays = this.selectedDates.start && addDays(this.selectedDates.start, this.maxSpanDays);
     return (
       <div class={'date-picker'}>
         {this.displayedDaysArr.map((month, index) => (
@@ -303,7 +304,7 @@ export class IrDateRange {
                         <td class="day-cell" key={format(day, 'yyyy-MM-dd')} role="gridcell">
                           {isSameMonth(day, month.month) && (
                             <button
-                              disabled={isBefore(day, this.minDate) || isAfter(day, this.maxDate)}
+                              disabled={isBefore(day, this.minDate) || isAfter(day, this.maxDate) || (this.selectedDates.start && isAfter(day, maxSpanDays))}
                               onMouseEnter={() => this.handleMouseEnter(day)}
                               onMouseLeave={() => this.handleMouseLeave()}
                               onClick={e => {

@@ -99,7 +99,6 @@ export class PaymentService extends Token {
     if (!token) {
       throw new MissingTokenError();
     }
-    console.log('here');
     const { data } = await axios.post(`/Get_Exposed_Applicable_Policies?Ticket=${token}`, params);
     if (data['ExceptionMsg'] !== '') {
       throw new Error(data.ExceptionMsg);

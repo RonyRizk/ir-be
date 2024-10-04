@@ -115,7 +115,7 @@ export class PropertyHelpers {
   }
   private async validateFreeCancelationZone(token: string, booking_nbr: string) {
     this.paymentService.setToken(token);
-    console.log(app_store.currencies.find(c => c.code.toLowerCase() === app_store.userPreferences.currency_id?.toLowerCase()));
+    // console.log(app_store.currencies.find(c => c.code.toLowerCase() === app_store.userPreferences.currency_id?.toLowerCase()));
     const result = await this.paymentService.GetExposedApplicablePolicies({
       book_date: new Date(),
       params: {
@@ -189,11 +189,11 @@ export class PropertyHelpers {
       if (!newRP || !newRP.is_active || !newRP.is_booking_engine_enabled) {
         return updatedRatePlans;
       }
-
+      // console.log('terst selected variation', newRP, newRP.variations, 'res', newRP.variations?.length > 0 ? newRP.variations[0] : null);
       updatedRatePlans.push({
         ...newRP,
         variations: agentExists ? newRP.variations : rp.variations,
-        selected_variation: newRP.variations ? newRP.variations[0] : null,
+        selected_variation: newRP.variations?.length > 0 ? newRP.variations[0] : null,
       });
 
       return updatedRatePlans;
@@ -220,11 +220,58 @@ export class PropertyHelpers {
   //     return updatedRatePlans;
   //   }, []);
   // }
+
+  //---------------------------
+  //         SORTING
+  //---------------------------
+
+  // private sortRoomTypes(roomTypes: RoomType[], userCriteria: { adult_nbr: number; child_nbr: number }): RoomType[] {
+  //   return roomTypes.sort((a, b) => {
+  //     // Move room types with zero inventory to the end
+  //     if (a.inventory === 0 && b.inventory !== 0) return 1;
+  //     if (a.inventory !== 0 && b.inventory === 0) return -1;
+
+  //     // Check for variations where is_calculated is true and amount is 0
+  //     const zeroCalculatedA = a.rateplans?.some(plan => plan?.variations?.some(variation => variation.is_calculated && (variation.amount === 0 || variation.amount === null)));
+  //     const zeroCalculatedB = b.rateplans?.some(plan => plan?.variations?.some(variation => variation.is_calculated && (variation.amount === 0 || variation.amount === null)));
+
+  //     // Prioritize these types to be before inventory 0 but after all others
+  //     if (zeroCalculatedA && !zeroCalculatedB) return 1;
+  //     if (!zeroCalculatedA && zeroCalculatedB) return -1;
+
+  //     // Check for exact matching variations
+  //     const matchA = a.rateplans?.some(plan =>
+  //       plan.variations?.some(variation => variation.adult_nbr === userCriteria.adult_nbr && variation.child_nbr === userCriteria.child_nbr),
+  //     );
+  //     const matchB = b.rateplans?.some(plan =>
+  //       plan.variations?.some(variation => variation.adult_nbr === userCriteria.adult_nbr && variation.child_nbr === userCriteria.child_nbr),
+  //     );
+
+  //     if (matchA && !matchB) return -1;
+  //     if (!matchA && matchB) return 1;
+
+  //     // Sort by the highest variation in any attribute, for example `amount`
+  //     const maxVariationA = Math.max(...a.rateplans.flatMap(plan => plan?.variations?.map(variation => variation.amount)));
+  //     const maxVariationB = Math.max(...b.rateplans.flatMap(plan => plan?.variations?.map(variation => variation.amount)));
+
+  //     if (maxVariationA < maxVariationB) return -1;
+  //     if (maxVariationA > maxVariationB) return 1;
+
+  //     return 0;
+  //   });
+  // }
   private sortRoomTypes(roomTypes: RoomType[], userCriteria: { adult_nbr: number; child_nbr: number }): RoomType[] {
     return roomTypes.sort((a, b) => {
       // Move room types with zero inventory to the end
       if (a.inventory === 0 && b.inventory !== 0) return 1;
       if (a.inventory !== 0 && b.inventory === 0) return -1;
+
+      // Move room types with all rate plans closed to the end
+      const allRateplansClosedA = a.rateplans?.every(plan => plan.is_closed);
+      const allRateplansClosedB = b.rateplans?.every(plan => plan.is_closed);
+
+      if (allRateplansClosedA && !allRateplansClosedB) return 1;
+      if (!allRateplansClosedA && allRateplansClosedB) return -1;
 
       // Check for variations where is_calculated is true and amount is 0
       const zeroCalculatedA = a.rateplans?.some(plan => plan?.variations?.some(variation => variation.is_calculated && (variation.amount === 0 || variation.amount === null)));
@@ -255,7 +302,6 @@ export class PropertyHelpers {
       return 0;
     });
   }
-
   private updateRoomTypeRatePlans(roomtypes: RoomType[], newRoomtypes: RoomType[], props: any) {
     const selectedRoomTypeIdx = roomtypes.findIndex(rt => rt.id === props.rt_id);
     if (selectedRoomTypeIdx === -1) {

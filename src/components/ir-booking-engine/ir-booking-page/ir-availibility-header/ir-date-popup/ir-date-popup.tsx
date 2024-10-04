@@ -86,7 +86,7 @@ export class IrDatePopup {
               fromDate={this.dates.start}
               toDate={this.dates.end}
               locale={localization_store.selectedLocale}
-              maxSpanDays={5}
+              maxSpanDays={app_store.property.max_nights}
               minDate={this.minDate}
             ></ir-date-range>
           </div>

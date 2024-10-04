@@ -52,31 +52,34 @@ export class IrRoomtype {
               )}
             </div>
             {/* </div> */}
-
-            <div>
-              {booking_store.enableBooking ? (
-                this.roomtype.rateplans.map(ratePlan => {
-                  if (!ratePlan.is_active || !ratePlan.is_booking_engine_enabled || !ratePlan.variations) {
-                    return null;
-                  }
-                  const visibleInventory = getVisibleInventory(this.roomtype.id, ratePlan.id);
-                  return (
-                    <ir-rateplan
-                      display={this.display}
-                      key={ratePlan.id}
-                      ratePlan={ratePlan}
-                      visibleInventory={visibleInventory}
-                      roomTypeId={this.roomtype.id}
-                      roomTypeInventory={this.roomtype.inventory}
-                    ></ir-rateplan>
-                  );
-                })
-              ) : (
-                <div class="app_container flex w-full  flex-col justify-between space-y-1 rounded-md bg-gray-100  text-sm md:flex-row">
-                  <p>{this.roomtype.description}</p>
-                </div>
-              )}
-            </div>
+            {this.roomtype.rateplans.every(r => r.is_closed) ? (
+              <p class={` text-center text-base ${this.display === 'default' ? '' : 'pt-4'}`}>Not available</p>
+            ) : (
+              <div>
+                {booking_store.enableBooking ? (
+                  this.roomtype.rateplans.map(ratePlan => {
+                    if (!ratePlan.is_active || ratePlan.is_closed || !ratePlan.is_booking_engine_enabled || !ratePlan.variations) {
+                      return null;
+                    }
+                    const visibleInventory = getVisibleInventory(this.roomtype.id, ratePlan.id);
+                    return (
+                      <ir-rateplan
+                        display={this.display}
+                        key={ratePlan.id}
+                        ratePlan={ratePlan}
+                        visibleInventory={visibleInventory}
+                        roomTypeId={this.roomtype.id}
+                        roomTypeInventory={this.roomtype.inventory}
+                      ></ir-rateplan>
+                    );
+                  })
+                ) : (
+                  <div class="app_container flex w-full  flex-col justify-between space-y-1 rounded-md bg-gray-100  text-sm md:flex-row">
+                    <p>{this.roomtype.description}</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </section>

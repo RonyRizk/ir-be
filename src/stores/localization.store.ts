@@ -177,6 +177,7 @@ export type TLocaleLocalizedWordsEntries = {
   Lcz_NoDepositRequired: string;
   Lcz_SecureByCard: string;
   Lcz_PayByCard: string;
+  Lcz_PaymentSecurity: string;
 };
 
 const initialState: ILocale = {

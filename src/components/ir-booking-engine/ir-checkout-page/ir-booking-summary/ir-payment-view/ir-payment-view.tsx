@@ -24,6 +24,7 @@ export class IrPaymentView {
       };
     }
   }
+
   @Watch('prepaymentAmount')
   handlePrePaymentAmount(newValue: number, oldValue: number) {
     if (newValue !== oldValue) {
@@ -239,16 +240,18 @@ export class IrPaymentView {
   }
   renderPaymentOptions() {
     const paymentMethods = app_store.property.allowed_payment_methods.filter(p => p.is_active) ?? [];
+
     const paymentLength = paymentMethods.length;
+    console.log(paymentLength);
     if ((this.prepaymentAmount === 0 && !paymentMethods.some(pm => !pm.is_payment_gateway)) || paymentLength === 0) {
       return <p class="text-center">{localizedWords.entries.Lcz_NoDepositRequired}</p>;
     }
     if (paymentLength === 1 && paymentMethods[0].is_payment_gateway) {
       return <p class={'text-center'}>{`${localizedWords.entries[`Lcz_Pay_${paymentMethods[0].code}`] ?? localizedWords.entries.Lcz_PayByCard}`}</p>;
     }
-    if (paymentLength === 1 && paymentMethods[0].code === '001') {
-      return <p>{localizedWords.entries.Lcz_SecureByCard}</p>;
-    }
+    // if (paymentLength === 1 && paymentMethods[0].code === '001') {
+    //   return <p>{localizedWords.entries.Lcz_SecureByCard}</p>;
+    // }
     if (paymentLength > 1) {
       const filteredMap = app_store.property?.allowed_payment_methods
         .map(apm => {
@@ -273,7 +276,7 @@ export class IrPaymentView {
         .filter(p => p !== null);
       if (filteredMap.length === 0) {
         return <p class="text-center">{localizedWords.entries.Lcz_NoDepositRequired}</p>;
-      } else if (filteredMap.length === 1 && filteredMap[0].id === '005') {
+      } else if (filteredMap.length === 1 && ['001', '005'].includes(filteredMap[0].id)) {
         return null;
       }
 
@@ -300,6 +303,7 @@ export class IrPaymentView {
   render() {
     return (
       <div class="w-full space-y-4 rounded-md border border-solid bg-white  p-4">
+        {this.prepaymentAmount === 0 && this.selectedPaymentMethod === '001' && <p>{localizedWords.entries.Lcz_PaymentSecurity}</p>}
         {this.renderPaymentOptions()}
         {this.renderPaymentMethod()}
         {this.cardType !== '' &&

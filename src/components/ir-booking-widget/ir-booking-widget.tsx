@@ -211,7 +211,7 @@ export class IrBookingWidget {
                 fromDate={this.dates?.from_date}
                 toDate={this.dates?.to_date}
                 locale={localization_store.selectedLocale}
-                maxSpanDays={5}
+                maxSpanDays={app_store.property.max_nights}
                 onDateChange={e => {
                   e.stopImmediatePropagation();
                   e.stopPropagation();

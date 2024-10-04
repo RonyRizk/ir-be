@@ -108,6 +108,7 @@ export class IrRateplan {
     // if (!this.ratePlan.is_targeting_travel_agency && booking_store.bookingAvailabilityParams.agent) {
     //   return null;
     // }
+    console.log('visible inventory', this.visibleInventory?.selected_variation?.variation.adult_child_offering);
     if (this.ratePlan.is_targeting_travel_agency && !app_store.app_data.isAgentMode) {
       return null;
     }

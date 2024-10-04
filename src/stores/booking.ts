@@ -73,13 +73,16 @@ const initialState: BookingStore = {
 
 export const { state: booking_store, onChange: onRoomTypeChange } = createStore<BookingStore>(initialState);
 function setSelectedVariation(lastVariation: Variation, variations: Variation[], currentVariation: ISelectedVariation): ISelectedVariation {
-  // console.log(lastVariation, variations, currentVariation);
   if (currentVariation?.state === 'default' || !currentVariation || booking_store.resetBooking) {
-    return { state: 'default', variation: lastVariation };
+    if (lastVariation.amount > 0) {
+      return { state: 'default', variation: lastVariation };
+    }
+    return { state: 'default', variation: variations[0] };
   }
-  const currentVariationIdx = variations.findIndex(v => v.adult_child_offering === currentVariation.variation.adult_child_offering);
+  const currentVariationIdx = variations.findIndex(v => v?.adult_child_offering === currentVariation.variation?.adult_child_offering);
   if (currentVariationIdx === -1) {
-    return { state: 'default', variation: lastVariation };
+    const variationWithAmount = variations.find(v => v.amount > 0);
+    return { state: 'default', variation: variationWithAmount ?? lastVariation };
   }
   return currentVariation;
 }
@@ -113,7 +116,7 @@ onRoomTypeChange('roomTypes', (newValue: RoomType[]) => {
           ? {
               ...currentRatePlanSelection,
               ratePlan,
-              selected_variation: setSelectedVariation(lastVariation, ratePlan.variations, currentRatePlanSelection.selected_variation),
+              selected_variation: setSelectedVariation(lastVariation, ratePlan.variations, ratePlan?.selected_variation),
               visibleInventory: roomType.inventory === 1 ? 2 : roomType.inventory,
               reserved: roomType.inventory === 0 ? 0 : booking_store.resetBooking ? 0 : currentRatePlanSelection.reserved,
               checkoutVariations: roomType.inventory === 0 ? [] : currentRatePlanSelection.checkoutVariations,
@@ -127,7 +130,7 @@ onRoomTypeChange('roomTypes', (newValue: RoomType[]) => {
           : {
               reserved: 0,
               visibleInventory: roomType.inventory === 1 ? 2 : roomType.inventory,
-              selected_variation: setSelectedVariation(lastVariation, ratePlan.variations, currentRatePlanSelection?.selected_variation),
+              selected_variation: setSelectedVariation(lastVariation, ratePlan.variations, ratePlan?.selected_variation),
               ratePlan,
               guestName: [],
               is_bed_configuration_enabled: roomType.is_bed_configuration_enabled,

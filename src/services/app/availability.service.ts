@@ -193,7 +193,6 @@ export class AvailabiltyService {
         this.roomTypes[selectedRoomTypeIndex] = { ...roomType, inventory: 1 };
       });
       booking_store.resetBooking = true;
-      console.log('roomtypes', this.roomTypes);
       booking_store.roomTypes = [...this.roomTypes];
     } catch (error) {
       console.error('Error processing payloads:', error);
