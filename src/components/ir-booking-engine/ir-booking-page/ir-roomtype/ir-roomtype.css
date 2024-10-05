@@ -11,6 +11,11 @@
   background-color: hsl(220, 14%, 96%);
   padding: 1rem;
 }
+.unavailable-roomtype {
+  text-align: center;
+  color: #ef4444;
+  font-weight: 400;
+}
 .rp-container-grid {
   height: 100%;
   display: flex;

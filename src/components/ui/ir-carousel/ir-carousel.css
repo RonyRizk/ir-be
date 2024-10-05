@@ -63,15 +63,9 @@
 .swiper:hover {
   --ir-carousel-opacity: 1;
 }
-
 .swiper-slide[data-swipable] img {
   cursor: grab;
-}
-.swiper-slide img {
-  -o-object-fit: contain;
   object-fit: contain;
-  -o-object-position: center;
-  object-position: center;
 }
 .swiper-slide[data-swipable] img:active {
   cursor: grabbing;

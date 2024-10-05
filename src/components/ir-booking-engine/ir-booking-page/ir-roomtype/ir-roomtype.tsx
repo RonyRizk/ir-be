@@ -1,6 +1,7 @@
 import { RoomType } from '@/models/property';
 import app_store from '@/stores/app.store';
 import booking_store, { getVisibleInventory } from '@/stores/booking';
+import localizedWords from '@/stores/localization.store';
 import { Component, Prop, h } from '@stencil/core';
 
 @Component({
@@ -53,7 +54,7 @@ export class IrRoomtype {
             </div>
             {/* </div> */}
             {this.roomtype.rateplans.every(r => r.is_closed) ? (
-              <p class={` text-center text-base ${this.display === 'default' ? '' : 'pt-4'}`}>Not available</p>
+              <p class={`unavailable-roomtype text-base ${this.display === 'default' ? '' : 'pt-4'}`}>{localizedWords.entries.Lcz_NotAvailable}</p>
             ) : (
               <div>
                 {booking_store.enableBooking ? (
