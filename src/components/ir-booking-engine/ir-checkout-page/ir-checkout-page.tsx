@@ -269,7 +269,7 @@ export class IrCheckoutPage {
         params: {
           booking_nbr: bookingResult.booking_nbr,
           amount: amountToBePayed,
-          currency_id: bookingResult.currency.id,
+          currency_id: app_store.currencies.find(a => a.code.toLowerCase() === (app_store.userPreferences.currency_id.toLowerCase() || 'usd')).id,
           email: bookingResult.guest.email,
           pgw_id: currentPayment.id.toString(),
         },

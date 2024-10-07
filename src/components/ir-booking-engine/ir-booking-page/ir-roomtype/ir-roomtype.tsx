@@ -1,7 +1,7 @@
 import { RoomType } from '@/models/property';
 import app_store from '@/stores/app.store';
 import booking_store, { getVisibleInventory } from '@/stores/booking';
-import localizedWords from '@/stores/localization.store';
+// import localizedWords from '@/stores/localization.store';
 import { Component, Prop, h } from '@stencil/core';
 
 @Component({
@@ -53,34 +53,34 @@ export class IrRoomtype {
               )}
             </div>
             {/* </div> */}
-            {this.roomtype.rateplans.every(r => r.is_closed) ? (
+            {/* {this.roomtype.rateplans.every(r => r.is_closed) ? (
               <p class={`unavailable-roomtype text-base ${this.display === 'default' ? '' : 'pt-4'}`}>{localizedWords.entries.Lcz_NotAvailable}</p>
-            ) : (
-              <div>
-                {booking_store.enableBooking ? (
-                  this.roomtype.rateplans.map(ratePlan => {
-                    if (!ratePlan.is_active || ratePlan.is_closed || !ratePlan.is_booking_engine_enabled || !ratePlan.variations) {
-                      return null;
-                    }
-                    const visibleInventory = getVisibleInventory(this.roomtype.id, ratePlan.id);
-                    return (
-                      <ir-rateplan
-                        display={this.display}
-                        key={ratePlan.id}
-                        ratePlan={ratePlan}
-                        visibleInventory={visibleInventory}
-                        roomTypeId={this.roomtype.id}
-                        roomTypeInventory={this.roomtype.inventory}
-                      ></ir-rateplan>
-                    );
-                  })
-                ) : (
-                  <div class="app_container flex w-full  flex-col justify-between space-y-1 rounded-md bg-gray-100  text-sm md:flex-row">
-                    <p>{this.roomtype.description}</p>
-                  </div>
-                )}
-              </div>
-            )}
+            ) : ( */}
+            <div>
+              {booking_store.enableBooking ? (
+                this.roomtype.rateplans.map(ratePlan => {
+                  if (!ratePlan.is_active || !ratePlan.is_booking_engine_enabled || !ratePlan.variations) {
+                    return null;
+                  }
+                  const visibleInventory = getVisibleInventory(this.roomtype.id, ratePlan.id);
+                  return (
+                    <ir-rateplan
+                      display={this.display}
+                      key={ratePlan.id}
+                      ratePlan={ratePlan}
+                      visibleInventory={visibleInventory}
+                      roomTypeId={this.roomtype.id}
+                      roomTypeInventory={this.roomtype.inventory}
+                    ></ir-rateplan>
+                  );
+                })
+              ) : (
+                <div class="app_container flex w-full  flex-col justify-between space-y-1 rounded-md bg-gray-100  text-sm md:flex-row">
+                  <p>{this.roomtype.description}</p>
+                </div>
+              )}
+            </div>
+            {/* )} */}
           </div>
         </div>
       </section>
