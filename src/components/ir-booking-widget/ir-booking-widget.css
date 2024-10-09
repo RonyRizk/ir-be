@@ -173,6 +173,8 @@
     flex-direction: row;
     align-items: center;
     width: fit-content;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
   }
   .date-trigger,
   .guests-trigger {

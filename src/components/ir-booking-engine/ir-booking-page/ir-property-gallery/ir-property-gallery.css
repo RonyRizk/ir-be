@@ -9,10 +9,12 @@
   aspect-ratio: 4/3;
 }
 .coursel_gallery_container {
-  aspect-ratio: 16/9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
   width: 100%;
-  height: auto;
-  position: relative;
+  aspect-ratio: 16/9;
 }
 
 .more-details-button {
@@ -28,14 +30,31 @@
   height: 100%;
   width: 100%;
   aspect-ratio: 16/9;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.single-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: min(var(--radius, 0.5rem), 1rem);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 .pg_carousel {
   border-bottom-left-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
 }
+
 @media (min-width: 768px) {
   :host([display='default']) .gallery-img {
     min-height: 200px;
+  }
+  :host([display='default']) .gallery-img,
+  :host([display='default']) .single-image {
+    border-bottom-left-radius: min(var(--radius, 0.5rem), 1rem);
+    border-bottom-right-radius: min(var(--radius, 0.5rem), 1rem);
   }
   :host([display='default']) .gallery-img.icon {
     max-height: 200px;

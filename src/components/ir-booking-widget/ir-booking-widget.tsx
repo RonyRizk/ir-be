@@ -25,6 +25,7 @@ export class IrBookingWidget {
   @Prop() aff: string = null;
 
   @State() isPopoverOpen: boolean;
+  @State() dateModifiers: any;
   @State() isLoading: boolean;
   @State() dates: { from_date: Date | null; to_date: Date | null } = {
     from_date: null,
@@ -42,6 +43,8 @@ export class IrBookingWidget {
   private commonService = new CommonService();
   private propertyService = new PropertyService();
   private guestPopover: HTMLIrPopoverElement;
+  containerRef: HTMLDivElement;
+  elTimout: NodeJS.Timeout;
 
   private initApp() {
     this.modifyContainerStyle();
@@ -86,10 +89,14 @@ export class IrBookingWidget {
           aname: this.p,
         }),
       ]);
+      this.dateModifiers = this.getDateModifiers();
     } catch (error) {
       console.log(error);
     } finally {
       this.isLoading = false;
+      this.elTimout = setTimeout(() => {
+        this.containerRef.style.opacity = '1';
+      }, 100);
     }
   }
 
@@ -174,14 +181,18 @@ export class IrBookingWidget {
       </div>
     );
   }
-
+  disconnectedCallback() {
+    if (this.elTimout) {
+      clearTimeout(this.elTimout);
+    }
+  }
   render() {
     if (this.isLoading) {
       return null;
     }
     return (
       <Fragment>
-        <div class="booking-widget-container" style={this.contentContainerStyle}>
+        <div class="booking-widget-container" ref={el => (this.containerRef = el)} style={this.contentContainerStyle}>
           <div class={'hovered-container'}></div>
           <ir-popover
             autoAdjust={false}
@@ -205,7 +216,7 @@ export class IrBookingWidget {
             {this.renderDateTrigger()}
             <div slot="popover-content" class="popup-container w-full border-0 bg-white p-4 pb-6 shadow-none sm:w-auto sm:border sm:p-4  md:p-6 ">
               <ir-date-range
-                dateModifiers={this.getDateModifiers()}
+                dateModifiers={this.dateModifiers}
                 minDate={addDays(new Date(), -1)}
                 style={{ '--radius': 'var(--ir-widget-radius)' }}
                 fromDate={this.dates?.from_date}

@@ -27,6 +27,7 @@ export class IrBookingPage {
   private checkoutContainerRef: HTMLDivElement;
   roomTypeSectionRef: HTMLElement;
   private availabiltyHeaderRef: HTMLIrAvailibilityHeaderElement;
+  propertyGalleryRef: HTMLDivElement;
 
   componentWillLoad() {
     this.property = { ...app_store.property };
@@ -51,10 +52,15 @@ export class IrBookingPage {
   handleScrolling(e: CustomEvent) {
     e.stopImmediatePropagation();
     e.stopPropagation();
-    // this.roomTypeSectionRef.scrollIntoView({ behavior: 'smooth' });
-    this.availabiltyHeaderRef.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+    const header: HTMLIrNavElement | null = document.querySelector('ir-be').shadowRoot.querySelector('ir-nav');
+    this.availabiltyHeaderRef.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => {
+      window.scrollTo({
+        top: this.availabiltyHeaderRef.getBoundingClientRect().top + window.scrollY - (header !== null ? header.getBoundingClientRect().height + 5 : 80),
+        behavior: 'smooth',
+      });
+    }, 100);
   }
-
   private renderTotalNights() {
     const diff = getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date());
     return `${diff} ${diff > 1 ? localizedWords.entries.Lcz_Nights : localizedWords.entries.Lcz_night}`;
@@ -83,7 +89,7 @@ export class IrBookingPage {
       <Host>
         <div class="space-y-5 ">
           {!isInjected && (
-            <div>
+            <div ref={el => (this.propertyGalleryRef = el)}>
               <ir-property-gallery></ir-property-gallery>
             </div>
           )}

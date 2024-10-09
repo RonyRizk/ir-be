@@ -164,12 +164,16 @@ export class IrPropertyGallery {
                     </Fragment>
                   ) : this.roomType.images?.length === 1 ? (
                     <Fragment>
-                      <img
-                        onClick={() => this.irDialog.openModal()}
-                        src={this.roomType.images[0].url}
-                        alt={formatImageAlt(this.roomType.images[0].tooltip, this.roomType?.name)}
-                        class="h-full w-full cursor-pointer rounded-[var(--radius,8px)] object-cover "
-                      />
+                      <div onClick={() => this.irDialog.openModal()} class="gallery-img icon hover:bg-gray-400">
+                        {/* <ir-icons name="image" svgClassName="size-10 mb-4"></ir-icons> */}
+                        <img
+                          // onClick={() => this.irDialog.openModal()}
+                          src={this.roomType.images[0].url}
+                          alt={formatImageAlt(this.roomType.images[0].tooltip, this.roomType?.name)}
+                          class="single-image h-full w-full cursor-pointer
+                           object-cover "
+                        />
+                      </div>
                       {this.showPlanLimitations({ showMoreTag: true, withRoomSize: true })}
                     </Fragment>
                   ) : (
