@@ -23,6 +23,7 @@ export class IrBookingWidget {
   @Prop() language: string = 'en';
   @Prop() roomTypeId: string | null = null;
   @Prop() aff: string = null;
+  @Prop() delay: number = 200;
 
   @State() isPopoverOpen: boolean;
   @State() dateModifiers: any;
@@ -96,7 +97,7 @@ export class IrBookingWidget {
       this.isLoading = false;
       this.elTimout = setTimeout(() => {
         this.containerRef.style.opacity = '1';
-      }, 100);
+      }, this.delay);
     }
   }
 

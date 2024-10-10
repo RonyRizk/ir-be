@@ -528,6 +528,7 @@ export namespace Components {
     interface IrWidget {
         "aff": string;
         "contentContainerStyle": TContainerStyle;
+        "delay": number;
         "language": string;
         "p": string;
         "perma_link": string;
@@ -2382,6 +2383,7 @@ declare namespace LocalJSX {
     interface IrWidget {
         "aff"?: string;
         "contentContainerStyle"?: TContainerStyle;
+        "delay"?: number;
         "language"?: string;
         "p"?: string;
         "perma_link"?: string;

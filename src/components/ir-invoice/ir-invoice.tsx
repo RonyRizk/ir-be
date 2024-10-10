@@ -455,7 +455,7 @@ export class IrInvoice {
                     <ir-icons name="danger"></ir-icons>
                     <h3 class={'booking-details-header'}>{localizedWords.entries.Lcz_ImportantInformation}</h3>
                   </div>
-                  <p>{app_store.property.description.important_info}</p>
+                  <p innerHTML={app_store.property.description.important_info}></p>
                 </section>
                 <section class={'space-y-2'}>
                   <div class="flex items-center gap-4">
