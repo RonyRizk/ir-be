@@ -20,15 +20,11 @@ export class IrUserForm {
 
   async componentWillLoad() {
     this.propertyService.setToken(app_store.app_data.token);
-    await this.propertyService.fetchSetupEntries();
+    this.propertyService.fetchSetupEntries();
   }
   render() {
     if (!app_store.setup_entries) {
-      return (
-        <div class={'flex h-72 flex-col'}>
-          <ir-checkout-skeleton></ir-checkout-skeleton>
-        </div>
-      );
+      return <div class={'flex h-72 flex-col'}>{/* <ir-checkout-skeleton></ir-checkout-skeleton> */}</div>;
     }
     return (
       <Fragment>

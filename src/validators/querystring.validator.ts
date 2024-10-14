@@ -1,5 +1,5 @@
 import app_store from '@/stores/app.store';
-import { parseISO, isValid, isAfter, isSameDay, isBefore } from 'date-fns';
+import { parseISO, isValid, isAfter, isSameDay, isBefore, format } from 'date-fns';
 import { z } from 'zod';
 
 export class QueryStringValidator {
@@ -55,7 +55,8 @@ export class QueryStringValidator {
       this.errors.push('Checkout date must be at least one day after checkin date.');
       return null;
     }
-    if (app_store.nonBookableNights[checkoutStr]) {
+
+    if (app_store.nonBookableNights[checkoutStr] && app_store.nonBookableNights[format(checkinDate, 'yyyy-MM-dd')]) {
       this.errors.push('Checkout date is unavailable.');
       return null;
     }

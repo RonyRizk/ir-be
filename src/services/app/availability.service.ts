@@ -115,6 +115,7 @@ export class AvailabiltyService {
         })),
       };
     });
+    booking_store.roomTypes = [...this.roomTypes];
   }
   private validateNumberString(input: string): number {
     const schema = z.string().refine(

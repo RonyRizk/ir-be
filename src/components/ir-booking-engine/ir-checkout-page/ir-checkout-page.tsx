@@ -39,59 +39,59 @@ export class IrCheckoutPage {
   private errorElement: HTMLElement;
 
   async componentWillLoad() {
+    const token = app_store.app_data.token;
+    this.propertyService.setToken(token);
+    this.paymentService.setToken(token);
+    this.authService.setToken(token);
+    this.calculateTotalPrepaymentAmount();
+  }
+  private async calculateTotalPrepaymentAmount() {
     try {
       this.isLoading = true;
-      const token = app_store.app_data.token;
-      this.propertyService.setToken(token);
-      this.paymentService.setToken(token);
-      this.authService.setToken(token);
-      await this.calculateTotalPrepaymentAmount();
+      let list: { booking_nbr: string; ratePlanId: number; roomTypeId: number }[] = [];
+      Object.keys(booking_store.ratePlanSelections).map(roomTypeId => {
+        return Object.keys(booking_store.ratePlanSelections[roomTypeId]).map(ratePlanId => {
+          const r: IRatePlanSelection = booking_store.ratePlanSelections[roomTypeId][ratePlanId];
+          if (r.reserved === 0) {
+            return null;
+          }
+          list.push({ booking_nbr: booking_store.fictus_booking_nbr.nbr, ratePlanId: r.ratePlan.id, roomTypeId: r.roomtype.id });
+        });
+      });
+      let requests = await Promise.all(
+        list.map(l =>
+          this.paymentService.GetExposedApplicablePolicies({
+            token: app_store.app_data.token,
+            book_date: new Date(),
+            params: {
+              booking_nbr: l.booking_nbr,
+              currency_id: app_store.currencies.find(c => c.code.toLowerCase() === (app_store.userPreferences.currency_id.toLowerCase() || 'usd')).id,
+              language: app_store.userPreferences.language_id,
+              rate_plan_id: l.ratePlanId,
+              room_type_id: l.roomTypeId,
+              property_id: app_store.property.id,
+            },
+          }),
+        ),
+      );
+      this.prepaymentAmount = requests.reduce((prev, curr) => {
+        let total = 1;
+        const roomtype = booking_store.ratePlanSelections[curr.room_type_id];
+        if (roomtype) {
+          const ratePlan = roomtype[curr.rate_plan_id];
+          if (ratePlan) {
+            total = ratePlan.reserved;
+          }
+        }
+        return (prev + curr.amount) * total;
+      }, 0);
+      // this.prepaymentAmount = 0;
+      checkout_store.prepaymentAmount = this.prepaymentAmount;
     } catch (error) {
       console.log(error);
     } finally {
       this.isLoading = false;
     }
-  }
-  private async calculateTotalPrepaymentAmount() {
-    let list: { booking_nbr: string; ratePlanId: number; roomTypeId: number }[] = [];
-    Object.keys(booking_store.ratePlanSelections).map(roomTypeId => {
-      return Object.keys(booking_store.ratePlanSelections[roomTypeId]).map(ratePlanId => {
-        const r: IRatePlanSelection = booking_store.ratePlanSelections[roomTypeId][ratePlanId];
-        if (r.reserved === 0) {
-          return null;
-        }
-        list.push({ booking_nbr: booking_store.fictus_booking_nbr.nbr, ratePlanId: r.ratePlan.id, roomTypeId: r.roomtype.id });
-      });
-    });
-    let requests = await Promise.all(
-      list.map(l =>
-        this.paymentService.GetExposedApplicablePolicies({
-          token: app_store.app_data.token,
-          book_date: new Date(),
-          params: {
-            booking_nbr: l.booking_nbr,
-            currency_id: app_store.currencies.find(c => c.code.toLowerCase() === (app_store.userPreferences.currency_id.toLowerCase() || 'usd')).id,
-            language: app_store.userPreferences.language_id,
-            rate_plan_id: l.ratePlanId,
-            room_type_id: l.roomTypeId,
-            property_id: app_store.property.id,
-          },
-        }),
-      ),
-    );
-    this.prepaymentAmount = requests.reduce((prev, curr) => {
-      let total = 1;
-      const roomtype = booking_store.ratePlanSelections[curr.room_type_id];
-      if (roomtype) {
-        const ratePlan = roomtype[curr.rate_plan_id];
-        if (ratePlan) {
-          total = ratePlan.reserved;
-        }
-      }
-      return (prev + curr.amount) * total;
-    }, 0);
-    // this.prepaymentAmount = 0;
-    checkout_store.prepaymentAmount = this.prepaymentAmount;
   }
   @Listen('bookingClicked')
   async handleBooking(e: CustomEvent) {

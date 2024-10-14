@@ -49,6 +49,7 @@
   line-height: 1.25rem !important;
   padding-bottom: 4px !important;
   font-weight: 400;
+  text-transform: capitalize;
 }
 
 .secondary-text {

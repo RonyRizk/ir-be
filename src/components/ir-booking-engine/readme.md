@@ -111,7 +111,6 @@ graph TD;
   ir-checkout-page --> ir-booking-summary
   ir-quick-auth --> ir-icons
   ir-quick-auth --> ir-button
-  ir-user-form --> ir-checkout-skeleton
   ir-user-form --> ir-input
   ir-user-form --> ir-phone-input
   ir-user-form --> ir-select
