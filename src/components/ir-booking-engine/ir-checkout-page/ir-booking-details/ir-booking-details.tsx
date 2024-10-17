@@ -261,6 +261,7 @@ export class IrBookingDetails {
     console.log(this.firstRoom);
     const total_nights = getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date());
     const total_rooms = this.calculateTotalRooms();
+    const total_persons = this.calculateTotalPersons();
     return (
       <Host>
         <div class="w-full">
@@ -268,8 +269,8 @@ export class IrBookingDetails {
             <div class="flex flex-1 items-center gap-2">
               <ir-icons name="bed"></ir-icons>
               <p>
-                {total_nights} {total_nights > 1 ? localizedWords.entries.Lcz_Nights : localizedWords.entries.Lcz_night} - {booking_store.bookingAvailabilityParams.adult_nbr}{' '}
-                {booking_store.bookingAvailabilityParams.adult_nbr > 1 ? localizedWords.entries.Lcz_Persons : localizedWords.entries.Lcz_Person} - {total_rooms}{' '}
+                {total_nights} {total_nights > 1 ? localizedWords.entries.Lcz_Nights : localizedWords.entries.Lcz_night} - {total_persons}{' '}
+                {total_persons > 1 ? localizedWords.entries.Lcz_Persons : localizedWords.entries.Lcz_Person} - {total_rooms}{' '}
                 {total_rooms > 1 ? localizedWords.entries.Lcz_Rooms : localizedWords.entries.Lcz_Room}
               </p>
             </div>
@@ -415,5 +416,17 @@ export class IrBookingDetails {
         </ir-dialog>
       </Host>
     );
+  }
+  calculateTotalPersons() {
+    let count = 0;
+    Object.keys(booking_store.ratePlanSelections).map(roomTypeId => {
+      return Object.keys(booking_store.ratePlanSelections[roomTypeId]).map(ratePlanId => {
+        const r: IRatePlanSelection = booking_store.ratePlanSelections[roomTypeId][ratePlanId];
+        if (r.reserved !== 0) {
+          count += r.selected_variation.variation.adult_nbr + r.selected_variation.variation.child_nbr;
+        }
+      });
+    });
+    return count;
   }
 }

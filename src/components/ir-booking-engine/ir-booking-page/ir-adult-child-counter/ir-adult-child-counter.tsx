@@ -117,7 +117,7 @@ export class IrAdultChildCounter {
                   <path fill="currentColor" d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z" />
                 </svg> */}
               </ir-button>
-              <p>{this.adultCount}</p>
+              <p class={'text-base'}>{this.adultCount}</p>
               <ir-button
                 iconName="plus"
                 disabled={this.adultCount === this.maxAdultCount}
@@ -156,7 +156,7 @@ export class IrAdultChildCounter {
                   <path fill="currentColor" d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z" />
                 </svg> */}
                 </ir-button>
-                <p>{this.childrenCount}</p>
+                <p class={'text-base'}>{this.childrenCount}</p>
                 <ir-button
                   disabled={this.childrenCount === this.maxChildrenCount}
                   variants="icon"

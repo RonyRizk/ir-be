@@ -191,8 +191,13 @@ export class IrInvoice {
 
   renderBookingDetailHeader() {
     const total_nights = getDateDifference(new Date(this.booking.from_date), new Date(this.booking.to_date));
-    const nbr_of_persons = this.booking.occupancy.adult_nbr + this.booking.occupancy.children_nbr;
+    // const nbr_of_persons = this.booking.occupancy.adult_nbr + this.booking.occupancy.children_nbr;
+    const nbr_of_persons = this.booking.rooms.reduce(
+      (prev, room) => prev + Number(room.rateplan.selected_variation.adult_nbr) + Number(room.rateplan.selected_variation.child_nbr),
+      0,
+    );
     const total_rooms = this.booking.rooms.length;
+
     return `${total_nights} ${total_nights > 1 ? localizedWords.entries.Lcz_Nights : localizedWords.entries.Lcz_night} - ${nbr_of_persons}
     ${nbr_of_persons > 1 ? localizedWords.entries.Lcz_Persons : localizedWords.entries.Lcz_Person} - ${total_rooms}
     ${total_rooms > 1 ? localizedWords.entries.Lcz_Rooms : localizedWords.entries.Lcz_Room}`;
