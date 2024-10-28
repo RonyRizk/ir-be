@@ -48,6 +48,7 @@ export class IrAccomodations {
             <div class="flex flex-wrap items-center">
               {this.bookingAttributes?.bedding_setup?.map((bed_setup, index) => (
                 <p key={bed_setup.code}>
+                  {bed_setup.count > 0 ? `${bed_setup.count} ` : ''}
                   {bed_setup.name} {index < this.bookingAttributes.bedding_setup.length - 1 && <span>-&nbsp;</span>}
                 </p>
               ))}

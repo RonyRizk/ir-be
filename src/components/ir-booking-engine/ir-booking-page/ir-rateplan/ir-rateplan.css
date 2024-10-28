@@ -124,9 +124,13 @@
     align-items: center;
     justify-content: center;
   }
+   :host([display='default']) .rateplan-amount-per-night.grid-view{
+    display: none;
+  }
 }
 /* md	768px	 */
 @media (min-width: 768px) {
+ 
 }
 /* lg	1024px */
 @media (min-width: 1024px) {

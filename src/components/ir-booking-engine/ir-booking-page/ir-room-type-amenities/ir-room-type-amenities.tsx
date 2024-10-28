@@ -92,6 +92,7 @@ export class IrRoomTypeAmenities {
               <ir-icons name="bed"></ir-icons>
               {this.roomType?.bedding_setup?.map((bed_setup, index) => (
                 <p key={bed_setup.code}>
+                  {bed_setup.count > 0 ? `${bed_setup.count} ` : ''}
                   {bed_setup.name} {index < this.roomType.bedding_setup.length - 1 && <span> - </span>}
                 </p>
               ))}

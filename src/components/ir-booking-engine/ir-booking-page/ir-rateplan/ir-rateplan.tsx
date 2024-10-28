@@ -20,10 +20,10 @@ export class IrRateplan {
   @Prop() visibleInventory?:
     | IRatePlanSelection
     | {
-        reserved: number;
-        visibleInventory?: number;
-        selected_variation: any;
-      };
+      reserved: number;
+      visibleInventory?: number;
+      selected_variation: any;
+    };
   @Prop() roomTypeInventory: number;
   @Prop() roomTypeId: number;
 
@@ -150,6 +150,7 @@ export class IrRateplan {
                 {this.isRatePlanAvailable ? (
                   !this.visibleInventory?.selected_variation?.variation?.IS_MLS_VIOLATED &&
                   this.visibleInventory?.selected_variation?.variation?.amount && (
+
                     <div class="rateplan-pricing-mobile">
                       {this.visibleInventory?.selected_variation?.variation?.discount_pct > 0 && (
                         <p class="rateplan-discounted-amount">
@@ -158,6 +159,7 @@ export class IrRateplan {
                       )}
                       <p class="rateplan-amount">{formatAmount(this.visibleInventory?.selected_variation?.variation?.amount, app_store.userPreferences.currency_id, 0)}</p>
                     </div>
+
                   )
                 ) : (
                   <p class="no-availability">{localizedWords.entries.Lcz_NotAvailable}</p>
@@ -166,24 +168,30 @@ export class IrRateplan {
             )}
           </div>
           <div class="rateplan-description">
-            {this.ratePlan.is_non_refundable ? (
-              <p class="rateplan-tooltip text-xs" style={{ color: 'var(--ir-green)' }}>
-                {localizedWords.entries.Lcz_NonRefundable}
-              </p>
-            ) : (
-              <ir-tooltip
-                labelColors={booking_store.isInFreeCancelationZone ? 'green' : 'default'}
-                class={`rateplan-tooltip`}
-                open_behavior="click"
-                label={booking_store.isInFreeCancelationZone ? localizedWords.entries.Lcz_FreeCancellation : localizedWords.entries.Lcz_IfICancel}
-                message={`${(this.cancelationMessage ?? '') || (this.ratePlan.cancelation ?? '')} ${this.ratePlan.guarantee ?? ''}`}
-                onTooltipOpenChange={e => {
-                  if (e.detail) {
-                    this.fetchCancelationMessage(this.ratePlan.id, this.roomTypeId);
-                  }
-                }}
-              ></ir-tooltip>
-            )}
+            <div class="flex items-center justify-between">
+              {this.ratePlan.is_non_refundable ? (
+                <p class="rateplan-tooltip text-xs" style={{ color: 'var(--ir-green)' }}>
+                  {localizedWords.entries.Lcz_NonRefundable}
+                </p>
+              ) : (
+                <ir-tooltip
+                  labelColors={booking_store.isInFreeCancelationZone ? 'green' : 'default'}
+                  class={`rateplan-tooltip`}
+                  open_behavior="click"
+                  label={booking_store.isInFreeCancelationZone ? localizedWords.entries.Lcz_FreeCancellation : localizedWords.entries.Lcz_IfICancel}
+                  message={`${(this.cancelationMessage ?? '') || (this.ratePlan.cancelation ?? '')} ${this.ratePlan.guarantee ?? ''}`}
+                  onTooltipOpenChange={e => {
+                    if (e.detail) {
+                      this.fetchCancelationMessage(this.ratePlan.id, this.roomTypeId);
+                    }
+                  }}
+                ></ir-tooltip>
+              )}
+              {getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date()) >
+                1 && (
+                  <p class="rateplan-amount-per-night grid-view">{`${formatAmount(this.visibleInventory?.selected_variation?.variation?.amount_per_night, app_store.userPreferences.currency_id, 0)}/${localizedWords.entries.Lcz_night}`}</p>
+                )}
+            </div>
             <p class="rateplan-custom-text" innerHTML={this.ratePlan.custom_text}></p>
           </div>
         </div>
@@ -229,8 +237,8 @@ export class IrRateplan {
                           <p class="rateplan-amount">{formatAmount(this.visibleInventory?.selected_variation?.variation?.amount, app_store.userPreferences.currency_id, 0)}</p>
                           {getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date()) >
                             1 && (
-                            <p class="rateplan-amount-per-night">{`${formatAmount(this.visibleInventory?.selected_variation?.variation?.amount_per_night, app_store.userPreferences.currency_id, 0)}/${localizedWords.entries.Lcz_night}`}</p>
-                          )}
+                              <p class="rateplan-amount-per-night">{`${formatAmount(this.visibleInventory?.selected_variation?.variation?.amount_per_night, app_store.userPreferences.currency_id, 0)}/${localizedWords.entries.Lcz_night}`}</p>
+                            )}
                         </div>
                       </Fragment>
                     )}
