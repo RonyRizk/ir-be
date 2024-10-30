@@ -266,6 +266,7 @@ export class PropertyService extends Token {
         check_in: false,
         is_pms: false,
         is_direct: true,
+        language: app_store?.userPreferences?.language_id || 'en',
         agent: booking_store.bookingAvailabilityParams.agent ? { id: booking_store.bookingAvailabilityParams.agent } : null,
         is_in_loyalty_mode: booking_store.bookingAvailabilityParams.loyalty,
         promo_key: booking_store.bookingAvailabilityParams.coupon ?? null,
