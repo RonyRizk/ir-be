@@ -129,7 +129,7 @@ export class IrBookingSummary {
                 </span>
               </div>
               {this.error?.cause === 'booking-summary' && !checkout_store.agreed_to_services && (
-                <p class="text-sm text-red-500">{localizedWords.entries.Lcz_YouMustAcceptPrivacyPolicy}//you must first</p>
+                <p class="text-sm text-red-500">{localizedWords.entries.Lcz_YouMustAcceptPrivacyPolicy}</p>
               )}
             </div>
             <ir-button

@@ -4,7 +4,7 @@ import { MissingTokenError, Token } from '@/models/Token';
 import app_store from '@/stores/app.store';
 import booking_store from '@/stores/booking';
 import axios from 'axios';
-import { isBefore, parseISO } from 'date-fns';
+import { isBefore, isSameDay, parseISO } from 'date-fns';
 
 type TExposedApplicablePolicies = { data: IExposedApplicablePolicies[]; amount: number; room_type_id?: number; rate_plan_id?: number };
 interface FetchCancelationMessageWithData {
@@ -109,10 +109,12 @@ export class PaymentService extends Token {
   public processAlicablePolicies(policies: IExposedApplicablePolicies[], book_date: Date) {
     let isInFreeCancelationZone = false;
     const guarenteeAmount = policies.find(po => po.type === 'guarantee')?.brackets[0]?.gross_amount || 0;
-    let cancelation = policies.find(po => po.type === 'cancelation' && po?.brackets?.some(b => isBefore(book_date, new Date(b.due_on)), book_date));
+    let cancelation = policies.find(
+      po => po.type === 'cancelation' && po?.brackets?.some(b => isBefore(book_date, new Date(b.due_on)) || isSameDay(new Date(b.due_on), book_date), book_date),
+    );
     if (cancelation) {
       isInFreeCancelationZone = true;
-      const cancelationAmount = cancelation.brackets.find(b => isBefore(new Date(b.due_on), book_date))?.gross_amount ?? null;
+      const cancelationAmount = cancelation.brackets.find(b => isBefore(book_date, new Date(b.due_on)) || isSameDay(new Date(b.due_on), book_date))?.gross_amount ?? null;
       return { amount: cancelationAmount > guarenteeAmount ? cancelationAmount : guarenteeAmount, isInFreeCancelationZone };
     }
     return { amount: guarenteeAmount, isInFreeCancelationZone };
