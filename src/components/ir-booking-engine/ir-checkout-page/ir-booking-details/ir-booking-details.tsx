@@ -27,8 +27,6 @@ export class IrBookingDetails {
   private paymentService = new PaymentService();
 
   componentWillLoad() {
-    this.propertyService.setToken(app_store.app_data.token);
-    this.paymentService.setToken(app_store.app_data.token);
     this.modifyBookings();
     onCheckoutDataChange('userFormData', newValue => {
       if (!checkout_store.modifiedGuestName) {

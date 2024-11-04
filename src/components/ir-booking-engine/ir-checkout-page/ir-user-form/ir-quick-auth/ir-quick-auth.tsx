@@ -1,5 +1,4 @@
 import { AuthService } from '@/services/api/auth.service';
-import app_store from '@/stores/app.store';
 import { Component, Host, h } from '@stencil/core';
 
 @Component({
@@ -11,7 +10,6 @@ export class IrQuickAuth {
   private authService = new AuthService();
   private googleButtonWrapper: any;
   componentWillLoad() {
-    this.authService.setToken(app_store.app_data.token);
     this.authService.initializeFacebookSignIn();
     if (!document.querySelector('.custom-google-button')) {
       this.authService.loadGoogleSignInScript(this.googleButtonWrapper);

@@ -12,6 +12,7 @@
 | `active`                        | `active`                            |             | `boolean`                                                                                                                                                                                                    | `false`     |
 | `allowFlip`                     | `allow-flip`                        |             | `boolean`                                                                                                                                                                                                    | `true`      |
 | `autoAdjust`                    | `auto-adjust`                       |             | `boolean`                                                                                                                                                                                                    | `true`      |
+| `outsideEvents`                 | `outside-events`                    |             | `"all" \| "none"`                                                                                                                                                                                            | `'all'`     |
 | `placement`                     | `placement`                         |             | `"auto" \| "auto-end" \| "auto-start" \| "bottom" \| "bottom-end" \| "bottom-start" \| "left" \| "left-end" \| "left-start" \| "right" \| "right-end" \| "right-start" \| "top" \| "top-end" \| "top-start"` | `undefined` |
 | `showCloseButton`               | `show-close-button`                 |             | `boolean`                                                                                                                                                                                                    | `true`      |
 | `stopListeningForOutsideClicks` | `stop-listening-for-outside-clicks` |             | `boolean`                                                                                                                                                                                                    | `false`     |
@@ -27,13 +28,23 @@
 
 ## Methods
 
-### `toggleVisibility() => Promise<void>`
+### `forceClose() => Promise<void>`
 
 
 
 #### Returns
 
 Type: `Promise<void>`
+
+
+
+### `toggleVisibility() => Promise<CustomEvent<boolean>>`
+
+
+
+#### Returns
+
+Type: `Promise<CustomEvent<boolean>>`
 
 
 

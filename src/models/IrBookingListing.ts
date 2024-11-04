@@ -1,4 +1,4 @@
-import { Identifier } from './commun';
+import { Identifier } from './common';
 
 export interface IExposedBookingsCriteria {
   channels: ICriteriaChannel[];

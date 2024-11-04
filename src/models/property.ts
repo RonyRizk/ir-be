@@ -1,4 +1,4 @@
-import { ICurrency } from './commun';
+import { ICurrency } from './common';
 
 export interface IExposedProperty {
   adult_child_constraints: AdultChildConstraints;

@@ -1,7 +1,6 @@
-import { DataStructure } from '@/models/commun';
+import { DataStructure } from '@/models/common';
 import { TPickupFormData } from '@/models/pickup';
 import { RatePlan, RoomType } from '@/models/property';
-import { MissingTokenError } from '@/models/Token';
 import booking_store, { modifyBookingStore } from '@/stores/booking';
 import axios from 'axios';
 import { addDays, format } from 'date-fns';
@@ -54,11 +53,6 @@ export class PropertyHelpers {
       console.error(error);
     }
   }
-  public validateToken(token: string | null) {
-    if (!token) {
-      throw new MissingTokenError();
-    }
-  }
 
   public collectRoomTypeIds(props: any): number[] {
     return props.rt_id ? [props.rt_id] : [];
@@ -91,8 +85,8 @@ export class PropertyHelpers {
     const names = guestName[index].split(' ');
     return { first_name: names[0] || null, last_name: names[1] || null };
   }
-  public async fetchAvailabilityData(token: string, props: any, roomtypeIds: number[], rateplanIds: number[]): Promise<any> {
-    const response = await axios.post(`/Get_Exposed_Booking_Availability?Ticket=${token}`, {
+  public async fetchAvailabilityData(props: any, roomtypeIds: number[], rateplanIds: number[]): Promise<any> {
+    const response = await axios.post(`/Get_Exposed_Booking_Availability`, {
       ...props.params,
       identifier: props.identifier,
       room_type_ids: roomtypeIds,
@@ -109,12 +103,11 @@ export class PropertyHelpers {
       modifyBookingStore('fictus_booking_nbr', {
         nbr: result.My_Result.booking_nbr,
       });
-      this.validateFreeCancelationZone(token, result.My_Result.booking_nbr);
+      this.validateFreeCancelationZone(result.My_Result.booking_nbr);
     }
     return result;
   }
-  private async validateFreeCancelationZone(token: string, booking_nbr: string) {
-    this.paymentService.setToken(token);
+  private async validateFreeCancelationZone(booking_nbr: string) {
     // console.log(app_store.currencies.find(c => c.code.toLowerCase() === app_store.userPreferences.currency_id?.toLowerCase()));
     const result = await this.paymentService.GetExposedApplicablePolicies({
       book_date: new Date(),
@@ -126,7 +119,6 @@ export class PropertyHelpers {
         rate_plan_id: 0,
         room_type_id: 0,
       },
-      token,
     });
     console.log('applicable policies', result);
     if (!result) {

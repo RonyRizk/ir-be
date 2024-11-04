@@ -2,8 +2,7 @@ import { CommonService } from '@/services/api/common.service';
 import { PropertyService } from '@/services/api/property.service';
 import { Component, Listen, Prop, State, Watch, h } from '@stencil/core';
 import { addYears, format, Locale } from 'date-fns';
-import { ICurrency, IExposedLanguages } from '@/models/commun';
-import axios from 'axios';
+
 import { IExposedProperty } from '@/models/property';
 import booking_store, { modifyBookingStore } from '@/stores/booking';
 import app_store, { changeLocale, TSource, updateUserPreference } from '@/stores/app.store';
@@ -12,6 +11,8 @@ import Stack from '@/models/stack';
 import { v4 } from 'uuid';
 import { AvailabiltyService } from '@/services/app/availability.service';
 import { checkout_store } from '@/stores/checkout.store';
+import Token from '@/models/Token';
+import { ICurrency, IExposedLanguages } from '@/models/common';
 
 @Component({
   tag: 'ir-be',
@@ -19,8 +20,6 @@ import { checkout_store } from '@/stores/checkout.store';
   shadow: true,
 })
 export class IrBookingEngine {
-  @Prop({ mutable: true }) token: string =
-    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MTQ1NTQ5OTIsIkNMQUlNLTAxIjoiOGJpaUdjK21FQVE9IiwiQ0xBSU0tMDIiOiI5UStMQm93VTl6az0iLCJDTEFJTS0wMyI6Ilp3Tys5azJoTzUwPSIsIkNMQUlNLTA0IjoicUxHWllZcVA3SzB5aENrRTFaY0tENm5TeFowNkEvQ2lPc1JrWUpYTHFhTEF5M3N0akltbU9CWkdDb080dDRyNVRiWjkxYnZQelFIQ2c1YlBGU2J3cm5HdjNsNjVVcjVLT3RnMmZQVWFnNHNEYmE3WTJkMDF4RGpDWUs2SFlGREhkcTFYTzBLdTVtd0NKeU5rWDFSeWZmSnhJdWdtZFBUeTZPWjk0RUVjYTJleWVSVzZFa0pYMnhCZzFNdnJ3aFRKRHF1cUxzaUxvZ3I0UFU5Y2x0MjdnQ2tJZlJzZ2lZbnpOK2szclZnTUdsQTUvWjRHekJWcHl3a0dqcWlpa0M5T0owWFUrdWJJM1dzNmNvSWEwSks4SWRqVjVaQ1VaZjZ1OGhBMytCUlpsUWlyWmFZVWZlVmpzU1FETFNwWFowYjVQY0FncE1EWVpmRGtWbGFscjRzZ1pRNVkwODkwcEp6dE16T0s2VTR5Z1FMQkdQbTlTSmRLY0ExSGU2MXl2YlhuIiwiQ0xBSU0tMDUiOiJFQTEzejA3ejBUcWRkM2gwNElyYThBcklIUzg2aEpCQSJ9.ySJjLhWwUDeP4X8LIJcbsjO74y_UgMHwRDpNrCClndc';
   @Prop() propertyId: number;
   @Prop() injected: boolean;
   @Prop() rt_id: number = null;
@@ -34,6 +33,7 @@ export class IrBookingEngine {
   @Prop() language: string;
   @Prop() adults: string = '2';
   @Prop() child: string;
+  @Prop() ages: string;
   @Prop() cur: string;
   @Prop() aff: string;
   @Prop() stag: string | null;
@@ -54,18 +54,19 @@ export class IrBookingEngine {
   @State() router = new Stack<HTMLElement>();
   @State() bookingListingScreenOptions: { screen: 'bookings' | 'booking-details'; params: unknown } = { params: null, screen: 'bookings' };
 
-  private version: string = '2.31';
+  private version: string = '2.32';
   private baseUrl: string = 'https://gateway.igloorooms.com/IRBE';
+
   private commonService = new CommonService();
   private propertyService = new PropertyService();
   private availabiltyService = new AvailabiltyService();
+  private token = new Token();
+
   private identifier: string;
   private privacyPolicyRef: HTMLIrPrivacyPolicyElement;
 
   async componentWillLoad() {
     console.log(`version:${this.version}`);
-    axios.defaults.withCredentials = true;
-    axios.defaults.baseURL = this.baseUrl;
     getUserPrefernce(this.language);
     if (this.property) {
       app_store.property = { ...this.property };
@@ -73,19 +74,14 @@ export class IrBookingEngine {
     const isAuthenticated = this.commonService.checkUserAuthState();
     if (isAuthenticated) {
       app_store.is_signed_in = true;
-      this.token = isAuthenticated.token;
-      app_store.app_data.token = this.token;
+      this.token.setToken(isAuthenticated.token);
     } else {
-      this.token = await this.commonService.getBEToken();
+      const token = await this.commonService.getBEToken();
+      this.token.setToken(token);
     }
+    this.initializeApp();
   }
 
-  @Watch('token')
-  handleTokenChange(newValue: string, oldValue: string) {
-    if (newValue !== oldValue) {
-      this.initializeApp();
-    }
-  }
   @Watch('source')
   handleSourceChange(newSource: TSource, oldSource: TSource) {
     if (newSource && (!oldSource || oldSource.code !== newSource.code)) {
@@ -136,15 +132,13 @@ export class IrBookingEngine {
   }
 
   private initializeApp() {
-    this.commonService.setToken(this.token);
-    this.propertyService.setToken(this.token);
     app_store.app_data = {
       aName: this.p,
       origin: this.origin,
       perma_link: this.perma_link,
       displayMode: 'default',
       isFromGhs: checkGhs(this.source?.code, this.stag),
-      token: this.token,
+      token: '',
       property_id: this.propertyId,
       injected: this.injected,
       roomtype_id: this.rt_id,
@@ -324,7 +318,7 @@ export class IrBookingEngine {
   private renderScreens() {
     switch (app_store.currentPage) {
       case 'booking':
-        return <ir-booking-page adultCount={this.adults} childrenCount={this.child} fromDate={this.checkin} toDate={this.checkout}></ir-booking-page>;
+        return <ir-booking-page adultCount={this.adults} childrenCount={this.child} ages={this.ages} fromDate={this.checkin} toDate={this.checkout}></ir-booking-page>;
       case 'checkout':
         return <ir-checkout-page></ir-checkout-page>;
       case 'invoice':

@@ -1,4 +1,5 @@
 import { pages } from '@/components';
+import Token from '@/models/Token';
 import { CommonService } from '@/services/api/common.service';
 import { PropertyService } from '@/services/api/property.service';
 import app_store from '@/stores/app.store';
@@ -30,14 +31,16 @@ export class IrBookingListing {
   @Prop() hideGoogleSignIn: boolean = true;
 
   @State() isLoading = false;
-  @State() token: string;
   @State() bookingNumber = null;
   @State() currentPage: 'bookings' | 'booking-details' | 'user-profile' = 'bookings';
   @State() selectedBooking: { email: string; booking_nbr: string } | null = null;
   @State() isAffiliate: boolean = false;
+  @State() isSignedIn: boolean = false;
 
   private commonService = new CommonService();
   private propertyService = new PropertyService();
+  private token = new Token();
+
   private privacyPolicyRef: HTMLIrPrivacyPolicyElement;
 
   async componentWillLoad() {
@@ -49,15 +52,14 @@ export class IrBookingListing {
     const isAuthenticated = this.commonService.checkUserAuthState();
     if (isAuthenticated) {
       this.bookingNumber = isAuthenticated.params ? isAuthenticated.params.booking_nbr : null;
-      this.token = isAuthenticated.token;
-      app_store.app_data.token = this.token;
+      this.token.setToken(isAuthenticated.token);
+      this.isSignedIn = true;
     } else {
       const token = await this.commonService.getBEToken();
       if (token) {
-        app_store.app_data.token = token;
+        this.token.setToken(token);
       }
     }
-    this.initializeServices();
     if (!this.be) {
       this.initializeApp();
     }
@@ -110,7 +112,7 @@ export class IrBookingListing {
           }),
         ];
       }
-      if (this.token) {
+      if (this.isSignedIn) {
         requests = [...requests, this.propertyService.getExposedGuest()];
       }
       await Promise.all(requests);
@@ -121,11 +123,7 @@ export class IrBookingListing {
       this.isLoading = false;
     }
   }
-  initializeServices() {
-    console.log(this.token);
-    this.propertyService.setToken(this.token ?? app_store.app_data.token);
-    this.commonService.setToken(this.token ?? app_store.app_data.token);
-  }
+
   @Listen('authFinish')
   handleAuthFinish(e: CustomEvent) {
     e.stopImmediatePropagation();
@@ -140,8 +138,8 @@ export class IrBookingListing {
         this.bookingNumber = payload.booking_nbr;
         this.currentPage = 'booking-details';
       }
-      this.token = token;
-      this.initializeServices();
+      this.token.setToken(token);
+      this.isSignedIn = true;
       this.fetchGuest();
     }
   }
@@ -150,7 +148,8 @@ export class IrBookingListing {
     if (this.be) {
       return;
     }
-    this.token = null;
+    this.token.setToken('');
+    this.isSignedIn = false;
   }
 
   @Listen('bl_routing')
@@ -175,7 +174,6 @@ export class IrBookingListing {
         return (
           <ir-booking-overview
             aff={this.isAffiliate}
-            token={this.token}
             propertyid={app_store.app_data.property_id}
             language={this.language}
             maxPages={this.maxPages}
@@ -239,7 +237,6 @@ export class IrBookingListing {
         return (
           <ir-booking-overview
             aff={this.isAffiliate}
-            token={this.token}
             propertyid={app_store.app_data.property_id}
             language={this.language}
             maxPages={this.maxPages}
@@ -334,7 +331,7 @@ export class IrBookingListing {
     return (
       <Host>
         {!this.be && <ir-interceptor></ir-interceptor>}
-        {!this.token ? this.renderAuthScreen() : this.renderBookingsScreen()}
+        {!this.isSignedIn ? this.renderAuthScreen() : this.renderBookingsScreen()}
       </Host>
     );
   }

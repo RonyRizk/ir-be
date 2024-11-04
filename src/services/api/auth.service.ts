@@ -1,4 +1,3 @@
-import { MissingTokenError, Token } from '@/models/Token';
 import app_store from '@/stores/app.store';
 import { TSignInValidator, TSignUpValidator } from '@/validators/auth.validator';
 import axios from 'axios';
@@ -38,7 +37,7 @@ interface LoginFailurePayload {
 
 type LoginEventPayload = LoginSuccessPayload | LoginFailurePayload;
 
-export class AuthService extends Token {
+export class AuthService {
   private subscribers: ((result: LoginEventPayload) => void)[] = [];
 
   // public onLoginCompleted(listener: (result: LoginEventPayload) => void) {
@@ -72,12 +71,8 @@ export class AuthService extends Token {
     app_store.app_data = { ...app_store.app_data, token };
   }
   public async login(params: LoginParams, signIn: boolean = true) {
-    const token = this.getToken();
     const { option, ...rest } = params;
-    if (!token) {
-      throw new MissingTokenError();
-    }
-    const { data } = await axios.post(`/Exposed_Guest_SignIn?Ticket=${token}`, option === 'direct' ? (rest as DirectLoginParams).params : { ...rest });
+    const { data } = await axios.post(`/Exposed_Guest_SignIn`, option === 'direct' ? (rest as DirectLoginParams).params : { ...rest });
     if (data['ExceptionMsg'] !== '') {
       this.notifySubscribers({
         state: 'failed',
@@ -90,11 +85,10 @@ export class AuthService extends Token {
       app_store.app_data.token = loginToken;
       app_store.is_signed_in = true;
       manageAnchorSession({ login: { method: option, ...rest, isLoggedIn: true, token: loginToken } });
+      const propertyService = new PropertyService();
+      propertyService.getExposedGuest();
     }
     console.count('auth called');
-    const propertyService = new PropertyService();
-    propertyService.setToken(loginToken);
-    propertyService.getExposedGuest();
     this.notifySubscribers({
       state: 'success',
       token: loginToken,
@@ -107,11 +101,7 @@ export class AuthService extends Token {
   }
 
   public async signUp(params: TSignUpValidator) {
-    const token = this.getToken();
-    if (!token) {
-      throw new MissingTokenError();
-    }
-    const { data } = await axios.post(`/Exposed_Guest_SignUp?Ticket=${token}`, params);
+    const { data } = await axios.post(`/Exposed_Guest_SignUp`, params);
     if (data['ExceptionMsg'] !== '') {
       throw new Error(data['ExceptionMsg']);
     }

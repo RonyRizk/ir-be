@@ -6,12 +6,12 @@ import app_store from '@/stores/app.store';
 import { Booking } from '@/models/booking.dto';
 import { PropertyService } from '@/services/api/property.service';
 import { CommonService } from '@/services/api/common.service';
-import axios from 'axios';
 import { AuthService } from '@/services/api/auth.service';
 import { PaymentService, TBookingInfo } from '@/services/api/payment.service';
 import { AllowedPaymentMethod } from '@/models/property';
 import { BookingListingAppService } from '@/services/app/booking-listing.service';
 import InvoiceSkeleton from './InvoiceSkeleton';
+import Token from '@/models/Token';
 
 @Component({
   tag: 'ir-invoice',
@@ -35,7 +35,6 @@ export class IrInvoice {
   @Prop() version: string = '2.0';
 
   @State() booking: Booking;
-  @State() token: string;
   @State() isAuthenticated = false;
   @State() isLoading = false;
   @State() cancelation_message: string = null;
@@ -44,11 +43,13 @@ export class IrInvoice {
   @State() amountToBePayed: number;
   @State() cancelation_policies: TBookingInfo[] = [];
 
+  private token = new Token();
   private propertyService = new PropertyService();
   private commonService = new CommonService();
   private authService = new AuthService();
   private paymentService = new PaymentService();
   private bookingListingAppService = new BookingListingAppService();
+
   private payment_option: AllowedPaymentMethod = null;
   private amount: number = null;
   private bookingCancelation: HTMLIrBookingCancelationElement;
@@ -58,8 +59,6 @@ export class IrInvoice {
     if (!this.baseUrl) {
       throw new Error('Missing base url');
     }
-    axios.defaults.baseURL = this.baseUrl;
-    axios.defaults.withCredentials = true;
     this.isLoading = true;
     if (!this.be) {
       getUserPrefernce(this.language);
@@ -67,12 +66,13 @@ export class IrInvoice {
     const isAuthenticated = this.commonService.checkUserAuthState();
     console.log(isAuthenticated);
     if (isAuthenticated) {
-      this.token = isAuthenticated.token;
+      this.token.setToken(isAuthenticated.token);
       this.isAuthenticated = true;
     } else {
-      this.token = await this.commonService.getBEToken();
+      const token = await this.commonService.getBEToken();
+      this.token.setToken(token);
     }
-    this.init();
+
     this.fetchData();
   }
   private detectPaymentOrigin() {
@@ -95,17 +95,11 @@ export class IrInvoice {
       );
     }
   }
-  async init() {
-    this.propertyService.setToken(this.token);
-    this.commonService.setToken(this.token);
-    this.authService.setToken(this.token);
-    this.paymentService.setToken(this.token);
-    app_store.app_data.token = this.token;
-  }
+
   async fetchData(language = this.language?.toLowerCase() || app_store.userPreferences.language_id, resetLanguage = false) {
     if (!this.isAuthenticated) {
-      this.token = await this.authService.login({ option: 'direct', params: { email: this.email, booking_nbr: this.bookingNbr } }, false);
-      this.init();
+      const token = await this.authService.login({ option: 'direct', params: { email: this.email, booking_nbr: this.bookingNbr } }, false);
+      this.token.setToken(token);
     }
     const requests: any[] = [this.propertyService.getExposedBooking({ booking_nbr: this.bookingNbr, language, currency: null })];
     if (!this.be || resetLanguage) {
@@ -153,7 +147,6 @@ export class IrInvoice {
       this.paymentService.getBookingPrepaymentAmount(this.booking),
       await this.paymentService.GetExposedApplicablePolicies({
         book_date: new Date(this.booking.booked_on.date),
-        token: this.token,
         params: {
           booking_nbr: this.bookingNbr,
           property_id: this.booking.property.id,

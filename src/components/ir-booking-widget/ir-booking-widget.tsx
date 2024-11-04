@@ -7,6 +7,7 @@ import axios from 'axios';
 import app_store from '@/stores/app.store';
 import { addDays, addYears, format } from 'date-fns';
 import localizedWords from '@/stores/localization.store';
+import Token from '@/models/Token';
 @Component({
   tag: 'ir-widget',
   styleUrl: 'ir-booking-widget.css',
@@ -28,24 +29,28 @@ export class IrBookingWidget {
   @State() isPopoverOpen: boolean;
   @State() dateModifiers: any;
   @State() isLoading: boolean;
+  @State() isGuestPopoverOpen: boolean;
   @State() dates: { from_date: Date | null; to_date: Date | null } = {
     from_date: null,
     to_date: null,
   };
-  @State() guests: { adultCount: number; childrenCount: number } = {
+  @State() guests: { adultCount: number; childrenCount: number; infants: number; childrenAges: string[] } = {
     adultCount: 2,
     childrenCount: 0,
+    infants: 0,
+    childrenAges: [],
   };
 
   private baseUrl: string = 'https://gateway.igloorooms.com/IRBE';
   private popover: HTMLIrPopoverElement;
-  private token: string;
+  private token = new Token();
 
   private commonService = new CommonService();
   private propertyService = new PropertyService();
   private guestPopover: HTMLIrPopoverElement;
-  containerRef: HTMLDivElement;
-  elTimout: NodeJS.Timeout;
+  private containerRef: HTMLDivElement;
+  private elTimout: NodeJS.Timeout;
+  error: boolean;
 
   private initApp() {
     this.modifyContainerStyle();
@@ -54,13 +59,12 @@ export class IrBookingWidget {
   }
   async componentWillLoad() {
     this.initApp();
-    this.token = await this.commonService.getBEToken();
+    const token = await this.commonService.getBEToken();
     app_store.userPreferences = {
       language_id: this.language,
       currency_id: 'usd',
     };
-    this.propertyService.setToken(this.token);
-    this.commonService.setToken(this.token);
+    this.token.setToken(token);
     this.initProperty();
   }
   componentDidLoad() {
@@ -112,6 +116,7 @@ export class IrBookingWidget {
     }
   }
   handleBooknow() {
+    if (!this.validateChildrenAges()) return;
     let subdomainURL = `bookingmystay.com`;
     const currentDomain = `${app_store.property.perma_link}.${subdomainURL}`;
     const { from_date, to_date } = this.dates;
@@ -122,7 +127,8 @@ export class IrBookingWidget {
     const children = childrenCount > 0 ? `children=${childrenCount}` : '';
     const roomTypeId = this.roomTypeId ? `rtid=${this.roomTypeId}` : '';
     const affiliate = this.aff ? `aff=${this.aff}` : '';
-    const queryParams = [fromDate, toDate, adults, children, roomTypeId, affiliate];
+    const ages = this.guests.childrenCount > 0 && this.guests.childrenAges.length > 0 ? `ages=${this.guests.childrenAges.join('_')}` : '';
+    const queryParams = [fromDate, toDate, adults, children, roomTypeId, affiliate, ages];
     const queryString = queryParams.filter(param => param !== '').join('&');
     window.open(`https://${currentDomain}?${queryString}`, '_blank');
   }
@@ -187,6 +193,28 @@ export class IrBookingWidget {
       clearTimeout(this.elTimout);
     }
   }
+  private handlePopoverToggle(e: CustomEvent) {
+    e.stopImmediatePropagation();
+    e.stopPropagation();
+    this.isGuestPopoverOpen = e.detail;
+    console.log('here');
+
+    if (!this.isGuestPopoverOpen) {
+      if (this.guests.childrenCount === 0) {
+        this.guestPopover.forceClose();
+      } else {
+        this.validateChildrenAges();
+      }
+    }
+  }
+  private validateChildrenAges() {
+    if (this.guests.childrenAges.some(c => c === '')) {
+      this.error = true;
+      return false;
+    }
+    this.guestPopover.forceClose();
+    return true;
+  }
   render() {
     if (this.isLoading) {
       return null;
@@ -215,7 +243,7 @@ export class IrBookingWidget {
             }}
           >
             {this.renderDateTrigger()}
-            <div slot="popover-content" class="popup-container w-full border-0 bg-white p-4 pb-6 shadow-none sm:w-auto sm:border sm:p-4  md:p-6 ">
+            <div slot="popover-content" class="popup-container w-full border-0 bg-white p-4  shadow-none sm:w-auto sm:border  ">
               <ir-date-range
                 dateModifiers={this.dateModifiers}
                 minDate={addDays(new Date(), -1)}
@@ -240,26 +268,29 @@ export class IrBookingWidget {
             </div>
           </ir-popover>
           <ir-popover
+            outsideEvents="none"
             autoAdjust={false}
             allowFlip={false}
             ref={el => (this.guestPopover = el)}
             class={'ir-popover'}
             showCloseButton={false}
             placement={this.position === 'fixed' ? 'top-start' : 'auto'}
+            onOpenChange={this.handlePopoverToggle.bind(this)}
           >
             {this.renderAdultChildTrigger()}
 
             <ir-guest-counter
               slot="popover-content"
+              error={this.error}
               adults={this.guests?.adultCount}
               child={this.guests?.childrenCount}
               minAdultCount={0}
               maxAdultCount={app_store?.property?.adult_child_constraints.adult_max_nbr}
               maxChildrenCount={app_store?.property?.adult_child_constraints.child_max_nbr}
               childMaxAge={app_store.property?.adult_child_constraints.child_max_age}
-              onUpdateCounts={e => (this.guests = e.detail)}
+              onUpdateCounts={e => (this.guests = { ...e.detail })}
               class={'h-full'}
-              onCloseGuestCounter={() => this.guestPopover.toggleVisibility()}
+              onCloseGuestCounter={() => this.guestPopover.forceClose()}
             ></ir-guest-counter>
           </ir-popover>
           <button class="btn-flip" onClick={this.handleBooknow.bind(this)}>

@@ -80,7 +80,7 @@ export class IrDatePopup {
           }}
         >
           {this.dateTrigger()}
-          <div slot="popover-content" class="date-range-container w-full border-0 p-4 pb-6 shadow-none sm:w-auto sm:border sm:p-4 sm:shadow-sm md:p-6 ">
+          <div slot="popover-content" class="date-range-container w-full border-0 p-4 pb-6 shadow-none sm:w-auto sm:border sm:p-4 sm:shadow-sm  ">
             <ir-date-range
               dateModifiers={this.getDateModifiers()}
               fromDate={this.dates.start}

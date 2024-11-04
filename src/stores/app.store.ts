@@ -1,4 +1,4 @@
-import { ICurrency, IExposedLanguages, pages, TCurrency, TDirection } from '@/models/commun';
+import { ICurrency, IExposedLanguages, pages, TCurrency, TDirection } from '@/models/common';
 import { Affiliate, IEntries, IExposedProperty } from '@/models/property';
 import { createStore } from '@stencil/store';
 import { enUS, Locale } from 'date-fns/locale';

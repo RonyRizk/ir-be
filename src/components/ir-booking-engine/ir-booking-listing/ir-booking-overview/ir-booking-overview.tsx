@@ -16,7 +16,6 @@ import localization_store from '@/stores/app.store';
   scoped: true,
 })
 export class IrBookingOverview {
-  @Prop() token: string;
   @Prop() propertyid: number;
   @Prop() language: string;
   @Prop() maxPages: number = 10;
@@ -58,9 +57,6 @@ export class IrBookingOverview {
     this.initializeApp();
   }
   initializeServices() {
-    this.bookingListingService.setToken(this.token);
-    this.propertyService.setToken(this.token);
-    this.commonService.setToken(this.token);
     if (!this.showAllBookings) {
       this.page_mode = 'multi';
     }
@@ -70,7 +66,7 @@ export class IrBookingOverview {
       this.isLoading = true;
       let requests = [];
       if (this.bookingNumber && this.page_mode === 'single') {
-        requests.unshift(this.propertyService.getExposedBooking({ booking_nbr: this.bookingNumber, language: this.language,currency:null }, false));
+        requests.unshift(this.propertyService.getExposedBooking({ booking_nbr: this.bookingNumber, language: this.language, currency: null }, false));
       } else if (this.page_mode === 'multi') {
         requests.unshift(this.getBookings());
       }

@@ -21,7 +21,6 @@ export class IrAuth {
   private googleButtonWrapper: any;
 
   componentWillLoad() {
-    this.authService.setToken(app_store.app_data.token);
     // this.authService.initializeFacebookSignIn();
     if (!document.querySelector('.custom-google-button') && !app_store.app_data.hideGoogleSignIn) {
       this.authService.loadGoogleSignInScript(this.googleButtonWrapper);

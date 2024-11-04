@@ -36,6 +36,12 @@
   padding-top: 0.625rem /* 10px */;
   padding-bottom: 0.625rem /* 10px */;
 }
+:host([data-state='error']) .selected-trigger {
+  border-color: var(--error-500, #f04438) !important;
+}
+:host([data-state='error']) .select-label {
+  color: var(--error-500, #f04438);
+}
 .select-el.icon {
   padding-inline-start: 2.25rem;
 }

@@ -221,3 +221,13 @@
     border-top-right-radius: 0;
   }
 }
+
+.popup-container {
+  height: 21.25rem;
+}
+
+@media (min-width: 1200px) {
+  .popup-container {
+    height: 24.5rem;
+  }
+}

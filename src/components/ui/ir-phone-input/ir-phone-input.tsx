@@ -3,7 +3,7 @@ import { createPopper } from '@popperjs/core';
 import localization_store from '@/stores/app.store';
 import { CommonService } from '@/services/api/common.service';
 import app_store from '@/stores/app.store';
-import { ICountry } from '@/models/commun';
+import { ICountry } from '@/models/common';
 import { updateUserFormData } from '@/stores/checkout.store';
 import localizedWords from '@/stores/localization.store';
 import phone_input_store from './phone.store';
@@ -44,7 +44,6 @@ export class IrPhoneInput {
   phoneInput: HTMLInputElement;
 
   async componentWillLoad() {
-    this.commonService.setToken(app_store.app_data.token);
     await this.initializeCountries();
     this.inputValue = this.mobile_number;
   }

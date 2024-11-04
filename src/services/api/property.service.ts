@@ -1,28 +1,24 @@
 import { PropertyHelpers } from './../app/property-helpers.service';
 import { TExposedBookingAvailability } from '@/components/ir-booking-engine/ir-booking-page/ir-availibility-header/availability';
-import { MissingTokenError, Token } from '@/models/Token';
 import { Booking } from '@/models/booking.dto';
-import { DataStructure } from '@/models/commun';
+import { DataStructure } from '@/models/common';
 import { ISetupEntries } from '@/models/property';
 import app_store from '@/stores/app.store';
 import booking_store, { IRatePlanSelection } from '@/stores/booking';
 import { checkout_store, ICardProcessingWithCVC, updateUserFormData } from '@/stores/checkout.store';
-import { getDateDifference } from '@/utils/utils';
+import { getDateDifference, injectHTML } from '@/utils/utils';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { Colors } from '../app/colors.service';
 import { TGuest } from '@/models/user_form';
 
-export class PropertyService extends Token {
+export class PropertyService {
   private propertyHelpers = new PropertyHelpers();
+  private static initialized = false;
   colors: Colors = new Colors();
 
   public async getExposedProperty(params: { id: number; language: string; aname: string | null; perma_link: string | null }, initTheme: boolean = true) {
-    const token = this.getToken();
-    if (!token) {
-      throw new MissingTokenError();
-    }
-    const { data } = await axios.post(`/Get_Exposed_Property?Ticket=${token}`, {
+    const { data } = await axios.post(`/Get_Exposed_Property`, {
       ...params,
       currency: app_store.userPreferences.currency_id,
       include_sales_rate_plans: true,
@@ -31,24 +27,25 @@ export class PropertyService extends Token {
     if (result.ExceptionMsg !== '') {
       throw new Error(result.ExceptionMsg);
     }
-    // if (result.My_Result.tags) {
-    //   result.My_Result.tags.map(({ key, value }) => {
-    //     if (!value) {
-    //       return;
-    //     }
-    //     switch (key) {
-    //       case 'header':
-    //         return injectHTML(value, 'head', 'first');
-    //       case 'body':
-    //         return injectHTML(value, 'body', 'first');
-    //       case 'footer':
-    //         return injectHTML(value, 'body', 'last');
-    //     }
-    //   });
-    // }
+    if (result.My_Result.tags && !PropertyService.initialized) {
+      PropertyService.initialized = true;
+      result.My_Result.tags.map(({ key, value }) => {
+        if (!value) {
+          return;
+        }
+        switch (key) {
+          case 'header':
+            return injectHTML(value, 'head', 'first');
+          case 'body':
+            return injectHTML(value, 'body', 'first');
+          case 'footer':
+            return injectHTML(value, 'body', 'last');
+        }
+      });
+    }
 
     if (!app_store.fetchedBooking) {
-      booking_store.roomTypes = [...result.My_Result.roomtypes];
+      booking_store.roomTypes = [...(result.My_Result?.roomtypes ?? [])];
     }
     // } else {
     //   const oldBookingStoreRoomTypes = [...booking_store.roomTypes];
@@ -79,11 +76,7 @@ export class PropertyService extends Token {
     return result.My_Result;
   }
   public async getExposedNonBookableNights(params: { from_date: string; to_date: string; porperty_id: number; aname: string; perma_link: string }) {
-    const token = this.getToken();
-    if (!token) {
-      throw new MissingTokenError();
-    }
-    const { data } = await axios.post(`/Get_Exposed_Non_Bookable_Nights?Ticket=${token}`, params);
+    const { data } = await axios.post(`/Get_Exposed_Non_Bookable_Nights`, params);
     if (data.ExceptionMsg !== '') {
       throw new Error(data.ExceptionMsg);
     }
@@ -102,13 +95,11 @@ export class PropertyService extends Token {
     mode: 'modify_rt' | 'default';
     adultChildConstraint?: string;
   }): Promise<DataStructure> {
-    const token = this.getToken();
-    this.propertyHelpers.validateToken(token);
     this.propertyHelpers.validateModeProps(props);
 
     const roomtypeIds = this.propertyHelpers.collectRoomTypeIds(props);
     const rateplanIds = this.propertyHelpers.collectRatePlanIds(props);
-    const data = await this.propertyHelpers.fetchAvailabilityData(token, props, roomtypeIds, rateplanIds);
+    const data = await this.propertyHelpers.fetchAvailabilityData(props, roomtypeIds, rateplanIds);
 
     this.propertyHelpers.updateBookingStore(data, props);
 
@@ -116,12 +107,7 @@ export class PropertyService extends Token {
   }
 
   public async getExposedBooking(params: { booking_nbr: string; language: string; currency: string }, withExtras: boolean = true) {
-    const token = this.getToken();
-    if (!token) {
-      throw new MissingTokenError();
-    }
-
-    const { data } = await axios.post(`/Get_Exposed_Booking?Ticket=${token}`, {
+    const { data } = await axios.post(`/Get_Exposed_Booking`, {
       ...params,
       extras: withExtras
         ? [
@@ -141,32 +127,24 @@ export class PropertyService extends Token {
     return result.My_Result as Booking;
   }
   public async fetchSetupEntries(): Promise<ISetupEntries> {
-    try {
-      const token = this.getToken();
-      if (token) {
-        if (app_store.setup_entries) {
-          return app_store.setup_entries;
-        }
-        const { data } = await axios.post(`/Get_Setup_Entries_By_TBL_NAME_MULTI?Ticket=${token}`, {
-          TBL_NAMES: ['_ARRIVAL_TIME', '_RATE_PRICING_MODE', '_BED_PREFERENCE_TYPE'],
-        });
-        if (data.ExceptionMsg !== '') {
-          throw new Error(data.ExceptionMsg);
-        }
-        const res: any[] = data.My_Result;
-        const setupEntries = {
-          arrivalTime: res.filter(e => e.TBL_NAME === '_ARRIVAL_TIME'),
-          ratePricingMode: res.filter(e => e.TBL_NAME === '_RATE_PRICING_MODE'),
-          bedPreferenceType: res.filter(e => e.TBL_NAME === '_BED_PREFERENCE_TYPE'),
-        };
-        app_store.setup_entries = setupEntries;
-        updateUserFormData('arrival_time', setupEntries.arrivalTime[0].CODE_NAME);
-        return setupEntries;
-      }
-    } catch (error) {
-      console.error(error);
-      throw new Error(error);
+    if (app_store.setup_entries) {
+      return app_store.setup_entries;
     }
+    const { data } = await axios.post(`/Get_Setup_Entries_By_TBL_NAME_MULTI`, {
+      TBL_NAMES: ['_ARRIVAL_TIME', '_RATE_PRICING_MODE', '_BED_PREFERENCE_TYPE'],
+    });
+    if (data.ExceptionMsg !== '') {
+      throw new Error(data.ExceptionMsg);
+    }
+    const res: any[] = data.My_Result;
+    const setupEntries = {
+      arrivalTime: res.filter(e => e.TBL_NAME === '_ARRIVAL_TIME'),
+      ratePricingMode: res.filter(e => e.TBL_NAME === '_RATE_PRICING_MODE'),
+      bedPreferenceType: res.filter(e => e.TBL_NAME === '_BED_PREFERENCE_TYPE'),
+    };
+    app_store.setup_entries = setupEntries;
+    updateUserFormData('arrival_time', setupEntries.arrivalTime[0].CODE_NAME);
+    return setupEntries;
   }
 
   private filterRooms() {
@@ -216,28 +194,16 @@ export class PropertyService extends Token {
     return rooms;
   }
   public async editExposedGuest(guest: TGuest, book_nbr: string): Promise<any> {
-    try {
-      const token = this.getToken();
-      if (token !== null) {
-        const { data } = await axios.post(`/Edit_Exposed_Guest?Ticket=${token}`, { ...guest, book_nbr });
-        if (data.ExceptionMsg !== '') {
-          throw new Error(data.ExceptionMsg);
-        }
-        return data.My_Result;
-      }
-    } catch (error) {
-      console.log(error);
-      throw new Error(error);
+    const { data } = await axios.post(`/Edit_Exposed_Guest`, { ...guest, book_nbr });
+    if (data.ExceptionMsg !== '') {
+      throw new Error(data.ExceptionMsg);
     }
+    return data.My_Result;
   }
 
   public async bookUser() {
     const prePaymentAmount = checkout_store.prepaymentAmount;
     try {
-      const token = this.getToken();
-      if (!token) {
-        throw new MissingTokenError();
-      }
       console.log('payment', checkout_store.payment);
       let guest: any = {
         email: checkout_store.userFormData.email,
@@ -306,7 +272,7 @@ export class PropertyService extends Token {
         pickup_info: checkout_store.pickup.location ? this.propertyHelpers.convertPickup(checkout_store.pickup) : null,
       };
       console.log('body');
-      const { data } = await axios.post(`/DoReservation?Ticket=${token}`, body);
+      const { data } = await axios.post(`/DoReservation`, body);
       if (data.ExceptionMsg !== '') {
         throw new Error(data.ExceptionMsg);
       }
@@ -318,12 +284,7 @@ export class PropertyService extends Token {
   }
 
   public async getExposedGuest() {
-    const token = this.getToken();
-    if (!token) {
-      throw new MissingTokenError();
-    }
-
-    const { data } = await axios.post(`/Get_Exposed_Guest?Ticket=${token}`, {
+    const { data } = await axios.post(`/Get_Exposed_Guest`, {
       email: null,
     });
     if (data.ExceptionMsg !== '') {

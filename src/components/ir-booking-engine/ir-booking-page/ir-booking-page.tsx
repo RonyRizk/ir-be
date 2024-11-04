@@ -1,6 +1,6 @@
 import { Component, Event, EventEmitter, Host, Listen, Prop, State, h } from '@stencil/core';
 import { Locale } from 'date-fns';
-import { ICurrency, IExposedLanguages, pages } from '@/models/commun';
+import { ICurrency, IExposedLanguages, pages } from '@/models/common';
 import { IExposedProperty } from '@/models/property';
 import booking_store, { calculateTotalCost } from '@/stores/booking';
 import app_store, { onAppDataChange } from '@/stores/app.store';
@@ -15,6 +15,7 @@ export class IrBookingPage {
   @Prop() fromDate: string;
   @Prop() toDate: string;
   @Prop() adultCount: string;
+  @Prop() ages: string;
   @Prop() childrenCount: string;
 
   @State() selectedLocale: Locale;
@@ -95,6 +96,7 @@ export class IrBookingPage {
           )}
           <div>
             <ir-availibility-header
+              ages={this.ages}
               ref={el => (this.availabiltyHeaderRef = el)}
               fromDate={this.fromDate}
               toDate={this.toDate}

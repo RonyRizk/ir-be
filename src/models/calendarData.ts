@@ -1,4 +1,4 @@
-import { ICountry } from './commun';
+import { ICountry } from './common';
 import { RoomDetail, STATUS } from './IBooking';
 
 export type TAdultChildConstraints = { adult_max_nbr: number | null; child_max_nbr: number | null; child_max_age: number | null };

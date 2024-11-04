@@ -86,6 +86,11 @@
 }
 @media (min-width: 640px) {
   .date-range-container {
-    height: auto;
+    height: 21.25rem;
+  }
+}
+@media (min-width: 1200px) {
+  .date-range-container {
+    height: 24.5rem;
   }
 }

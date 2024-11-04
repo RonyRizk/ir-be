@@ -10,6 +10,7 @@
 | Property        | Attribute        | Description | Type     | Default     |
 | --------------- | ---------------- | ----------- | -------- | ----------- |
 | `adultCount`    | `adult-count`    |             | `string` | `undefined` |
+| `ages`          | `ages`           |             | `string` | `''`        |
 | `childrenCount` | `children-count` |             | `string` | `undefined` |
 | `fromDate`      | `from-date`      |             | `string` | `undefined` |
 | `toDate`        | `to-date`        |             | `string` | `undefined` |
@@ -54,6 +55,7 @@ graph TD;
   ir-adult-child-counter --> ir-icons
   ir-adult-child-counter --> ir-popover
   ir-adult-child-counter --> ir-button
+  ir-adult-child-counter --> ir-select
   ir-coupon-dialog --> ir-button
   ir-coupon-dialog --> ir-icons
   ir-coupon-dialog --> ir-dialog

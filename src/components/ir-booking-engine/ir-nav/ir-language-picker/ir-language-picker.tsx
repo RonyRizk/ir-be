@@ -1,4 +1,4 @@
-import { ICurrency, IExposedLanguages } from '@/models/commun';
+import { ICurrency, IExposedLanguages } from '@/models/common';
 import app_store, { changeLocale, onAppDataChange, updateUserPreference } from '@/stores/app.store';
 import localizedWords from '@/stores/localization.store';
 import { cn, matchLocale, modifyQueryParam } from '@/utils/utils';

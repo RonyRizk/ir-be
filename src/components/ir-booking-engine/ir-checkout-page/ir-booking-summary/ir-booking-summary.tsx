@@ -1,4 +1,4 @@
-import { CheckoutErrors, pages } from '@/models/commun';
+import { CheckoutErrors, pages } from '@/models/common';
 import app_store from '@/stores/app.store';
 import booking_store, { calculateTotalCost } from '@/stores/booking';
 import { checkout_store } from '@/stores/checkout.store';

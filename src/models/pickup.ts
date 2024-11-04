@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ZCurrency } from './commun';
+import { ZCurrency } from './common';
 
 export const ZAllowedLocation = z.object({
   description: z.string(),

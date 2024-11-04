@@ -10,6 +10,7 @@ import { v4 } from 'uuid';
 export class IrSelect {
   @Prop() label: string;
   @Prop() icon: boolean;
+  @Prop() addDummyOption: boolean = false;
 
   @Prop() value: string | number;
   @Prop() data: { id: string | number; value: string; disabled?: boolean; html?: boolean }[];
@@ -46,6 +47,7 @@ export class IrSelect {
           data-stid={this.select_id}
           class={`select-el ${this.variant} ${this.customStyles} ${this.icon ? 'icon' : ''}`}
         >
+          {this.addDummyOption && <option value="" class={'hidden'} aria-selected="false"></option>}
           {this.data?.map(d => {
             if (d.html) {
               return <option innerHTML={d.value} value={d.id} disabled={d.disabled} selected={d.id === this.value}></option>;

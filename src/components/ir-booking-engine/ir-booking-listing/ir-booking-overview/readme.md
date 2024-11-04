@@ -15,7 +15,6 @@
 | `maxPages`        | `max-pages`         |             | `number`  | `10`        |
 | `propertyid`      | `propertyid`        |             | `number`  | `undefined` |
 | `showAllBookings` | `show-all-bookings` |             | `boolean` | `true`      |
-| `token`           | `token`             |             | `string`  | `undefined` |
 
 
 ## Events

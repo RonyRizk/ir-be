@@ -1,6 +1,6 @@
 import { Component, Event, EventEmitter, Fragment, h, Listen, Prop, State, Watch } from '@stencil/core';
 import { TTabsState } from './nav-types';
-import { ICurrency, IExposedLanguages, pages } from '@/models/commun';
+import { ICurrency, IExposedLanguages, pages } from '@/models/common';
 import app_store from '@/stores/app.store';
 import { cn, renderPropertyLocation } from '@/utils/utils';
 import localizedWords from '@/stores/localization.store';

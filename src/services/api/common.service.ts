@@ -1,51 +1,30 @@
 import axios from 'axios';
-import { MissingTokenError, Token } from '../../models/Token';
 import app_store from '@/stores/app.store';
 import localizedWords from '@/stores/localization.store';
 
-export class CommonService extends Token {
+export class CommonService {
   public async getCurrencies() {
-    const token = this.getToken();
-    if (!token) {
-      throw new MissingTokenError();
-    }
-    const { data } = await axios.post(`/Get_Exposed_Currencies?Ticket=${token}`);
+    const { data } = await axios.post(`/Get_Exposed_Currencies`);
     app_store.currencies = [...data['My_Result']];
     return data['My_Result'];
   }
   public async getExposedLanguages() {
-    const token = this.getToken();
-    if (!token) {
-      throw new MissingTokenError();
-    }
-    const { data } = await axios.post(`/Get_Exposed_Languages?Ticket=${token}`);
+    const { data } = await axios.post(`/Get_Exposed_Languages`);
     app_store.languages = [...data.My_Result];
     return data['My_Result'];
   }
   public async getCountries(language: string) {
-    try {
-      const token = this.getToken();
-      if (token) {
-        const { data } = await axios.post(`/Get_Exposed_Countries?Ticket=${token}`, {
-          language,
-        });
-        if (data.ExceptionMsg !== '') {
-          throw new Error(data.ExceptionMsg);
-        }
-        return data.My_Result;
-      }
-    } catch (error) {
-      console.error(error);
-      throw new Error(error);
+    const { data } = await axios.post(`/Get_Exposed_Countries`, {
+      language,
+    });
+    if (data.ExceptionMsg !== '') {
+      throw new Error(data.ExceptionMsg);
     }
+    return data.My_Result;
   }
   public async getUserDefaultCountry(params: { id: string; aname: string; perma_link: string }) {
     try {
-      const token = this.getToken();
-      if (!token) {
-        throw new MissingTokenError();
-      }
-      const { data } = await axios.post(`/Get_Country_By_IP?Ticket=${token}`, {
+      const { data } = await axios.post(`/Get_Country_By_IP`, {
         IP: '',
         ...params,
       });
@@ -60,12 +39,7 @@ export class CommonService extends Token {
   }
   public async getExposedCountryByIp(params: { id: string; aname: string; perma_link: string }) {
     try {
-      const token = this.getToken();
-      if (!token) {
-        throw new MissingTokenError();
-      }
-
-      const { data } = await axios.post(`/Get_Exposed_Country_By_IP?Ticket=${token}`, {
+      const { data } = await axios.post(`/Get_Exposed_Country_By_IP`, {
         IP: '',
         lang: 'en',
         ...params,
@@ -94,11 +68,7 @@ export class CommonService extends Token {
   }
   public async getExposedLanguage() {
     try {
-      const token = this.getToken();
-      if (!token) {
-        throw new MissingTokenError();
-      }
-      const { data } = await axios.post(`/Get_Exposed_Language?Ticket=${token}`, { code: app_store.userPreferences.language_id, sections: ['_BE_FRONT'] });
+      const { data } = await axios.post(`/Get_Exposed_Language`, { code: app_store.userPreferences.language_id, sections: ['_BE_FRONT'] });
       if (data.ExceptionMsg !== '') {
         throw new Error(data.ExceptionMsg);
       }

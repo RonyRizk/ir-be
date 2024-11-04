@@ -26,9 +26,6 @@ export class IrUserProfile {
   private commonService = new CommonService();
 
   async componentWillLoad() {
-    this.propertyService.setToken(app_store.app_data.token);
-    console.log('token', app_store.app_data.token);
-    this.commonService.setToken(app_store.app_data.token);
     await this.fetchData();
     this.user = { ...this.user_data };
   }

@@ -19,7 +19,6 @@ export class IrUserForm {
   private propertyService = new PropertyService();
 
   async componentWillLoad() {
-    this.propertyService.setToken(app_store.app_data.token);
     this.propertyService.fetchSetupEntries();
   }
   render() {

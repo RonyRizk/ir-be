@@ -38,8 +38,6 @@ export class IrRateplan {
   private paymentService = new PaymentService();
 
   componentWillLoad() {
-    this.propertyService.setToken(app_store.app_data.token);
-    this.paymentService.setToken(app_store.app_data.token);
     this.checkAvailability();
   }
   @Watch('roomTypeInventory')

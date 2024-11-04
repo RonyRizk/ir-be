@@ -1,5 +1,5 @@
 import { Booking } from '@/models/booking.dto';
-import { CheckoutErrors, pages } from '@/models/commun';
+import { CheckoutErrors, pages } from '@/models/common';
 import { PickupFormData } from '@/models/pickup';
 import { AllowedPaymentMethod } from '@/models/property';
 import { IrUserFormData } from '@/models/user_form';
@@ -10,7 +10,7 @@ import app_store from '@/stores/app.store';
 import booking_store, { IRatePlanSelection, validateBooking } from '@/stores/booking';
 import { checkout_store } from '@/stores/checkout.store';
 import localizedWords from '@/stores/localization.store';
-import { destroyBookingCookie, detectCardType, getDateDifference, runScriptAndRemove } from '@/utils/utils';
+import { destroyBookingCookie, detectCardType, getDateDifference, injectHTMLAndRunScript } from '@/utils/utils';
 import { ZCreditCardSchemaWithCvc } from '@/validators/checkout.validator';
 import { Component, Host, Listen, State, h, Event, EventEmitter } from '@stencil/core';
 import { ZodError, ZodIssue } from 'zod';
@@ -39,10 +39,6 @@ export class IrCheckoutPage {
   private errorElement: HTMLElement;
 
   async componentWillLoad() {
-    const token = app_store.app_data.token;
-    this.propertyService.setToken(token);
-    this.paymentService.setToken(token);
-    this.authService.setToken(token);
     this.calculateTotalPrepaymentAmount();
   }
   private async calculateTotalPrepaymentAmount() {
@@ -61,7 +57,6 @@ export class IrCheckoutPage {
       let requests = await Promise.all(
         list.map(l =>
           this.paymentService.GetExposedApplicablePolicies({
-            token: app_store.app_data.token,
             book_date: new Date(),
             params: {
               booking_nbr: l.booking_nbr,
@@ -255,8 +250,9 @@ export class IrCheckoutPage {
     tag = tag.replace(/\$\$total_price\$\$/g, booking.financial.total_amount.toString());
     tag = tag.replace(/\$\$length_of_stay\$\$/g, getDateDifference(new Date(booking.from_date), new Date(booking.to_date)).toString());
     tag = tag.replace(/\$\$booking_xref\$\$/g, booking.booking_nbr.toString());
-    tag = tag.replace(/\$\$curr\$\$/g, booking.currency.code.toString());
-    runScriptAndRemove(tag);
+    tag = tag.replace(/\$\$curr\$\$/g, app_store.userPreferences?.currency_id?.toString());
+    tag = tag.replace(/\$\$cur_code\$\$/g, app_store.userPreferences?.currency_id?.toString());
+    injectHTMLAndRunScript(tag, 'conversion_tag');
   }
   private async processPayment(bookingResult: Booking, currentPayment: AllowedPaymentMethod, paymentAmount: number, token) {
     let amountToBePayed = paymentAmount;
@@ -274,7 +270,7 @@ export class IrCheckoutPage {
           pgw_id: currentPayment.id.toString(),
         },
         onRedirect: url => (window.location.href = url),
-        onScriptRun: script => runScriptAndRemove(script),
+        onScriptRun: script => injectHTMLAndRunScript(script, 'conversion_tag'),
       });
     }
   }

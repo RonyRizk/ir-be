@@ -1,6 +1,5 @@
 import { Booking } from '@/models/booking.dto';
 import { IBrackets, IExposedApplicablePolicies } from '@/models/property';
-import { MissingTokenError, Token } from '@/models/Token';
 import app_store from '@/stores/app.store';
 import booking_store from '@/stores/booking';
 import axios from 'axios';
@@ -22,13 +21,9 @@ interface FetchCancelationMessageWithoutData {
 
 type FetchCancelationMessageParams = FetchCancelationMessageWithData | FetchCancelationMessageWithoutData;
 export type TBookingInfo = { statement: string; rp_name: string; rt_name: string };
-export class PaymentService extends Token {
+export class PaymentService {
   public async getExposedCancelationDueAmount(params: { booking_nbr: string; currency_id: number }) {
-    const token = this.getToken();
-    if (!token) {
-      throw new MissingTokenError();
-    }
-    const { data } = await axios.post(`/Get_Exposed_Cancelation_Due_Amount?Ticket=${token}`, {
+    const { data } = await axios.post(`/Get_Exposed_Cancelation_Due_Amount`, {
       ...params,
     });
     if (data['ExceptionMsg'] !== '') {
@@ -49,13 +44,20 @@ export class PaymentService extends Token {
     onRedirect: (url: string) => void;
     onScriptRun: (script: string) => void;
   }) {
-    if (!token) {
-      throw new MissingTokenError();
-    }
-    const { data } = await axios.post(`/Generate_Payment_Caller?Ticket=${token}`, {
-      ...params,
-      callback_url: `https://${app_store.property.perma_link}.bookingmystay.com/invoice`,
-    });
+    // const resp = await fetch(`https://gateway.igloorooms.com/IRBE/Generate_Payment_Caller`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Authorization': token,
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({ ...params, callback_url: `https://${app_store.property.perma_link}.bookingmystay.com/invoice` }),
+    // });
+    // const data = await resp.json();
+    const { data } = await axios.post(
+      '/Generate_Payment_Caller',
+      { ...params, callback_url: `https://${app_store.property.perma_link}.bookingmystay.com/invoice` },
+      { headers: { Authorization: token } },
+    );
     if (data['ExceptionMsg'] !== '') {
       throw new Error(data.ExceptionMsg);
     }
@@ -68,11 +70,7 @@ export class PaymentService extends Token {
     return res;
   }
   public async RequestBookingCancelation(booking_nbr: string) {
-    const token = this.getToken();
-    if (!token) {
-      throw new MissingTokenError();
-    }
-    const { data } = await axios.post(`/Request_Booking_Cancelation?Ticket=${token}`, { BOOK_NBR: booking_nbr });
+    const { data } = await axios.post(`/Request_Booking_Cancelation`, { BOOK_NBR: booking_nbr });
     if (data['ExceptionMsg'] !== '') {
       throw new Error(data.ExceptionMsg);
     }
@@ -81,11 +79,9 @@ export class PaymentService extends Token {
   }
 
   public async GetExposedApplicablePolicies({
-    token,
     params,
     book_date,
   }: {
-    token: string;
     params: {
       booking_nbr: string;
       property_id: number;
@@ -96,10 +92,7 @@ export class PaymentService extends Token {
     };
     book_date: Date;
   }): Promise<TExposedApplicablePolicies> {
-    if (!token) {
-      throw new MissingTokenError();
-    }
-    const { data } = await axios.post(`/Get_Exposed_Applicable_Policies?Ticket=${token}`, params);
+    const { data } = await axios.post(`/Get_Exposed_Applicable_Policies`, params);
     if (data['ExceptionMsg'] !== '') {
       throw new Error(data.ExceptionMsg);
     }
@@ -136,7 +129,6 @@ export class PaymentService extends Token {
           rate_plan_id: id,
           room_type_id: roomTypeId,
         },
-        token: app_store.app_data.token,
       });
       applicablePolicies = result.data;
     }
@@ -144,15 +136,10 @@ export class PaymentService extends Token {
     return { message: message ? `${params.showCancelation ? '<b><u>Cancellation: </u></b>' : ''}${message}<br/>` : '<span></span>', data: applicablePolicies };
   }
   public async getBookingPrepaymentAmount(booking: Booking) {
-    const token = this.getToken();
-    if (!token) {
-      throw new MissingTokenError();
-    }
     const list = this.setUpBooking(booking);
     let requests = await Promise.all(
       list.map(l =>
         this.GetExposedApplicablePolicies({
-          token,
           book_date: new Date(booking.booked_on.date),
           params: {
             booking_nbr: l.booking_nbr,

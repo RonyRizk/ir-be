@@ -2,9 +2,10 @@ import { Component, Event, EventEmitter, Host, Prop, State, h } from '@stencil/c
 import { SignInValidtor, TSignInAuthTrigger, TSignInValidator } from '@/validators/auth.validator';
 import { ZodError } from 'zod';
 import { AuthService } from '@/services/api/auth.service';
-import app_store, { onAppDataChange } from '@/stores/app.store';
+import app_store from '@/stores/app.store';
 import { TAuthNavigation } from '../auth.types';
 import localizedWords from '@/stores/localization.store';
+import Token from '@/models/Token';
 
 @Component({
   tag: 'ir-signin',
@@ -33,13 +34,7 @@ export class IrSignin {
   @Event({ bubbles: true, composed: true }) signIn: EventEmitter<TSignInAuthTrigger>;
 
   private authService = new AuthService();
-
-  componentWillLoad() {
-    this.authService.setToken(app_store.app_data.token);
-    onAppDataChange('app_data', newValue => {
-      this.authService.setToken(newValue.token);
-    });
-  }
+  private token = new Token();
 
   modifySignInParams(params: Partial<TSignInValidator>) {
     if (!this.signInParams) {
@@ -52,6 +47,7 @@ export class IrSignin {
     try {
       this.isLoading = true;
       const token = await this.authService.login({ option: 'direct', params });
+      this.token.setToken(token);
       this.authFinish.emit({
         state: 'success',
         token,

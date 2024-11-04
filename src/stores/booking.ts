@@ -37,6 +37,7 @@ export interface IBookinAvailabilityParams {
   to_date: Date | null;
   adult_nbr: number;
   child_nbr: number;
+  infant_nbr: number;
   coupon?: string;
   agent?: number;
   loyalty?: boolean;
@@ -66,6 +67,7 @@ const initialState: BookingStore = {
     to_date: null,
     adult_nbr: 0,
     child_nbr: 0,
+    infant_nbr: 0,
   },
   booking: null,
   fictus_booking_nbr: null,

@@ -1,7 +1,6 @@
 import { Component, Event, EventEmitter, Fragment, h, Method, Prop, State } from '@stencil/core';
 import { isRequestPending } from '@/stores/ir-interceptor.store';
 import { PaymentService, TBookingInfo } from '@/services/api/payment.service';
-import app_store from '@/stores/app.store';
 import { formatAmount } from '@/utils/utils';
 import { Booking } from '@/models/booking.dto';
 import localizedWords from '@/stores/localization.store';
@@ -28,9 +27,6 @@ export class IrBookingCancelation {
   private alertDialog: HTMLIrAlertDialogElement;
   private paymentService = new PaymentService();
 
-  componentWillLoad() {
-    this.paymentService.setToken(app_store.app_data.token);
-  }
   async setOverdueAmount() {
     try {
       const res = await this.paymentService.getExposedCancelationDueAmount({

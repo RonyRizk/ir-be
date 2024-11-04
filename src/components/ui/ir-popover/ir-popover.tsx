@@ -18,6 +18,7 @@ export class IrPopover {
   @Prop() stopListeningForOutsideClicks: boolean = false;
   @Prop() showCloseButton: boolean = true;
   @Prop() allowFlip: boolean = true;
+  @Prop() outsideEvents: 'all' | 'none' = 'all';
 
   @State() isVisible: boolean = false;
   @State() isMobile: boolean = window.innerWidth < 640;
@@ -76,7 +77,7 @@ export class IrPopover {
   initializePopover() {
     if (this.triggerElement && this.contentElement) {
       this.popoverInstance = createPopper(this.triggerElement, this.contentElement, {
-        placement: this.placement?this.placement: localization_store.dir === 'LTR' ? 'bottom-start' : 'bottom-end',
+        placement: this.placement ? this.placement : localization_store.dir === 'LTR' ? 'bottom-start' : 'bottom-end',
         modifiers: [
           {
             name: 'offset',
@@ -95,7 +96,18 @@ export class IrPopover {
   }
 
   @Method()
+  async forceClose() {
+    this.isVisible = false;
+    if (!this.isVisible) {
+      this.dialogElement?.closeModal();
+    }
+  }
+
+  @Method()
   async toggleVisibility() {
+    if (this.outsideEvents === 'none' && this.isVisible) {
+      return this.openChange.emit(false);
+    }
     this.isVisible = !this.isVisible;
     if (this.dialogElement) {
       this.dialogElement.closeModal();
@@ -119,8 +131,10 @@ export class IrPopover {
           .then(() => {
             this.popoverInstance.update();
           });
-      } else if ( (this.popoverInstance.state.options.placement === 'top-start' && currentDir === 'rtl') ||
-      (this.popoverInstance.state.options.placement === 'top-end' && currentDir === 'ltr')) {
+      } else if (
+        (this.popoverInstance.state.options.placement === 'top-start' && currentDir === 'rtl') ||
+        (this.popoverInstance.state.options.placement === 'top-end' && currentDir === 'ltr')
+      ) {
         let newPlacement = this.popoverInstance.state.options.placement;
         if (currentDir === 'rtl') {
           newPlacement = newPlacement.replace('top-start', 'top-end');
@@ -138,7 +152,7 @@ export class IrPopover {
         this.popoverInstance.update();
       }
     }
-    if (!app_store.app_data.injected&&this.autoAdjust) {
+    if (!app_store.app_data.injected && this.autoAdjust) {
       this.adjustPopoverPlacement();
     }
     this.openChange.emit(this.isVisible);
@@ -162,8 +176,10 @@ export class IrPopover {
   handleOutsideClick = (event: MouseEvent) => {
     const outsideClick = typeof event.composedPath === 'function' && !event.composedPath().includes(this.el);
     if (outsideClick && this.isVisible) {
-      this.isVisible = false;
-      this.openChange.emit(this.isVisible);
+      if (this.outsideEvents === 'all') {
+        this.isVisible = false;
+      }
+      this.openChange.emit(false);
     }
   };
 

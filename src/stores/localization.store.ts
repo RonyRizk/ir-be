@@ -10,8 +10,10 @@ export type TLocaleLocalizedWordsEntries = {
   Lcz_Activities: string;
   Lcz_Address: string;
   Lcz_Adult: string;
+  Lcz_enterchildage: string;
   Lcz_Adults: string;
   Lcz_Age: string;
+  Lcz_under1: string;
   Lcz_NoAvailability: string;
   Lcz_Ages: string;
   Lcz_AlreadyHaveAnAccount: string;
