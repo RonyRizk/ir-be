@@ -7,7 +7,7 @@ import { AuthService } from '@/services/api/auth.service';
 import { PaymentService } from '@/services/api/payment.service';
 import { PropertyService } from '@/services/api/property.service';
 import app_store from '@/stores/app.store';
-import booking_store, { IRatePlanSelection, validateBooking } from '@/stores/booking';
+import booking_store, { calculateTotalRooms, IRatePlanSelection, validateBooking } from '@/stores/booking';
 import { checkout_store } from '@/stores/checkout.store';
 import localizedWords from '@/stores/localization.store';
 import { destroyBookingCookie, detectCardType, getDateDifference, injectHTMLAndRunScript } from '@/utils/utils';
@@ -104,10 +104,9 @@ export class IrCheckoutPage {
     if (checkout_store.agreed_to_services) {
       return false;
     }
-    this.error = { cause: 'booking-summary', issues: 'unchecked aggreement' };
+    this.error = { cause: 'booking-summary', issues: 'unchecked agreement' };
     return true;
   }
-
   private validatePayment(): boolean {
     if (!app_store.property.allowed_payment_methods.some(p => p.is_active)) {
       return true;
@@ -248,7 +247,7 @@ export class IrCheckoutPage {
   private modifyConversionTag(tag: string) {
     const booking = booking_store.booking;
     tag = tag.replace(/\$\$total_price\$\$/g, booking.financial.total_amount.toString());
-    tag = tag.replace(/\$\$length_of_stay\$\$/g, getDateDifference(new Date(booking.from_date), new Date(booking.to_date)).toString());
+    tag = tag.replace(/\$\$total_roomnights\$\$/g, (getDateDifference(new Date(booking.from_date), new Date(booking.to_date)) * calculateTotalRooms()).toString());
     tag = tag.replace(/\$\$booking_xref\$\$/g, booking.booking_nbr.toString());
     tag = tag.replace(/\$\$curr\$\$/g, app_store.userPreferences?.currency_id?.toString());
     tag = tag.replace(/\$\$cur_code\$\$/g, app_store.userPreferences?.currency_id?.toString());

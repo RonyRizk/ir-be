@@ -285,4 +285,17 @@ export function validateBooking() {
     Object.values(roomTypeSelection).every(ratePlan => ratePlan.guestName.every(name => name.trim() !== '')),
   );
 }
+export function calculateTotalRooms() {
+  return Object.values(booking_store.ratePlanSelections).reduce((total, value) => {
+    return (
+      total +
+      Object.values(value).reduce((innerTotal, ratePlan) => {
+        if (ratePlan.reserved === 0) {
+          return innerTotal;
+        }
+        return innerTotal + ratePlan.reserved;
+      }, 0)
+    );
+  }, 0);
+}
 export default booking_store;

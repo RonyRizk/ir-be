@@ -96,7 +96,7 @@ export class IrBookingPage {
           )}
           <div>
             <ir-availibility-header
-              ages={this.ages}
+              // ages={this.ages}
               ref={el => (this.availabiltyHeaderRef = el)}
               fromDate={this.fromDate}
               toDate={this.toDate}

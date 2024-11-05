@@ -7,7 +7,6 @@ export const ExposedBookingAvailability = z.object({
   room_type_ids: z.string().array().optional().default([]),
   adult_nbr: z.number().min(1),
   child_nbr: z.number().min(0),
-  infant_nbr: z.number().min(0),
   language: z.string().default('en'),
   currency_ref: z.string(),
   is_in_loyalty_mode: z.boolean().default(false),

@@ -127,8 +127,8 @@ export class IrBookingWidget {
     const children = childrenCount > 0 ? `children=${childrenCount}` : '';
     const roomTypeId = this.roomTypeId ? `rtid=${this.roomTypeId}` : '';
     const affiliate = this.aff ? `aff=${this.aff}` : '';
-    const ages = this.guests.childrenCount > 0 && this.guests.childrenAges.length > 0 ? `ages=${this.guests.childrenAges.join('_')}` : '';
-    const queryParams = [fromDate, toDate, adults, children, roomTypeId, affiliate, ages];
+    // const ages = this.guests.childrenCount > 0 && this.guests.childrenAges.length > 0 ? `ages=${this.guests.childrenAges.join('_')}` : '';
+    const queryParams = [fromDate, toDate, adults, children, roomTypeId, affiliate];
     const queryString = queryParams.filter(param => param !== '').join('&');
     window.open(`https://${currentDomain}?${queryString}`, '_blank');
   }
@@ -193,20 +193,20 @@ export class IrBookingWidget {
       clearTimeout(this.elTimout);
     }
   }
-  private handlePopoverToggle(e: CustomEvent) {
-    e.stopImmediatePropagation();
-    e.stopPropagation();
-    this.isGuestPopoverOpen = e.detail;
-    console.log('here');
+  // private handlePopoverToggle(e: CustomEvent) {
+  //   e.stopImmediatePropagation();
+  //   e.stopPropagation();
+  //   this.isGuestPopoverOpen = e.detail;
+  //   console.log('here');
 
-    if (!this.isGuestPopoverOpen) {
-      if (this.guests.childrenCount === 0) {
-        this.guestPopover.forceClose();
-      } else {
-        this.validateChildrenAges();
-      }
-    }
-  }
+  //   if (!this.isGuestPopoverOpen) {
+  //     if (this.guests.childrenCount === 0) {
+  //       this.guestPopover.forceClose();
+  //     } else {
+  //       this.validateChildrenAges();
+  //     }
+  //   }
+  // }
   private validateChildrenAges() {
     if (this.guests.childrenAges.some(c => c === '')) {
       this.error = true;
@@ -268,29 +268,26 @@ export class IrBookingWidget {
             </div>
           </ir-popover>
           <ir-popover
-            outsideEvents="none"
             autoAdjust={false}
             allowFlip={false}
             ref={el => (this.guestPopover = el)}
             class={'ir-popover'}
             showCloseButton={false}
             placement={this.position === 'fixed' ? 'top-start' : 'auto'}
-            onOpenChange={this.handlePopoverToggle.bind(this)}
           >
             {this.renderAdultChildTrigger()}
 
             <ir-guest-counter
               slot="popover-content"
-              error={this.error}
               adults={this.guests?.adultCount}
               child={this.guests?.childrenCount}
               minAdultCount={0}
               maxAdultCount={app_store?.property?.adult_child_constraints.adult_max_nbr}
               maxChildrenCount={app_store?.property?.adult_child_constraints.child_max_nbr}
               childMaxAge={app_store.property?.adult_child_constraints.child_max_age}
-              onUpdateCounts={e => (this.guests = { ...e.detail })}
+              onUpdateCounts={e => (this.guests = e.detail)}
               class={'h-full'}
-              onCloseGuestCounter={() => this.guestPopover.forceClose()}
+              onCloseGuestCounter={() => this.guestPopover.toggleVisibility()}
             ></ir-guest-counter>
           </ir-popover>
           <button class="btn-flip" onClick={this.handleBooknow.bind(this)}>

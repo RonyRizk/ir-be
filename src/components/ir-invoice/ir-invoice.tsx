@@ -1,6 +1,6 @@
 import { Component, Host, Listen, Prop, State, Watch, h } from '@stencil/core';
 import { format, isBefore } from 'date-fns';
-import { cn, formatAmount, getDateDifference, getUserPrefernce, runScriptAndRemove } from '@/utils/utils';
+import { cn, formatAmount, getDateDifference, getUserPreference as getUserPreference, runScriptAndRemove } from '@/utils/utils';
 import localizedWords from '@/stores/localization.store';
 import app_store from '@/stores/app.store';
 import { Booking } from '@/models/booking.dto';
@@ -61,7 +61,7 @@ export class IrInvoice {
     }
     this.isLoading = true;
     if (!this.be) {
-      getUserPrefernce(this.language);
+      getUserPreference(this.language);
     }
     const isAuthenticated = this.commonService.checkUserAuthState();
     console.log(isAuthenticated);
@@ -206,9 +206,10 @@ export class IrInvoice {
   }
   renderPaymentText(paymentOption: AllowedPaymentMethod) {
     if (paymentOption.is_payment_gateway) {
+      const amount = this.booking.financial.payments?.reduce((prev, cur) => cur.amount + prev, 0) ?? 0;
       return (
         <p class="total-payment text-sm">
-          {localizedWords.entries.Lcz_YouHavePaid} <span>{formatAmount(this.amount, this.booking.currency.code)}</span>
+          {localizedWords.entries.Lcz_YouHavePaid} <span>{formatAmount(amount, this.booking.currency.code)}</span>
         </p>
       );
     }

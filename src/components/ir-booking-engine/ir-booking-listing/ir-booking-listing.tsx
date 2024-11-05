@@ -5,7 +5,7 @@ import { PropertyService } from '@/services/api/property.service';
 import app_store from '@/stores/app.store';
 import { checkout_store } from '@/stores/checkout.store';
 import localizedWords from '@/stores/localization.store';
-import { checkAffiliate, getUserPrefernce } from '@/utils/utils';
+import { checkAffiliate, getUserPreference } from '@/utils/utils';
 import { Component, Fragment, Host, Listen, Prop, State, Watch, h } from '@stencil/core';
 import axios from 'axios';
 
@@ -48,7 +48,7 @@ export class IrBookingListing {
     app_store.app_data.hideGoogleSignIn = this.hideGoogleSignIn;
     this.currentPage = this.startScreen.screen;
     this.selectedBooking = (this.startScreen.params as any) ?? null;
-    getUserPrefernce(this.language);
+    getUserPreference(this.language);
     const isAuthenticated = this.commonService.checkUserAuthState();
     if (isAuthenticated) {
       this.bookingNumber = isAuthenticated.params ? isAuthenticated.params.booking_nbr : null;

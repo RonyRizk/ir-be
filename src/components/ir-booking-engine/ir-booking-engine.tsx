@@ -6,7 +6,7 @@ import { addYears, format, Locale } from 'date-fns';
 import { IExposedProperty } from '@/models/property';
 import booking_store, { modifyBookingStore } from '@/stores/booking';
 import app_store, { changeLocale, TSource, updateUserPreference } from '@/stores/app.store';
-import { checkAffiliate, checkGhs, getUserPrefernce, matchLocale, setDefaultLocale, validateAgentCode, validateCoupon } from '@/utils/utils';
+import { checkAffiliate, checkGhs, getUserPreference, matchLocale, setDefaultLocale, validateAgentCode, validateCoupon } from '@/utils/utils';
 import Stack from '@/models/stack';
 import { v4 } from 'uuid';
 import { AvailabiltyService } from '@/services/app/availability.service';
@@ -54,7 +54,7 @@ export class IrBookingEngine {
   @State() router = new Stack<HTMLElement>();
   @State() bookingListingScreenOptions: { screen: 'bookings' | 'booking-details'; params: unknown } = { params: null, screen: 'bookings' };
 
-  private version: string = '2.32';
+  private version: string = '2.33';
   private baseUrl: string = 'https://gateway.igloorooms.com/IRBE';
 
   private commonService = new CommonService();
@@ -67,7 +67,7 @@ export class IrBookingEngine {
 
   async componentWillLoad() {
     console.log(`version:${this.version}`);
-    getUserPrefernce(this.language);
+    getUserPreference(this.language);
     if (this.property) {
       app_store.property = { ...this.property };
     }

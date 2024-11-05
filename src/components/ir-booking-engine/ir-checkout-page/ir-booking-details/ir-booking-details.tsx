@@ -2,7 +2,7 @@ import { ISmokingOption, RatePlan, RoomType, Variation } from '@/models/property
 import { PaymentService } from '@/services/api/payment.service';
 import { PropertyService } from '@/services/api/property.service';
 import app_store from '@/stores/app.store';
-import booking_store, { IRatePlanSelection } from '@/stores/booking';
+import booking_store, { calculateTotalRooms, IRatePlanSelection } from '@/stores/booking';
 import { checkout_store, onCheckoutDataChange } from '@/stores/checkout.store';
 import localizedWords from '@/stores/localization.store';
 import { formatAmount, getDateDifference } from '@/utils/utils';
@@ -92,20 +92,6 @@ export class IrBookingDetails {
     });
 
     booking_store.ratePlanSelections = { ...result };
-  }
-
-  calculateTotalRooms() {
-    return Object.values(booking_store.ratePlanSelections).reduce((total, value) => {
-      return (
-        total +
-        Object.values(value).reduce((innerTotal, ratePlan) => {
-          if (ratePlan.reserved === 0) {
-            return innerTotal;
-          }
-          return innerTotal + ratePlan.reserved;
-        }, 0)
-      );
-    }, 0);
   }
 
   handleGuestNameChange(index: number, e: InputEvent, rateplanId: number, roomTypeId: number): void {
@@ -258,7 +244,7 @@ export class IrBookingDetails {
   render() {
     console.log(this.firstRoom);
     const total_nights = getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date());
-    const total_rooms = this.calculateTotalRooms();
+    const total_rooms = calculateTotalRooms();
     const total_persons = this.calculateTotalPersons();
     return (
       <Host>
