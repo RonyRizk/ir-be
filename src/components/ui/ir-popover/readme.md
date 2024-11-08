@@ -54,7 +54,7 @@ Type: `Promise<CustomEvent<boolean>>`
 ### Used by
 
  - [ir-adult-child-counter](../../ir-booking-engine/ir-booking-page/ir-adult-child-counter)
- - [ir-date-popup](../../ir-booking-engine/ir-booking-page/ir-availibility-header/ir-date-popup)
+ - [ir-date-popup](../../ir-booking-engine/ir-booking-page/ir-availability-header/ir-date-popup)
  - [ir-pickup](../../ir-booking-engine/ir-checkout-page/ir-pickup)
  - [ir-widget](../../ir-booking-widget)
 

@@ -2,14 +2,11 @@ import { CommonService } from '@/services/api/common.service';
 import { PropertyService } from '@/services/api/property.service';
 import { Component, Listen, Prop, State, Watch, h } from '@stencil/core';
 import { addYears, format, Locale } from 'date-fns';
-
 import { IExposedProperty } from '@/models/property';
 import booking_store, { modifyBookingStore } from '@/stores/booking';
 import app_store, { changeLocale, TSource, updateUserPreference } from '@/stores/app.store';
 import { checkAffiliate, checkGhs, getUserPreference, matchLocale, setDefaultLocale, validateAgentCode, validateCoupon } from '@/utils/utils';
 import Stack from '@/models/stack';
-import { v4 } from 'uuid';
-import { AvailabiltyService } from '@/services/app/availability.service';
 import { checkout_store } from '@/stores/checkout.store';
 import Token from '@/models/Token';
 import { ICurrency, IExposedLanguages } from '@/models/common';
@@ -54,16 +51,13 @@ export class IrBookingEngine {
   @State() router = new Stack<HTMLElement>();
   @State() bookingListingScreenOptions: { screen: 'bookings' | 'booking-details'; params: unknown } = { params: null, screen: 'bookings' };
 
-  private version: string = '2.33';
+  private version: string = '2.34';
   private baseUrl: string = 'https://gateway.igloorooms.com/IRBE';
 
   private commonService = new CommonService();
   private propertyService = new PropertyService();
-  private availabiltyService = new AvailabiltyService();
   private token = new Token();
-
-  private identifier: string;
-  private privacyPolicyRef: HTMLIrPrivacyPolicyElement;
+  privacyPolicyRef: any;
 
   async componentWillLoad() {
     console.log(`version:${this.version}`);
@@ -184,7 +178,6 @@ export class IrBookingEngine {
       }
       let currency = app_store.userDefaultCountry.currency;
       if (this.cur) {
-        console.log(this.cur);
         const newCurr = this.currencies.find(c => c.code.toLowerCase() === this.cur.toLowerCase());
         if (newCurr) {
           currency = newCurr;
@@ -251,9 +244,7 @@ export class IrBookingEngine {
   handleAuthFinish(e: CustomEvent) {
     e.stopImmediatePropagation();
     e.stopPropagation();
-    console.log('auth finish');
-    const { token, state, payload } = e.detail;
-    console.log(token, state, payload);
+    const { state, payload } = e.detail;
     if (state === 'success') {
       if (payload.method === 'direct') {
         this.bookingListingScreenOptions = {
@@ -291,27 +282,23 @@ export class IrBookingEngine {
   }
 
   private async checkAvailability() {
-    this.identifier = v4();
-    this.availabiltyService.initSocket(this.identifier);
+    console.warn('here');
+    booking_store.resetBooking = false;
     await this.propertyService.getExposedBookingAvailability({
-      params: {
-        propertyid: app_store.app_data.property_id,
-        from_date: format(booking_store.bookingAvailabilityParams.from_date, 'yyyy-MM-dd'),
-        to_date: format(booking_store.bookingAvailabilityParams.to_date, 'yyyy-MM-dd'),
-        room_type_ids: [],
-        adult_nbr: booking_store.bookingAvailabilityParams.adult_nbr,
-        child_nbr: booking_store.bookingAvailabilityParams.child_nbr,
-        language: app_store.userPreferences.language_id,
-        currency_ref: app_store.userPreferences.currency_id,
-        is_in_loyalty_mode: booking_store.bookingAvailabilityParams.loyalty ? true : !!booking_store.bookingAvailabilityParams.coupon,
-        promo_key: booking_store.bookingAvailabilityParams.coupon || '',
-        is_in_agent_mode: !!booking_store.bookingAvailabilityParams.agent || false,
-        agent_id: booking_store.bookingAvailabilityParams.agent || 0,
-        is_in_affiliate_mode: !!app_store.app_data.affiliate,
-        affiliate_id: app_store.app_data.affiliate ? app_store.app_data.affiliate.id : null,
-      },
-      identifier: this.identifier,
-      mode: 'default',
+      propertyid: app_store.app_data.property_id,
+      from_date: format(booking_store.bookingAvailabilityParams.from_date, 'yyyy-MM-dd'),
+      to_date: format(booking_store.bookingAvailabilityParams.to_date, 'yyyy-MM-dd'),
+      room_type_ids: [],
+      adult_nbr: booking_store.bookingAvailabilityParams.adult_nbr,
+      child_nbr: booking_store.bookingAvailabilityParams.child_nbr,
+      language: app_store.userPreferences.language_id,
+      currency_ref: app_store.userPreferences.currency_id,
+      is_in_loyalty_mode: booking_store.bookingAvailabilityParams.loyalty ? true : !!booking_store.bookingAvailabilityParams.coupon,
+      promo_key: booking_store.bookingAvailabilityParams.coupon || '',
+      is_in_agent_mode: !!booking_store.bookingAvailabilityParams.agent || false,
+      agent_id: booking_store.bookingAvailabilityParams.agent || 0,
+      is_in_affiliate_mode: !!app_store.app_data.affiliate,
+      affiliate_id: app_store.app_data.affiliate ? app_store.app_data.affiliate.id : null,
     });
   }
 
@@ -371,10 +358,6 @@ export class IrBookingEngine {
       default:
         return null;
     }
-  }
-
-  disconnectedCallback() {
-    this.availabiltyService.disconnectSocket();
   }
 
   render() {

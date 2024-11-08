@@ -54,7 +54,7 @@
 
  - [ir-booking-code](../../ir-booking-engine/ir-booking-page/ir-booking-code)
  - [ir-booking-details](../../ir-booking-engine/ir-checkout-page/ir-booking-details)
- - [ir-coupon-dialog](../../ir-booking-engine/ir-booking-page/ir-availibility-header/ir-coupon-dialog)
+ - [ir-coupon-dialog](../../ir-booking-engine/ir-booking-page/ir-availability-header/ir-coupon-dialog)
  - [ir-payment-view](../../ir-booking-engine/ir-checkout-page/ir-booking-summary/ir-payment-view)
  - [ir-pickup](../../ir-booking-engine/ir-checkout-page/ir-pickup)
  - [ir-signin](../../ir-booking-engine/ir-nav/ir-auth/ir-signin)

@@ -1,21 +1,11 @@
 import { DataStructure } from '@/models/common';
 import { TPickupFormData } from '@/models/pickup';
-import { RatePlan, RoomType } from '@/models/property';
-import booking_store, { modifyBookingStore } from '@/stores/booking';
+import { RoomType, Variation } from '@/models/property';
+import booking_store from '@/stores/booking';
 import axios from 'axios';
 import { addDays, format } from 'date-fns';
-import { PaymentService } from '../api/payment.service';
-import app_store from '@/stores/app.store';
 
 export class PropertyHelpers {
-  private static readonly MODE_MODIFY_RT = 'modify_rt';
-  private static readonly MODE_DEFAULT = 'default';
-  private paymentService = new PaymentService();
-  public validateModeProps(props: any) {
-    if (props.mode === PropertyHelpers.MODE_MODIFY_RT && (!props.rp_id || !props.rt_id)) {
-      throw new Error('Missing property: rp_id or rt_id is required in modify_rt mode');
-    }
-  }
   public convertPickup(pickup: TPickupFormData) {
     let res: any = {};
     const [hour, minute] = pickup.arrival_time.split(':');
@@ -33,20 +23,13 @@ export class PropertyHelpers {
     };
     return res;
   }
-  public updateBookingStore(data: any, props: any) {
+
+  public updateBookingStore(data: any) {
     try {
-      let roomtypes = [...booking_store.roomTypes];
-      const newRoomtypes = data.My_Result.roomtypes;
-      if (props.mode === PropertyHelpers.MODE_DEFAULT) {
-        roomtypes = this.updateInventory(roomtypes, newRoomtypes);
-        roomtypes = this.sortRoomTypes(roomtypes, {
-          adult_nbr: props.params.adult_nbr,
-          child_nbr: props.params.child_nbr,
-        });
-      } else {
-        roomtypes = this.updateRoomTypeRatePlans(roomtypes, newRoomtypes, props);
-      }
-      booking_store.roomTypes = roomtypes;
+      const newRoomtypes = data.My_Result;
+      const { adult_nbr, child_nbr } = data.My_Params_Check_Availability;
+      const sortedRoomTypes = this.sortRoomTypes(newRoomtypes, { adult_nbr, child_nbr });
+      booking_store.roomTypes = [...sortedRoomTypes.map(rt => ({ ...rt, rateplans: rt.rateplans?.map(rp => ({ ...rp, variations: this.sortVariations(rp?.variations ?? []) })) }))];
       booking_store.tax_statement = { message: data.My_Result.tax_statement };
       booking_store.enableBooking = true;
     } catch (error) {
@@ -86,9 +69,8 @@ export class PropertyHelpers {
     return { first_name: names[0] || null, last_name: names[1] || null };
   }
   public async fetchAvailabilityData(props: any, roomtypeIds: number[], rateplanIds: number[]): Promise<any> {
-    const response = await axios.post(`/Get_Exposed_Booking_Availability`, {
-      ...props.params,
-      identifier: props.identifier,
+    const response = await axios.post(`/Check_Availability`, {
+      ...props,
       room_type_ids: roomtypeIds,
       rate_plan_ids: rateplanIds,
       skip_getting_assignable_units: true,
@@ -99,181 +81,25 @@ export class PropertyHelpers {
     if (result.ExceptionMsg !== '') {
       throw new Error(result.ExceptionMsg);
     }
-    if (result.My_Result.booking_nbr) {
-      modifyBookingStore('fictus_booking_nbr', {
-        nbr: result.My_Result.booking_nbr,
-      });
-      this.validateFreeCancelationZone(result.My_Result.booking_nbr);
-    }
+
     return result;
   }
-  private async validateFreeCancelationZone(booking_nbr: string) {
-    // console.log(app_store.currencies.find(c => c.code.toLowerCase() === app_store.userPreferences.currency_id?.toLowerCase()));
-    const result = await this.paymentService.GetExposedApplicablePolicies({
-      book_date: new Date(),
-      params: {
-        booking_nbr,
-        currency_id: app_store.currencies.find(c => c.code.toLowerCase() === (app_store.userPreferences.currency_id.toLowerCase() || 'usd')).id,
-        language: app_store.userPreferences.language_id,
-        property_id: app_store.app_data.property_id,
-        rate_plan_id: 0,
-        room_type_id: 0,
-      },
-    });
-    console.log('applicable policies', result);
-    if (!result) {
-      booking_store.isInFreeCancelationZone = true;
-    }
-    if (result) {
-      const { isInFreeCancelationZone } = this.paymentService.processAlicablePolicies(result.data, new Date());
-      booking_store.isInFreeCancelationZone = isInFreeCancelationZone;
-    }
-  }
-  private updateInventory(roomtypes: RoomType[], newRoomtypes: RoomType[]): RoomType[] {
-    const newRoomtypesMap = new Map(newRoomtypes.map(rt => [rt.id, rt]));
-    return roomtypes.reduce((updatedRoomtypes, rt) => {
-      const newRoomtype = newRoomtypesMap.get(rt.id);
-      if (!newRoomtype) {
-        return updatedRoomtypes;
-      }
-      // console.log('new roomtypes', newRoomtypes);
-      const updatedRoomtype = {
-        ...rt,
-        inventory: newRoomtype.inventory,
-        pre_payment_amount: newRoomtype.pre_payment_amount,
-        rateplans: this.updateRatePlan(rt.rateplans, newRoomtype),
-      };
-      updatedRoomtypes.push(updatedRoomtype);
-      return updatedRoomtypes;
-    }, []);
-  }
-  // private updateRatePlan(ratePlans: RatePlan[], newRoomtype: RoomType) {
-  //   return ratePlans.reduce((updatedRatePlans, rp) => {
-  //     const newRatePlan = newRoomtype.rateplans.find(newRP => newRP.id === rp.id);
-  //     if (!newRatePlan || !newRatePlan.is_active || !newRatePlan.is_booking_engine_enabled) {
-  //       return updatedRatePlans;
-  //     }
-  //     updatedRatePlans.push({
-  //       ...newRatePlan,
-  //       is_targeting_travel_agency: newRatePlan.is_targeting_travel_agency,
-  //       variations: rp.variations,
-  //       // variations: rp.variations.map(v => {
-  //       //   if (!newRatePlan.variations) {
-  //       //     return v;
-  //       //   }
-  //       //   if (v.adult_child_offering === newRatePlan.variations[0].adult_child_offering) {
-  //       //     return newRatePlan.variations[0];
-  //       //   }
-  //       //   return v;
-  //       // }),
-  //       selected_variation: newRatePlan.variations ? newRatePlan.variations[0] : null,
-  //       // selected_variation: newRatePlan.variations ? rp.variations.find(v => v.adult_child_offering === newRatePlan.variations[0].adult_child_offering) : null,
-  //     });
-  //     return updatedRatePlans;
-  //   }, []);
-  // }
-  private updateRatePlan(ratePlans: RatePlan[], newRoomtype: RoomType): RatePlan[] {
-    const agentExists = !!booking_store.bookingAvailabilityParams.agent;
 
-    return ratePlans.reduce((updatedRatePlans: RatePlan[], rp: RatePlan) => {
-      const newRP = newRoomtype.rateplans?.find(newRatePlan => newRatePlan.id === rp.id);
-
-      if (!newRP || !newRP.is_active || !newRP.is_booking_engine_enabled) {
-        return updatedRatePlans;
-      }
-      // console.log('terst selected variation', newRP, newRP.variations, 'res', newRP.variations?.length > 0 ? newRP.variations[0] : null);
-      updatedRatePlans.push({
-        ...newRP,
-        variations: agentExists ? newRP.variations : rp.variations,
-        selected_variation: newRP.variations?.length > 0 ? newRP.variations[0] : null,
-      });
-
-      return updatedRatePlans;
-    }, []);
-  }
-  // private updateRatePlan(ratePlans: RatePlan[], newRoomtype: RoomType): RatePlan[] {
-  //   const agentExists = !!booking_store.bookingAvailabilityParams.agent;
-
-  //   return ratePlans.reduce((updatedRatePlans: RatePlan[], rp: RatePlan) => {
-  //     const newRP = newRoomtype.rateplans?.find(newRP => newRP.id === rp.id);
-  //     const newRatePlan = agentExists ? newRoomtype.rateplans?.find(newRP => newRP.id === rp.id) : ratePlans.find(newRP => newRP.id === rp.id);
-
-  //     if (!newRatePlan || !newRP || !newRatePlan.is_active || !newRatePlan.is_booking_engine_enabled) {
-  //       return updatedRatePlans;
-  //     }
-  //     updatedRatePlans.push({
-  //       ...newRatePlan,
-  //       short_name: newRP.short_name,
-  //       is_targeting_travel_agency: newRatePlan.is_targeting_travel_agency,
-  //       variations: agentExists ? newRatePlan.variations : rp.variations,
-  //       selected_variation: newRatePlan.variations ? newRatePlan.variations[0] : null,
-  //     });
-
-  //     return updatedRatePlans;
-  //   }, []);
-  // }
-
-  //---------------------------
-  //         SORTING
-  //---------------------------
-
-  // private sortRoomTypes(roomTypes: RoomType[], userCriteria: { adult_nbr: number; child_nbr: number }): RoomType[] {
-  //   return roomTypes.sort((a, b) => {
-  //     // Move room types with zero inventory to the end
-  //     if (a.inventory === 0 && b.inventory !== 0) return 1;
-  //     if (a.inventory !== 0 && b.inventory === 0) return -1;
-
-  //     // Check for variations where is_calculated is true and amount is 0
-  //     const zeroCalculatedA = a.rateplans?.some(plan => plan?.variations?.some(variation => variation.is_calculated && (variation.amount === 0 || variation.amount === null)));
-  //     const zeroCalculatedB = b.rateplans?.some(plan => plan?.variations?.some(variation => variation.is_calculated && (variation.amount === 0 || variation.amount === null)));
-
-  //     // Prioritize these types to be before inventory 0 but after all others
-  //     if (zeroCalculatedA && !zeroCalculatedB) return 1;
-  //     if (!zeroCalculatedA && zeroCalculatedB) return -1;
-
-  //     // Check for exact matching variations
-  //     const matchA = a.rateplans?.some(plan =>
-  //       plan.variations?.some(variation => variation.adult_nbr === userCriteria.adult_nbr && variation.child_nbr === userCriteria.child_nbr),
-  //     );
-  //     const matchB = b.rateplans?.some(plan =>
-  //       plan.variations?.some(variation => variation.adult_nbr === userCriteria.adult_nbr && variation.child_nbr === userCriteria.child_nbr),
-  //     );
-
-  //     if (matchA && !matchB) return -1;
-  //     if (!matchA && matchB) return 1;
-
-  //     // Sort by the highest variation in any attribute, for example `amount`
-  //     const maxVariationA = Math.max(...a.rateplans.flatMap(plan => plan?.variations?.map(variation => variation.amount)));
-  //     const maxVariationB = Math.max(...b.rateplans.flatMap(plan => plan?.variations?.map(variation => variation.amount)));
-
-  //     if (maxVariationA < maxVariationB) return -1;
-  //     if (maxVariationA > maxVariationB) return 1;
-
-  //     return 0;
-  //   });
-  // }
   private sortRoomTypes(roomTypes: RoomType[], userCriteria: { adult_nbr: number; child_nbr: number }): RoomType[] {
     return roomTypes.sort((a, b) => {
-      // Move room types with zero inventory to the end
-      if (a.inventory === 0 && b.inventory !== 0) return 1;
-      if (a.inventory !== 0 && b.inventory === 0) return -1;
+      // Priority to available rooms
+      if (a.is_available_to_book && !b.is_available_to_book) return -1;
+      if (!a.is_available_to_book && b.is_available_to_book) return 1;
 
-      // Move room types with all rate plans closed to the end
-      const allRateplansClosedA = a.rateplans?.every(plan => plan.is_closed);
-      const allRateplansClosedB = b.rateplans?.every(plan => plan.is_closed);
+      // Check for variations where is_calculated is true and amount is 0 or null
+      const zeroCalculatedA = a.rateplans?.some(plan => plan.variations?.some(variation => variation.discounted_amount === 0 || variation.discounted_amount === null));
+      const zeroCalculatedB = b.rateplans?.some(plan => plan.variations?.some(variation => variation.discounted_amount === 0 || variation.discounted_amount === null));
 
-      if (allRateplansClosedA && !allRateplansClosedB) return 1;
-      if (!allRateplansClosedA && allRateplansClosedB) return -1;
-
-      // Check for variations where is_calculated is true and amount is 0
-      const zeroCalculatedA = a.rateplans?.some(plan => plan?.variations?.some(variation => variation.is_calculated && (variation.amount === 0 || variation.amount === null)));
-      const zeroCalculatedB = b.rateplans?.some(plan => plan?.variations?.some(variation => variation.is_calculated && (variation.amount === 0 || variation.amount === null)));
-
-      // Prioritize these types to be before inventory 0 but after all others
+      // Prioritize these types to be before inventory 0 but after all available ones
       if (zeroCalculatedA && !zeroCalculatedB) return 1;
       if (!zeroCalculatedA && zeroCalculatedB) return -1;
 
-      // Check for exact matching variations
+      // Check for exact matching variations based on user criteria
       const matchA = a.rateplans?.some(plan =>
         plan.variations?.some(variation => variation.adult_nbr === userCriteria.adult_nbr && variation.child_nbr === userCriteria.child_nbr),
       );
@@ -284,9 +110,9 @@ export class PropertyHelpers {
       if (matchA && !matchB) return -1;
       if (!matchA && matchB) return 1;
 
-      // Sort by the highest variation in any attribute, for example `amount`
-      const maxVariationA = Math.max(...a.rateplans.flatMap(plan => plan?.variations?.map(variation => variation.amount)));
-      const maxVariationB = Math.max(...b.rateplans.flatMap(plan => plan?.variations?.map(variation => variation.amount)));
+      // Sort by the highest variation amount
+      const maxVariationA = Math.max(...a.rateplans.flatMap(plan => plan.variations?.map(variation => variation.discounted_amount ?? 0)));
+      const maxVariationB = Math.max(...b.rateplans.flatMap(plan => plan.variations?.map(variation => variation.discounted_amount ?? 0)));
 
       if (maxVariationA < maxVariationB) return -1;
       if (maxVariationA > maxVariationB) return 1;
@@ -294,40 +120,14 @@ export class PropertyHelpers {
       return 0;
     });
   }
-  private updateRoomTypeRatePlans(roomtypes: RoomType[], newRoomtypes: RoomType[], props: any) {
-    const selectedRoomTypeIdx = roomtypes.findIndex(rt => rt.id === props.rt_id);
-    if (selectedRoomTypeIdx === -1) {
-      throw new Error('Invalid RoomType');
-    }
-    const selectednewRoomTypeIdx = newRoomtypes.findIndex(rt => rt.id === props.rt_id);
-    if (selectedRoomTypeIdx === -1) {
-      throw new Error('Invalid RoomType');
-    }
-    if (selectednewRoomTypeIdx === -1) {
-      throw new Error('Invalid New RoomType');
-    }
-    const newRatePlan = newRoomtypes[selectednewRoomTypeIdx].rateplans?.find(rp => rp.id === props.rp_id);
-    if (!newRatePlan) {
-      throw new Error('Invalid New Rateplan');
-    }
-    const newVariation = newRatePlan.variations.find(v => v.adult_child_offering === props.adultChildConstraint);
-    if (!newVariation) {
-      throw new Error('Missing variation');
-    }
-    roomtypes[selectedRoomTypeIdx] = {
-      ...roomtypes[selectedRoomTypeIdx],
-      rateplans: roomtypes[selectedRoomTypeIdx].rateplans.map(rp => {
-        return {
-          ...rp,
-          variations: rp.variations.map(v => {
-            if (v.adult_child_offering === props.adultChildConstraint && rp.id === props.rp_id) {
-              return newVariation;
-            }
-            return v;
-          }),
-        };
-      }),
-    };
-    return roomtypes;
+  private sortVariations(variations: Variation[]): Variation[] {
+    return variations.sort((a, b) => {
+      // Sort by adult_nbr in descending order first
+      if (b.adult_nbr !== a.adult_nbr) {
+        return b.adult_nbr - a.adult_nbr;
+      }
+      // If adult_nbr is the same, sort by child_nbr in descending order
+      return b.child_nbr - a.child_nbr;
+    });
   }
 }

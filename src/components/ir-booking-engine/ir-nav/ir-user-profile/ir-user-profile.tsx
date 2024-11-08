@@ -41,7 +41,6 @@ export class IrUserProfile {
   }
 
   updateUserData(key: keyof TGuest, value: unknown) {
-    console.log(key, value);
     this.user = {
       ...this.user,
       [key]: value,
@@ -66,7 +65,7 @@ export class IrUserProfile {
       };
     } catch (error) {
       if (error instanceof ZodError) {
-        console.log(error.issues);
+        console.error(error.issues);
       }
     } finally {
       this.isLoading = false;
@@ -74,7 +73,6 @@ export class IrUserProfile {
   }
 
   render() {
-    console.log(isRequestPending('/Get_Exposed_Country_By_IP'));
     if (isRequestPending('/Get_Exposed_Country_By_IP')) {
       return null;
     }

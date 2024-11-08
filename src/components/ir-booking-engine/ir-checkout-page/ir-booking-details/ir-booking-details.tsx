@@ -1,14 +1,12 @@
 import { ISmokingOption, RatePlan, RoomType, Variation } from '@/models/property';
 import { PaymentService } from '@/services/api/payment.service';
-import { PropertyService } from '@/services/api/property.service';
+// import { PropertyService } from '@/services/api/property.service';
 import app_store from '@/stores/app.store';
 import booking_store, { calculateTotalRooms, IRatePlanSelection } from '@/stores/booking';
 import { checkout_store, onCheckoutDataChange } from '@/stores/checkout.store';
 import localizedWords from '@/stores/localization.store';
 import { formatAmount, getDateDifference } from '@/utils/utils';
-import { Component, Host, Prop, State, h } from '@stencil/core';
-import { format } from 'date-fns';
-import { v4 } from 'uuid';
+import { Component, Event, EventEmitter, Host, Prop, State, h } from '@stencil/core';
 
 @Component({
   tag: 'ir-booking-details',
@@ -20,11 +18,14 @@ export class IrBookingDetails {
   @State() currentRatePlan: RatePlan | null = null;
   @State() isLoading: number = null;
   @State() cancelationMessage: string;
+  @State() prepaymentAmount: number = 0;
 
   private dialogRef: HTMLIrDialogElement;
   private firstRoom: { roomtypeId: string; ratePlanId: string };
-  private propertyService = new PropertyService();
+  // private propertyService = new PropertyService();
   private paymentService = new PaymentService();
+
+  @Event() prepaymentChange: EventEmitter<number>;
 
   componentWillLoad() {
     this.modifyBookings();
@@ -34,44 +35,66 @@ export class IrBookingDetails {
       }
     });
   }
-  modifyBookings() {
-    const result: any = {};
+  private calculatePrepaymentAmount() {
+    let total = 0;
+    for (const roomtypeId in booking_store.ratePlanSelections) {
+      for (const rateplanId in booking_store.ratePlanSelections[roomtypeId]) {
+        const rateplan = booking_store.ratePlanSelections[roomtypeId][rateplanId];
+        rateplan.checkoutVariations.map(v => {
+          total += this.paymentService.processAlicablePolicies(v.applicable_policies, new Date()).amount;
+        });
+      }
+    }
 
-    Object.keys(booking_store.ratePlanSelections).map(roomTypeId => {
-      result[roomTypeId] = {};
-      return Object.keys(booking_store.ratePlanSelections[roomTypeId]).map(ratePlanId => {
-        const r: IRatePlanSelection = booking_store.ratePlanSelections[roomTypeId][ratePlanId];
-        if (r.reserved === 0) {
-          result[roomTypeId][ratePlanId] = r;
-        } else {
-          if (!this.firstRoom) {
-            this.firstRoom = {
-              roomtypeId: roomTypeId,
-              ratePlanId,
-            };
-          }
-          result[roomTypeId][ratePlanId] = {
-            ...r,
-            checkoutVariations: Array(r.reserved).fill(r.selected_variation.variation),
-            checkoutBedSelection: r.is_bed_configuration_enabled ? Array(r.reserved).fill(r.roomtype.bedding_setup[0].code) : [],
-            checkoutSmokingSelection: Array(r.reserved).fill(r.roomtype.smoking_option[0]),
-          };
-          if (!checkout_store.modifiedGuestName && r.guestName?.length === 0) {
-            const name = [...new Array(r.reserved)].map((_, i) => {
-              if (i === 0 && !checkout_store.userFormData.bookingForSomeoneElse && this.firstRoom.roomtypeId === roomTypeId && this.firstRoom.ratePlanId === ratePlanId) {
-                return (checkout_store.userFormData?.firstName || '') + ' ' + (checkout_store.userFormData?.lastName || '') || '';
+    this.prepaymentChange.emit(total);
+  }
+  private modifyBookings() {
+    try {
+      const result: any = {};
+      for (const roomtypeId in booking_store.ratePlanSelections) {
+        if (booking_store.ratePlanSelections.hasOwnProperty(roomtypeId)) {
+          const roomtype = booking_store.ratePlanSelections[roomtypeId];
+          result[roomtypeId] = {};
+          for (const ratePlanId in roomtype) {
+            if (roomtype.hasOwnProperty(ratePlanId)) {
+              const ratePlan = roomtype[ratePlanId];
+              if (ratePlan.reserved === 0) {
+                result[roomtypeId][ratePlanId] = ratePlan;
+              } else {
+                if (!this.firstRoom) {
+                  this.firstRoom = {
+                    roomtypeId,
+                    ratePlanId,
+                  };
+                }
+                result[roomtypeId][ratePlanId] = {
+                  ...ratePlan,
+                  checkoutVariations: Array(ratePlan.reserved).fill(ratePlan.selected_variation),
+                  checkoutBedSelection: ratePlan.is_bed_configuration_enabled ? Array(ratePlan.reserved).fill(ratePlan.roomtype.bedding_setup[0].code) : [],
+                  checkoutSmokingSelection: Array(ratePlan.reserved).fill(ratePlan.roomtype.smoking_option[0]),
+                };
               }
-              return '';
-            });
-            result[roomTypeId][ratePlanId] = {
-              ...result[roomTypeId][ratePlanId],
-              guestName: name,
-            };
+              if (!checkout_store.modifiedGuestName && ratePlan.guestName?.length === 0) {
+                const name = [...new Array(ratePlan.reserved)].map((_, i) => {
+                  if (i === 0 && !checkout_store.userFormData.bookingForSomeoneElse && this.firstRoom.roomtypeId === roomtypeId && this.firstRoom.ratePlanId === ratePlanId) {
+                    return (checkout_store.userFormData?.firstName || '') + ' ' + (checkout_store.userFormData?.lastName || '') || '';
+                  }
+                  return '';
+                });
+                result[roomtypeId][ratePlanId] = {
+                  ...result[roomtypeId][ratePlanId],
+                  guestName: name,
+                };
+              }
+            }
           }
         }
-      });
-    });
-    booking_store.ratePlanSelections = { ...result };
+      }
+      booking_store.ratePlanSelections = { ...result };
+      this.calculatePrepaymentAmount();
+    } catch (error) {
+      console.error('modify Booking error', error);
+    }
   }
 
   updateGuestNames(isBookingForSomeoneElse: boolean, firstName: string, lastName: string) {
@@ -117,16 +140,9 @@ export class IrBookingDetails {
     if (!selectedVariation) {
       return;
     }
-    if (!selectedVariation.amount) {
+    if (!selectedVariation.discounted_amount) {
       this.isLoading = rateplanId;
-      const res = await this.updateVariation({
-        adult_nbr: selectedVariation.adult_nbr,
-        child_nbr: selectedVariation.child_nbr,
-        rp_id: rateplanId,
-        rt_id: roomTypeId,
-        adultChildConstraint: selectedVariation.adult_child_offering,
-      });
-      selectedVariation = this.getNewSelectedVariation(res.roomtypes, selectedVariation, roomTypeId, rateplanId);
+      // selectedVariation = this.getNewSelectedVariation(res.roomtypes, selectedVariation, roomTypeId, rateplanId);
       this.isLoading = null;
     }
     const oldVariations = [...booking_store.ratePlanSelections[roomTypeId][rateplanId]?.checkoutVariations];
@@ -137,12 +153,12 @@ export class IrBookingDetails {
         ...booking_store.ratePlanSelections[roomTypeId],
         [rateplanId]: {
           ...booking_store.ratePlanSelections[roomTypeId][rateplanId],
-          selected_variation: { state: 'modified', variation: selectedVariation },
+          selected_variation: selectedVariation,
           checkoutVariations: oldVariations,
         },
       },
     };
-    console.log(booking_store.ratePlanSelections);
+    this.calculatePrepaymentAmount();
   }
   getNewSelectedVariation(roomtypes: RoomType[], oldVariation: Variation, roomTypeId: number, rateplanId: number) {
     const roomType = roomtypes.find(rt => rt.id === roomTypeId);
@@ -154,31 +170,6 @@ export class IrBookingDetails {
       throw new Error('Invalid room type');
     }
     return rateplan.variations.find(v => v.adult_child_offering === oldVariation.adult_child_offering);
-  }
-  async updateVariation(params: { adult_nbr: number; child_nbr: number; rt_id: number; rp_id: number; adultChildConstraint: string }) {
-    const identifier = v4();
-    const res = await this.propertyService.getExposedBookingAvailability({
-      params: {
-        propertyid: app_store.app_data.property_id,
-        from_date: format(booking_store.bookingAvailabilityParams.from_date, 'yyyy-MM-dd'),
-        to_date: format(booking_store.bookingAvailabilityParams.to_date, 'yyyy-MM-dd'),
-        room_type_ids: [],
-        adult_nbr: params.adult_nbr,
-        child_nbr: params.child_nbr,
-        language: app_store.userPreferences.language_id,
-        currency_ref: app_store.userPreferences.currency_id,
-        is_in_loyalty_mode: booking_store.bookingAvailabilityParams.loyalty ? true : !!booking_store.bookingAvailabilityParams.coupon,
-        promo_key: booking_store.bookingAvailabilityParams.coupon || '',
-        is_in_agent_mode: !!booking_store.bookingAvailabilityParams.agent || false,
-        agent_id: booking_store.bookingAvailabilityParams.agent || 0,
-      },
-      identifier,
-      mode: 'modify_rt',
-      rp_id: params.rp_id,
-      rt_id: params.rt_id,
-      adultChildConstraint: params.adultChildConstraint,
-    });
-    return res.My_Result;
   }
 
   handleBedConfiguration(roomTypeId: string, rateplanId: string, detail: string | number, index: number): void {
@@ -198,7 +189,12 @@ export class IrBookingDetails {
       },
     };
   }
-
+  private formatVariation(v: Variation): any {
+    const adults = `${v.adult_nbr} ${v.adult_nbr === 1 ? localizedWords.entries.Lcz_Adult.toLowerCase() : localizedWords.entries.Lcz_Adults.toLowerCase()}`;
+    const children =
+      v.child_nbr > 0 ? `${v.child_nbr}  ${v.child_nbr > 1 ? localizedWords.entries.Lcz_Children.toLowerCase() : localizedWords.entries.Lcz_Child.toLowerCase()}` : null;
+    return children ? `${adults} ${children}` : adults;
+  }
   handleSmokeConfiguration(roomTypeId: string, rateplanId: string, detail: string | number, index: number): void {
     let oldSmokingConfiguration = [...booking_store.ratePlanSelections[roomTypeId][rateplanId]?.checkoutSmokingSelection];
     oldSmokingConfiguration[index] = detail;
@@ -213,8 +209,8 @@ export class IrBookingDetails {
       },
     };
   }
-  async fetchCancelationMessage(id: number, roomTypeId: number) {
-    this.cancelationMessage = (await this.paymentService.fetchCancelationMessage({ id, roomTypeId })).message;
+  async fetchCancelationMessage(applicable_policies) {
+    this.cancelationMessage = this.cancelationMessage = this.paymentService.getCancelationMessage(applicable_policies, true)?.message;
   }
   renderSmokingView(smoking_option: ISmokingOption, index: number, ratePlanId: string, roomTypeId: string, checkoutSmokingSelection: string[]) {
     if (smoking_option.code === '002') {
@@ -242,7 +238,6 @@ export class IrBookingDetails {
   }
 
   render() {
-    console.log(this.firstRoom);
     const total_nights = getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date());
     const total_rooms = calculateTotalRooms();
     const total_persons = this.calculateTotalPersons();
@@ -290,7 +285,7 @@ export class IrBookingDetails {
                                     buttonStyles={{ paddingLeft: '0', fontSize: '12px', paddingTop: '0', paddingBottom: '0' }}
                                     onButtonClick={async () => {
                                       this.currentRatePlan = r.ratePlan;
-                                      await this.fetchCancelationMessage(r.ratePlan.id, r.roomtype.id);
+                                      await this.fetchCancelationMessage(r.checkoutVariations[index].applicable_policies);
                                       this.dialogRef.openModal();
                                     }}
                                     label={localizedWords.entries.Lcz_IfICancel}
@@ -301,7 +296,9 @@ export class IrBookingDetails {
                               )}
                             </div>
                             <div class="ml-1 flex-1 ">
-                              <p class="text-end text-base font-medium xl:text-xl">{formatAmount(r.checkoutVariations[index].amount, app_store.userPreferences.currency_id)}</p>
+                              <p class="text-end text-base font-medium xl:text-xl">
+                                {formatAmount(r.checkoutVariations[index].discounted_amount, app_store.userPreferences.currency_id)}
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -345,11 +342,13 @@ export class IrBookingDetails {
                           </ir-input>
                           <ir-select
                             variant="double-line"
-                            value={r.ratePlan.variations.findIndex(v => v.adult_child_offering === r.checkoutVariations[index].adult_child_offering).toString()}
+                            value={r.ratePlan.variations
+                              .findIndex(v => `${v.adult_nbr}_a_${v.child_nbr}_c` === `${r.checkoutVariations[index].adult_nbr}_a_${r.checkoutVariations[index].child_nbr}_c`)
+                              .toString()}
                             label={localizedWords.entries.Lcz_RequiredCapacity}
                             data={r.ratePlan.variations.map((v, i) => ({
                               id: i.toString(),
-                              value: v.adult_child_offering,
+                              value: this.formatVariation(v),
                             }))}
                             class="hidden w-full sm:block"
                             onValueChange={e => this.handleVariationChange(index, e, r.ratePlan.variations, Number(ratePlanId), Number(roomTypeId))}
@@ -407,7 +406,7 @@ export class IrBookingDetails {
       return Object.keys(booking_store.ratePlanSelections[roomTypeId]).map(ratePlanId => {
         const r: IRatePlanSelection = booking_store.ratePlanSelections[roomTypeId][ratePlanId];
         if (r.reserved !== 0) {
-          count += r.selected_variation.variation.adult_nbr + r.selected_variation.variation.child_nbr;
+          count += r.selected_variation.adult_nbr + r.selected_variation.child_nbr;
         }
       });
     });

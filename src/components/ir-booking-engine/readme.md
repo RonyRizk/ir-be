@@ -62,7 +62,7 @@ graph TD;
   ir-be --> ir-privacy-policy
   ir-be --> ir-footer
   ir-booking-page --> ir-property-gallery
-  ir-booking-page --> ir-availibility-header
+  ir-booking-page --> ir-availability-header
   ir-booking-page --> ir-roomtype
   ir-booking-page --> ir-facilities
   ir-booking-page --> ir-button
@@ -75,11 +75,11 @@ graph TD;
   ir-dialog --> ir-button
   ir-button --> ir-icons
   ir-room-type-amenities --> ir-icons
-  ir-availibility-header --> ir-date-popup
-  ir-availibility-header --> ir-adult-child-counter
-  ir-availibility-header --> ir-button
-  ir-availibility-header --> ir-coupon-dialog
-  ir-availibility-header --> ir-loyalty
+  ir-availability-header --> ir-date-popup
+  ir-availability-header --> ir-adult-child-counter
+  ir-availability-header --> ir-button
+  ir-availability-header --> ir-coupon-dialog
+  ir-availability-header --> ir-loyalty
   ir-date-popup --> ir-icons
   ir-date-popup --> ir-popover
   ir-date-popup --> ir-date-range

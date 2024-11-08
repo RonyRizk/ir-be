@@ -1,11 +1,11 @@
 import { Component, Event, EventEmitter, Host, Listen, Prop, State, h } from '@stencil/core';
 import { Locale } from 'date-fns';
-import { ICurrency, IExposedLanguages, pages } from '@/models/common';
 import { IExposedProperty } from '@/models/property';
 import booking_store, { calculateTotalCost } from '@/stores/booking';
 import app_store, { onAppDataChange } from '@/stores/app.store';
 import { cn, formatAmount, getDateDifference } from '@/utils/utils';
 import localizedWords from '@/stores/localization.store';
+import { ICurrency, IExposedLanguages, pages } from '@/models/common';
 @Component({
   tag: 'ir-booking-page',
   styleUrl: 'ir-booking-page.css',
@@ -27,7 +27,7 @@ export class IrBookingPage {
 
   private checkoutContainerRef: HTMLDivElement;
   roomTypeSectionRef: HTMLElement;
-  private availabiltyHeaderRef: HTMLIrAvailibilityHeaderElement;
+  private availabilityHeaderRef: HTMLIrAvailabilityHeaderElement;
   propertyGalleryRef: HTMLDivElement;
 
   componentWillLoad() {
@@ -54,10 +54,10 @@ export class IrBookingPage {
     e.stopImmediatePropagation();
     e.stopPropagation();
     const header: HTMLIrNavElement | null = document.querySelector('ir-be').shadowRoot.querySelector('ir-nav');
-    this.availabiltyHeaderRef.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    this.availabilityHeaderRef.scrollIntoView({ behavior: 'smooth', block: 'start' });
     setTimeout(() => {
       window.scrollTo({
-        top: this.availabiltyHeaderRef.getBoundingClientRect().top + window.scrollY - (header !== null ? header.getBoundingClientRect().height + 5 : 80),
+        top: this.availabilityHeaderRef.getBoundingClientRect().top + window.scrollY - (header !== null ? header.getBoundingClientRect().height + 5 : 80),
         behavior: 'smooth',
       });
     }, 100);
@@ -95,14 +95,14 @@ export class IrBookingPage {
             </div>
           )}
           <div>
-            <ir-availibility-header
+            <ir-availability-header
               // ages={this.ages}
-              ref={el => (this.availabiltyHeaderRef = el)}
+              ref={el => (this.availabilityHeaderRef = el)}
               fromDate={this.fromDate}
               toDate={this.toDate}
               adultCount={this.adultCount}
               childrenCount={this.childrenCount}
-            ></ir-availibility-header>
+            ></ir-availability-header>
           </div>
 
           <section class={app_store.app_data.displayMode === 'default' ? 'relative justify-between gap-4 rounded-md ' : ''} ref={el => (this.roomTypeSectionRef = el)}>

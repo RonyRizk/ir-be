@@ -41,7 +41,7 @@
 
  - [ir-adult-child-counter](../../ir-booking-engine/ir-booking-page/ir-adult-child-counter)
  - [ir-auth](../../ir-booking-engine/ir-nav/ir-auth)
- - [ir-availibility-header](../../ir-booking-engine/ir-booking-page/ir-availibility-header)
+ - [ir-availability-header](../../ir-booking-engine/ir-booking-page/ir-availability-header)
  - [ir-booking-cancelation](../../ir-booking-cancelation)
  - [ir-booking-card](../../ir-booking-engine/ir-booking-listing/ir-booking-card)
  - [ir-booking-code](../../ir-booking-engine/ir-booking-page/ir-booking-code)
@@ -51,14 +51,14 @@
  - [ir-booking-page](../../ir-booking-engine/ir-booking-page)
  - [ir-booking-summary](../../ir-booking-engine/ir-checkout-page/ir-booking-summary)
  - [ir-checkout-page](../../ir-booking-engine/ir-checkout-page)
- - [ir-coupon-dialog](../../ir-booking-engine/ir-booking-page/ir-availibility-header/ir-coupon-dialog)
+ - [ir-coupon-dialog](../../ir-booking-engine/ir-booking-page/ir-availability-header/ir-coupon-dialog)
  - [ir-dialog](../ir-dialog)
  - [ir-footer](../../ir-booking-engine/ir-footer)
  - [ir-guest-counter](../../ir-guest-counter)
  - [ir-interceptor](../../ir-interceptor)
  - [ir-invoice](../../ir-invoice)
  - [ir-language-picker](../../ir-booking-engine/ir-nav/ir-language-picker)
- - [ir-loyalty](../../ir-booking-engine/ir-booking-page/ir-availibility-header/ir-loyalty)
+ - [ir-loyalty](../../ir-booking-engine/ir-booking-page/ir-availability-header/ir-loyalty)
  - [ir-nav](../../ir-booking-engine/ir-nav)
  - [ir-pagination](../../ir-booking-engine/ir-booking-listing/ir-pagination)
  - [ir-privacy-policy](../../ir-booking-engine/ir-privacy-policy)
@@ -79,7 +79,7 @@ graph TD;
   ir-button --> ir-icons
   ir-adult-child-counter --> ir-button
   ir-auth --> ir-button
-  ir-availibility-header --> ir-button
+  ir-availability-header --> ir-button
   ir-booking-cancelation --> ir-button
   ir-booking-card --> ir-button
   ir-booking-code --> ir-button

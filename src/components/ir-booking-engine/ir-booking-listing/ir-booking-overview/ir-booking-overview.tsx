@@ -425,7 +425,6 @@ export class IrBookingOverview {
                 onOptionClicked={(e: CustomEvent) => {
                   this.selectedBooking = booking;
                   const { id } = e.detail;
-                  console.log(id);
                   this.handleBlEvents(id);
                 }}
               ></ir-booking-card>

@@ -47,7 +47,7 @@ Type: `Promise<void>`
 ### Used by
 
  - [ir-booking-details](../../ir-booking-engine/ir-checkout-page/ir-booking-details)
- - [ir-coupon-dialog](../../ir-booking-engine/ir-booking-page/ir-availibility-header/ir-coupon-dialog)
+ - [ir-coupon-dialog](../../ir-booking-engine/ir-booking-page/ir-availability-header/ir-coupon-dialog)
  - [ir-footer](../../ir-booking-engine/ir-footer)
  - [ir-modal](../ir-modal)
  - [ir-nav](../../ir-booking-engine/ir-nav)

@@ -1,7 +1,6 @@
 import { PropertyHelpers } from './../app/property-helpers.service';
-import { TExposedBookingAvailability } from '@/components/ir-booking-engine/ir-booking-page/ir-availibility-header/availability';
+import { TExposedBookingAvailability } from '@/components/ir-booking-engine/ir-booking-page/ir-availability-header/availability';
 import { Booking } from '@/models/booking.dto';
-import { DataStructure } from '@/models/common';
 import { ISetupEntries } from '@/models/property';
 import app_store from '@/stores/app.store';
 import booking_store, { IRatePlanSelection } from '@/stores/booking';
@@ -11,6 +10,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import { Colors } from '../app/colors.service';
 import { TGuest } from '@/models/user_form';
+import { DataStructure } from '@/models/common';
 
 export class PropertyService {
   private propertyHelpers = new PropertyHelpers();
@@ -63,6 +63,10 @@ export class PropertyService {
     //     };
     //   });
     // }
+
+    if (!app_store.fetchedBooking) {
+      booking_store.roomTypes = [...(result.My_Result?.roomtypes ?? [])];
+    }
     if (params.aname || params.perma_link) {
       app_store.app_data = { ...app_store.app_data, property_id: result.My_Result.id };
     }
@@ -71,7 +75,6 @@ export class PropertyService {
     app_store.app_data.property_id = result.My_Result.id;
     if (initTheme) {
       this.colors.initTheme(result.My_Result);
-      // app_store.app_data.displayMode = 'grid';
     }
     return result.My_Result;
   }
@@ -87,22 +90,11 @@ export class PropertyService {
     app_store.nonBookableNights = nights;
     return data.My_Result;
   }
-  public async getExposedBookingAvailability(props: {
-    params: TExposedBookingAvailability;
-    identifier: string;
-    rp_id?: number;
-    rt_id?: number;
-    mode: 'modify_rt' | 'default';
-    adultChildConstraint?: string;
-  }): Promise<DataStructure> {
-    this.propertyHelpers.validateModeProps(props);
-
+  public async getExposedBookingAvailability(props: TExposedBookingAvailability): Promise<DataStructure> {
     const roomtypeIds = this.propertyHelpers.collectRoomTypeIds(props);
     const rateplanIds = this.propertyHelpers.collectRatePlanIds(props);
     const data = await this.propertyHelpers.fetchAvailabilityData(props, roomtypeIds, rateplanIds);
-
-    this.propertyHelpers.updateBookingStore(data, props);
-
+    this.propertyHelpers.updateBookingStore(data);
     return data;
   }
 
@@ -204,7 +196,6 @@ export class PropertyService {
   public async bookUser() {
     const prePaymentAmount = checkout_store.prepaymentAmount;
     try {
-      console.log('payment', checkout_store.payment);
       let guest: any = {
         email: checkout_store.userFormData.email,
         first_name: checkout_store.userFormData.firstName,
@@ -232,7 +223,7 @@ export class PropertyService {
         check_in: false,
         is_pms: false,
         is_direct: true,
-        language: app_store?.userPreferences?.language_id || 'en',
+        language: app_store?.userPreferences?.language_id ?? 'en',
         agent: booking_store.bookingAvailabilityParams.agent ? { id: booking_store.bookingAvailabilityParams.agent } : null,
         is_in_loyalty_mode: booking_store.bookingAvailabilityParams.loyalty,
         promo_key: booking_store.bookingAvailabilityParams.coupon ?? null,
@@ -271,7 +262,7 @@ export class PropertyService {
         ].filter(f => f !== null),
         pickup_info: checkout_store.pickup.location ? this.propertyHelpers.convertPickup(checkout_store.pickup) : null,
       };
-      console.log('body');
+
       const { data } = await axios.post(`/DoReservation`, body);
       if (data.ExceptionMsg !== '') {
         throw new Error(data.ExceptionMsg);

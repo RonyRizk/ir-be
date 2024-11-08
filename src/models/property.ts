@@ -270,6 +270,7 @@ export interface RoomType {
   is_bed_configuration_enabled: boolean;
   main_image: Image | null;
   name: string;
+  is_available_to_book: boolean;
   occupancy_default: Occupancy;
   occupancy_max: Occupancy;
   physicalrooms: PhysicalRoom[];
@@ -323,26 +324,85 @@ export interface Housekeeper {
   username: any;
 }
 
+export interface Sellmode {
+  code: string;
+  description: string;
+}
 export interface RatePlan {
-  assignable_units: Assignableunit[];
-  cancelation: string;
+  assignable_units: Assignableunit[] | null;
+  applicable_policies: ApplicablePolicy[] | null;
+  cancelation: string | null;
   custom_text?: any;
-  guarantee: string;
+  guarantee: string | null;
   id: number;
   is_active: boolean;
+  is_available_to_book: boolean;
   is_booking_engine_enabled: boolean;
   is_channel_enabled: boolean;
-  is_closed: boolean;
+  is_closed: boolean | null;
   is_non_refundable: boolean;
   is_targeting_travel_agency: boolean;
   name: string;
+  not_available_reason?: string;
+  pre_payment_amount: number | null;
+  pre_payment_amount_gross: number | null;
   rate_restrictions?: any;
-  selected_variation?: any;
+  selected_variation?: Variation | null;
   sell_mode: SellMode;
   variations: Variation[];
   short_name: string;
-  pre_payment_amount: number;
-  pre_payment_amount_gross: number;
+  sleeps?: number;
+  extra_bed_for_code?: string;
+  extra_bed_max?: number;
+  extra_bed_rate_per_night?: number;
+  extra_bed_rate_per_night_first_child?: number;
+  extra_bed_rate_per_night_additional_child?: number;
+  is_extra_bed_free_for_children?: boolean;
+  agents?: any[];
+}
+
+export interface Night {
+  amount: number;
+  applied_promotion: Appliedpromotion;
+  discounted_amount: number;
+  discounted_gross_amount: number;
+  extra_bed_nbr: number;
+  extra_bed_nbr_child: number;
+  extra_bed_nbr_child_addi: number;
+  extra_bed_rate_per_night: number;
+  extra_bed_rate_per_night_child: number;
+  extra_bed_rate_per_night_child_addi: number;
+  gross_amount: number;
+  night: string;
+}
+
+interface Appliedpromotion {
+  from: string;
+  id: number;
+  is_last_minute_discount: boolean;
+  is_loyalty: null;
+  key: string;
+  mode: string;
+  to: string;
+  type: string;
+  value: number;
+}
+export interface ApplicablePolicy {
+  brackets: Bracket[];
+  combined_statement: string;
+  type: ApplicablePolicyType;
+}
+export type ApplicablePolicyType = 'cancelation' | 'guarantee';
+export interface Bracket {
+  amount: number;
+  amount_formatted: string;
+  code: string;
+  currency_id: number;
+  due_on: string;
+  due_on_formatted: string;
+  gross_amount: number;
+  gross_amount_formatted: number;
+  statement: string;
 }
 export interface Variation {
   adult_child_offering: string;
@@ -359,6 +419,17 @@ export interface Variation {
   MLS_ALERT?: string;
   amount_gross: number;
   MLS_ALERT_VALUE: string | null;
+  applicable_policies: IExposedApplicablePolicies[] | null;
+  bed_preference_code: string;
+  discounted_amount: number;
+  discounted_gross_amount: number;
+  extra_bed_free_nbr: number;
+  extra_bed_nbr: number;
+  extra_bed_rate_per_night: number;
+  food_nbr_upsell: number;
+  infant_nbr: null;
+  nights: Night[];
+  smoking_code: string;
 }
 export interface Assignableunit {
   Is_Fully_Available: boolean;

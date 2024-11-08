@@ -7,13 +7,13 @@
 
 ## Properties
 
-| Property            | Attribute             | Description | Type                                                                                              | Default     |
-| ------------------- | --------------------- | ----------- | ------------------------------------------------------------------------------------------------- | ----------- |
-| `display`           | `display`             |             | `"default" \| "grid"`                                                                             | `'default'` |
-| `ratePlan`          | --                    |             | `RatePlan`                                                                                        | `undefined` |
-| `roomTypeId`        | `room-type-id`        |             | `number`                                                                                          | `undefined` |
-| `roomTypeInventory` | `room-type-inventory` |             | `number`                                                                                          | `undefined` |
-| `visibleInventory`  | --                    |             | `IRatePlanSelection \| { reserved: number; visibleInventory?: number; selected_variation: any; }` | `undefined` |
+| Property            | Attribute             | Description | Type                                                                                                    | Default     |
+| ------------------- | --------------------- | ----------- | ------------------------------------------------------------------------------------------------------- | ----------- |
+| `display`           | `display`             |             | `"default" \| "grid"`                                                                                   | `'default'` |
+| `ratePlan`          | --                    |             | `RatePlan`                                                                                              | `undefined` |
+| `roomTypeId`        | `room-type-id`        |             | `number`                                                                                                | `undefined` |
+| `roomTypeInventory` | `room-type-inventory` |             | `number`                                                                                                | `undefined` |
+| `visibleInventory`  | --                    |             | `IRatePlanSelection \| { reserved: number; visibleInventory?: number; selected_variation: Variation; }` | `undefined` |
 
 
 ## Events

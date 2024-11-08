@@ -12,6 +12,13 @@
 | `errors` | `errors`  |             | `string` | `undefined` |
 
 
+## Events
+
+| Event              | Description | Type                  |
+| ------------------ | ----------- | --------------------- |
+| `prepaymentChange` |             | `CustomEvent<number>` |
+
+
 ## Dependencies
 
 ### Used by

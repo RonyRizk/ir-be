@@ -47,7 +47,6 @@ export class IrInterceptor {
   }
 
   handleResponse(response: AxiosResponse) {
-    console.log('handleResponse');
     const extractedUrl = this.extractEndpoint(response.config.url);
     if (this.isHandledEndpoint(extractedUrl)) {
       this.isLoading = false;
@@ -64,7 +63,6 @@ export class IrInterceptor {
   }
 
   handleError(error: string) {
-    console.log('error', error);
     this.errorMessage = error;
     this.alertRef.openModal();
     return Promise.reject(error);

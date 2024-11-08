@@ -28,8 +28,6 @@ export class IrBookingSummary {
   render() {
     const total_nights = getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date());
     const { totalAmount } = calculateTotalCost(true);
-    console.log(totalAmount);
-    console.log(booking_store.ratePlanSelections);
     if (isRequestPending('/Get_Setup_Entries_By_TBL_NAME_MULTI')) {
       return (
         <div>

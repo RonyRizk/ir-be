@@ -30,7 +30,7 @@
 
 ### Used by
 
- - [ir-date-popup](../../ir-booking-engine/ir-booking-page/ir-availibility-header/ir-date-popup)
+ - [ir-date-popup](../../ir-booking-engine/ir-booking-page/ir-availability-header/ir-date-popup)
  - [ir-widget](../../ir-booking-widget)
 
 ### Graph

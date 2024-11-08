@@ -2,6 +2,7 @@ import { Booking } from '@/models/booking.dto';
 import { IBrackets, IExposedApplicablePolicies } from '@/models/property';
 import app_store from '@/stores/app.store';
 import booking_store from '@/stores/booking';
+import localizedWords from '@/stores/localization.store';
 import axios from 'axios';
 import { isBefore, isSameDay, parseISO } from 'date-fns';
 
@@ -100,24 +101,49 @@ export class PaymentService {
     return { data: result, amount: this.processAlicablePolicies(result, book_date).amount, room_type_id: params.room_type_id, rate_plan_id: params.rate_plan_id };
   }
   public processAlicablePolicies(policies: IExposedApplicablePolicies[], book_date: Date) {
-    let isInFreeCancelationZone = false;
     const guarenteeAmount = policies.find(po => po.type === 'guarantee')?.brackets[0]?.gross_amount || 0;
     let cancelation = policies.find(
-      po => po.type === 'cancelation' && po?.brackets?.some(b => isBefore(book_date, new Date(b.due_on)) || isSameDay(new Date(b.due_on), book_date), book_date),
+      po => po.type === 'cancelation' && po?.brackets?.some(b => isBefore(new Date(b.due_on), book_date) || isSameDay(new Date(b.due_on), book_date)),
     );
     if (cancelation) {
-      isInFreeCancelationZone = true;
-      const cancelationAmount = cancelation.brackets.find(b => isBefore(book_date, new Date(b.due_on)) || isSameDay(new Date(b.due_on), book_date))?.gross_amount ?? null;
-      return { amount: cancelationAmount > guarenteeAmount ? cancelationAmount : guarenteeAmount, isInFreeCancelationZone };
+      const cancelationAmount = cancelation.brackets.find(b => isBefore(new Date(b.due_on), book_date) || isSameDay(new Date(b.due_on), book_date))?.gross_amount ?? null;
+      return { amount: cancelationAmount > guarenteeAmount ? cancelationAmount : guarenteeAmount };
     }
-    return { amount: guarenteeAmount, isInFreeCancelationZone };
+    return { amount: guarenteeAmount };
   }
+
+  public checkFreeCancelationZone(policies: IExposedApplicablePolicies[]) {
+    const now = new Date();
+    let isInFreeCancelationZone = false;
+    let cancelation = policies?.find(po => po.type === 'cancelation' && po?.brackets?.some(b => isBefore(new Date(b.due_on), now) || isSameDay(new Date(b.due_on), now)));
+    if (!cancelation) {
+      isInFreeCancelationZone = true;
+    }
+    return isInFreeCancelationZone;
+  }
+
+  public getCancelationMessage(applicablePolicies: IExposedApplicablePolicies[] | null, showCancelation = false, includeGuarentee = true) {
+    const cancelationMessage = applicablePolicies.find(t => t.type === 'cancelation')?.combined_statement;
+    let message = cancelationMessage ? `${showCancelation ? `<b><u>${localizedWords.entries.Lcz_Cancelation}: </u></b>` : ''}${cancelationMessage}<br/>` : '<span></span>';
+
+    if (includeGuarentee) {
+      const guarenteeMessage = applicablePolicies.find(t => t.type === 'guarantee')?.combined_statement;
+      if (guarenteeMessage) {
+        message += `${showCancelation ? `<b><u>${localizedWords.entries.Lcz_Guarantee}: </u></b>` : ''}${guarenteeMessage}<br/>`;
+      }
+    }
+
+    return {
+      message,
+      data: applicablePolicies,
+    };
+  }
+
   public async fetchCancelationMessage(params: FetchCancelationMessageParams) {
     let applicablePolicies: IExposedApplicablePolicies[] | null;
     if ('data' in params && params.data) {
       applicablePolicies = params.data;
     } else {
-      console.log('fetching cancelation message');
       const { id, roomTypeId, bookingNbr = booking_store.fictus_booking_nbr?.nbr } = params as FetchCancelationMessageWithoutData;
       const result = await this.GetExposedApplicablePolicies({
         book_date: new Date(),

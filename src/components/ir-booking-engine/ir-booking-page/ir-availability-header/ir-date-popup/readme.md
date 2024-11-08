@@ -23,7 +23,7 @@
 
 ### Used by
 
- - [ir-availibility-header](..)
+ - [ir-availability-header](..)
 
 ### Depends on
 
@@ -40,7 +40,7 @@ graph TD;
   ir-popover --> ir-dialog
   ir-dialog --> ir-button
   ir-button --> ir-icons
-  ir-availibility-header --> ir-date-popup
+  ir-availability-header --> ir-date-popup
   style ir-date-popup fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

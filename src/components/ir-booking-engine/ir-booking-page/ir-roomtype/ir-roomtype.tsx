@@ -54,22 +54,14 @@ export class IrRoomtype {
             </div>
             {/* </div> */}
             {booking_store.enableBooking &&
-            (this.roomtype.rateplans.every(r => r.is_closed) ||
-              this.roomtype.rateplans.every(
-                ratePlan => !(this.roomtype.inventory > 0 && !ratePlan.variations.some(v => v.is_calculated && (v.amount === 0 || v.amount === null))),
-              )) ? (
+            (!this.roomtype.is_available_to_book ||
+              this.roomtype.rateplans.every(ratePlan => !ratePlan.is_available_to_book && !ratePlan.not_available_reason?.includes('MLS'))) ? (
               <p class={`unavailable-roomtype text-base ${this.display === 'default' ? '' : 'pt-4'}`}>{localizedWords.entries.Lcz_NotAvailable}</p>
             ) : (
               <div>
                 {booking_store.enableBooking ? (
-                  this.roomtype.rateplans.map(ratePlan => {
-                    if (
-                      !ratePlan.is_active ||
-                      ratePlan.is_closed ||
-                      !(this.roomtype.inventory > 0 && !ratePlan.variations.some(v => v.is_calculated && (v.amount === 0 || v.amount === null))) ||
-                      !ratePlan.is_booking_engine_enabled ||
-                      !ratePlan.variations
-                    ) {
+                  this.roomtype.rateplans?.map(ratePlan => {
+                    if (!ratePlan.is_available_to_book && !ratePlan.not_available_reason?.includes('MLS')) {
                       return null;
                     }
                     const visibleInventory = getVisibleInventory(this.roomtype.id, ratePlan.id);

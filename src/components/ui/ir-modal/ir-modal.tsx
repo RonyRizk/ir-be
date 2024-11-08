@@ -98,7 +98,6 @@ export class IrModal {
       this.auth = document.createElement('ir-auth');
       this.auth.addEventListener('closeDialog', () => this.closeModal());
       this.auth.addEventListener('authFinish', (e: CustomEvent) => {
-        console.log('auth finish');
         this.authStatus.emit(e.detail);
       });
       this.modalContainer.appendChild(this.auth);

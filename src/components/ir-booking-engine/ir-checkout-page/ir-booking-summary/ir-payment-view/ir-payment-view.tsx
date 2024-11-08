@@ -46,8 +46,6 @@ export class IrPaymentView {
       const [firstMethod, secondMethod] = paymentMethods;
       selectedMethodCode = firstMethod.code === '000' && secondMethod ? secondMethod.code : firstMethod.code;
     }
-    console.log('selectedMethodCode', selectedMethodCode);
-
     this.selectedPaymentMethod = selectedMethodCode;
   }
 
@@ -242,7 +240,6 @@ export class IrPaymentView {
     const paymentMethods = app_store.property.allowed_payment_methods.filter(p => p.is_active) ?? [];
 
     const paymentLength = paymentMethods.length;
-    console.log(paymentLength);
     if ((this.prepaymentAmount === 0 && !paymentMethods.some(pm => !pm.is_payment_gateway)) || paymentLength === 0) {
       return <p class="text-center">{localizedWords.entries.Lcz_NoDepositRequired}</p>;
     }
@@ -258,9 +255,9 @@ export class IrPaymentView {
           if (!apm.is_active) {
             return null;
           }
-          if (apm.code === '000') {
-            return null;
-          }
+          // if (apm.code === '000') {
+          //   return null;
+          // }
           if (apm.is_payment_gateway && this.prepaymentAmount === 0) {
             return null;
           }

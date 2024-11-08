@@ -4,10 +4,6 @@ import app_store from '@/stores/app.store';
 import booking_store, { IRatePlanSelection, reserveRooms, updateRoomParams } from '@/stores/booking';
 import { formatAmount, getDateDifference } from '@/utils/utils';
 import localizedWords from '@/stores/localization.store';
-import { v4 } from 'uuid';
-import { PropertyService } from '@/services/api/property.service';
-import { format } from 'date-fns';
-import { AvailabiltyService } from '@/services/app/availability.service';
 import { PaymentService } from '@/services/api/payment.service';
 @Component({
   tag: 'ir-rateplan',
@@ -20,10 +16,10 @@ export class IrRateplan {
   @Prop() visibleInventory?:
     | IRatePlanSelection
     | {
-      reserved: number;
-      visibleInventory?: number;
-      selected_variation: any;
-    };
+        reserved: number;
+        visibleInventory?: number;
+        selected_variation: Variation;
+      };
   @Prop() roomTypeInventory: number;
   @Prop() roomTypeId: number;
 
@@ -33,8 +29,6 @@ export class IrRateplan {
 
   @Event() animateBookingButton: EventEmitter<null>;
 
-  private propertyService = new PropertyService();
-  private availabilityService = new AvailabiltyService();
   private paymentService = new PaymentService();
 
   componentWillLoad() {
@@ -48,71 +42,34 @@ export class IrRateplan {
     this.checkAvailability();
   }
   private checkAvailability() {
-    this.isRatePlanAvailable = this.roomTypeInventory > 0 && !this.ratePlan.variations.some(v => v.is_calculated && (v.amount === 0 || v.amount === null));
-    // this.isRatePlanAvailable = this.roomTypeInventory > 0;
+    this.isRatePlanAvailable =
+      this.roomTypeInventory > 0 && (this.ratePlan.is_available_to_book || (!this.ratePlan.is_available_to_book && this.ratePlan.not_available_reason?.includes('MLS')));
   }
   private async handleVariationChange(e: CustomEvent, variations: Variation[], rateplanId: number, roomTypeId: number) {
     e.stopImmediatePropagation();
     e.stopPropagation();
     const value = e.detail;
     let selectedVariation = variations[value];
-    console.log(selectedVariation);
     if (!selectedVariation) {
       return;
     }
-    if (!selectedVariation.amount) {
-      this.isLoading = true;
-      await this.updateVariation({
-        adult_nbr: selectedVariation.adult_nbr,
-        child_nbr: selectedVariation.child_nbr,
-        rp_id: rateplanId,
-        rt_id: roomTypeId,
-        adultChildConstraint: selectedVariation.adult_child_offering,
-      });
-      this.isLoading = false;
-    }
     selectedVariation = booking_store.roomTypes.find(rt => rt.id === roomTypeId).rateplans.find(rp => rp.id === rateplanId).variations[value];
-    updateRoomParams({ params: { selected_variation: { variation: selectedVariation, state: 'modified' } }, ratePlanId: rateplanId, roomTypeId });
+    updateRoomParams({ params: { selected_variation: selectedVariation }, ratePlanId: rateplanId, roomTypeId });
   }
-  private async updateVariation(params: { adult_nbr: number; child_nbr: number; rt_id: number; rp_id: number; adultChildConstraint: string }) {
-    const identifier = v4();
-    this.availabilityService.initSocket(identifier, true);
-    await this.propertyService.getExposedBookingAvailability({
-      params: {
-        propertyid: app_store.app_data.property_id,
-        from_date: format(booking_store.bookingAvailabilityParams.from_date, 'yyyy-MM-dd'),
-        to_date: format(booking_store.bookingAvailabilityParams.to_date, 'yyyy-MM-dd'),
-        room_type_ids: [],
-        adult_nbr: params.adult_nbr,
-        child_nbr: params.child_nbr,
-        language: app_store.userPreferences.language_id,
-        currency_ref: app_store.userPreferences.currency_id,
-        is_in_loyalty_mode: booking_store.bookingAvailabilityParams.loyalty ? true : !!booking_store.bookingAvailabilityParams.coupon,
-        promo_key: booking_store.bookingAvailabilityParams.coupon || '',
-        is_in_agent_mode: !!booking_store.bookingAvailabilityParams.agent || false,
-        agent_id: booking_store.bookingAvailabilityParams.agent || 0,
-      },
-      identifier,
-      mode: 'modify_rt',
-      rp_id: params.rp_id,
-      rt_id: params.rt_id,
-      adultChildConstraint: params.adultChildConstraint,
-    });
-  }
-  private async fetchCancelationMessage(id: number, roomTypeId: number) {
-    this.cancelationMessage = (await this.paymentService.fetchCancelationMessage({ id, roomTypeId })).message;
+  private async fetchCancelationMessage() {
+    this.cancelationMessage = this.paymentService.getCancelationMessage(this.visibleInventory.selected_variation?.applicable_policies, true)?.message;
   }
   render() {
-    // if (!this.ratePlan.is_targeting_travel_agency && booking_store.bookingAvailabilityParams.agent) {
-    //   return null;
-    // }
-    console.log('visible inventory', this.visibleInventory?.selected_variation?.variation.adult_child_offering);
+    if (!this.ratePlan.is_targeting_travel_agency && booking_store.bookingAvailabilityParams.agent) {
+      return null;
+    }
     if (this.ratePlan.is_targeting_travel_agency && !app_store.app_data.isAgentMode) {
       return null;
     }
+    const isInFreeCancelationZone = this.paymentService.checkFreeCancelationZone(this.visibleInventory?.selected_variation?.applicable_policies);
     const isInventoryFull =
       this.visibleInventory?.visibleInventory === 0 ||
-      !this.visibleInventory?.selected_variation?.variation?.amount ||
+      !this.visibleInventory?.selected_variation?.discounted_amount ||
       Object.values(booking_store.ratePlanSelections[this.roomTypeId]).some(f => f.visibleInventory === f.reserved);
     return (
       <div class="rateplan-container">
@@ -125,18 +82,20 @@ export class IrRateplan {
                   {localizedWords.entries.Lcz_NonRefundable}
                 </p>
               ) : (
-                <ir-tooltip
-                  labelColors={booking_store.isInFreeCancelationZone ? 'green' : 'default'}
-                  class={`rateplan-tooltip`}
-                  open_behavior="click"
-                  label={booking_store.isInFreeCancelationZone ? localizedWords.entries.Lcz_FreeCancellation : localizedWords.entries.Lcz_IfICancel}
-                  message={`${this.cancelationMessage || this.ratePlan.cancelation} ${this.ratePlan.guarantee ?? ''}`}
-                  onTooltipOpenChange={e => {
-                    if (e.detail) {
-                      this.fetchCancelationMessage(this.ratePlan.id, this.roomTypeId);
-                    }
-                  }}
-                ></ir-tooltip>
+                this.ratePlan.is_available_to_book && (
+                  <ir-tooltip
+                    labelColors={isInFreeCancelationZone ? 'green' : 'default'}
+                    class={`rateplan-tooltip`}
+                    open_behavior="click"
+                    label={isInFreeCancelationZone ? localizedWords.entries.Lcz_FreeCancellation : localizedWords.entries.Lcz_IfICancel}
+                    message={`${this.cancelationMessage || this.ratePlan.cancelation} ${this.ratePlan.guarantee ?? ''}`}
+                    onTooltipOpenChange={e => {
+                      if (e.detail) {
+                        this.fetchCancelationMessage();
+                      }
+                    }}
+                  ></ir-tooltip>
+                )
               )}
             </p>
             {this.isLoading ? (
@@ -146,18 +105,13 @@ export class IrRateplan {
             ) : (
               <Fragment>
                 {this.isRatePlanAvailable ? (
-                  !this.visibleInventory?.selected_variation?.variation?.IS_MLS_VIOLATED &&
-                  this.visibleInventory?.selected_variation?.variation?.amount && (
-
+                  this.visibleInventory?.selected_variation?.discounted_amount && (
                     <div class="rateplan-pricing-mobile">
-                      {this.visibleInventory?.selected_variation?.variation?.discount_pct > 0 && (
-                        <p class="rateplan-discounted-amount">
-                          {formatAmount(this.visibleInventory?.selected_variation?.variation?.total_before_discount, app_store.userPreferences.currency_id, 0)}
-                        </p>
+                      {this.visibleInventory?.selected_variation?.discount_pct > 0 && (
+                        <p class="rateplan-discounted-amount">{formatAmount(this.visibleInventory?.selected_variation?.amount, app_store.userPreferences.currency_id, 0)}</p>
                       )}
-                      <p class="rateplan-amount">{formatAmount(this.visibleInventory?.selected_variation?.variation?.amount, app_store.userPreferences.currency_id, 0)}</p>
+                      <p class="rateplan-amount">{formatAmount(this.visibleInventory?.selected_variation?.discounted_amount, app_store.userPreferences.currency_id, 0)}</p>
                     </div>
-
                   )
                 ) : (
                   <p class="no-availability">{localizedWords.entries.Lcz_NotAvailable}</p>
@@ -172,71 +126,75 @@ export class IrRateplan {
                   {localizedWords.entries.Lcz_NonRefundable}
                 </p>
               ) : (
-                <ir-tooltip
-                  labelColors={booking_store.isInFreeCancelationZone ? 'green' : 'default'}
-                  class={`rateplan-tooltip`}
-                  open_behavior="click"
-                  label={booking_store.isInFreeCancelationZone ? localizedWords.entries.Lcz_FreeCancellation : localizedWords.entries.Lcz_IfICancel}
-                  message={`${(this.cancelationMessage ?? '') || (this.ratePlan.cancelation ?? '')} ${this.ratePlan.guarantee ?? ''}`}
-                  onTooltipOpenChange={e => {
-                    if (e.detail) {
-                      this.fetchCancelationMessage(this.ratePlan.id, this.roomTypeId);
-                    }
-                  }}
-                ></ir-tooltip>
+                this.ratePlan.is_available_to_book && (
+                  <ir-tooltip
+                    labelColors={isInFreeCancelationZone ? 'green' : 'default'}
+                    class={`rateplan-tooltip`}
+                    open_behavior="click"
+                    label={isInFreeCancelationZone ? localizedWords.entries.Lcz_FreeCancellation : localizedWords.entries.Lcz_IfICancel}
+                    message={`${(this.cancelationMessage ?? '') || (this.ratePlan.cancelation ?? '')} ${this.ratePlan.guarantee ?? ''}`}
+                    onTooltipOpenChange={e => {
+                      if (e.detail) {
+                        this.fetchCancelationMessage();
+                      }
+                    }}
+                  ></ir-tooltip>
+                )
               )}
-              {getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date()) >
-                1 && (
-                  <p class="rateplan-amount-per-night grid-view">{`${formatAmount(this.visibleInventory?.selected_variation?.variation?.amount_per_night, app_store.userPreferences.currency_id, 0)}/${localizedWords.entries.Lcz_night}`}</p>
-                )}
+              {getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date()) > 1 && (
+                <p class="rateplan-amount-per-night grid-view">{`${formatAmount(this.visibleInventory?.selected_variation?.amount_per_night, app_store.userPreferences.currency_id, 0)}/${localizedWords.entries.Lcz_night}`}</p>
+              )}
             </div>
             <p class="rateplan-custom-text" innerHTML={this.ratePlan.custom_text}></p>
           </div>
         </div>
         {this.isRatePlanAvailable && (
           <div class={`rateplan-details ${this.ratePlan.custom_text ? 'rateplan-details-no-custom-text' : ''}`}>
-            {this.isLoading || this.ratePlan.variations?.length === 0 ? (
+            {this.isLoading ? (
               <div class="col-span-6 w-full ">
                 <ir-skeleton class="block h-12 w-full"></ir-skeleton>
               </div>
             ) : (
               <Fragment>
                 <div class="rateplan-travelers">
-                  {this.ratePlan.variations && (
+                  {this.ratePlan.variations && this.ratePlan.is_available_to_book && (
                     <ir-select
                       class="rateplan-select-travelers"
                       label={'Travelers'}
                       value={this.ratePlan.variations
-                        .findIndex(f => f.adult_child_offering === this.visibleInventory?.selected_variation?.variation.adult_child_offering)
+                        .findIndex(
+                          f =>
+                            `${f.adult_nbr}_a_${f.child_nbr}_c` ===
+                            `${this.visibleInventory?.selected_variation?.adult_nbr}_a_${this.visibleInventory?.selected_variation?.child_nbr}_c`,
+                        )
                         .toString()}
                       onValueChange={e => {
                         this.handleVariationChange(e, this.ratePlan.variations, this.ratePlan.id, this.roomTypeId);
                       }}
                       data={this.ratePlan.variations.map((v, i) => ({
                         id: i.toString(),
-                        value: v.adult_child_offering,
+                        value: this.formatVariation(v),
                       }))}
                     ></ir-select>
                   )}
                 </div>
-                {!this.visibleInventory?.selected_variation?.variation?.IS_MLS_VIOLATED ? (
+
+                {!this.ratePlan.not_available_reason?.includes('MLS') ? (
                   <Fragment>
-                    {this.visibleInventory?.selected_variation?.variation?.amount && (
+                    {this.visibleInventory?.selected_variation?.discounted_amount && (
                       <Fragment>
-                        {this.visibleInventory?.selected_variation?.variation?.discount_pct > 0 && (
+                        {this.visibleInventory?.selected_variation?.discount_pct > 0 && (
                           <div class="rateplan-pricing">
-                            <p class="rateplan-discounted-amount">
-                              {formatAmount(this.visibleInventory?.selected_variation?.variation?.total_before_discount, app_store.userPreferences.currency_id, 0)}
-                            </p>
-                            <p class="rateplan-discount">{`-${this.visibleInventory?.selected_variation?.variation?.discount_pct}%`}</p>
+                            <p class="rateplan-discounted-amount">{formatAmount(this.visibleInventory?.selected_variation?.amount, app_store.userPreferences.currency_id, 0)}</p>
+                            <p class="rateplan-discount">{`-${Number(this.visibleInventory?.selected_variation?.discount_pct).toPrecision(2)}%`}</p>
                           </div>
                         )}
-                        <div class="rateplan-final-pricing" data-style={this.visibleInventory?.selected_variation?.variation?.discount_pct > 0 ? '' : 'full-width'}>
-                          <p class="rateplan-amount">{formatAmount(this.visibleInventory?.selected_variation?.variation?.amount, app_store.userPreferences.currency_id, 0)}</p>
+                        <div class="rateplan-final-pricing" data-style={this.visibleInventory?.selected_variation?.discount_pct > 0 ? '' : 'full-width'}>
+                          <p class="rateplan-amount">{formatAmount(this.visibleInventory?.selected_variation?.discounted_amount, app_store.userPreferences.currency_id, 0)}</p>
                           {getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date()) >
                             1 && (
-                              <p class="rateplan-amount-per-night">{`${formatAmount(this.visibleInventory?.selected_variation?.variation?.amount_per_night, app_store.userPreferences.currency_id, 0)}/${localizedWords.entries.Lcz_night}`}</p>
-                            )}
+                            <p class="rateplan-amount-per-night">{`${formatAmount(this.visibleInventory?.selected_variation?.amount_per_night, app_store.userPreferences.currency_id, 0)}/${localizedWords.entries.Lcz_night}`}</p>
+                          )}
                         </div>
                       </Fragment>
                     )}
@@ -254,7 +212,7 @@ export class IrRateplan {
                           value:
                             i === 0
                               ? `0`
-                              : `${i}&nbsp;&nbsp;&nbsp;${i === 0 ? '' : formatAmount(this.visibleInventory?.selected_variation?.variation?.amount * i, app_store.userPreferences.currency_id, 0)}`,
+                              : `${i}&nbsp;&nbsp;&nbsp;${i === 0 ? '' : formatAmount(this.visibleInventory?.selected_variation?.discounted_amount * i, app_store.userPreferences.currency_id, 0)}`,
                           disabled: i >= this.visibleInventory?.visibleInventory + 1,
                           html: true,
                         }))}
@@ -276,7 +234,7 @@ export class IrRateplan {
                     )}
                   </Fragment>
                 ) : (
-                  <p class="mls_alert">{localizedWords.entries.Lcz_MLS_Alert.replace('{0}', this.visibleInventory.selected_variation?.variation?.MLS_ALERT_VALUE)}</p>
+                  <p class="mls_alert">{localizedWords.entries.Lcz_MLS_Alert.replace('{0}', this.ratePlan.not_available_reason?.replace('MLS-', ''))}</p>
                 )}
               </Fragment>
             )}
@@ -284,5 +242,11 @@ export class IrRateplan {
         )}
       </div>
     );
+  }
+  formatVariation(v: Variation): any {
+    const adults = `${v.adult_nbr} ${v.adult_nbr === 1 ? localizedWords.entries.Lcz_Adult.toLowerCase() : localizedWords.entries.Lcz_Adults.toLowerCase()}`;
+    const children =
+      v.child_nbr > 0 ? `${v.child_nbr}  ${v.child_nbr > 1 ? localizedWords.entries.Lcz_Children.toLowerCase() : localizedWords.entries.Lcz_Child.toLowerCase()}` : null;
+    return children ? `${adults} ${children}` : adults;
   }
 }

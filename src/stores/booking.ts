@@ -5,7 +5,7 @@ import { createStore } from '@stencil/store';
 export interface IRatePlanSelection {
   reserved: number;
   visibleInventory: number;
-  selected_variation: { variation: Variation; state: 'default' | 'modified' };
+  selected_variation: Variation | null;
   ratePlan: RatePlan;
   guestName: string[];
   is_bed_configuration_enabled: boolean;
@@ -74,34 +74,18 @@ const initialState: BookingStore = {
 };
 
 export const { state: booking_store, onChange: onRoomTypeChange } = createStore<BookingStore>(initialState);
-function setSelectedVariation(lastVariation: Variation, variations: Variation[], currentVariation: ISelectedVariation): ISelectedVariation {
-  if (currentVariation?.state === 'default' || !currentVariation || booking_store.resetBooking) {
-    if (lastVariation.amount > 0) {
-      return { state: 'default', variation: lastVariation };
-    }
-    return { state: 'default', variation: variations[0] };
+
+function checkVariation(variations: Variation[], selected_variation: Variation): Variation {
+  if (!variations) {
+    return null;
   }
-  const currentVariationIdx = variations.findIndex(v => v?.adult_child_offering === currentVariation.variation?.adult_child_offering);
-  if (currentVariationIdx === -1) {
-    const variationWithAmount = variations.find(v => v.amount > 0);
-    return { state: 'default', variation: variationWithAmount ?? lastVariation };
+  if (!selected_variation || booking_store.resetBooking) {
+    return variations[0];
   }
-  return currentVariation;
+  return variations?.find(v => v.adult_nbr === selected_variation.adult_nbr && v.child_nbr === selected_variation.child_nbr) ?? null;
 }
-// function setSelectedVariation(lastVariation: Variation, variations: Variation[], currentVariation: ISelectedVariation): ISelectedVariation {
-//   if (currentVariation?.state === 'default' || !currentVariation || booking_store.resetBooking) {
-//     const variationWithAmount = variations.find(v => v.amount > 0);
-//     return { state: 'default', variation: variationWithAmount ?? lastVariation };
-//   }
-//   const currentVariationIdx = variations.findIndex(v => v.adult_child_offering === currentVariation.variation.adult_child_offering);
-//   if (currentVariationIdx === -1) {
-//     const variationWithAmount = variations.find(v => v.amount > 0);
-//     return { state: 'default', variation: variationWithAmount ?? lastVariation };
-//   }
-//   return currentVariation;
-// }
+
 onRoomTypeChange('roomTypes', (newValue: RoomType[]) => {
-  // console.log('hellow', newValue);
   const currentSelections = booking_store.ratePlanSelections;
   const ratePlanSelections: { [roomTypeId: number]: IRoomTypeSelection } = {};
   newValue.forEach(roomType => {
@@ -118,7 +102,7 @@ onRoomTypeChange('roomTypes', (newValue: RoomType[]) => {
           ? {
               ...currentRatePlanSelection,
               ratePlan,
-              selected_variation: setSelectedVariation(lastVariation, ratePlan.variations, ratePlan?.selected_variation),
+              selected_variation: checkVariation(ratePlan.variations, currentRatePlanSelection.selected_variation) ?? null,
               visibleInventory: roomType.inventory === 1 ? 2 : roomType.inventory,
               reserved: roomType.inventory === 0 ? 0 : booking_store.resetBooking ? 0 : currentRatePlanSelection.reserved,
               checkoutVariations: roomType.inventory === 0 ? [] : currentRatePlanSelection.checkoutVariations,
@@ -132,7 +116,7 @@ onRoomTypeChange('roomTypes', (newValue: RoomType[]) => {
           : {
               reserved: 0,
               visibleInventory: roomType.inventory === 1 ? 2 : roomType.inventory,
-              selected_variation: setSelectedVariation(lastVariation, ratePlan.variations, ratePlan?.selected_variation),
+              selected_variation: ratePlan?.variations[0] ?? null,
               ratePlan,
               guestName: [],
               is_bed_configuration_enabled: roomType.is_bed_configuration_enabled,
@@ -148,7 +132,6 @@ onRoomTypeChange('roomTypes', (newValue: RoomType[]) => {
             };
     });
   });
-  // console.log(ratePlanSelections);
   booking_store.ratePlanSelections = ratePlanSelections;
   booking_store.resetBooking = false;
 });
@@ -262,11 +245,10 @@ export function calculateTotalCost(gross: boolean = false): { totalAmount: numbe
         return ratePlan.reserved * ratePlan.ratePlan.pre_payment_amount || 0;
       }
       return ratePlan.checkoutVariations.reduce((sum, variation) => {
-        console.log(gross, variation['amount_gross'], variation['amount'], variation);
-        return sum + Number(variation[gross ? 'amount_gross' : 'amount']);
+        return sum + Number(variation[gross ? 'discounted_gross_amount' : 'discounted_amount']);
       }, 0);
     } else if (ratePlan.reserved > 0) {
-      const amount = isPrePayment ? ratePlan.ratePlan.pre_payment_amount ?? 0 : ratePlan.selected_variation?.variation[gross ? 'amount_gross' : 'amount'];
+      const amount = isPrePayment ? ratePlan.ratePlan.pre_payment_amount ?? 0 : ratePlan.selected_variation[gross ? 'discounted_gross_amount' : 'discounted_amount'];
       return ratePlan.reserved * (amount ?? 0);
     }
     return 0;

@@ -107,7 +107,6 @@ export class IrMenu {
     const item = this.data[index];
     if (item && !item.disabled) {
       this.selectedItemName = item.item;
-      console.log(item);
       this.menuItemClick.emit(item.id);
       this.closeDropdown();
     }
@@ -120,7 +119,6 @@ export class IrMenu {
 
   toggleDropdown() {
     this.isDropdownVisible = !this.isDropdownVisible;
-    console.log(this.isDropdownVisible)
     if (this.isDropdownVisible) {
       this.currentHighlightedIndex = -1;
       this.adjustPopoverPlacement();
@@ -157,10 +155,15 @@ export class IrMenu {
   render() {
     return (
       <Fragment>
-        <button ref={el => (this.buttonRef = el)}  type="button" aria-haspopup="listbox" aria-expanded={this.isDropdownVisible?"true":"false"}
+        <button
+          ref={el => (this.buttonRef = el)}
+          type="button"
+          aria-haspopup="listbox"
+          aria-expanded={this.isDropdownVisible ? 'true' : 'false'}
           onClick={() => {
-           this.toggleDropdown()
-        }}>
+            this.toggleDropdown();
+          }}
+        >
           <slot name="menu-trigger">
             <div class="SelectTrigger">
               {this.selectedItemName || this.menuItem}
@@ -174,7 +177,6 @@ export class IrMenu {
               </svg>
             </div>
           </slot>
-          
         </button>
         <div ref={el => (this.contentElement = el)} class="SelectContent" data-state={this.isDropdownVisible ? 'open' : 'closed'}>
           {this.isDropdownVisible && (

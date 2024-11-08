@@ -40,11 +40,11 @@
 ### Graph
 ```mermaid
 graph TD;
-  ir-availibility-header --> ir-date-popup
-  ir-availibility-header --> ir-adult-child-counter
-  ir-availibility-header --> ir-button
-  ir-availibility-header --> ir-coupon-dialog
-  ir-availibility-header --> ir-loyalty
+  ir-availability-header --> ir-date-popup
+  ir-availability-header --> ir-adult-child-counter
+  ir-availability-header --> ir-button
+  ir-availability-header --> ir-coupon-dialog
+  ir-availability-header --> ir-loyalty
   ir-date-popup --> ir-icons
   ir-date-popup --> ir-popover
   ir-date-popup --> ir-date-range
@@ -60,8 +60,8 @@ graph TD;
   ir-coupon-dialog --> ir-input
   ir-loyalty --> ir-button
   ir-loyalty --> ir-icons
-  ir-booking-page --> ir-availibility-header
-  style ir-availibility-header fill:#f9f,stroke:#333,stroke-width:4px
+  ir-booking-page --> ir-availability-header
+  style ir-availability-header fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
 ----------------------------------------------

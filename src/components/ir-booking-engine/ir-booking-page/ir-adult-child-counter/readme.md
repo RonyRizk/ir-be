@@ -29,7 +29,7 @@
 
 ### Used by
 
- - [ir-availibility-header](../ir-availibility-header)
+ - [ir-availability-header](../ir-availability-header)
 
 ### Depends on
 
@@ -46,7 +46,7 @@ graph TD;
   ir-popover --> ir-dialog
   ir-dialog --> ir-button
   ir-button --> ir-icons
-  ir-availibility-header --> ir-adult-child-counter
+  ir-availability-header --> ir-adult-child-counter
   style ir-adult-child-counter fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

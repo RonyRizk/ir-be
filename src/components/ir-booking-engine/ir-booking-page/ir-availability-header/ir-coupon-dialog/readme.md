@@ -1,4 +1,4 @@
-# ir-loyalty
+# ir-coupon-dialog
 
 
 
@@ -16,21 +16,26 @@
 
 ### Used by
 
- - [ir-availibility-header](..)
+ - [ir-availability-header](..)
 
 ### Depends on
 
 - [ir-button](../../../../ui/ir-button)
 - [ir-icons](../../../../ui/ir-icons)
+- [ir-dialog](../../../../ui/ir-dialog)
+- [ir-input](../../../../ui/ir-input)
 
 ### Graph
 ```mermaid
 graph TD;
-  ir-loyalty --> ir-button
-  ir-loyalty --> ir-icons
+  ir-coupon-dialog --> ir-button
+  ir-coupon-dialog --> ir-icons
+  ir-coupon-dialog --> ir-dialog
+  ir-coupon-dialog --> ir-input
   ir-button --> ir-icons
-  ir-availibility-header --> ir-loyalty
-  style ir-loyalty fill:#f9f,stroke:#333,stroke-width:4px
+  ir-dialog --> ir-button
+  ir-availability-header --> ir-coupon-dialog
+  style ir-coupon-dialog fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
 ----------------------------------------------
