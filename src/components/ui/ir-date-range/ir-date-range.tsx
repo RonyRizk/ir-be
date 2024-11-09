@@ -304,7 +304,9 @@ export class IrDateRange {
                         <td class="day-cell" key={format(day, 'yyyy-MM-dd')} role="gridcell">
                           {isSameMonth(day, month.month) && (
                             <button
-                              disabled={isBefore(day, this.minDate) || isAfter(day, this.maxDate) || (this.selectedDates.start && isAfter(day, maxSpanDays))}
+                              disabled={
+                                isBefore(day, this.minDate) || isAfter(day, this.maxDate) || (this.selectedDates.start && isAfter(day, maxSpanDays) && !this.selectedDates.end)
+                              }
                               onMouseEnter={() => this.handleMouseEnter(day)}
                               onMouseLeave={() => this.handleMouseLeave()}
                               onClick={e => {
