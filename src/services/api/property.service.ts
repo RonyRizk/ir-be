@@ -164,7 +164,8 @@ export class PropertyService {
               days: this.propertyHelpers.generateDays(
                 booking_store.bookingAvailabilityParams.from_date,
                 booking_store.bookingAvailabilityParams.to_date,
-                +rp.checkoutVariations[index].amount / getDateDifference(booking_store.bookingAvailabilityParams.from_date, booking_store.bookingAvailabilityParams.to_date),
+                Number(rp.checkoutVariations[index].discounted_amount) /
+                  getDateDifference(booking_store.bookingAvailabilityParams.from_date, booking_store.bookingAvailabilityParams.to_date),
               ),
               guest: {
                 email: null,
