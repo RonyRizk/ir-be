@@ -216,6 +216,9 @@ export class IrCheckoutPage {
       const result = await this.propertyService.bookUser();
       this.isBookingConfirmed = true;
       booking_store.booking = result;
+      if (app_store.app_data.isFromGhs) {
+        destroyBookingCookie();
+      }
       const conversionTag = app_store.property?.tags.find(t => t.key === 'conversion');
       if (conversionTag && conversionTag.value) {
         this.modifyConversionTag(conversionTag.value);
@@ -260,9 +263,6 @@ export class IrCheckoutPage {
   }
   private async processPayment(bookingResult: Booking, currentPayment: AllowedPaymentMethod, paymentAmount: number, token) {
     let amountToBePayed = paymentAmount;
-    if (app_store.app_data.isFromGhs) {
-      destroyBookingCookie();
-    }
     if (amountToBePayed > 0) {
       await this.paymentService.GeneratePaymentCaller({
         token,
