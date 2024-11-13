@@ -430,6 +430,8 @@ export interface Variation {
   infant_nbr: null;
   nights: Night[];
   smoking_code: string;
+  prepayment_amount: number;
+  prepayment_amount_gross: number;
 }
 export interface Assignableunit {
   Is_Fully_Available: boolean;

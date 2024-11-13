@@ -41,7 +41,7 @@ export class IrBookingDetails {
       for (const rateplanId in booking_store.ratePlanSelections[roomtypeId]) {
         const rateplan = booking_store.ratePlanSelections[roomtypeId][rateplanId];
         rateplan.checkoutVariations.map(v => {
-          total += this.paymentService.processAlicablePolicies(v.applicable_policies, new Date()).amount;
+          total += v.prepayment_amount_gross;
         });
       }
     }
