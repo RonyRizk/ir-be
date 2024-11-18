@@ -75,6 +75,7 @@ export class IrInvoice {
     this.fetchData();
   }
   private detectPaymentOrigin() {
+    console.log(this.booking.extras);
     if (!this.booking.extras) {
       return null;
     }
@@ -203,6 +204,8 @@ export class IrInvoice {
     return `mailto:${email}?subject=${encodedSubject}`;
   }
   renderPaymentText(paymentOption: AllowedPaymentMethod) {
+    console.log('here');
+    console.log(paymentOption);
     if (paymentOption.is_payment_gateway) {
       const amount = this.booking.financial.payments?.reduce((prev, cur) => cur.amount + prev, 0) ?? 0;
       return (
@@ -459,7 +462,7 @@ export class IrInvoice {
                     <ir-icons name="car"></ir-icons>
                     <p>
                       {app_store.property?.parking_offering.title} {localizedWords.entries.Lcz_At}{' '}
-                      {formatAmount(app_store.property?.parking_offering.pricing, app_store.userPreferences.currency_id)}
+                      {app_store.property?.parking_offering.pricing > 0 && formatAmount(app_store.property?.parking_offering.pricing, app_store.userPreferences.currency_id)}
                     </p>
                   </div>
                   <div class="flex items-center gap-4">
@@ -467,7 +470,7 @@ export class IrInvoice {
                     <p>{app_store.property?.pets_acceptance.title}</p>
                   </div>
                   <div class="flex items-center gap-4 ">
-                    <ir-icons name="bed"></ir-icons>
+                    <ir-icons name="baby"></ir-icons>
                     <p>{app_store.property?.baby_cot_offering.title}</p>
                   </div>
                 </section>

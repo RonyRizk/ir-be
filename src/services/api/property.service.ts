@@ -244,12 +244,10 @@ export class PropertyService {
           rooms: this.filterRooms(),
         },
         extras: [
-          prePaymentAmount > 0
-            ? {
-                key: 'payment_code',
-                value: checkout_store.payment.code,
-              }
-            : null,
+          {
+            key: 'payment_code',
+            value: checkout_store.payment.code,
+          },
           prePaymentAmount > 0
             ? {
                 key: 'prepayment_amount',

@@ -59,10 +59,12 @@ export class IrPhoneInput {
       const [countries] = await Promise.all(requests);
       phone_input_store.countries = countries;
     }
-    if (this.user_country) {
-      this.selectCountryByProperty('id', this.user_country.COUNTRY_ID);
+    if (this.mode === 'country_code_and_prefix' && this.country_phone_prefix) {
+      this.selectCountryByProperty('phone_prefix', this.country_phone_prefix.toString());
     } else if (this.country_code && this.mode === 'country_code_and_prefix') {
       this.selectCountryByProperty('id', this.country_code.toString());
+    } else if (this.user_country) {
+      this.selectCountryByProperty('id', this.user_country.COUNTRY_ID);
     } else if (this.mode === 'prefix_only' && this.country_phone_prefix) {
       this.selectCountryByProperty('phone_prefix', this.country_phone_prefix.toString());
     }

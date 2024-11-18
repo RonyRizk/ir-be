@@ -111,6 +111,7 @@ export class IrUserForm {
                   updateUserFormData('mobile_number', e.detail.mobile);
                   updateUserFormData('country_phone_prefix', e.detail.phone_prefix);
                 }}
+                country_phone_prefix={checkout_store.userFormData.country_phone_prefix}
                 country_code={checkout_store.userFormData.country_id || null}
                 onPhoneInputBlur={e => {
                   const schema = IrUserFormData.pick({ mobile_number: true });

@@ -24,7 +24,7 @@ export class IrFacilities {
         <div class="facilities-container space-y-5 bg-gray-100 p-6">
           <div class="flex  items-center gap-4">
             <ir-icons name="clock"></ir-icons>
-            {app_store.property?.time_constraints.check_in_from && app_store.property?.time_constraints.check_in_till && (
+            {app_store.property?.time_constraints.check_in_from && app_store.property?.time_constraints.check_in_till ? (
               <p>
                 {localizedWords.entries.Lcz_CheckInFromUntil.replace('%1', app_store.property?.time_constraints.check_in_from).replace(
                   '%2',
@@ -32,7 +32,11 @@ export class IrFacilities {
                 )}
                 {/* Check-in: from {app_store.property?.time_constraints.check_in_from} until {app_store.property?.time_constraints.check_in_till} */}
               </p>
-            )}
+            ) : app_store.property?.time_constraints.check_in_from ? (
+              <p>
+                {localizedWords.entries.Lcz_CheckIn}:{app_store.property?.time_constraints.check_in_from}
+              </p>
+            ) : null}
             <p>
               {localizedWords.entries.Lcz_CheckOut}:{app_store.property?.time_constraints.check_out_till}
             </p>
@@ -71,7 +75,7 @@ export class IrFacilities {
           )}
           {app_store.property?.baby_cot_offering.title && (
             <div class="flex items-center gap-4">
-              <ir-icons name="bed"></ir-icons>
+              <ir-icons name="baby"></ir-icons>
               <p>{app_store.property?.baby_cot_offering.title}</p>
             </div>
           )}
