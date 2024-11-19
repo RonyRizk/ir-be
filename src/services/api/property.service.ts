@@ -150,6 +150,7 @@ export class PropertyService {
               identifier: null,
               roomtype: rp.roomtype,
               rateplan: rp.ratePlan,
+              prepayment_amount_gross: rp?.selected_variation?.prepayment_amount_gross,
               unit: null,
               smoking_option: rp.checkoutSmokingSelection[index],
               occupancy: {
