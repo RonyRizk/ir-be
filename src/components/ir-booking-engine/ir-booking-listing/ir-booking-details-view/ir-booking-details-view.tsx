@@ -17,7 +17,7 @@ export class IrBookingDetailsView {
     route: 'booking' | 'booking-details';
     params?: unknown;
   }>;
-  private bookingCancelation: HTMLIrBookingCancelationElement;
+  private bookingCancelation: HTMLIrBookingCancellationElement;
   private bookingListingAppService = new BookingListingAppService();
   private email: string;
 
@@ -190,11 +190,11 @@ export class IrBookingDetailsView {
           <h2 class="section-title">Guest Service</h2>
           <p class="detail-container" innerHTML={this.formatGuest()}></p>
         </section>
-        <ir-booking-cancelation
+        <ir-booking-cancellation
           ref={el => (this.bookingCancelation = el)}
           booking_nbr={this.booking?.booking_nbr}
-          cancelation={this.booking?.rooms[0].rateplan.cancelation}
-          onCancelationResult={e => {
+          cancellation={this.booking?.rooms[0].rateplan.cancelation}
+          onCancellationResult={e => {
             e.stopImmediatePropagation();
             e.stopPropagation();
             const { state } = e.detail;
@@ -202,7 +202,7 @@ export class IrBookingDetailsView {
               this.booking = { ...this.booking, status: { code: '003', description: 'Cancelled' } };
             }
           }}
-        ></ir-booking-cancelation>
+        ></ir-booking-cancellation>
       </div>
     );
   }

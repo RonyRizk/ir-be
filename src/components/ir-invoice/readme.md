@@ -17,6 +17,7 @@
 | `footerShown`        | `footer-shown`         |             | `boolean` | `true`                                  |
 | `headerMessageShown` | `header-message-shown` |             | `boolean` | `true`                                  |
 | `headerShown`        | `header-shown`         |             | `boolean` | `true`                                  |
+| `isConfermation`     | `is-confermation`      |             | `boolean` | `true`                                  |
 | `language`           | `language`             |             | `string`  | `undefined`                             |
 | `locationShown`      | `location-shown`       |             | `boolean` | `true`                                  |
 | `perma_link`         | `perma_link`           |             | `string`  | `null`                                  |
@@ -40,7 +41,7 @@
 - [ir-button](../ui/ir-button)
 - [ir-footer](../ir-booking-engine/ir-footer)
 - [ir-privacy-policy](../ir-booking-engine/ir-privacy-policy)
-- [ir-booking-cancelation](../ir-booking-cancelation)
+- [ir-booking-cancellation](../ir-booking-cancellation)
 - [ir-skeleton](../ui/ir-skeleton)
 
 ### Graph
@@ -52,7 +53,7 @@ graph TD;
   ir-invoice --> ir-button
   ir-invoice --> ir-footer
   ir-invoice --> ir-privacy-policy
-  ir-invoice --> ir-booking-cancelation
+  ir-invoice --> ir-booking-cancellation
   ir-invoice --> ir-skeleton
   ir-interceptor --> ir-alert-dialog
   ir-interceptor --> ir-icons
@@ -97,10 +98,10 @@ graph TD;
   ir-footer --> ir-dialog
   ir-privacy-policy --> ir-button
   ir-privacy-policy --> ir-dialog
-  ir-booking-cancelation --> ir-alert-dialog
-  ir-booking-cancelation --> ir-skeleton
-  ir-booking-cancelation --> ir-icons
-  ir-booking-cancelation --> ir-button
+  ir-booking-cancellation --> ir-alert-dialog
+  ir-booking-cancellation --> ir-skeleton
+  ir-booking-cancellation --> ir-icons
+  ir-booking-cancellation --> ir-button
   ir-be --> ir-invoice
   ir-booking-listing --> ir-invoice
   style ir-invoice fill:#f9f,stroke:#333,stroke-width:4px

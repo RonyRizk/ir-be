@@ -63,23 +63,23 @@ graph TD;
   ir-booking-overview --> ir-menu
   ir-booking-overview --> ir-pagination
   ir-booking-overview --> ir-booking-card
-  ir-booking-overview --> ir-booking-cancelation
+  ir-booking-overview --> ir-booking-cancellation
   ir-pagination --> ir-button
   ir-pagination --> ir-icons
   ir-button --> ir-icons
   ir-booking-card --> ir-badge
   ir-booking-card --> ir-button
-  ir-booking-cancelation --> ir-alert-dialog
-  ir-booking-cancelation --> ir-skeleton
-  ir-booking-cancelation --> ir-icons
-  ir-booking-cancelation --> ir-button
+  ir-booking-cancellation --> ir-alert-dialog
+  ir-booking-cancellation --> ir-skeleton
+  ir-booking-cancellation --> ir-icons
+  ir-booking-cancellation --> ir-button
   ir-invoice --> ir-interceptor
   ir-invoice --> ir-nav
   ir-invoice --> ir-icons
   ir-invoice --> ir-button
   ir-invoice --> ir-footer
   ir-invoice --> ir-privacy-policy
-  ir-invoice --> ir-booking-cancelation
+  ir-invoice --> ir-booking-cancellation
   ir-invoice --> ir-skeleton
   ir-interceptor --> ir-alert-dialog
   ir-interceptor --> ir-icons

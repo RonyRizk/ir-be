@@ -8,7 +8,7 @@ import app_store from '@/stores/app.store';
 import booking_store from '@/stores/booking';
 import localizedWords from '@/stores/localization.store';
 import { QueryStringValidator } from '@/validators/querystring.validator';
-import { modifyQueryParam } from '@/utils/utils';
+import { calculateInfantNumber, modifyQueryParam } from '@/utils/utils';
 import { AddAdultsAndChildrenEvent } from '../ir-adult-child-counter/ir-adult-child-counter';
 
 @Component({
@@ -21,15 +21,15 @@ export class IrAvailabilityHeader {
   @Prop() toDate: string;
   @Prop() adultCount: string;
   @Prop() childrenCount: string;
-  // @Prop() ages: string = '';
+  @Prop() ages: string = '';
 
   @State() target: HTMLElement = null;
   @State() isLoading = false;
-  // @State() childrenAges: string[] = [];
   @State() exposedBookingAvailabilityParams: TExposedBookingAvailability = {
     adult_nbr: 2,
     child_nbr: 0,
     currency_ref: 'USD',
+    infant_nbr: 0,
     language: 'en',
     room_type_ids: [],
     propertyid: 42,
@@ -45,7 +45,7 @@ export class IrAvailabilityHeader {
   private errorCause: ('date' | 'adult_child')[] | null = null;
   private popoverInstance = null;
   private toast_timeout: NodeJS.Timeout;
-  // private personCounter: HTMLIrAdultChildCounterElement;
+  private personCounter: HTMLIrAdultChildCounterElement;
 
   private propertyService = new PropertyService();
   private validator = new QueryStringValidator();
@@ -60,9 +60,6 @@ export class IrAvailabilityHeader {
       from_date: validatedFromDate ? this.fromDate : null,
       to_date: this.validator.validateCheckout(this.toDate, validatedFromDate) ? this.toDate : null,
     };
-    // this.childrenAges = [...Array(this.exposedBookingAvailabiltyParams.child_nbr)].fill('');
-
-    // this.proccessAges();
 
     if (booking_store.bookingAvailabilityParams.from_date) {
       this.exposedBookingAvailabilityParams.from_date = format(booking_store.bookingAvailabilityParams.from_date, 'yyyy-MM-dd');
@@ -77,6 +74,11 @@ export class IrAvailabilityHeader {
       language: app_store.userPreferences.language_id,
       currency_ref: app_store.userPreferences.currency_id,
     });
+    if (booking_store.childrenAges.length == 0) {
+      booking_store.childrenAges = [...Array(this.exposedBookingAvailabilityParams.child_nbr)].fill('');
+    }
+
+    this.processAges();
     onAppDataChange('userPreferences', async newValue => {
       this.changeExposedAvailabilityParams({
         language: newValue.language_id,
@@ -93,12 +95,12 @@ export class IrAvailabilityHeader {
     this.recheckAvailability();
   }
 
-  // @Watch('ages')
-  // handleAgesChange(newValue: string, oldValue: string) {
-  //   if (newValue !== oldValue) {
-  //     this.proccessAges();
-  //   }
-  // }
+  @Watch('ages')
+  handleAgesChange(newValue: string, oldValue: string) {
+    if (newValue !== oldValue) {
+      this.processAges();
+    }
+  }
 
   @Watch('fromDate')
   handleFromDateChange(newValue: string, oldValue: string) {
@@ -139,7 +141,7 @@ export class IrAvailabilityHeader {
           ...this.exposedBookingAvailabilityParams,
           child_nbr: +newValue,
         };
-        // this.childrenAges = [...Array(this.exposedBookingAvailabiltyParams.child_nbr)].fill('');
+        booking_store.childrenAges = [...Array(this.exposedBookingAvailabilityParams.child_nbr)].fill('');
         this.recheckAvailability();
       }
     }
@@ -184,13 +186,15 @@ export class IrAvailabilityHeader {
   handleAdultChildChange(e: CustomEvent<AddAdultsAndChildrenEvent>) {
     e.stopPropagation();
     e.stopImmediatePropagation();
-    const { adult_nbr, child_nbr } = e.detail;
-    this.changeExposedAvailabilityParams({ adult_nbr, child_nbr });
+    const { adult_nbr, child_nbr, childrenAges, infant_nbr } = e.detail;
+    booking_store.childrenAges = [...childrenAges];
+    this.changeExposedAvailabilityParams({ adult_nbr, child_nbr, infant_nbr });
     modifyQueryParam('adults', this.exposedBookingAvailabilityParams.adult_nbr?.toString());
     modifyQueryParam('children', this.exposedBookingAvailabilityParams.child_nbr?.toString());
-    // if (infant_nbr) {
-    //   modifyQueryParam('ages', encodeURIComponent(childrenAges.join('_')));
-    // }
+    if (infant_nbr) {
+      modifyQueryParam('ages', encodeURIComponent(childrenAges.join('_')));
+    }
+    console.log(this.exposedBookingAvailabilityParams);
   }
 
   private setDefaultAdultCount() {
@@ -221,32 +225,32 @@ export class IrAvailabilityHeader {
     }
   }
 
-  // private proccessAges() {
-  //   if (this.exposedBookingAvailabiltyParams.child_nbr === 0) {
-  //     return;
-  //   }
-  //   if (this.validator.validateAges(this.ages)) {
-  //     const ages = this.ages.split('_');
-  //     ages.slice(0, this.adultCount.length + 1).forEach((age, index) => {
-  //       this.childrenAges[index] = age.toString();
-  //     });
-  //     const infant_nbr = calculateInfantNumber(this.childrenAges);
-  //     this.exposedBookingAvailabiltyParams = {
-  //       ...this.exposedBookingAvailabiltyParams,
-  //       infant_nbr,
-  //     };
-  //   }
-  //   if (this.exposedBookingAvailabiltyParams.child_nbr > 0 && this.childrenAges.some(c => c === '')) {
-  //     setTimeout(() => {
-  //       this.personCounter?.open();
-  //     }, 100);
-  //   }
-  // }
+  private processAges() {
+    if (this.exposedBookingAvailabilityParams.child_nbr === 0) {
+      return;
+    }
+    if (this.validator.validateAges(this.ages)) {
+      const ages = this.ages.split('_');
+      ages.slice(0, this.adultCount.length + 1).forEach((age, index) => {
+        booking_store.childrenAges[index] = age.toString();
+      });
+      const infant_nbr = calculateInfantNumber(booking_store.childrenAges);
+      this.exposedBookingAvailabilityParams = {
+        ...this.exposedBookingAvailabilityParams,
+        infant_nbr,
+      };
+    }
+    if (this.exposedBookingAvailabilityParams.child_nbr > 0 && booking_store.childrenAges.some(c => c === '')) {
+      setTimeout(() => {
+        this.personCounter?.open();
+      }, 100);
+    }
+  }
 
   private async checkAvailability() {
     const params = ExposedBookingAvailability.parse(this.exposedBookingAvailabilityParams);
     if (app_store.app_data.injected) {
-      const { from_date, to_date, adult_nbr, child_nbr } = params;
+      const { from_date, to_date, adult_nbr, child_nbr, infant_nbr } = params;
       const fromDate = `checkin=${from_date}`;
       const toDate = `checkout=${to_date}`;
       const adults = `adults=${adult_nbr}`;
@@ -257,22 +261,22 @@ export class IrAvailabilityHeader {
       const loyalty = booking_store.bookingAvailabilityParams.loyalty ? 'loyalty=true' : '';
       const promo_key = booking_store.bookingAvailabilityParams.coupon ? `promo=${booking_store.bookingAvailabilityParams.coupon}` : '';
       const agent = booking_store.bookingAvailabilityParams.agent ? `agent=${booking_store.bookingAvailabilityParams.agent}` : '';
-      // const ages = infant_nbr > 0 && !this.childrenAges.every(c => c === '') ? `ages=${this.childrenAges.join('_')}` : '';
-      const queryParams = [fromDate, toDate, adults, children, affiliate, language, currency, loyalty, promo_key, agent];
-      // const queryParams = [fromDate, toDate, adults, ages, children, affiliate, language, currency, loyalty, promo_key, agent];
+      const ages = infant_nbr > 0 && !booking_store.childrenAges.every(c => c === '') ? `ages=${booking_store.childrenAges.join('_')}` : '';
+      // const queryParams = [fromDate, toDate, adults, children, affiliate, language, currency, loyalty, promo_key, agent];
+      const queryParams = [fromDate, toDate, adults, ages, children, affiliate, language, currency, loyalty, promo_key, agent];
       const queryString = queryParams.filter(param => param !== '').join('&');
 
       return (location.href = `https://${app_store.property.perma_link}.bookingmystay.com?${queryString}`);
     }
 
-    // if (this.childrenAges.length > 0 && this.childrenAges.some(c => c === '') && this.exposedBookingAvailabiltyParams.child_nbr > 0) {
-    //   if (!this.errorCause) {
-    //     this.errorCause = [];
-    //   }
-    //   console.log('error');
-    //   this.errorCause.push('adult_child');
-    //   return;
-    // }
+    if (booking_store.childrenAges.length > 0 && booking_store.childrenAges.some(c => c === '') && this.exposedBookingAvailabilityParams.child_nbr > 0) {
+      if (!this.errorCause) {
+        this.errorCause = [];
+      }
+      console.log('error');
+      this.errorCause.push('adult_child');
+      return;
+    }
     booking_store.bookingAvailabilityParams = {
       ...booking_store.bookingAvailabilityParams,
       from_date: new Date(params.from_date),
@@ -282,10 +286,11 @@ export class IrAvailabilityHeader {
     };
     this.scrollToRoomType.emit(null);
     booking_store.resetBooking = true;
+    const { infant_nbr, ...rest } = this.exposedBookingAvailabilityParams;
     await this.propertyService.getExposedBookingAvailability({
-      ...this.exposedBookingAvailabilityParams,
+      ...rest,
       child_nbr: this.exposedBookingAvailabilityParams.child_nbr,
-      // child_nbr: this.exposedBookingAvailabiltyParams.child_nbr - this.exposedBookingAvailabiltyParams.infant_nbr,
+      // child_nbr: this.exposedBookingAvailabilityParams.child_nbr - this.exposedBookingAvailabilityParams.infant_nbr,
       promo_key: booking_store.bookingAvailabilityParams.coupon || '',
       is_in_agent_mode: !!booking_store.bookingAvailabilityParams.agent || false,
       agent_id: booking_store.bookingAvailabilityParams.agent || 0,
@@ -382,6 +387,9 @@ export class IrAvailabilityHeader {
             maxChildrenCount={app_store.property.adult_child_constraints.child_max_nbr}
             childMaxAge={app_store.property.adult_child_constraints.child_max_age}
             class="adult-child-counter"
+            ref={el => (this.personCounter = el)}
+            baseChildrenAges={booking_store.childrenAges}
+            // onCheckAvailability={() => this.handleCheckAvailability()}
           ></ir-adult-child-counter>
           <div class={'hidden sm:block'}>
             <ir-button

@@ -1,3 +1,5 @@
+import localizedWords from '@/stores/localization.store';
+import { calculateInfantNumber } from '@/utils/utils';
 import { Component, Event, EventEmitter, Prop, State, Watch, h } from '@stencil/core';
 
 @Component({
@@ -14,11 +16,12 @@ export class IrGuestCounter {
   @Prop() childMaxAge: number = 17;
   @Prop() child: number;
   @Prop() adults: number;
+  @Prop({ mutable: true }) error: boolean = false;
 
   // Local state
   @State() adultCount: number = this.minAdultCount;
   @State() childrenCount: number = this.minChildrenCount;
-
+  @State() childrenAges: string[] = [];
   // Events
   @Event() updateCounts: EventEmitter;
   @Event() closeGuestCounter: EventEmitter;
@@ -43,33 +46,61 @@ export class IrGuestCounter {
   incrementAdultCount() {
     if (this.adultCount < this.maxAdultCount) {
       this.adultCount++;
-      this.updateCounts.emit({ adultCount: this.adultCount, childrenCount: this.childrenCount });
+      this.emitCountHandler();
     }
   }
 
   decrementAdultCount() {
     if (this.adultCount > this.minAdultCount) {
       this.adultCount--;
-      this.updateCounts.emit({ adultCount: this.adultCount, childrenCount: this.childrenCount });
+      this.emitCountHandler();
     }
   }
 
   incrementChildrenCount() {
     if (this.childrenCount < this.maxChildrenCount) {
+      const newValue = this.childrenCount + 1;
+      if (newValue > this.maxChildrenCount) {
+        return;
+      }
+
+      this.childrenAges.push('');
       this.childrenCount++;
-      this.updateCounts.emit({ adultCount: this.adultCount, childrenCount: this.childrenCount });
+      this.emitCountHandler();
     }
   }
 
   decrementChildrenCount() {
     if (this.childrenCount > this.minChildrenCount) {
+      const newValue = this.childrenCount - 1;
+      if (newValue < this.minChildrenCount) {
+        return;
+      }
+      this.childrenAges.pop();
       this.childrenCount--;
-      this.updateCounts.emit({ adultCount: this.adultCount, childrenCount: this.childrenCount });
+      this.emitCountHandler();
     }
   }
-
-  addChildrenAndAdult() {
+  private validateChildrenAges() {
+    if (this.childrenAges.some(c => c === '')) {
+      this.error = true;
+      return;
+    }
     this.closeGuestCounter.emit(null);
+    // this.popover.forceClose();
+  }
+  private emitCountHandler() {
+    const infant_nbr = calculateInfantNumber(this.childrenAges);
+    const config = {
+      adultCount: this.adultCount,
+      childrenCount: this.childrenCount,
+      infants: infant_nbr,
+      childrenAges: this.childrenAges,
+    };
+    this.updateCounts.emit(config);
+  }
+  addChildrenAndAdult() {
+    this.validateChildrenAges();
   }
 
   render() {
@@ -79,7 +110,7 @@ export class IrGuestCounter {
         <div class="counter-item">
           <div>
             <p class="main-text">Adults</p>
-            <p class="secondary-text">Age {this.childMaxAge + 1}+</p>
+            <p class="secondary-text">Ages {this.childMaxAge + 1}+</p>
           </div>
           <div class="counter-buttons-group">
             <ir-button
@@ -106,7 +137,7 @@ export class IrGuestCounter {
           <div class="counter-item">
             <div>
               <p class="main-text">Children</p>
-              <p class="secondary-text">Ages 1-{this.childMaxAge}</p>
+              <p class="secondary-text">Ages 0-{this.childMaxAge}</p>
             </div>
             <div class="counter-buttons-group">
               <ir-button
@@ -129,6 +160,29 @@ export class IrGuestCounter {
             </div>
           </div>
         )}
+        {this.childrenAges?.map((v, i) => (
+          <div>
+            <ir-select
+              addDummyOption
+              value={v}
+              key={`child_${i}_age`}
+              data-state={this.error && v === '' ? 'error' : ''}
+              variant="double-line"
+              label={`Child ${i + 1} age`}
+              onValueChange={e => {
+                const prev = [...this.childrenAges];
+                prev[i] = e.detail.toString();
+                this.childrenAges = [...prev];
+                this.emitCountHandler();
+              }}
+              data={[...Array(this.childMaxAge + 1)].map((_, index) => ({
+                id: index.toString(),
+                value: index === 0 ? localizedWords.entries['Lcz_under1'] : index.toString(),
+              }))}
+            ></ir-select>
+            {this.error && v === '' && <p class={'m-0 p-0 text-xs text-red-500'}>{localizedWords.entries.Lcz_enterchildage}</p>}
+          </div>
+        ))}
         <ir-button
           onButtonClick={this.addChildrenAndAdult.bind(this)}
           size="md"

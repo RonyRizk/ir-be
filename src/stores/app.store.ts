@@ -23,6 +23,7 @@ export type TSource = {
 };
 
 export interface IAppStore {
+  childrenStartAge?: number;
   nonBookableNights: Record<string, null>;
   currencies: TCurrency[];
   localizedWords: string[];
@@ -67,6 +68,7 @@ export interface IAppStore {
 
 const initialState: IAppStore = {
   nonBookableNights: null,
+  childrenStartAge: 3,
   currentPage: 'booking',
   dir: 'LTR',
   selectedLocale: enUS,

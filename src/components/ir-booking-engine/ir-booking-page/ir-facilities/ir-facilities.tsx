@@ -61,7 +61,8 @@ export class IrFacilities {
                 {app_store.property?.parking_offering.title}{' '}
                 {Number(app_store.property?.parking_offering.pricing) > 0 && (
                   <span>
-                    {localizedWords.entries.Lcz_At} {formatAmount(app_store.property?.parking_offering.pricing, app_store.userPreferences.currency_id)}
+                    {localizedWords.entries.Lcz_At} {formatAmount(app_store.property?.parking_offering.pricing, app_store.userPreferences.currency_id)}/
+                    {app_store.property?.parking_offering.schedule}
                   </span>
                 )}
               </p>

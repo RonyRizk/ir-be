@@ -4,6 +4,7 @@
   width: 100%;
   box-sizing: border-box !important;
   pointer-events: none;
+  font-size: 16px !important;
   --spread: 90deg;
   --shimmer-color: white;
   --speed: 3s;

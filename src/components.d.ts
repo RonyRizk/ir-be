@@ -6,6 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Amenity, BeddingSetup, IExposedProperty, RatePlan, RoomType, Variation } from "./models/property";
+import { AddAdultsAndChildrenEvent } from "./components/ir-booking-engine/ir-booking-page/ir-adult-child-counter/ir-adult-child-counter";
 import { TSource } from "./stores/app.store";
 import { TBookingInfo } from "./services/api/payment.service";
 import { Booking } from "./models/booking.dto";
@@ -22,6 +23,7 @@ import { TSignInAuthTrigger, TSignUpAuthTrigger } from "./validators/auth.valida
 import { TGuest } from "./models/user_form";
 import { TContainerStyle } from "./components/ir-booking-widget/types";
 export { Amenity, BeddingSetup, IExposedProperty, RatePlan, RoomType, Variation } from "./models/property";
+export { AddAdultsAndChildrenEvent } from "./components/ir-booking-engine/ir-booking-page/ir-adult-child-counter/ir-adult-child-counter";
 export { TSource } from "./stores/app.store";
 export { TBookingInfo } from "./services/api/payment.service";
 export { Booking } from "./models/booking.dto";
@@ -47,12 +49,16 @@ export namespace Components {
     }
     interface IrAdultChildCounter {
         "adultCount": number;
+        "baseChildrenAges": string[];
         "childMaxAge": number;
         "childrenCount": number;
+        "error": boolean;
+        "infant_nbr": number;
         "maxAdultCount": number;
         "maxChildrenCount": number;
         "minAdultCount": number;
         "minChildrenCount": number;
+        "open": () => Promise<void>;
     }
     interface IrAlertDialog {
         "closeModal": () => Promise<void>;
@@ -63,6 +69,7 @@ export namespace Components {
     }
     interface IrAvailabilityHeader {
         "adultCount": string;
+        "ages": string;
         "childrenCount": string;
         "fromDate": string;
         "toDate": string;
@@ -107,13 +114,14 @@ export namespace Components {
         "source": TSource | null;
         "stag": string | null;
     }
-    interface IrBookingCancelation {
+    interface IrBookingCancellation {
         "booking": Booking;
         "booking_nbr": string;
-        "cancelation": string;
-        "cancelation_policies": TBookingInfo[];
+        "cancellation": string;
+        "cancellation_policies": TBookingInfo[];
         "currency": { code: string; id: number };
         "openDialog": () => Promise<void>;
+        "property_id": number;
     }
     interface IrBookingCard {
         "aff": boolean;
@@ -269,6 +277,7 @@ export namespace Components {
         "adults": number;
         "child": number;
         "childMaxAge": number;
+        "error": boolean;
         "maxAdultCount": number;
         "maxChildrenCount": number;
         "minAdultCount": number;
@@ -346,6 +355,7 @@ export namespace Components {
         "footerShown": boolean;
         "headerMessageShown": boolean;
         "headerShown": boolean;
+        "isConfermation": boolean;
         "language": string;
         "locationShown": boolean;
         "perma_link": string;
@@ -560,9 +570,9 @@ export interface IrBadgeGroupCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLIrBadgeGroupElement;
 }
-export interface IrBookingCancelationCustomEvent<T> extends CustomEvent<T> {
+export interface IrBookingCancellationCustomEvent<T> extends CustomEvent<T> {
     detail: T;
-    target: HTMLIrBookingCancelationElement;
+    target: HTMLIrBookingCancellationElement;
 }
 export interface IrBookingCardCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -740,7 +750,8 @@ declare global {
         new (): HTMLIrAccomodationsElement;
     };
     interface HTMLIrAdultChildCounterElementEventMap {
-        "addAdultsAndChildren": { adult_nbr: number; child_nbr: number };
+        "addAdultsAndChildren": AddAdultsAndChildrenEvent;
+        "checkAvailability": null;
     }
     interface HTMLIrAdultChildCounterElement extends Components.IrAdultChildCounter, HTMLStencilElement {
         addEventListener<K extends keyof HTMLIrAdultChildCounterElementEventMap>(type: K, listener: (this: HTMLIrAdultChildCounterElement, ev: IrAdultChildCounterCustomEvent<HTMLIrAdultChildCounterElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -843,23 +854,23 @@ declare global {
         prototype: HTMLIrBeElement;
         new (): HTMLIrBeElement;
     };
-    interface HTMLIrBookingCancelationElementEventMap {
+    interface HTMLIrBookingCancellationElementEventMap {
         "openChange": boolean;
-        "cancelationResult": { state: 'failed' | 'success'; booking_nbr: string };
+        "cancellationResult": { state: 'failed' | 'success'; booking_nbr: string };
     }
-    interface HTMLIrBookingCancelationElement extends Components.IrBookingCancelation, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLIrBookingCancelationElementEventMap>(type: K, listener: (this: HTMLIrBookingCancelationElement, ev: IrBookingCancelationCustomEvent<HTMLIrBookingCancelationElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+    interface HTMLIrBookingCancellationElement extends Components.IrBookingCancellation, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLIrBookingCancellationElementEventMap>(type: K, listener: (this: HTMLIrBookingCancellationElement, ev: IrBookingCancellationCustomEvent<HTMLIrBookingCancellationElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLIrBookingCancelationElementEventMap>(type: K, listener: (this: HTMLIrBookingCancelationElement, ev: IrBookingCancelationCustomEvent<HTMLIrBookingCancelationElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLIrBookingCancellationElementEventMap>(type: K, listener: (this: HTMLIrBookingCancellationElement, ev: IrBookingCancellationCustomEvent<HTMLIrBookingCancellationElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
-    var HTMLIrBookingCancelationElement: {
-        prototype: HTMLIrBookingCancelationElement;
-        new (): HTMLIrBookingCancelationElement;
+    var HTMLIrBookingCancellationElement: {
+        prototype: HTMLIrBookingCancellationElement;
+        new (): HTMLIrBookingCancellationElement;
     };
     interface HTMLIrBookingCardElementEventMap {
         "optionClicked": { tag: string; id: number };
@@ -1751,7 +1762,7 @@ declare global {
         "ir-badge-group": HTMLIrBadgeGroupElement;
         "ir-banner": HTMLIrBannerElement;
         "ir-be": HTMLIrBeElement;
-        "ir-booking-cancelation": HTMLIrBookingCancelationElement;
+        "ir-booking-cancellation": HTMLIrBookingCancellationElement;
         "ir-booking-card": HTMLIrBookingCardElement;
         "ir-booking-code": HTMLIrBookingCodeElement;
         "ir-booking-details": HTMLIrBookingDetailsElement;
@@ -1826,13 +1837,17 @@ declare namespace LocalJSX {
     }
     interface IrAdultChildCounter {
         "adultCount"?: number;
+        "baseChildrenAges"?: string[];
         "childMaxAge"?: number;
         "childrenCount"?: number;
+        "error"?: boolean;
+        "infant_nbr"?: number;
         "maxAdultCount"?: number;
         "maxChildrenCount"?: number;
         "minAdultCount"?: number;
         "minChildrenCount"?: number;
-        "onAddAdultsAndChildren"?: (event: IrAdultChildCounterCustomEvent<{ adult_nbr: number; child_nbr: number }>) => void;
+        "onAddAdultsAndChildren"?: (event: IrAdultChildCounterCustomEvent<AddAdultsAndChildrenEvent>) => void;
+        "onCheckAvailability"?: (event: IrAdultChildCounterCustomEvent<null>) => void;
     }
     interface IrAlertDialog {
         "onOpenChange"?: (event: IrAlertDialogCustomEvent<boolean>) => void;
@@ -1843,6 +1858,7 @@ declare namespace LocalJSX {
     }
     interface IrAvailabilityHeader {
         "adultCount"?: string;
+        "ages"?: string;
         "childrenCount"?: string;
         "fromDate"?: string;
         "onResetBooking"?: (event: IrAvailabilityHeaderCustomEvent<null>) => void;
@@ -1890,14 +1906,15 @@ declare namespace LocalJSX {
         "source"?: TSource | null;
         "stag"?: string | null;
     }
-    interface IrBookingCancelation {
+    interface IrBookingCancellation {
         "booking"?: Booking;
         "booking_nbr"?: string;
-        "cancelation"?: string;
-        "cancelation_policies"?: TBookingInfo[];
+        "cancellation"?: string;
+        "cancellation_policies"?: TBookingInfo[];
         "currency"?: { code: string; id: number };
-        "onCancelationResult"?: (event: IrBookingCancelationCustomEvent<{ state: 'failed' | 'success'; booking_nbr: string }>) => void;
-        "onOpenChange"?: (event: IrBookingCancelationCustomEvent<boolean>) => void;
+        "onCancellationResult"?: (event: IrBookingCancellationCustomEvent<{ state: 'failed' | 'success'; booking_nbr: string }>) => void;
+        "onOpenChange"?: (event: IrBookingCancellationCustomEvent<boolean>) => void;
+        "property_id"?: number;
     }
     interface IrBookingCard {
         "aff"?: boolean;
@@ -2099,6 +2116,7 @@ declare namespace LocalJSX {
         "adults"?: number;
         "child"?: number;
         "childMaxAge"?: number;
+        "error"?: boolean;
         "maxAdultCount"?: number;
         "maxChildrenCount"?: number;
         "minAdultCount"?: number;
@@ -2181,6 +2199,7 @@ declare namespace LocalJSX {
         "footerShown"?: boolean;
         "headerMessageShown"?: boolean;
         "headerShown"?: boolean;
+        "isConfermation"?: boolean;
         "language"?: string;
         "locationShown"?: boolean;
         "perma_link"?: string;
@@ -2422,7 +2441,7 @@ declare namespace LocalJSX {
         "ir-badge-group": IrBadgeGroup;
         "ir-banner": IrBanner;
         "ir-be": IrBe;
-        "ir-booking-cancelation": IrBookingCancelation;
+        "ir-booking-cancellation": IrBookingCancellation;
         "ir-booking-card": IrBookingCard;
         "ir-booking-code": IrBookingCode;
         "ir-booking-details": IrBookingDetails;
@@ -2500,7 +2519,7 @@ declare module "@stencil/core" {
             "ir-badge-group": LocalJSX.IrBadgeGroup & JSXBase.HTMLAttributes<HTMLIrBadgeGroupElement>;
             "ir-banner": LocalJSX.IrBanner & JSXBase.HTMLAttributes<HTMLIrBannerElement>;
             "ir-be": LocalJSX.IrBe & JSXBase.HTMLAttributes<HTMLIrBeElement>;
-            "ir-booking-cancelation": LocalJSX.IrBookingCancelation & JSXBase.HTMLAttributes<HTMLIrBookingCancelationElement>;
+            "ir-booking-cancellation": LocalJSX.IrBookingCancellation & JSXBase.HTMLAttributes<HTMLIrBookingCancellationElement>;
             "ir-booking-card": LocalJSX.IrBookingCard & JSXBase.HTMLAttributes<HTMLIrBookingCardElement>;
             "ir-booking-code": LocalJSX.IrBookingCode & JSXBase.HTMLAttributes<HTMLIrBookingCodeElement>;
             "ir-booking-details": LocalJSX.IrBookingDetails & JSXBase.HTMLAttributes<HTMLIrBookingDetailsElement>;

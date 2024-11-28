@@ -38,7 +38,7 @@
 - [ir-menu](../../../ui/ir-menu)
 - [ir-pagination](../ir-pagination)
 - [ir-booking-card](../ir-booking-card)
-- [ir-booking-cancelation](../../../ir-booking-cancelation)
+- [ir-booking-cancellation](../../../ir-booking-cancellation)
 
 ### Graph
 ```mermaid
@@ -49,16 +49,16 @@ graph TD;
   ir-booking-overview --> ir-menu
   ir-booking-overview --> ir-pagination
   ir-booking-overview --> ir-booking-card
-  ir-booking-overview --> ir-booking-cancelation
+  ir-booking-overview --> ir-booking-cancellation
   ir-pagination --> ir-button
   ir-pagination --> ir-icons
   ir-button --> ir-icons
   ir-booking-card --> ir-badge
   ir-booking-card --> ir-button
-  ir-booking-cancelation --> ir-alert-dialog
-  ir-booking-cancelation --> ir-skeleton
-  ir-booking-cancelation --> ir-icons
-  ir-booking-cancelation --> ir-button
+  ir-booking-cancellation --> ir-alert-dialog
+  ir-booking-cancellation --> ir-skeleton
+  ir-booking-cancellation --> ir-icons
+  ir-booking-cancellation --> ir-button
   ir-booking-listing --> ir-booking-overview
   style ir-booking-overview fill:#f9f,stroke:#333,stroke-width:4px
 ```

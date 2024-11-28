@@ -1,5 +1,6 @@
 import localizedWords from '@/stores/localization.store';
-import { Component, Prop, h, Event, EventEmitter, State, Fragment } from '@stencil/core';
+import { calculateInfantNumber } from '@/utils/utils';
+import { Component, Prop, h, Event, EventEmitter, State, Fragment, Method, Watch } from '@stencil/core';
 export type AddAdultsAndChildrenEvent = { adult_nbr: number; child_nbr: number; infant_nbr: number; childrenAges: string[] };
 @Component({
   tag: 'ir-adult-child-counter',
@@ -7,55 +8,117 @@ export type AddAdultsAndChildrenEvent = { adult_nbr: number; child_nbr: number; 
   shadow: true,
 })
 export class IrAdultChildCounter {
-  @Prop({ reflect: true, mutable: true }) adultCount = 2;
-  @Prop({ mutable: true, reflect: true }) childrenCount = 0;
+  @Prop({ mutable: true }) adultCount = 2;
+  @Prop({ mutable: true }) childrenCount = 0;
+  @Prop({ mutable: true }) infant_nbr = 0;
+  @Prop({ mutable: true }) error: boolean;
   @Prop() minAdultCount = 0;
   @Prop() minChildrenCount = 0;
   @Prop() maxAdultCount = 10;
   @Prop() maxChildrenCount = 10;
   @Prop() childMaxAge: number = 0;
+  @Prop() baseChildrenAges: string[] = [];
 
-  @Event() addAdultsAndChildren: EventEmitter<{ adult_nbr: number; child_nbr: number }>;
   @State() isPopoverOpen: boolean = false;
+  @State() childrenAges: string[] = [];
+
+  @Event()
+  addAdultsAndChildren: EventEmitter<AddAdultsAndChildrenEvent>;
+  @Event() checkAvailability: EventEmitter<null>;
 
   private popover: HTMLIrPopoverElement;
-  addChildrenAndAdult() {
-    this.addAdultsAndChildren.emit({
-      adult_nbr: this.adultCount,
-      child_nbr: this.childrenCount,
-    });
+
+  componentWillLoad() {
+    this.childrenAges = [...this.baseChildrenAges];
+  }
+
+  @Watch('baseChildrenAges')
+  handleBaseChildrenAgesChange(newValue: string[]) {
+    this.childrenAges = [...newValue];
+  }
+  @Method()
+  async open() {
+    if (this.isPopoverOpen) {
+      return;
+    }
     this.popover.toggleVisibility();
   }
 
-  incrementAdultCount() {
+  private addChildrenAndAdult() {
+    this.error = false;
+    this.updateGuestInformation();
+    this.validateChildrenAges();
+    this.checkAvailability.emit(null);
+  }
+
+  private incrementAdultCount() {
     const newValue = this.adultCount + 1;
     if (newValue > this.maxAdultCount) {
       return;
     }
     this.adultCount = newValue;
   }
-  decrementAdultCount() {
+
+  private decrementAdultCount() {
     const newValue = this.adultCount - 1;
     if (newValue < this.minAdultCount) {
       return;
     }
     this.adultCount = newValue;
   }
-  incrementChildrenCount() {
+
+  private incrementChildrenCount() {
     const newValue = this.childrenCount + 1;
     if (newValue > this.maxChildrenCount) {
       return;
     }
+
+    this.childrenAges.push('');
     this.childrenCount = newValue;
   }
-  decrementChildrenCount() {
+
+  private decrementChildrenCount() {
     const newValue = this.childrenCount - 1;
     if (newValue < this.minChildrenCount) {
       return;
     }
+    this.childrenAges.pop();
     this.childrenCount = newValue;
   }
-  guestTrigger() {
+
+  private handlePopoverToggle(e: CustomEvent) {
+    e.stopImmediatePropagation();
+    e.stopPropagation();
+    this.isPopoverOpen = e.detail;
+    if (!this.isPopoverOpen) {
+      if (this.childrenCount === 0) {
+        this.popover.forceClose();
+      } else {
+        this.validateChildrenAges();
+      }
+      this.updateGuestInformation();
+    }
+  }
+
+  private updateGuestInformation() {
+    const infant_nbr = calculateInfantNumber(this.childrenAges);
+    const config = {
+      adult_nbr: this.adultCount,
+      child_nbr: this.childrenCount,
+      infant_nbr,
+      childrenAges: this.childrenAges,
+    };
+    console.log(config);
+    this.addAdultsAndChildren.emit(config);
+  }
+  private validateChildrenAges() {
+    if (this.childrenAges.some(c => c === '')) {
+      this.error = true;
+      return;
+    }
+    this.popover.forceClose();
+  }
+  private guestTrigger() {
     return (
       <div class="popover-trigger w-full sm:w-fit" slot="trigger" data-state={this.isPopoverOpen ? 'opened' : 'closed'}>
         <ir-icons name="user" svgClassName="size-[1.125rem]"></ir-icons>
@@ -81,22 +144,18 @@ export class IrAdultChildCounter {
       </div>
     );
   }
-  handlePopoverToggle(e: CustomEvent) {
-    e.stopImmediatePropagation();
-    e.stopPropagation();
-    this.isPopoverOpen = e.detail;
-    if (!this.isPopoverOpen) {
-      this.addAdultsAndChildren.emit({
-        adult_nbr: this.adultCount,
-        child_nbr: this.childrenCount,
-      });
-    }
-  }
   render() {
     return (
-      <ir-popover ref={el => (this.popover = el)} onOpenChange={this.handlePopoverToggle.bind(this)}>
+      <ir-popover
+        ref={el => (this.popover = el)}
+        allowFlip={false}
+        placement="bottom-end"
+        autoAdjust={false}
+        outsideEvents="none"
+        onOpenChange={this.handlePopoverToggle.bind(this)}
+      >
         {this.guestTrigger()}
-        <div class="counter-container w-full border-0 p-4 pt-14 shadow-none sm:w-auto sm:border sm:pt-4 sm:shadow-sm" slot="popover-content">
+        <div class="counter-container  w-full border-0 p-4 pt-14 shadow-none sm:w-auto sm:border sm:pt-4 sm:shadow-sm" slot="popover-content">
           <div class="counter-item">
             <div>
               <p class="main-text">{localizedWords.entries.Lcz_Adults}</p>
@@ -140,7 +199,7 @@ export class IrAdultChildCounter {
               <div>
                 <p class="main-text">{localizedWords.entries.Lcz_Children}</p>
                 <p class="secondary-text">
-                  {localizedWords.entries.Lcz_Age} 1-{this.childMaxAge}
+                  {localizedWords.entries.Lcz_Age} 0-{this.childMaxAge}
                 </p>
               </div>
               <div class="counter-buttons-group" role="group">
@@ -175,6 +234,28 @@ export class IrAdultChildCounter {
               </div>
             </div>
           )}
+          {this.childrenAges?.map((v, i) => (
+            <div>
+              <ir-select
+                addDummyOption
+                value={v.toString()}
+                key={`child_${i}_age`}
+                data-state={this.error && v === '' ? 'error' : ''}
+                variant="double-line"
+                label={`Child ${i + 1} age`}
+                onValueChange={e => {
+                  const prev = [...this.childrenAges];
+                  prev[i] = e.detail.toString();
+                  this.childrenAges = [...prev];
+                }}
+                data={[...Array(this.childMaxAge + 1)].map((_, index) => ({
+                  id: index.toString(),
+                  value: index === 0 ? localizedWords.entries['Lcz_under1'] : index.toString(),
+                }))}
+              ></ir-select>
+              {this.error && v === '' && <p class={'m-0 p-0 text-xs text-red-500'}>{localizedWords.entries.Lcz_enterchildage}</p>}
+            </div>
+          ))}
           <ir-button
             onButtonClick={this.addChildrenAndAdult.bind(this)}
             size="md"

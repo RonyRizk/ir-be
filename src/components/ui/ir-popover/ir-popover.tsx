@@ -110,7 +110,9 @@ export class IrPopover {
     }
     this.isVisible = !this.isVisible;
     if (this.dialogElement) {
-      this.dialogElement.closeModal();
+      if (this.isVisible) {
+        this.dialogElement.openModal();
+      } else this.dialogElement.closeModal();
     }
     if (this.isVisible && this.popoverInstance) {
       const currentDir = localization_store.dir.toLowerCase() || 'ltr';

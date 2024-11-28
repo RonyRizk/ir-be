@@ -24,6 +24,7 @@ export class IrInvoice {
   @Prop() baseUrl: string = 'https://gateway.igloorooms.com/IRBE';
   @Prop() language: string;
   @Prop() bookingNbr: string;
+  @Prop() isConfermation = true;
   @Prop() status: 0 | 1 = 1;
   @Prop() perma_link: string = null;
   @Prop() aName: string = null;
@@ -52,7 +53,7 @@ export class IrInvoice {
 
   private payment_option: AllowedPaymentMethod = null;
   private amount: number = null;
-  private bookingCancelation: HTMLIrBookingCancelationElement;
+  private bookingCancelation: HTMLIrBookingCancellationElement;
   private privacyPolicyRef: HTMLIrPrivacyPolicyElement;
 
   async componentWillLoad() {
@@ -143,42 +144,12 @@ export class IrInvoice {
     if (this.amount || isBefore(new Date(this.booking.to_date), new Date())) {
       return;
     }
-    const [bookings_by_amount, newPrepayment] = await Promise.all([
-      this.paymentService.getBookingPrepaymentAmount(this.booking),
-      await this.paymentService.GetExposedApplicablePolicies({
-        book_date: new Date(this.booking.booked_on.date),
-        params: {
-          booking_nbr: this.bookingNbr,
-          property_id: this.booking.property.id,
-          room_type_id: 0,
-          rate_plan_id: 0,
-          currency_id: this.booking.currency.id,
-          language: this.language || app_store.userPreferences.language_id,
-        },
-      }),
-    ]);
+    const [bookings_by_amount] = await Promise.all([this.paymentService.getBookingPrepaymentAmount(this.booking)]);
     const { amount, cancelation_message, guarantee_message, cancelation_policies } = bookings_by_amount;
     this.cancelation_policies = cancelation_policies;
     this.cancelation_message = cancelation_message;
     this.guarantee_message = guarantee_message;
     this.amount = amount;
-    let cancelation = null;
-    let guarantee = null;
-    const { message } = await this.paymentService.fetchCancelationMessage({ data: newPrepayment.data });
-    this.cancelationMessage = message;
-    const cancelationBrackets = newPrepayment.data.find(t => t.type === 'cancelation');
-    if (cancelationBrackets?.brackets) {
-      cancelation = this.paymentService.findClosestDate(cancelationBrackets?.brackets);
-    }
-    const guaranteeBrackets = newPrepayment.data.find(t => t.type === 'guarantee');
-    if (guaranteeBrackets?.brackets) {
-      guarantee = this.paymentService.findClosestDate(guaranteeBrackets?.brackets);
-    }
-    if (guarantee && cancelation) {
-      if (isBefore(new Date(guarantee.due_on), new Date(cancelation.due_on))) {
-        this.amountToBePayed = cancelation.gross_amount;
-      }
-    }
   }
 
   renderBookingDetailHeader() {
@@ -230,6 +201,9 @@ export class IrInvoice {
           ></p>
         </div>
       );
+    }
+    if (paymentOption.code === '000') {
+      return <p class="total-payment text-sm">{localizedWords.entries.Lcz_NoDepositRequired}</p>;
     }
     return (
       <p class="total-payment text-sm">
@@ -462,7 +436,11 @@ export class IrInvoice {
                     <ir-icons name="car"></ir-icons>
                     <p>
                       {app_store.property?.parking_offering.title} {localizedWords.entries.Lcz_At}{' '}
-                      {app_store.property?.parking_offering.pricing > 0 && formatAmount(app_store.property?.parking_offering.pricing, app_store.userPreferences.currency_id)}
+                      {app_store.property?.parking_offering.pricing > 0 && (
+                        <span>
+                          {formatAmount(app_store.property?.parking_offering.pricing, app_store.userPreferences.currency_id)}/{app_store.property?.parking_offering.schedule}
+                        </span>
+                      )}
                     </p>
                   </div>
                   <div class="flex items-center gap-4">
@@ -489,6 +467,7 @@ export class IrInvoice {
                   )}
                   <a class="mapLink" target="_blank" href={google_maps_url}>
                     <img
+                      alt="property_location"
                       src={`https://maps.googleapis.com/maps/api/staticmap?center=${app_store.property?.location.latitude || 34.022},${app_store.property?.location.longitude || 35.628}&zoom=15&size=1024x768&maptype=roadmap&markers=color:red%7Clabel:${app_store.property.name}%7C34.022,35.628&key=AIzaSyCJ5P4SraJdZzcBi9Ue16hyg_iWJv-aHpk`}
                       loading="lazy"
                     ></img>
@@ -509,13 +488,14 @@ export class IrInvoice {
           </section>
           {this.footerShown && <ir-footer version={this.version}></ir-footer>}
           {this.footerShown && <ir-privacy-policy hideTrigger ref={el => (this.privacyPolicyRef = el)}></ir-privacy-policy>}
-          <ir-booking-cancelation
-            cancelation_policies={this.cancelation_policies}
+          <ir-booking-cancellation
+            booking={this.booking}
+            cancellation_policies={this.cancelation_policies}
             ref={el => (this.bookingCancelation = el)}
             booking_nbr={this.booking?.booking_nbr}
             currency={{ code: this.booking.currency.code, id: this.booking.currency.id }}
-            cancelation={this.cancelationMessage || this.booking?.rooms[0].rateplan.cancelation}
-          ></ir-booking-cancelation>
+            cancellation={this.cancelationMessage || this.booking?.rooms[0].rateplan.cancelation}
+          ></ir-booking-cancellation>
         </main>
       </Host>
     );

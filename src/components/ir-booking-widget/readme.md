@@ -40,6 +40,7 @@ graph TD;
   ir-dialog --> ir-button
   ir-button --> ir-icons
   ir-guest-counter --> ir-button
+  ir-guest-counter --> ir-select
   style ir-widget fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

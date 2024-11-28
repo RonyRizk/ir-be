@@ -87,6 +87,7 @@ graph TD;
   ir-adult-child-counter --> ir-icons
   ir-adult-child-counter --> ir-popover
   ir-adult-child-counter --> ir-button
+  ir-adult-child-counter --> ir-select
   ir-coupon-dialog --> ir-button
   ir-coupon-dialog --> ir-icons
   ir-coupon-dialog --> ir-dialog
@@ -139,7 +140,7 @@ graph TD;
   ir-invoice --> ir-button
   ir-invoice --> ir-footer
   ir-invoice --> ir-privacy-policy
-  ir-invoice --> ir-booking-cancelation
+  ir-invoice --> ir-booking-cancellation
   ir-invoice --> ir-skeleton
   ir-interceptor --> ir-alert-dialog
   ir-interceptor --> ir-icons
@@ -181,10 +182,10 @@ graph TD;
   ir-footer --> ir-dialog
   ir-privacy-policy --> ir-button
   ir-privacy-policy --> ir-dialog
-  ir-booking-cancelation --> ir-alert-dialog
-  ir-booking-cancelation --> ir-skeleton
-  ir-booking-cancelation --> ir-icons
-  ir-booking-cancelation --> ir-button
+  ir-booking-cancellation --> ir-alert-dialog
+  ir-booking-cancellation --> ir-skeleton
+  ir-booking-cancellation --> ir-icons
+  ir-booking-cancellation --> ir-button
   ir-booking-listing --> ir-booking-overview
   ir-booking-listing --> ir-button
   ir-booking-listing --> ir-invoice
@@ -201,7 +202,7 @@ graph TD;
   ir-booking-overview --> ir-menu
   ir-booking-overview --> ir-pagination
   ir-booking-overview --> ir-booking-card
-  ir-booking-overview --> ir-booking-cancelation
+  ir-booking-overview --> ir-booking-cancellation
   ir-pagination --> ir-button
   ir-pagination --> ir-icons
   ir-booking-card --> ir-badge

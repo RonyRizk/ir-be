@@ -76,7 +76,7 @@ export class IrBookingSummary {
               </div>
             </div>
 
-            <ir-button onButtonClick={() => this.routing.emit('booking')} label={localizedWords.entries.Lcz_ChangeDetails} variants="outline" class="w-full"></ir-button>
+            <ir-button onButtonClick={() => this.routing.emit('booking')} label={localizedWords.entries.Lcz_ChangeDetails} variants="outline-primary" class="w-full"></ir-button>
             <div class={'mt-4  w-full'}>
               <ul class={'w-full space-y-2'}>
                 <li class={'flex w-full items-center justify-between'}>

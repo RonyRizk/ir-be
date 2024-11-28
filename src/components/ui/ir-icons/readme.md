@@ -23,7 +23,7 @@
  - [ir-accomodations](../../ir-booking-engine/ir-booking-page/ir-accomodations)
  - [ir-adult-child-counter](../../ir-booking-engine/ir-booking-page/ir-adult-child-counter)
  - [ir-badge-group](../ir-badge-group)
- - [ir-booking-cancelation](../../ir-booking-cancelation)
+ - [ir-booking-cancellation](../../ir-booking-cancellation)
  - [ir-booking-details](../../ir-booking-engine/ir-checkout-page/ir-booking-details)
  - [ir-booking-details-view](../../ir-booking-engine/ir-booking-listing/ir-booking-details-view)
  - [ir-button](../ir-button)
@@ -50,7 +50,7 @@ graph TD;
   ir-accomodations --> ir-icons
   ir-adult-child-counter --> ir-icons
   ir-badge-group --> ir-icons
-  ir-booking-cancelation --> ir-icons
+  ir-booking-cancellation --> ir-icons
   ir-booking-details --> ir-icons
   ir-booking-details-view --> ir-icons
   ir-button --> ir-icons

@@ -33,7 +33,7 @@ export class IrBookingOverview {
   @State() selectedBooking: Booking | null;
   @State() selectedMenuIds: Record<string, number> = {};
   @State() hoveredBooking = null;
-  @State() cancelationMessage: string;
+  @State() cancellationMessage: string;
   @State() amountToBePayed: number;
 
   @Event() bl_routing: EventEmitter<{
@@ -48,7 +48,7 @@ export class IrBookingOverview {
   private paymentService = new PaymentService();
 
   private booking: Booking;
-  private bookingCancelation: HTMLIrBookingCancelationElement;
+  private bookingCancellation: HTMLIrBookingCancellationElement;
   async componentWillLoad() {
     if (!this.propertyid) {
       throw new Error('missing property id');
@@ -173,11 +173,11 @@ export class IrBookingOverview {
     if (cancelationBrackets?.brackets) {
       this.amountToBePayed = this.paymentService.findClosestDate(cancelationBrackets?.brackets)?.gross_amount || null;
     }
-    this.cancelationMessage = message;
+    this.cancellationMessage = message;
   }
   private async handleBookingCancelation() {
     await this.fetchCancelationMessage(0, 0);
-    this.bookingCancelation.openDialog();
+    this.bookingCancellation.openDialog();
   }
   private handleMenuItemChange(e: CustomEvent) {
     e.stopImmediatePropagation();
@@ -432,13 +432,13 @@ export class IrBookingOverview {
             {this.page_mode === 'multi' && <ir-pagination total={totalPages} current={this.currentPage}></ir-pagination>}
           </section>
 
-          <ir-booking-cancelation
-            ref={el => (this.bookingCancelation = el)}
+          <ir-booking-cancellation
+            ref={el => (this.bookingCancellation = el)}
             booking={this.selectedBooking}
             booking_nbr={this.selectedBooking?.booking_nbr}
             currency={{ code: this.selectedBooking?.currency.code, id: this.selectedBooking?.currency.id }}
-            cancelation={this.cancelationMessage || this.selectedBooking?.rooms[0].rateplan.cancelation}
-            onCancelationResult={e => {
+            cancellation={this.cancellationMessage || this.selectedBooking?.rooms[0].rateplan.cancelation}
+            onCancellationResult={e => {
               e.stopImmediatePropagation();
               e.stopPropagation();
               const { state, booking_nbr } = e.detail;
@@ -446,7 +446,7 @@ export class IrBookingOverview {
                 this.modifyCancelBooking(booking_nbr);
               }
             }}
-          ></ir-booking-cancelation>
+          ></ir-booking-cancellation>
         </section>
       </Host>
     );

@@ -7,10 +7,14 @@ export interface ILocale {
 export type TLocaleLocalizedWordsEntries = {
   Lcz_AcceptAndConfirm: string;
   Lcz_AcceptedCreditCards: string;
+  Lcz_No: string;
+  Lcz_AnyInfant: string;
   Lcz_Activities: string;
   Lcz_Address: string;
   Lcz_Adult: string;
   Lcz_enterchildage: string;
+  Lcz_Bedconfiguration: string;
+  Lcz_IfYouCancelNow: string;
   Lcz_Adults: string;
   Lcz_Age: string;
   Lcz_under1: string;

@@ -5,6 +5,7 @@ import { createStore } from '@stencil/store';
 export interface IRatePlanSelection {
   reserved: number;
   visibleInventory: number;
+  infant_nbr: number;
   selected_variation: Variation | null;
   ratePlan: RatePlan;
   guestName: string[];
@@ -37,7 +38,6 @@ export interface IBookinAvailabilityParams {
   to_date: Date | null;
   adult_nbr: number;
   child_nbr: number;
-  infant_nbr: number;
   coupon?: string;
   agent?: number;
   loyalty?: boolean;
@@ -53,11 +53,13 @@ interface BookingStore {
   resetBooking: boolean;
   isInFreeCancelationZone: boolean;
   fictus_booking_nbr: { nbr: string | null };
+  childrenAges: string[];
 }
 
 const initialState: BookingStore = {
   tax_statement: null,
   roomTypes: undefined,
+  childrenAges: [],
   enableBooking: false,
   resetBooking: false,
   ratePlanSelections: {},
@@ -67,7 +69,6 @@ const initialState: BookingStore = {
     to_date: null,
     adult_nbr: 0,
     child_nbr: 0,
-    infant_nbr: 0,
   },
   booking: null,
   fictus_booking_nbr: null,
@@ -115,6 +116,7 @@ onRoomTypeChange('roomTypes', (newValue: RoomType[]) => {
             }
           : {
               reserved: 0,
+              infant_nbr: 0,
               visibleInventory: roomType.inventory === 1 ? 2 : roomType.inventory,
               selected_variation: ratePlan?.variations[0] ?? null,
               ratePlan,
@@ -194,6 +196,7 @@ export function reserveRooms(roomTypeId: number, ratePlanId: number, rooms: numb
     booking_store.ratePlanSelections[roomTypeId][ratePlanId] = {
       guestName: null,
       reserved: 0,
+      infant_nbr: 0,
       is_bed_configuration_enabled: roomType.is_bed_configuration_enabled,
       visibleInventory: 0,
       selected_variation: null,
@@ -262,9 +265,37 @@ export function calculateTotalCost(gross: boolean = false): { totalAmount: numbe
   return { totalAmount, prePaymentAmount };
 }
 
+// export function validateBooking() {
+//   return Object.values(booking_store.ratePlanSelections).every(roomTypeSelection =>
+//     Object.values(roomTypeSelection).every(ratePlan => ratePlan.guestName.every(name => name.trim() !== '')),
+//   );
+// }
+// export function validateBooking() {
+//   return Object.values(booking_store.ratePlanSelections).every(roomTypeSelection =>
+//     Object.values(roomTypeSelection).every(ratePlan => {
+//       console.log(ratePlan);
+//       return (
+//         (ratePlan.guestName.every(name => name.trim() !== '') &&
+//           (!ratePlan.is_bed_configuration_enabled || ratePlan.checkoutBedSelection.every(selection => selection !== '-1'))) ||
+//         Number(ratePlan.infant_nbr) !== -1
+//       );
+//     }),
+//   );
+// }
+
 export function validateBooking() {
   return Object.values(booking_store.ratePlanSelections).every(roomTypeSelection =>
-    Object.values(roomTypeSelection).every(ratePlan => ratePlan.guestName.every(name => name.trim() !== '')),
+    Object.values(roomTypeSelection).every(ratePlan => {
+      // console.log(ratePlan);
+      return (
+        // Check guestName: All names must be non-empty
+        ratePlan.guestName.every(name => name.trim() !== '') &&
+        // Check bed configuration: If enabled, all selections must be valid
+        (!ratePlan.is_bed_configuration_enabled || ratePlan.checkoutBedSelection.every(selection => selection !== '-1')) &&
+        // Check infant_nbr: Must be greater than -1
+        Number(ratePlan.infant_nbr) > -1
+      );
+    }),
   );
 }
 export function calculateTotalRooms() {

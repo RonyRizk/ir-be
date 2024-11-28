@@ -206,6 +206,7 @@ export class IrBookingListing {
               propertyId={app_store.app_data.property_id}
               perma_link={this.perma_link}
               aName={this.aName}
+              isConfermation={false}
               language={this.language}
               baseUrl={this.baseUrl}
               email={this.selectedBooking.email}
