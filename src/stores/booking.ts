@@ -1,5 +1,5 @@
 import { Booking } from '@/models/booking.dto';
-import { BeddingSetup, ISmokingOption, RatePlan, RoomType, Variation } from '@/models/property';
+import { Agent, BeddingSetup, ISmokingOption, RatePlan, RoomType, Variation } from '@/models/property';
 import { createStore } from '@stencil/store';
 
 export interface IRatePlanSelection {
@@ -39,7 +39,7 @@ export interface IBookinAvailabilityParams {
   adult_nbr: number;
   child_nbr: number;
   coupon?: string;
-  agent?: number;
+  agent?: Agent;
   loyalty?: boolean;
   agent_code?: string;
 }

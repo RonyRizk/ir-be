@@ -134,16 +134,22 @@ export class IrBookingCancellation {
                 </button>
                 {this.isOpen && (
                   <Fragment>
-                    <div class={'divide-y py-2'}>
-                      {this.policies?.map(d => (
-                        <div class="space-y-1.5 py-2.5">
-                          <p class={'font-medium'}>
-                            {d.rt_name} {d.rp_name}
-                          </p>
-                          <p class="text-xs text-gray-500">{d.statement}</p>
-                        </div>
-                      ))}
-                    </div>
+                    {isRequestPending('/Get_Exposed_Applicable_Policies') ? (
+                      <div class="h-20 w-full">
+                        <ir-skeleton class="mb-2.5 h-20  w-60"></ir-skeleton>
+                      </div>
+                    ) : (
+                      <div class={'divide-y py-2'}>
+                        {this.policies?.map(d => (
+                          <div class="space-y-1.5 py-2.5">
+                            <p class={'font-medium'}>
+                              {d.rt_name} {d.rp_name}
+                            </p>
+                            <p class="text-xs text-gray-500">{d.statement}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </Fragment>
                 )}
               </Fragment>

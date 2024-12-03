@@ -38,6 +38,10 @@ export class IrBookingDetails {
     });
   }
   private calculatePrepaymentAmount() {
+    const agent = booking_store.bookingAvailabilityParams.agent;
+    if (agent && agent.payment_mode.code === '001') {
+      return this.prepaymentChange.emit(0);
+    }
     let total = 0;
     for (const roomtypeId in booking_store.ratePlanSelections) {
       for (const rateplanId in booking_store.ratePlanSelections[roomtypeId]) {

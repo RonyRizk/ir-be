@@ -51,7 +51,7 @@ export class IrBookingEngine {
   @State() router = new Stack<HTMLElement>();
   @State() bookingListingScreenOptions: { screen: 'bookings' | 'booking-details'; params: unknown } = { params: null, screen: 'bookings' };
 
-  private version: string = '2.43';
+  private version: string = '2.45';
   private baseUrl: string = 'https://gateway.igloorooms.com/IRBE';
 
   private commonService = new CommonService();
@@ -296,7 +296,7 @@ export class IrBookingEngine {
       is_in_loyalty_mode: booking_store.bookingAvailabilityParams.loyalty ? true : !!booking_store.bookingAvailabilityParams.coupon,
       promo_key: booking_store.bookingAvailabilityParams.coupon || '',
       is_in_agent_mode: !!booking_store.bookingAvailabilityParams.agent || false,
-      agent_id: booking_store.bookingAvailabilityParams.agent || 0,
+      agent_id: booking_store.bookingAvailabilityParams.agent?.id || 0,
       is_in_affiliate_mode: !!app_store.app_data.affiliate,
       affiliate_id: app_store.app_data.affiliate ? app_store.app_data.affiliate.id : null,
     });

@@ -1,4 +1,4 @@
-import { Component, Prop, h } from '@stencil/core';
+import { Component, Prop, State, Watch, h } from '@stencil/core';
 import { Amenity, RoomType } from '@/models/property';
 import localizedWords from '@/stores/localization.store';
 @Component({
@@ -9,7 +9,33 @@ import localizedWords from '@/stores/localization.store';
 export class IrRoomTypeAmenities {
   @Prop() aminities: Amenity[];
   @Prop() roomType: RoomType;
-  renderOccupancyView() {
+  @State() _amenities = [];
+
+  componentWillLoad() {
+    this.setupAmenities();
+  }
+
+  @Watch('aminities')
+  handleAmenitiesChange(newValue, oldValue) {
+    if (newValue !== oldValue) {
+      this.setupAmenities();
+    }
+  }
+  @Watch('roomType')
+  handleRoomTypeChange(newValue, oldValue) {
+    if (newValue !== oldValue) {
+      this.setupAmenities();
+    }
+  }
+  private setupAmenities() {
+    this._amenities = [...this.roomType.amenities, ...(this.aminities ?? [])]?.sort((a, b) => {
+      if (a.description < b.description) return -1;
+      if (a.description > b.description) return 1;
+      return 0;
+    });
+  }
+
+  private renderOccupancyView() {
     const { adult_nbr, children_nbr } = this.roomType.occupancy_max;
     const maxNumber = adult_nbr + children_nbr;
 
@@ -107,7 +133,7 @@ export class IrRoomTypeAmenities {
         <p innerHTML={this.roomType?.description} class="py-4"></p>
         <h3 class="text-lg font-medium text-gray-800">{localizedWords.entries.Lcz_Amenities}</h3>
         <ul class="grid grid-cols-2 gap-2 pb-6 text-xs sm:text-sm lg:grid-cols-3">
-          {this.aminities.map(aminity => {
+          {this._amenities?.map(aminity => {
             if (aminity.amenity_type !== 'room') {
               return null;
             }

@@ -54,6 +54,7 @@ export class IrCheckoutPage {
   @Listen('prepaymentChange')
   handlePrepaymentAmountChange(e: CustomEvent<number>) {
     this.prepaymentAmount = e.detail;
+    checkout_store.prepaymentAmount = this.prepaymentAmount;
   }
   @Listen('bookingClicked')
   async handleBooking(e: CustomEvent) {

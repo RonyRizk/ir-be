@@ -308,7 +308,7 @@ export function validateAgentCode(code: string) {
     isValidCode = true;
     booking_store.bookingAvailabilityParams = {
       ...booking_store.bookingAvailabilityParams,
-      agent: agent.id,
+      agent,
       agent_code: code,
     };
     app_store.app_data = {

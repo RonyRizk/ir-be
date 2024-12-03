@@ -109,6 +109,7 @@ export class PropertyService {
               value: '',
             },
             { key: 'payment_code', value: '' },
+            { key: 'agent_payment_mode', value: '' },
           ]
         : null,
     });
@@ -226,7 +227,7 @@ export class PropertyService {
         is_pms: false,
         is_direct: true,
         language: app_store?.userPreferences?.language_id ?? 'en',
-        agent: booking_store.bookingAvailabilityParams.agent ? { id: booking_store.bookingAvailabilityParams.agent } : null,
+        agent: booking_store.bookingAvailabilityParams.agent ? { id: booking_store.bookingAvailabilityParams.agent?.id } : null,
         is_in_loyalty_mode: booking_store.bookingAvailabilityParams.loyalty,
         promo_key: booking_store.bookingAvailabilityParams.coupon ?? null,
         booking: {
@@ -253,6 +254,12 @@ export class PropertyService {
             ? {
                 key: 'prepayment_amount',
                 value: prePaymentAmount,
+              }
+            : null,
+          booking_store.bookingAvailabilityParams.agent
+            ? {
+                key: 'agent_payment_mode',
+                value: booking_store.bookingAvailabilityParams.agent.payment_mode.code,
               }
             : null,
           {

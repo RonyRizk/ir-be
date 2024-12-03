@@ -5,6 +5,7 @@ import booking_store, { IRatePlanSelection, reserveRooms, updateRoomParams } fro
 import { formatAmount, getDateDifference } from '@/utils/utils';
 import localizedWords from '@/stores/localization.store';
 import { PaymentService } from '@/services/api/payment.service';
+import { isRequestPending } from '@/stores/ir-interceptor.store';
 @Component({
   tag: 'ir-rateplan',
   styleUrl: 'ir-rateplan.css',
@@ -221,7 +222,7 @@ export class IrRateplan {
                       ></ir-select>
                     ) : (
                       <ir-button
-                        disabled={isInventoryFull}
+                        disabled={isInventoryFull || isRequestPending('/Check_Availability')}
                         class="rateplan-select-rooms-btn"
                         buttonStyles={{ background: 'white', width: '100%', opacity: isInventoryFull ? '0.5' : '1' }}
                         label={localizedWords.entries.Lcz_Select}

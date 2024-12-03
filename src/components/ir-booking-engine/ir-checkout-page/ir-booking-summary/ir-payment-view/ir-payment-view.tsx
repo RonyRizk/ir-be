@@ -1,4 +1,5 @@
 import app_store from '@/stores/app.store';
+import booking_store from '@/stores/booking';
 import { checkout_store, ICardProcessingWithCVC, ICardProcessingWithoutCVC } from '@/stores/checkout.store';
 import localizedWords from '@/stores/localization.store';
 import { ZCreditCardSchemaWithCvc } from '@/validators/checkout.validator';
@@ -298,11 +299,14 @@ export class IrPaymentView {
   }
 
   render() {
+    console.log(booking_store.bookingAvailabilityParams.agent);
+    const hasAgentWithCode001 = booking_store.bookingAvailabilityParams.agent && booking_store.bookingAvailabilityParams.agent.payment_mode.code === '001';
     return (
       <div class="w-full space-y-4 rounded-md border border-solid bg-white  p-4">
         {this.prepaymentAmount === 0 && this.selectedPaymentMethod === '001' && <p>{localizedWords.entries.Lcz_PaymentSecurity}</p>}
-        {this.renderPaymentOptions()}
-        {this.renderPaymentMethod()}
+        {!hasAgentWithCode001 && this.renderPaymentOptions()}
+        {!hasAgentWithCode001 && this.renderPaymentMethod()}
+        {hasAgentWithCode001 && <p class={'text-center'}>{localizedWords.entries.Lcz_OnCredit}</p>}
         {this.cardType !== '' &&
           !app_store.property.allowed_cards.find(c => c.name.toLowerCase().includes(this.cardType === 'AMEX' ? 'american express' : this.cardType?.toLowerCase())) && (
             <p class={'text-red-500'}>

@@ -141,15 +141,15 @@ export class IrInvoice {
     this.fetchData(e.detail, true);
   }
   async setAmountAndCancelationPolicy() {
-    if (this.amount || isBefore(new Date(this.booking.to_date), new Date())) {
-      return;
-    }
-    const [bookings_by_amount] = await Promise.all([this.paymentService.getBookingPrepaymentAmount(this.booking)]);
-    const { amount, cancelation_message, guarantee_message, cancelation_policies } = bookings_by_amount;
-    this.cancelation_policies = cancelation_policies;
-    this.cancelation_message = cancelation_message;
-    this.guarantee_message = guarantee_message;
-    this.amount = amount;
+    // if (this.amount || isBefore(new Date(this.booking.to_date), new Date())) {
+    //   return;
+    // }
+    // const [bookings_by_amount] = await Promise.all([this.paymentService.getBookingPrepaymentAmount(this.booking)]);
+    // const { amount, cancelation_message, guarantee_message, cancelation_policies } = bookings_by_amount;
+    // this.cancelation_policies = cancelation_policies;
+    // this.cancelation_message = cancelation_message;
+    // this.guarantee_message = guarantee_message;
+    // this.amount = amount;
   }
 
   renderBookingDetailHeader() {
@@ -175,8 +175,14 @@ export class IrInvoice {
     return `mailto:${email}?subject=${encodedSubject}`;
   }
   renderPaymentText(paymentOption: AllowedPaymentMethod) {
-    console.log('here');
-    console.log(paymentOption);
+    if (this.booking?.extras?.find(e => e.key === 'agent_payment_mode')?.value === '001') {
+      return <p class="total-payment text-sm">{localizedWords.entries.Lcz_OnCredit}</p>;
+    }
+
+    if (!paymentOption) {
+      return null;
+    }
+
     if (paymentOption.is_payment_gateway) {
       const amount = this.booking.financial.payments?.reduce((prev, cur) => cur.amount + prev, 0) ?? 0;
       return (
@@ -421,7 +427,7 @@ export class IrInvoice {
                     {localizedWords.entries.Lcz_Total}{' '}
                     <span class="payment_amount text-green-600">{formatAmount(this.booking.financial.gross_total, this.booking.currency.code)}</span>
                   </p>
-                  {this.payment_option && this.renderPaymentText(this.payment_option)}
+                  {this.renderPaymentText(this.payment_option)}
                 </section>
 
                 <section class="space-y-2">

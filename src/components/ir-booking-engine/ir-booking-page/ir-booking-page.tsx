@@ -6,6 +6,7 @@ import app_store, { onAppDataChange } from '@/stores/app.store';
 import { cn, formatAmount, getDateDifference } from '@/utils/utils';
 import localizedWords from '@/stores/localization.store';
 import { ICurrency, IExposedLanguages, pages } from '@/models/common';
+import { isRequestPending } from '@/stores/ir-interceptor.store';
 @Component({
   tag: 'ir-booking-page',
   styleUrl: 'ir-booking-page.css',
@@ -162,6 +163,7 @@ export class IrBookingPage {
               label={localizedWords.entries.Lcz_BookNow}
               size="lg"
               class="w-auto lg:w-60"
+              disabled={isRequestPending('/Check_Availability')}
               buttonStyles={{
                 height: '64px',
                 borderRadius: '0',

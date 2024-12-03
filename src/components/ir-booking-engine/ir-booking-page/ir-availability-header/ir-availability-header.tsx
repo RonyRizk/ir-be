@@ -36,7 +36,7 @@ export class IrAvailabilityHeader {
     is_in_loyalty_mode: booking_store.bookingAvailabilityParams.loyalty ? true : !!booking_store.bookingAvailabilityParams.coupon,
     promo_key: booking_store.bookingAvailabilityParams.coupon || '',
     is_in_agent_mode: !!booking_store.bookingAvailabilityParams.agent || false,
-    agent_id: booking_store.bookingAvailabilityParams.agent || 0,
+    agent_id: booking_store.bookingAvailabilityParams.agent?.id || 0,
   };
 
   @Event() resetBooking: EventEmitter<null>;
@@ -180,6 +180,9 @@ export class IrAvailabilityHeader {
     }
     modifyQueryParam('checkin', this.exposedBookingAvailabilityParams.from_date);
     modifyQueryParam('checkout', this.exposedBookingAvailabilityParams.to_date);
+    if (this.exposedBookingAvailabilityParams.adult_nbr && this.exposedBookingAvailabilityParams.from_date && this.exposedBookingAvailabilityParams.to_date) {
+      this.recheckAvailability();
+    }
   }
 
   @Listen('addAdultsAndChildren')
@@ -293,7 +296,7 @@ export class IrAvailabilityHeader {
       // child_nbr: this.exposedBookingAvailabilityParams.child_nbr - this.exposedBookingAvailabilityParams.infant_nbr,
       promo_key: booking_store.bookingAvailabilityParams.coupon || '',
       is_in_agent_mode: !!booking_store.bookingAvailabilityParams.agent || false,
-      agent_id: booking_store.bookingAvailabilityParams.agent || 0,
+      agent_id: booking_store.bookingAvailabilityParams.agent?.id || 0,
       is_in_loyalty_mode: booking_store.bookingAvailabilityParams.loyalty ? true : !!booking_store.bookingAvailabilityParams.coupon,
       is_in_affiliate_mode: !!app_store.app_data.affiliate,
       affiliate_id: app_store.app_data.affiliate ? app_store.app_data.affiliate.id : null,
