@@ -211,15 +211,17 @@ export class PropertyService {
         dob: null,
         subscribe_to_news_letter: true,
         cci:
-          checkout_store.payment?.code === '001'
-            ? {
-                nbr: (checkout_store.payment as ICardProcessingWithCVC)?.cardNumber.replace(/ /g, ''),
-                holder_name: (checkout_store.payment as ICardProcessingWithCVC)?.cardHolderName,
-                expiry_month: (checkout_store.payment as ICardProcessingWithCVC)?.expiry_month.split('/')[0],
-                expiry_year: (checkout_store.payment as ICardProcessingWithCVC)?.expiry_year.split('/')[1],
-                cvc: (checkout_store.payment as ICardProcessingWithCVC).cvc,
-              }
-            : null,
+          booking_store.bookingAvailabilityParams.agent && booking_store.bookingAvailabilityParams.agent?.payment_mode?.code === '001'
+            ? null
+            : checkout_store.payment?.code === '001'
+              ? {
+                  nbr: (checkout_store.payment as ICardProcessingWithCVC)?.cardNumber?.replace(/ /g, ''),
+                  holder_name: (checkout_store.payment as ICardProcessingWithCVC)?.cardHolderName,
+                  expiry_month: (checkout_store.payment as ICardProcessingWithCVC)?.expiry_month.split('/')[0],
+                  expiry_year: (checkout_store.payment as ICardProcessingWithCVC)?.expiry_year.split('/')[1],
+                  cvc: (checkout_store.payment as ICardProcessingWithCVC).cvc,
+                }
+              : null,
       };
       const body = {
         assign_units: false,

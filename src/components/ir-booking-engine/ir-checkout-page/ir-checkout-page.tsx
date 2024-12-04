@@ -76,6 +76,9 @@ export class IrCheckoutPage {
     return true;
   }
   private validatePayment(): boolean {
+    if (booking_store.bookingAvailabilityParams.agent && booking_store.bookingAvailabilityParams?.agent?.payment_mode.code === '001') {
+      return true;
+    }
     if (!app_store.property.allowed_payment_methods.some(p => p.is_active)) {
       return true;
     }
