@@ -105,6 +105,7 @@ export class IrPopover {
 
   @Method()
   async toggleVisibility() {
+    console.log('toggleVisibility', this.outsideEvents, this.isVisible);
     if (this.outsideEvents === 'none' && this.isVisible) {
       return this.openChange.emit(false);
     }
@@ -161,7 +162,11 @@ export class IrPopover {
   }
   adjustPopoverPlacement() {
     requestAnimationFrame(() => {
-      const rect = this.contentElement.getBoundingClientRect();
+      if (!this.contentElement) {
+        return;
+      }
+      const rect = this.contentElement?.getBoundingClientRect();
+
       if (rect.bottom > window.innerHeight) {
         this.popoverInstance.setOptions({
           placement: 'top-end',
@@ -215,6 +220,7 @@ export class IrPopover {
                 e.stopImmediatePropagation();
                 e.stopPropagation();
                 this.isDialogOpen = e.detail;
+                this.isVisible = e.detail;
                 this.openChange.emit(e.detail);
               }}
             >
@@ -235,7 +241,7 @@ export class IrPopover {
               }}
             >
               <slot name="trigger">
-                <button class="trigger">
+                <button class="trigger" type="button">
                   <span>{this.trigger_label}</span>
                   <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
