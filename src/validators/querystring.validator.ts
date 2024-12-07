@@ -36,6 +36,9 @@ export class QueryStringValidator {
     return checkinDate;
   }
   public validateAges(str: string) {
+    if (str.length === 1 && !isNaN(Number(str))) {
+      return true;
+    }
     const regex = /^(\d+_)+\d+$/;
     return regex.test(str);
   }

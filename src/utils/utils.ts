@@ -284,7 +284,7 @@ export function validateCoupon(coupon: string) {
     return false;
   }
   let isValidCoupon = false;
-  const c = app_store.property.promotions.find(p => p.key === coupon.trim());
+  const c = app_store.property.promotions.find(p => p.key?.toLowerCase() === coupon.trim()?.toLowerCase());
   if (c) {
     if (isBefore(new Date(c.to), new Date())) {
       return false;

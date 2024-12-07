@@ -197,7 +197,6 @@ export class IrAvailabilityHeader {
     if (infant_nbr) {
       modifyQueryParam('ages', encodeURIComponent(childrenAges.join('_')));
     }
-    console.log(this.exposedBookingAvailabilityParams);
   }
 
   private setDefaultAdultCount() {
