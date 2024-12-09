@@ -53,14 +53,11 @@ export class IrRoomtype {
               )}
             </div>
             {/* </div> */}
-            {booking_store.enableBooking &&
-            (!this.roomtype.is_available_to_book ||
-              this.roomtype.rateplans.every(ratePlan => !ratePlan.is_available_to_book && !ratePlan.not_available_reason?.includes('MLS'))) ? (
-              <p class={`unavailable-roomtype text-base ${this.display === 'default' ? '' : 'pt-4'}`}>{localizedWords.entries.Lcz_NotAvailable}</p>
-            ) : (
+            {(booking_store.enableBooking && this.roomtype.is_available_to_book) ||
+            (!this.roomtype.is_available_to_book && this.roomtype?.rateplans?.some(rp => !rp.is_available_to_book && rp.not_available_reason?.includes('MLS'))) ? (
               <div>
                 {booking_store.enableBooking ? (
-                  this.roomtype.rateplans?.map(ratePlan => {
+                  this.roomtype?.rateplans?.map(ratePlan => {
                     if (!ratePlan.is_available_to_book && !ratePlan.not_available_reason?.includes('MLS')) {
                       return null;
                     }
@@ -82,6 +79,8 @@ export class IrRoomtype {
                   </div>
                 )}
               </div>
+            ) : (
+              <p class={`unavailable-roomtype text-base ${this.display === 'default' ? '' : 'pt-4'}`}>{localizedWords.entries.Lcz_NotAvailable}</p>
             )}
           </div>
         </div>

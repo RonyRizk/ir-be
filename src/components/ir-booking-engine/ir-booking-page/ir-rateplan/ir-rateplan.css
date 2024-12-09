@@ -83,9 +83,13 @@
 }
 .rateplan-discount,
 .no-availability,
-.mls_alert {
+.mls_alert,
+.mls_alert_grid {
   font-weight: 400;
   color: #ef4444;
+  display: inline-flex;
+  padding: 0;
+  margin: 0;
 }
 .rateplan-container .no-availability {
   flex: 1 1 0%;
@@ -106,6 +110,9 @@
   font-size: 1.25rem;
   line-height: 1.2rem;
   padding-bottom: 0.28rem;
+}
+.mls_alert {
+  display: none;
 }
 
 /* sm	640px	 */
@@ -181,6 +188,12 @@
   :host([display='default']) .selectStyle {
     width: 3.5rem !important;
     padding-inline-end: 1.75rem !important;
+  }
+  :host([display='default']) .mls_alert {
+    display: inline-flex;
+  }
+  :host([display='default']) .mls_alert_grid {
+    display: none;
   }
 }
 /* xl	1280px */

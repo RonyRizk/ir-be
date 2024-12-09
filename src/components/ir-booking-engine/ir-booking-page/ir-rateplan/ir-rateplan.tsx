@@ -120,33 +120,38 @@ export class IrRateplan {
               </Fragment>
             )}
           </div>
-          <div class="rateplan-description">
-            <div class="flex items-center justify-between">
-              {this.ratePlan.is_non_refundable ? (
-                <p class="rateplan-tooltip text-xs" style={{ color: 'var(--ir-green)' }}>
-                  {localizedWords.entries.Lcz_NonRefundable}
-                </p>
-              ) : (
-                this.ratePlan.is_available_to_book && (
-                  <ir-tooltip
-                    labelColors={isInFreeCancelationZone ? 'green' : 'default'}
-                    class={`rateplan-tooltip`}
-                    open_behavior="click"
-                    label={isInFreeCancelationZone ? localizedWords.entries.Lcz_FreeCancellation : localizedWords.entries.Lcz_IfICancel}
-                    message={`${(this.cancelationMessage ?? '') || (this.ratePlan.cancelation ?? '')} ${this.ratePlan.guarantee ?? ''}`}
-                    onTooltipOpenChange={e => {
-                      if (e.detail) {
-                        this.fetchCancelationMessage();
-                      }
-                    }}
-                  ></ir-tooltip>
-                )
-              )}
-              {getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date()) > 1 && (
-                <p class="rateplan-amount-per-night grid-view">{`${formatAmount(this.visibleInventory?.selected_variation?.amount_per_night, app_store.userPreferences.currency_id, 0)}/${localizedWords.entries.Lcz_night}`}</p>
-              )}
+          <div class={'flex items-center'}>
+            <div class="rateplan-description flex-1">
+              <div class="flex items-center justify-between">
+                {this.ratePlan.is_non_refundable ? (
+                  <p class="rateplan-tooltip text-xs" style={{ color: 'var(--ir-green)' }}>
+                    {localizedWords.entries.Lcz_NonRefundable}
+                  </p>
+                ) : (
+                  this.ratePlan.is_available_to_book && (
+                    <ir-tooltip
+                      labelColors={isInFreeCancelationZone ? 'green' : 'default'}
+                      class={`rateplan-tooltip`}
+                      open_behavior="click"
+                      label={isInFreeCancelationZone ? localizedWords.entries.Lcz_FreeCancellation : localizedWords.entries.Lcz_IfICancel}
+                      message={`${(this.cancelationMessage ?? '') || (this.ratePlan.cancelation ?? '')} ${this.ratePlan.guarantee ?? ''}`}
+                      onTooltipOpenChange={e => {
+                        if (e.detail) {
+                          this.fetchCancelationMessage();
+                        }
+                      }}
+                    ></ir-tooltip>
+                  )
+                )}
+                {getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date()) > 1 && (
+                  <p class="rateplan-amount-per-night grid-view">{`${formatAmount(this.visibleInventory?.selected_variation?.amount_per_night, app_store.userPreferences.currency_id, 0)}/${localizedWords.entries.Lcz_night}`}</p>
+                )}
+              </div>
+              <p class="rateplan-custom-text" innerHTML={this.ratePlan.custom_text}></p>
             </div>
-            <p class="rateplan-custom-text" innerHTML={this.ratePlan.custom_text}></p>
+            {!this.ratePlan.is_available_to_book && this.ratePlan.not_available_reason.includes('MLS') && (
+              <p class="mls_alert_grid">{localizedWords.entries.Lcz_MLS_Alert.replace('{0}', this.ratePlan.not_available_reason?.replace('MLS-', ''))}</p>
+            )}
           </div>
         </div>
         {this.isRatePlanAvailable && (
