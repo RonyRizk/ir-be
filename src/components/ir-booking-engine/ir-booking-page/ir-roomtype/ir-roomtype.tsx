@@ -53,11 +53,11 @@ export class IrRoomtype {
               )}
             </div>
             {/* </div> */}
-            {(booking_store.enableBooking && this.roomtype.is_available_to_book) ||
-            (!this.roomtype.is_available_to_book && this.roomtype?.rateplans?.some(rp => !rp.is_available_to_book && rp.not_available_reason?.includes('MLS'))) ? (
-              <div>
-                {booking_store.enableBooking ? (
-                  this.roomtype?.rateplans?.map(ratePlan => {
+            {booking_store.enableBooking ? (
+              this.roomtype.is_available_to_book ||
+              (!this.roomtype.is_available_to_book && this.roomtype?.rateplans?.some(rp => !rp.is_available_to_book && rp.not_available_reason?.includes('MLS'))) ? (
+                <div>
+                  {this.roomtype?.rateplans?.map(ratePlan => {
                     if (!ratePlan.is_available_to_book && !ratePlan.not_available_reason?.includes('MLS')) {
                       return null;
                     }
@@ -72,15 +72,15 @@ export class IrRoomtype {
                         roomTypeInventory={this.roomtype.inventory}
                       ></ir-rateplan>
                     );
-                  })
-                ) : (
-                  <div class="app_container flex w-full  flex-col justify-between space-y-1 rounded-md bg-gray-100  text-sm md:flex-row">
-                    <p>{this.roomtype.description}</p>
-                  </div>
-                )}
-              </div>
+                  })}
+                </div>
+              ) : (
+                <p class={`unavailable-roomtype text-base ${this.display === 'default' ? '' : 'pt-4'}`}>{localizedWords.entries.Lcz_NotAvailable}</p>
+              )
             ) : (
-              <p class={`unavailable-roomtype text-base ${this.display === 'default' ? '' : 'pt-4'}`}>{localizedWords.entries.Lcz_NotAvailable}</p>
+              <div class="app_container flex w-full  flex-col justify-between space-y-1 rounded-md bg-gray-100  text-sm md:flex-row">
+                <p>{this.roomtype.description}</p>
+              </div>
             )}
           </div>
         </div>
