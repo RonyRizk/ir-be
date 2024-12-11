@@ -7,14 +7,10 @@
 
 ## Properties
 
-| Property                | Attribute      | Description | Type                            | Default     |
-| ----------------------- | -------------- | ----------- | ------------------------------- | ----------- |
-| `booking`               | --             |             | `Booking`                       | `undefined` |
-| `booking_nbr`           | `booking_nbr`  |             | `string`                        | `undefined` |
-| `cancellation`          | `cancellation` |             | `string`                        | `undefined` |
-| `cancellation_policies` | --             |             | `TBookingInfo[]`                | `[]`        |
-| `currency`              | --             |             | `{ code: string; id: number; }` | `undefined` |
-| `property_id`           | `property_id`  |             | `number`                        | `undefined` |
+| Property      | Attribute     | Description | Type      | Default     |
+| ------------- | ------------- | ----------- | --------- | ----------- |
+| `booking`     | --            |             | `Booking` | `undefined` |
+| `property_id` | `property_id` |             | `number`  | `undefined` |
 
 
 ## Events

@@ -191,9 +191,8 @@ export class IrBookingDetailsView {
           <p class="detail-container" innerHTML={this.formatGuest()}></p>
         </section>
         <ir-booking-cancellation
+          booking={this.booking}
           ref={el => (this.bookingCancelation = el)}
-          booking_nbr={this.booking?.booking_nbr}
-          cancellation={this.booking?.rooms[0].rateplan.cancelation}
           onCancellationResult={e => {
             e.stopImmediatePropagation();
             e.stopPropagation();

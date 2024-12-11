@@ -494,14 +494,7 @@ export class IrInvoice {
           </section>
           {this.footerShown && <ir-footer version={this.version}></ir-footer>}
           {this.footerShown && <ir-privacy-policy hideTrigger ref={el => (this.privacyPolicyRef = el)}></ir-privacy-policy>}
-          <ir-booking-cancellation
-            booking={this.booking}
-            cancellation_policies={this.cancelation_policies}
-            ref={el => (this.bookingCancelation = el)}
-            booking_nbr={this.booking?.booking_nbr}
-            currency={{ code: this.booking.currency.code, id: this.booking.currency.id }}
-            cancellation={this.cancelationMessage || this.booking?.rooms[0].rateplan.cancelation}
-          ></ir-booking-cancellation>
+          <ir-booking-cancellation booking={this.booking} ref={el => (this.bookingCancelation = el)}></ir-booking-cancellation>
         </main>
       </Host>
     );

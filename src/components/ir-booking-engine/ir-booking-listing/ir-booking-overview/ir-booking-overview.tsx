@@ -167,17 +167,10 @@ export class IrBookingOverview {
     ]);
     this.bookings = bookings;
   }
-  async fetchCancelationMessage(id: number, roomTypeId: number) {
-    const { data, message } = await this.paymentService.fetchCancelationMessage({ id, roomTypeId, bookingNbr: this.selectedBooking.booking_nbr, showCancelation: false });
-    const cancelationBrackets = data.find(d => d.type === 'cancelation' && d.brackets);
-    if (cancelationBrackets?.brackets) {
-      this.amountToBePayed = this.paymentService.findClosestDate(cancelationBrackets?.brackets)?.gross_amount || null;
-    }
-    this.cancellationMessage = message;
-  }
-  private async handleBookingCancelation() {
-    await this.fetchCancelationMessage(0, 0);
-    this.bookingCancellation.openDialog();
+  private handleBookingCancellation() {
+    setTimeout(() => {
+      this.bookingCancellation.openDialog();
+    }, 10);
   }
   private handleMenuItemChange(e: CustomEvent) {
     e.stopImmediatePropagation();
@@ -193,7 +186,7 @@ export class IrBookingOverview {
       case 2:
         return this.processPayment();
       case 3:
-        return this.handleBookingCancelation();
+        return this.handleBookingCancellation();
       default:
         return null;
     }
@@ -435,9 +428,6 @@ export class IrBookingOverview {
           <ir-booking-cancellation
             ref={el => (this.bookingCancellation = el)}
             booking={this.selectedBooking}
-            booking_nbr={this.selectedBooking?.booking_nbr}
-            currency={{ code: this.selectedBooking?.currency.code, id: this.selectedBooking?.currency.id }}
-            cancellation={this.cancellationMessage || this.selectedBooking?.rooms[0].rateplan.cancelation}
             onCancellationResult={e => {
               e.stopImmediatePropagation();
               e.stopPropagation();

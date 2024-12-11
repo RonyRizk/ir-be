@@ -8,7 +8,6 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Amenity, BeddingSetup, IExposedProperty, RatePlan, RoomType, Variation } from "./models/property";
 import { AddAdultsAndChildrenEvent } from "./components/ir-booking-engine/ir-booking-page/ir-adult-child-counter/ir-adult-child-counter";
 import { TSource } from "./stores/app.store";
-import { TBookingInfo } from "./services/api/payment.service";
 import { Booking } from "./models/booking.dto";
 import { CheckoutErrors, ICurrency, IExposedLanguages, pages } from "./models/common";
 import { TIcons } from "./components/ui/ir-icons/icons";
@@ -25,7 +24,6 @@ import { TContainerStyle } from "./components/ir-booking-widget/types";
 export { Amenity, BeddingSetup, IExposedProperty, RatePlan, RoomType, Variation } from "./models/property";
 export { AddAdultsAndChildrenEvent } from "./components/ir-booking-engine/ir-booking-page/ir-adult-child-counter/ir-adult-child-counter";
 export { TSource } from "./stores/app.store";
-export { TBookingInfo } from "./services/api/payment.service";
 export { Booking } from "./models/booking.dto";
 export { CheckoutErrors, ICurrency, IExposedLanguages, pages } from "./models/common";
 export { TIcons } from "./components/ui/ir-icons/icons";
@@ -116,10 +114,6 @@ export namespace Components {
     }
     interface IrBookingCancellation {
         "booking": Booking;
-        "booking_nbr": string;
-        "cancellation": string;
-        "cancellation_policies": TBookingInfo[];
-        "currency": { code: string; id: number };
         "openDialog": () => Promise<void>;
         "property_id": number;
     }
@@ -1908,10 +1902,6 @@ declare namespace LocalJSX {
     }
     interface IrBookingCancellation {
         "booking"?: Booking;
-        "booking_nbr"?: string;
-        "cancellation"?: string;
-        "cancellation_policies"?: TBookingInfo[];
-        "currency"?: { code: string; id: number };
         "onCancellationResult"?: (event: IrBookingCancellationCustomEvent<{ state: 'failed' | 'success'; booking_nbr: string }>) => void;
         "onOpenChange"?: (event: IrBookingCancellationCustomEvent<boolean>) => void;
         "property_id"?: number;
