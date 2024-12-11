@@ -10,7 +10,7 @@ import app_store from '@/stores/app.store';
 import booking_store, { calculateTotalRooms, validateBooking } from '@/stores/booking';
 import { checkout_store } from '@/stores/checkout.store';
 import localizedWords from '@/stores/localization.store';
-import { destroyBookingCookie, detectCardType, getDateDifference, injectHTMLAndRunScript } from '@/utils/utils';
+import { destroyBookingCookie, detectCardType, generateCheckoutUrl, getDateDifference, injectHTMLAndRunScript } from '@/utils/utils';
 import { ZCreditCardSchemaWithCvc } from '@/validators/checkout.validator';
 import { Component, Host, Listen, State, h, Event, EventEmitter } from '@stencil/core';
 import { ZodError, ZodIssue } from 'zod';
@@ -195,7 +195,12 @@ export class IrCheckoutPage {
           email: booking_store.booking.guest.email,
           booking_number: booking_store.booking.booking_nbr,
         };
-        this.routing.emit('invoice');
+        return (window.location.href = generateCheckoutUrl(app_store.property.perma_link, {
+          e: result.guest.email,
+          b: result.booking_nbr,
+          lang: app_store.userPreferences.language_id,
+          s: '1',
+        }));
       } else {
         let token = app_store.app_data.token;
         if (!app_store.is_signed_in) {

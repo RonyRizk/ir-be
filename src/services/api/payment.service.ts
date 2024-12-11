@@ -3,6 +3,7 @@ import { IBrackets, IExposedApplicablePolicies } from '@/models/property';
 import app_store from '@/stores/app.store';
 import booking_store from '@/stores/booking';
 import localizedWords from '@/stores/localization.store';
+import { generateCheckoutUrl } from '@/utils/utils';
 import axios from 'axios';
 import { isBefore, isSameDay, parseISO } from 'date-fns';
 
@@ -56,7 +57,7 @@ export class PaymentService {
     // const data = await resp.json();
     const { data } = await axios.post(
       '/Generate_Payment_Caller',
-      { ...params, callback_url: `https://${app_store.property.perma_link}.bookingmystay.com/invoice` },
+      { ...params, callback_url: generateCheckoutUrl(app_store.property.perma_link) },
       { headers: { Authorization: token } },
     );
     if (data['ExceptionMsg'] !== '') {
