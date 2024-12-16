@@ -31,6 +31,7 @@
 }
 
 :host([data-state='error']) .input-trigger {
+  border-width: 2px;
   border-color: var(--error-500, hsl(4, 86%, 58%));
 }
 :host([data-state='error']) label {

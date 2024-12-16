@@ -30,6 +30,16 @@
 :host {
   z-index: 10;
 }
+.total-amount-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.infant-tooltip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .carousel-container {
   aspect-ratio: 4/3;
 }

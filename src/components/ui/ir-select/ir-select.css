@@ -37,6 +37,7 @@
   padding-bottom: 0.625rem /* 10px */;
 }
 :host([data-state='error']) .selected-trigger {
+  border-width: 2px;
   border-color: var(--error-500, #f04438) !important;
 }
 :host([data-state='error']) .select-label {

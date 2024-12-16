@@ -27,13 +27,12 @@ export class IrBookingSummary {
 
   render() {
     const total_nights = getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date());
-    const { totalAmount } = calculateTotalCost(true);
+    const { totalAmount } = calculateTotalCost({
+      gross: true,
+      infants: true,
+    });
     if (isRequestPending('/Get_Setup_Entries_By_TBL_NAME_MULTI')) {
-      return (
-        <div>
-          <p>Loading</p>
-        </div>
-      );
+      return <div></div>;
     }
     return (
       <Host>

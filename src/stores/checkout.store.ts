@@ -35,7 +35,7 @@ const initialState: CheckoutStore = {
     arrival_date: format(new Date(), 'yyyy-MM-dd'),
   },
   payment: null,
-  agreed_to_services: false,
+  agreed_to_services: true,
 };
 
 export const { state: checkout_store, onChange: onCheckoutDataChange } = createStore<CheckoutStore>(initialState);

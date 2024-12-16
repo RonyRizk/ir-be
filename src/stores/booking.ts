@@ -1,11 +1,12 @@
 import { Booking } from '@/models/booking.dto';
 import { Agent, BeddingSetup, ISmokingOption, RatePlan, RoomType, Variation } from '@/models/property';
+import VariationService from '@/services/app/variation.service';
 import { createStore } from '@stencil/store';
 
 export interface IRatePlanSelection {
   reserved: number;
   visibleInventory: number;
-  infant_nbr: number;
+  infant_nbr: number[];
   selected_variation: Variation | null;
   ratePlan: RatePlan;
   guestName: string[];
@@ -116,7 +117,7 @@ onRoomTypeChange('roomTypes', (newValue: RoomType[]) => {
             }
           : {
               reserved: 0,
-              infant_nbr: 0,
+              infant_nbr: [],
               visibleInventory: roomType.inventory === 1 ? 2 : roomType.inventory,
               selected_variation: ratePlan?.variations[0] ?? null,
               ratePlan,
@@ -196,7 +197,7 @@ export function reserveRooms(roomTypeId: number, ratePlanId: number, rooms: numb
     booking_store.ratePlanSelections[roomTypeId][ratePlanId] = {
       guestName: null,
       reserved: 0,
-      infant_nbr: 0,
+      infant_nbr: [],
       is_bed_configuration_enabled: roomType.is_bed_configuration_enabled,
       visibleInventory: 0,
       selected_variation: null,
@@ -239,32 +240,83 @@ export function modifyBookingStore(key: keyof BookingStore, value: any) {
   booking_store[key] = value;
 }
 
-export function calculateTotalCost(gross: boolean = false): { totalAmount: number; prePaymentAmount: number } {
+// export function calculateTotalCost(gross: boolean = false): { totalAmount: number; prePaymentAmount: number } {
+//   let prePaymentAmount = 0;
+//   let totalAmount = 0;
+//   const variationService = new VariationService();
+//   const calculateCost = (ratePlan: IRatePlanSelection, isPrePayment: boolean = false) => {
+//     if (ratePlan.checkoutVariations.length > 0 && ratePlan.reserved > 0) {
+//       if (isPrePayment) {
+//         return ratePlan.reserved * ratePlan.ratePlan.pre_payment_amount || 0;
+//       }
+//       return ratePlan.checkoutVariations.reduce((sum, variation, index) => {
+//         const infantBasedVariation = variationService.getVariationBasedOnInfants({
+//           variations: ratePlan.ratePlan.variations,
+//           baseVariation: variation,
+//           infants: ratePlan.infant_nbr[index],
+//         });
+//         return sum + Number(infantBasedVariation[gross ? 'discounted_gross_amount' : 'discounted_amount']);
+//       }, 0);
+//     } else if (ratePlan.reserved > 0) {
+//       const amount = isPrePayment ? ratePlan.ratePlan.pre_payment_amount ?? 0 : ratePlan.selected_variation[gross ? 'discounted_gross_amount' : 'discounted_amount'];
+//       return ratePlan.reserved * (amount ?? 0);
+//     }
+//     return 0;
+//   };
+//   Object.values(booking_store.ratePlanSelections).forEach(value => {
+//     Object.values(value).forEach(ratePlan => {
+//       totalAmount += calculateCost(ratePlan);
+//       prePaymentAmount += calculateCost(ratePlan, true);
+//     });
+//   });
+//   return { totalAmount, prePaymentAmount };
+// }
+type CostCalculationConfig = {
+  gross: boolean;
+  infants: boolean;
+};
+export function calculateTotalCost(config: CostCalculationConfig = { gross: false, infants: false }): { totalAmount: number; prePaymentAmount: number } {
   let prePaymentAmount = 0;
   let totalAmount = 0;
-  const calculateCost = (ratePlan: IRatePlanSelection, isPrePayment: boolean = false) => {
+  const variationService = new VariationService();
+
+  // Helper to calculate cost for a single rate plan
+  const calculateCost = (ratePlan: IRatePlanSelection, isPrePayment: boolean): number => {
     if (ratePlan.checkoutVariations.length > 0 && ratePlan.reserved > 0) {
-      if (isPrePayment) {
-        return ratePlan.reserved * ratePlan.ratePlan.pre_payment_amount || 0;
+      let variations: Variation[] = ratePlan.checkoutVariations;
+      if (config.infants) {
+        variations = [
+          ...ratePlan.checkoutVariations.map((variation, index) =>
+            variationService.getVariationBasedOnInfants({
+              variations: ratePlan.ratePlan.variations,
+              baseVariation: variation,
+              infants: ratePlan.infant_nbr[index],
+            }),
+          ),
+        ];
       }
-      return ratePlan.checkoutVariations.reduce((sum, variation) => {
-        return sum + Number(variation[gross ? 'discounted_gross_amount' : 'discounted_amount']);
+
+      return variations.reduce((sum, infantBasedVariation) => {
+        const amount = isPrePayment ? ratePlan.ratePlan.pre_payment_amount || 0 : infantBasedVariation[config.gross ? 'discounted_gross_amount' : 'discounted_amount'] || 0;
+        return sum + amount * ratePlan.reserved;
       }, 0);
     } else if (ratePlan.reserved > 0) {
-      const amount = isPrePayment ? ratePlan.ratePlan.pre_payment_amount ?? 0 : ratePlan.selected_variation[gross ? 'discounted_gross_amount' : 'discounted_amount'];
-      return ratePlan.reserved * (amount ?? 0);
+      const amount = isPrePayment ? ratePlan.ratePlan.pre_payment_amount || 0 : ratePlan.selected_variation?.[config.gross ? 'discounted_gross_amount' : 'discounted_amount'] || 0;
+      return amount * ratePlan.reserved;
     }
     return 0;
   };
-  Object.values(booking_store.ratePlanSelections).forEach(value => {
-    Object.values(value).forEach(ratePlan => {
-      totalAmount += calculateCost(ratePlan);
+
+  // Iterate through rate plan selections
+  Object.values(booking_store.ratePlanSelections).forEach(roomTypeSelection => {
+    Object.values(roomTypeSelection).forEach(ratePlan => {
+      totalAmount += calculateCost(ratePlan, false);
       prePaymentAmount += calculateCost(ratePlan, true);
     });
   });
+
   return { totalAmount, prePaymentAmount };
 }
-
 // export function validateBooking() {
 //   return Object.values(booking_store.ratePlanSelections).every(roomTypeSelection =>
 //     Object.values(roomTypeSelection).every(ratePlan => ratePlan.guestName.every(name => name.trim() !== '')),
@@ -293,7 +345,7 @@ export function validateBooking() {
         // Check bed configuration: If enabled, all selections must be valid
         (!ratePlan.is_bed_configuration_enabled || ratePlan.checkoutBedSelection.every(selection => selection !== '-1')) &&
         // Check infant_nbr: Must be greater than -1
-        Number(ratePlan.infant_nbr) > -1
+        ratePlan.infant_nbr.every(nb => Number(nb) > -1)
       );
     }),
   );

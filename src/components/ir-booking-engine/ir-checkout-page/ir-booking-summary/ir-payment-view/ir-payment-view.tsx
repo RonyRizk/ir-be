@@ -1,3 +1,4 @@
+import { AllowedPaymentMethod } from '@/models/property';
 import app_store from '@/stores/app.store';
 import booking_store from '@/stores/booking';
 import { checkout_store, ICardProcessingWithCVC, ICardProcessingWithoutCVC } from '@/stores/checkout.store';
@@ -14,8 +15,10 @@ import { ZodIssue } from 'zod';
 export class IrPaymentView {
   @Prop() prepaymentAmount: number = 0;
   @Prop() errors: Record<string, ZodIssue>;
+
   @State() selectedPaymentMethod: string;
   @State() cardType: string = '';
+  @State() paymentDetails: { paymentMethods: AllowedPaymentMethod[]; filteredMap: { id: string; value: string }[] };
 
   componentWillLoad() {
     this.setPaymentMethod();
@@ -34,7 +37,7 @@ export class IrPaymentView {
   }
 
   private setPaymentMethod() {
-    const paymentMethods = app_store.property?.allowed_payment_methods.filter(pm => pm.is_active) || [];
+    const { paymentMethods } = this.setPaymentDetails();
     let selectedMethodCode = null;
     if (
       (this.prepaymentAmount === 0 && paymentMethods.length === 1 && paymentMethods[0].is_payment_gateway) ||
@@ -48,6 +51,26 @@ export class IrPaymentView {
       selectedMethodCode = firstMethod.code === '000' && secondMethod ? secondMethod.code : firstMethod.code;
     }
     this.selectedPaymentMethod = selectedMethodCode;
+  }
+  private setPaymentDetails() {
+    const paymentMethods = app_store.property.allowed_payment_methods.filter(p => p.is_active) || [];
+
+    const filteredMap = paymentMethods
+      .filter(apm => !(apm.is_payment_gateway && this.prepaymentAmount === 0)) // Filter out inactive gateways for zero prepayment
+      .map(apm => ({
+        id: apm.code,
+        value: apm.is_payment_gateway
+          ? localizedWords.entries[`Lcz_Pay_${apm.code}`] || localizedWords.entries.Lcz_PayByCard
+          : ['001', '004'].includes(apm.code)
+            ? localizedWords.entries.Lcz_SecureByCard
+            : apm.description,
+      }));
+    const paymentDetails = {
+      paymentMethods,
+      filteredMap,
+    };
+    this.paymentDetails = paymentDetails;
+    return paymentDetails;
   }
 
   private getExpiryMask() {
@@ -74,8 +97,15 @@ export class IrPaymentView {
       placeholderChar: '_',
     };
   }
+  private handlePaymentSelectionChange(e: CustomEvent) {
+    e.stopImmediatePropagation();
+    e.stopPropagation();
+    const payment_code = e.detail;
+    this.selectedPaymentMethod = payment_code;
+    checkout_store.payment.code = payment_code;
+  }
 
-  renderPaymentMethod() {
+  private renderPaymentMethod() {
     if (app_store.property.allowed_payment_methods.length === 0) {
       return;
     }
@@ -217,7 +247,7 @@ export class IrPaymentView {
       return (
         <div class="flex w-full gap-4">
           <div class="flex-1 space-y-1.5">
-            <p>{method.description}</p>
+            {this.paymentDetails?.filteredMap?.length === 1 && <p>{method.description}</p>}
             <p
               class="text-xs text-gray-700"
               innerHTML={
@@ -230,16 +260,9 @@ export class IrPaymentView {
       );
     }
   }
-  handlePaymentSelectionChange(e: CustomEvent) {
-    e.stopImmediatePropagation();
-    e.stopPropagation();
-    const payment_code = e.detail;
-    this.selectedPaymentMethod = payment_code;
-    checkout_store.payment.code = payment_code;
-  }
-  renderPaymentOptions() {
-    const paymentMethods = app_store.property.allowed_payment_methods.filter(p => p.is_active) ?? [];
 
+  private renderPaymentOptions() {
+    const { filteredMap, paymentMethods } = this.paymentDetails;
     const paymentLength = paymentMethods.length;
     if ((this.prepaymentAmount === 0 && !paymentMethods.some(pm => !pm.is_payment_gateway)) || paymentLength === 0) {
       return <p class="text-center">{localizedWords.entries.Lcz_NoDepositRequired}</p>;
@@ -251,27 +274,6 @@ export class IrPaymentView {
     //   return <p>{localizedWords.entries.Lcz_SecureByCard}</p>;
     // }
     if (paymentLength > 1) {
-      const filteredMap = app_store.property?.allowed_payment_methods
-        .map(apm => {
-          if (!apm.is_active) {
-            return null;
-          }
-          // if (apm.code === '000') {
-          //   return null;
-          // }
-          if (apm.is_payment_gateway && this.prepaymentAmount === 0) {
-            return null;
-          }
-          return {
-            id: apm.code,
-            value: apm.is_payment_gateway
-              ? `${localizedWords.entries[`Lcz_Pay_${apm.code}`] ?? localizedWords.entries.Lcz_PayByCard}`
-              : apm.code === '001' || apm.code === '004'
-                ? localizedWords.entries.Lcz_SecureByCard
-                : apm.description,
-          };
-        })
-        .filter(p => p !== null);
       if (filteredMap.length === 0) {
         return <p class="text-center">{localizedWords.entries.Lcz_NoDepositRequired}</p>;
       } else if (filteredMap.length === 1 && ['001', '005'].includes(filteredMap[0].id)) {
@@ -299,7 +301,6 @@ export class IrPaymentView {
   }
 
   render() {
-    console.log(booking_store.bookingAvailabilityParams.agent);
     const hasAgentWithCode001 = booking_store.bookingAvailabilityParams.agent && booking_store.bookingAvailabilityParams.agent.payment_mode.code === '001';
     return (
       <div class="w-full space-y-4 rounded-md border border-solid bg-white  p-4">

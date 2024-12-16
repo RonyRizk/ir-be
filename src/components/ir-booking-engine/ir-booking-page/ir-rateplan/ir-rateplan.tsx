@@ -180,6 +180,7 @@ export class IrRateplan {
                       data={this.ratePlan.variations.map((v, i) => ({
                         id: i.toString(),
                         value: this.formatVariation(v),
+                        html: true,
                       }))}
                     ></ir-select>
                   )}
@@ -228,8 +229,8 @@ export class IrRateplan {
                     ) : (
                       <ir-button
                         disabled={isInventoryFull || isRequestPending('/Check_Availability')}
-                        class="rateplan-select-rooms-btn"
-                        buttonStyles={{ background: 'white', width: '100%', opacity: isInventoryFull ? '0.5' : '1' }}
+                        class="rateplan-select-rooms w-full"
+                        buttonStyles={{ background: 'white', opacity: isInventoryFull ? '0.5' : '1' }}
                         label={localizedWords.entries.Lcz_Select}
                         variants="outline-primary"
                         onButtonClick={() => {
@@ -253,6 +254,6 @@ export class IrRateplan {
     const adults = `${v.adult_nbr} ${v.adult_nbr === 1 ? localizedWords.entries.Lcz_Adult.toLowerCase() : localizedWords.entries.Lcz_Adults.toLowerCase()}`;
     const children =
       v.child_nbr > 0 ? `${v.child_nbr}  ${v.child_nbr > 1 ? localizedWords.entries.Lcz_Children.toLowerCase() : localizedWords.entries.Lcz_Child.toLowerCase()}` : null;
-    return children ? `${adults} ${children}` : adults;
+    return children ? `${adults}&nbsp&nbsp&nbsp${children}` : adults;
   }
 }

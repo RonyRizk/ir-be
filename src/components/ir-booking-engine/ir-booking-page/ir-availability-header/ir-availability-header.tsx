@@ -180,8 +180,13 @@ export class IrAvailabilityHeader {
     }
     modifyQueryParam('checkin', this.exposedBookingAvailabilityParams.from_date);
     modifyQueryParam('checkout', this.exposedBookingAvailabilityParams.to_date);
-    if (this.exposedBookingAvailabilityParams.adult_nbr && this.exposedBookingAvailabilityParams.from_date && this.exposedBookingAvailabilityParams.to_date) {
-      this.recheckAvailability();
+    if (
+      !!this.exposedBookingAvailabilityParams.adult_nbr &&
+      !!this.exposedBookingAvailabilityParams.from_date &&
+      !!this.exposedBookingAvailabilityParams.to_date &&
+      app_store.fetchedBooking
+    ) {
+      this.checkAvailability();
     }
   }
 
@@ -233,7 +238,7 @@ export class IrAvailabilityHeader {
     }
     if (this.validator.validateAges(this.ages)) {
       const ages = this.ages.split('_');
-      ages.slice(0, this.adultCount.length + 1).forEach((age, index) => {
+      ages.slice(0, this.exposedBookingAvailabilityParams.child_nbr + 1).forEach((age, index) => {
         booking_store.childrenAges[index] = age.toString();
       });
       const infant_nbr = calculateInfantNumber(booking_store.childrenAges);
@@ -391,7 +396,7 @@ export class IrAvailabilityHeader {
             class="adult-child-counter"
             ref={el => (this.personCounter = el)}
             baseChildrenAges={booking_store.childrenAges}
-            // onCheckAvailability={() => this.handleCheckAvailability()}
+            onCheckAvailability={() => this.handleCheckAvailability()}
           ></ir-adult-child-counter>
           <div class={'hidden sm:block'}>
             <ir-button

@@ -65,6 +65,7 @@ graph TD;
   ir-booking-page --> ir-availability-header
   ir-booking-page --> ir-roomtype
   ir-booking-page --> ir-facilities
+  ir-booking-page --> ir-tooltip
   ir-booking-page --> ir-button
   ir-property-gallery --> ir-icons
   ir-property-gallery --> ir-gallery

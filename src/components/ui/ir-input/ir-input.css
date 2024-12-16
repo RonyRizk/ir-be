@@ -1,5 +1,6 @@
 :host([data-state='error']) .input-container {
   border-color: red;
+  border-width: 2px;
 }
 .input-container {
   border-radius: 8px;

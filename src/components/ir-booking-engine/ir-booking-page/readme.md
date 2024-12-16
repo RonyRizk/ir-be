@@ -35,6 +35,7 @@
 - [ir-availability-header](ir-availability-header)
 - [ir-roomtype](ir-roomtype)
 - [ir-facilities](ir-facilities)
+- [ir-tooltip](../../ui/ir-tooltip)
 - [ir-button](../../ui/ir-button)
 
 ### Graph
@@ -44,6 +45,7 @@ graph TD;
   ir-booking-page --> ir-availability-header
   ir-booking-page --> ir-roomtype
   ir-booking-page --> ir-facilities
+  ir-booking-page --> ir-tooltip
   ir-booking-page --> ir-button
   ir-property-gallery --> ir-icons
   ir-property-gallery --> ir-gallery

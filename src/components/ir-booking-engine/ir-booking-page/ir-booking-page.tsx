@@ -74,8 +74,6 @@ export class IrBookingPage {
       const targetPosition = this.availabilityHeaderRef.getBoundingClientRect().top + window.scrollY - (headerHeight + 5);
       const currentPosition = window.scrollY;
       const tolerance = 10;
-      console.log(currentPosition, targetPosition);
-
       if (currentPosition === 0 || Math.abs(currentPosition - targetPosition) > tolerance) {
         this.availabilityHeaderRef.scrollIntoView({ behavior: 'smooth', block: 'start' });
         setTimeout(() => {
@@ -157,7 +155,15 @@ export class IrBookingPage {
             class="sticky bottom-2 z-40 mt-14 flex w-full items-center justify-end gap-4 rounded-md bg-gray-700/80 text-base text-gray-200 md:text-lg lg:gap-10  lg:text-2xl"
           >
             <p>{this.renderTotalNights()}</p>
-            {totalAmount > 0 && <div>{formatAmount(totalAmount, app_store.userPreferences.currency_id, 0)}</div>}
+            {totalAmount > 0 && (
+              <div class="total-amount-container">
+                <span>{formatAmount(totalAmount, app_store.userPreferences.currency_id, 0)}</span>
+                {booking_store.childrenAges?.some(age => Number(age) < app_store.childrenStartAge) && (
+                  <ir-tooltip class="infant-tooltip" message={localizedWords.entries.Lcz_PriceDrop}></ir-tooltip>
+                )}
+              </div>
+            )}
+
             <ir-button
               onButtonClick={() => this.routing.emit('checkout')}
               label={localizedWords.entries.Lcz_BookNow}

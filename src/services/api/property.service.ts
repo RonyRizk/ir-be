@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { Colors } from '../app/colors.service';
 import { TGuest } from '@/models/user_form';
 import { DataStructure } from '@/models/common';
+import VariationService from '../app/variation.service';
 
 export class PropertyService {
   private propertyHelpers = new PropertyHelpers();
@@ -142,11 +143,17 @@ export class PropertyService {
 
   private filterRooms() {
     let rooms = [];
+    const variationService = new VariationService();
     Object.values(booking_store.ratePlanSelections).map(rt => {
       Object.values(rt).map((rp: IRatePlanSelection) => {
         if (rp.reserved > 0) {
           [...new Array(rp.reserved)].map((_, index) => {
             const { first_name, last_name } = this.propertyHelpers.extractFirstNameAndLastName(index, rp.guestName);
+            const variation = variationService.getVariationBasedOnInfants({
+              baseVariation: rp.checkoutVariations[index],
+              variations: rp.ratePlan.variations,
+              infants: rp.infant_nbr[index],
+            });
             rooms.push({
               identifier: null,
               roomtype: rp.roomtype,
@@ -156,8 +163,8 @@ export class PropertyService {
               smoking_option: rp.checkoutSmokingSelection[index],
               occupancy: {
                 adult_nbr: rp.checkoutVariations[index].adult_nbr,
-                children_nbr: rp.checkoutVariations[index].child_nbr,
-                infant_nbr: rp.infant_nbr,
+                children_nbr: rp.checkoutVariations[index].child_nbr - rp.infant_nbr[index],
+                infant_nbr: rp.infant_nbr[index],
               },
               bed_preference: rp.is_bed_configuration_enabled ? rp.checkoutBedSelection[index] : null,
               from_date: format(booking_store.bookingAvailabilityParams.from_date, 'yyyy-MM-dd'),
@@ -166,9 +173,9 @@ export class PropertyService {
               days: this.propertyHelpers.generateDays(
                 booking_store.bookingAvailabilityParams.from_date,
                 booking_store.bookingAvailabilityParams.to_date,
-                Number(rp.checkoutVariations[index].discounted_amount) /
-                  getDateDifference(booking_store.bookingAvailabilityParams.from_date, booking_store.bookingAvailabilityParams.to_date),
+                Number(variation.discounted_gross_amount) / getDateDifference(booking_store.bookingAvailabilityParams.from_date, booking_store.bookingAvailabilityParams.to_date),
               ),
+              // days: variation.nights,
               guest: {
                 email: null,
                 first_name,
