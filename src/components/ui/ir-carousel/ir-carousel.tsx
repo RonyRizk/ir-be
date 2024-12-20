@@ -92,7 +92,8 @@ export class IrCarousel {
           {/* Slides */}
           {this.slides.map(slide => (
             <div class="swiper-slide" data-swipable={this.enableCarouselSwipe}>
-              <img loading="lazy" src={slide.image_uri} onClick={() => this.carouselImageClicked.emit(null)} key={slide.id} alt={slide.alt} />
+              <ir-image thumbnail={slide.thumbnail} class="slide-img" src={slide.image_uri} onClick={() => this.carouselImageClicked.emit(null)} key={slide.id} alt={slide.alt} />
+              {/* <img loading="lazy" src={slide.image_uri} onClick={() => this.carouselImageClicked.emit(null)} key={slide.id} alt={slide.alt} /> */}
             </div>
           ))}
         </div>

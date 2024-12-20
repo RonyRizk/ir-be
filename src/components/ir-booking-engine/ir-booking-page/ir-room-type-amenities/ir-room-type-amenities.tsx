@@ -130,9 +130,9 @@ export class IrRoomTypeAmenities {
             <div class="flex items-center gap-2">{this.renderOccupancyView()}</div>
           </div>
         )}
-        <p innerHTML={this.roomType?.description} class="py-4"></p>
+        <p innerHTML={this.roomType?.description} class="py-2"></p>
         <h3 class="text-lg font-medium text-gray-800">{localizedWords.entries.Lcz_Amenities}</h3>
-        <ul class="grid grid-cols-2 gap-2 pb-6 text-xs sm:text-sm lg:grid-cols-3">
+        <ul class="grid grid-cols-2 gap-1 pb-6 text-xs sm:text-sm lg:grid-cols-3">
           {this._amenities?.map(aminity => {
             if (aminity.amenity_type !== 'room') {
               return null;

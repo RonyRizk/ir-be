@@ -6,15 +6,16 @@
   background: #ffffff;
 }
 .carousel-container {
-  aspect-ratio: 4/3;
+  aspect-ratio: 1.5;
+  width: 100%;
 }
-.coursel_gallery_container {
+.carousel_gallery_container {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
   width: 100%;
-  aspect-ratio: 16/9;
+  aspect-ratio: 1.5;
 }
 
 .more-details-button {
@@ -65,8 +66,15 @@
     border-bottom-right-radius: min(var(--radius, 8px), 1rem);
     border-bottom-left-radius: min(var(--radius, 8px), 1rem);
   }
+  :host([display='default']) .carousel-container {
+    aspect-ratio: 16/12;
+    width: 18.75rem;
+  }
 }
 @media (min-width: 1280px) {
+  :host([display='default']) .carousel-container {
+    max-height: 15.625rem;
+  }
   :host([display='default']) .gallery-img {
     min-height: 250px;
   }

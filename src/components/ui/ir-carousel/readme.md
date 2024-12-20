@@ -30,9 +30,14 @@
 
  - [ir-property-gallery](../../ir-booking-engine/ir-booking-page/ir-property-gallery)
 
+### Depends on
+
+- [ir-image](../ir-image)
+
 ### Graph
 ```mermaid
 graph TD;
+  ir-carousel --> ir-image
   ir-property-gallery --> ir-carousel
   style ir-carousel fill:#f9f,stroke:#333,stroke-width:4px
 ```

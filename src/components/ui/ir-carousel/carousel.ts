@@ -3,4 +3,5 @@ export type TCarouselSlides = {
   title?: string;
   id: string;
   alt: string;
+  thumbnail: string;
 };

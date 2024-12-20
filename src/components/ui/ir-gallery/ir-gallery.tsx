@@ -9,7 +9,7 @@ import { Navigation } from 'swiper/modules';
   shadow: true,
 })
 export class IrGallery {
-  @Prop() images: { url: string; alt: string }[] = [];
+  @Prop() images: { url: string; alt: string; thumbnail: string }[] = [];
   @Prop() totalImages: number = 0;
   @Prop() maxLength: number;
   @Prop() disableCarouselClick: boolean = false;
@@ -103,7 +103,22 @@ export class IrGallery {
                     <p class="sr-only">open gallery</p>
                   </button>
                 )}
-                <img
+                <ir-image
+                  thumbnail={image.thumbnail}
+                  class="slide-image"
+                  data-disabled={this.disableCarouselClick}
+                  onClick={() => {
+                    if (this.disableCarouselClick) {
+                      return;
+                    }
+                    this.handleOpenGallery();
+                  }}
+                  draggable={false}
+                  src={image.url}
+                  alt={image.alt}
+                ></ir-image>
+                {/* <img
+                  class="slide-image"
                   data-disabled={this.disableCarouselClick}
                   onClick={() => {
                     if (this.disableCarouselClick) {
@@ -115,7 +130,7 @@ export class IrGallery {
                   draggable={false}
                   src={image.url}
                   alt={image.alt}
-                />
+                /> */}
               </div>
             ))}
           </div>
@@ -136,7 +151,8 @@ export class IrGallery {
               <button class="absolute">
                 <p class="sr-only">open gallery</p>
               </button>
-              <img loading="lazy" onClick={() => this.handleOpenGallery(idx)} src={image.url} alt={image.alt} />
+              <ir-image thumbnail={image.thumbnail} class="gallery-image" onClick={() => this.handleOpenGallery(idx)} src={image.url} alt={image.alt}></ir-image>
+              {/* <img  class="gallery-image" loading="lazy" onClick={() => this.handleOpenGallery(idx)} src={image.url} alt={image.alt} /> */}
             </figure>
           ))}
         </div>

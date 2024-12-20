@@ -170,6 +170,7 @@ export interface Description {
 export interface Image {
   tooltip: any; // More specific type if known
   url: string;
+  thumbnail: string;
 }
 
 export interface InternetOffering {

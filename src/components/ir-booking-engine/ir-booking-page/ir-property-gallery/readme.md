@@ -24,8 +24,8 @@
 ### Depends on
 
 - [ir-icons](../../../ui/ir-icons)
-- [ir-gallery](../../../ui/ir-gallery)
 - [ir-carousel](../../../ui/ir-carousel)
+- [ir-gallery](../../../ui/ir-gallery)
 - [ir-dialog](../../../ui/ir-dialog)
 - [ir-button](../../../ui/ir-button)
 - [ir-room-type-amenities](../ir-room-type-amenities)
@@ -34,11 +34,13 @@
 ```mermaid
 graph TD;
   ir-property-gallery --> ir-icons
-  ir-property-gallery --> ir-gallery
   ir-property-gallery --> ir-carousel
+  ir-property-gallery --> ir-gallery
   ir-property-gallery --> ir-dialog
   ir-property-gallery --> ir-button
   ir-property-gallery --> ir-room-type-amenities
+  ir-carousel --> ir-image
+  ir-gallery --> ir-image
   ir-dialog --> ir-button
   ir-button --> ir-icons
   ir-room-type-amenities --> ir-icons

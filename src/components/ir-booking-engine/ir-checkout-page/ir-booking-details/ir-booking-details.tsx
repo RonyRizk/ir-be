@@ -76,7 +76,7 @@ export class IrBookingDetails {
         return Math.min(
           booking_store.childrenAges.reduce((prev, cur) => {
             if (Number(cur) < app_store.childrenStartAge) {
-              return prev + Number(cur);
+              return prev + 1;
             }
             return prev;
           }, 0),

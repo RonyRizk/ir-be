@@ -16,6 +16,7 @@
   width: 100%;
   position: relative;
 }
+.swiper-img,
 .swiper-slide img {
   display: block;
   height: 100%;

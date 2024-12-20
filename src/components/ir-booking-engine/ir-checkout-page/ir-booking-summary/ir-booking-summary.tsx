@@ -133,7 +133,7 @@ export class IrBookingSummary {
             </div>
             <ir-button
               disabled={isRequestPending('/DoReservation') || this.isBookingConfirmed}
-              isLoading={isRequestPending('/DoReservation')}
+              isLoading={isRequestPending('/DoReservation') || this.isBookingConfirmed}
               size="md"
               class="w-full"
               label={localizedWords.entries.Lcz_ConfirmBooking}
