@@ -31,6 +31,7 @@
 | `rt_id`            | `rt_id`               |             | `number`                                 | `null`      |
 | `source`           | --                    |             | `{ code: string; description: string; }` | `null`      |
 | `stag`             | `stag`                |             | `string`                                 | `undefined` |
+| `view`             | `view`                |             | `"default" \| "extended"`                | `'default'` |
 
 
 ## Dependencies

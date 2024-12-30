@@ -111,6 +111,7 @@ export namespace Components {
         "rt_id": number;
         "source": TSource | null;
         "stag": string | null;
+        "view": 'extended' | 'default';
     }
     interface IrBookingCancellation {
         "booking": Booking;
@@ -1914,6 +1915,7 @@ declare namespace LocalJSX {
         "rt_id"?: number;
         "source"?: TSource | null;
         "stag"?: string | null;
+        "view"?: 'extended' | 'default';
     }
     interface IrBookingCancellation {
         "booking"?: Booking;

@@ -112,11 +112,12 @@ export class IrBookingPage {
     return (
       <Host>
         <div class="space-y-5 ">
-          {!isInjected && (
+          {isInjected && app_store.app_data.view === 'default' ? null : (
             <div ref={el => (this.propertyGalleryRef = el)}>
               <ir-property-gallery></ir-property-gallery>
             </div>
           )}
+          {isInjected && app_store.app_data.view === 'extended' && <p innerHTML={this.property?.description?.location_and_intro} class="py-2"></p>}
           <div>
             <ir-availability-header
               ages={this.ages}

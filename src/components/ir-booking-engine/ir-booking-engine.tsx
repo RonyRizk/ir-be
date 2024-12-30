@@ -38,6 +38,7 @@ export class IrBookingEngine {
   @Prop() source: TSource | null = null;
   @Prop() hideGoogleSignIn: boolean = true;
   @Prop() origin: string | null = null;
+  @Prop() view: 'extended' | 'default' = 'default';
 
   //discount properties
   @Prop() coupon: string;
@@ -51,7 +52,7 @@ export class IrBookingEngine {
   @State() router = new Stack<HTMLElement>();
   @State() bookingListingScreenOptions: { screen: 'bookings' | 'booking-details'; params: unknown } = { params: null, screen: 'bookings' };
 
-  private version: string = '2.55';
+  private version: string = '2.56';
   private baseUrl: string = 'https://gateway.igloorooms.com/IRBE';
 
   private commonService = new CommonService();
@@ -65,6 +66,7 @@ export class IrBookingEngine {
     if (this.property) {
       app_store.property = { ...this.property };
     }
+
     const isAuthenticated = this.commonService.checkUserAuthState();
     if (isAuthenticated) {
       app_store.is_signed_in = true;
@@ -110,6 +112,12 @@ export class IrBookingEngine {
       validateAgentCode(newValue);
     }
   }
+  @Watch('view')
+  handleAppViewChange(newValue: string, oldValue: string) {
+    if (newValue !== oldValue) {
+      app_store.app_data.view = newValue as any;
+    }
+  }
 
   private setSource(newSource: TSource) {
     app_store.app_data = { ...app_store.app_data, source: newSource };
@@ -127,6 +135,7 @@ export class IrBookingEngine {
 
   private initializeApp() {
     app_store.app_data = {
+      view: this.view,
       aName: this.p,
       origin: this.origin,
       perma_link: this.perma_link,

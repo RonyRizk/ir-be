@@ -31,6 +31,7 @@ export interface IAppStore {
   selectedLocale: Locale;
   userPreferences: UserPreference;
   app_data: {
+    view: 'extended' | 'default';
     override_rp?: boolean;
     token: string;
     property_id: number;
@@ -79,6 +80,7 @@ const initialState: IAppStore = {
   },
   invoice: null,
   app_data: {
+    view: 'default',
     origin: null,
     override_rp: false,
     displayMode: 'default',
