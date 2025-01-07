@@ -275,13 +275,12 @@ type CostCalculationConfig = {
   gross: boolean;
   infants: boolean;
 };
-export function calculateTotalCost(config: CostCalculationConfig = { gross: false, infants: false }): { totalAmount: number; prePaymentAmount: number } {
-  let prePaymentAmount = 0;
+export function calculateTotalCost(config: CostCalculationConfig = { gross: false, infants: false }): { totalAmount: number } {
   let totalAmount = 0;
   const variationService = new VariationService();
 
   // Helper to calculate cost for a single rate plan
-  const calculateCost = (ratePlan: IRatePlanSelection, isPrePayment: boolean): number => {
+  const calculateCost = (ratePlan: IRatePlanSelection): number => {
     if (ratePlan.checkoutVariations.length > 0 && ratePlan.reserved > 0) {
       let variations: Variation[] = ratePlan.checkoutVariations;
       if (config.infants) {
@@ -297,11 +296,11 @@ export function calculateTotalCost(config: CostCalculationConfig = { gross: fals
       }
 
       return variations.reduce((sum, infantBasedVariation) => {
-        const amount = isPrePayment ? ratePlan.ratePlan.pre_payment_amount || 0 : infantBasedVariation[config.gross ? 'discounted_gross_amount' : 'discounted_amount'] || 0;
-        return sum + amount * ratePlan.reserved;
+        const amount = infantBasedVariation[config.gross ? 'discounted_gross_amount' : 'discounted_amount'] || 0;
+        return sum + amount;
       }, 0);
     } else if (ratePlan.reserved > 0) {
-      const amount = isPrePayment ? ratePlan.ratePlan.pre_payment_amount || 0 : ratePlan.selected_variation?.[config.gross ? 'discounted_gross_amount' : 'discounted_amount'] || 0;
+      const amount = ratePlan.selected_variation?.[config.gross ? 'discounted_gross_amount' : 'discounted_amount'] || 0;
       return amount * ratePlan.reserved;
     }
     return 0;
@@ -310,12 +309,11 @@ export function calculateTotalCost(config: CostCalculationConfig = { gross: fals
   // Iterate through rate plan selections
   Object.values(booking_store.ratePlanSelections).forEach(roomTypeSelection => {
     Object.values(roomTypeSelection).forEach(ratePlan => {
-      totalAmount += calculateCost(ratePlan, false);
-      prePaymentAmount += calculateCost(ratePlan, true);
+      totalAmount += calculateCost(ratePlan);
     });
   });
 
-  return { totalAmount, prePaymentAmount };
+  return { totalAmount };
 }
 // export function validateBooking() {
 //   return Object.values(booking_store.ratePlanSelections).every(roomTypeSelection =>
