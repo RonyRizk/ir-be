@@ -74,6 +74,13 @@
 :host([display='grid']) .rateplan-select-rooms-btn {
   flex: 0;
 }
+
+:host([display='default']) .rateplan-custom-text {
+  display: none;
+}
+:host([display='default']) .rateplan-custom-text.grid-view {
+  display: block;
+}
 :host([display='default']) .rateplan-select-rooms-btn {
   flex: 1 1 0%;
 }
@@ -89,6 +96,7 @@
   color: #ef4444;
   display: inline-flex;
   padding: 0;
+  /* width: 100%; */
   margin: 0;
 }
 .rateplan-container .no-availability {
@@ -118,9 +126,12 @@
 /* sm	640px	 */
 @media (min-width: 640px) {
   :host([display='default']) .rateplan-pricing-mobile,
-  :host([display='default']) .rateplan-description .rateplan-tooltip {
+  :host([display='default']) .rateplan-description .rateplan-tooltip,
+  :host([display='default']) .rateplan-custom-text.grid-view,
+  :host([display='default']) .rateplan-amount-per-night.grid-view {
     display: none;
   }
+  :host([display='default']) .rateplan-custom-text,
   :host([display='default']) .rateplan-name .rateplan-tooltip {
     display: block;
   }
@@ -130,9 +141,6 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-  }
-  :host([display='default']) .rateplan-amount-per-night.grid-view {
-    display: none;
   }
 }
 /* md	768px	 */
@@ -191,6 +199,7 @@
   }
   :host([display='default']) .mls_alert {
     display: inline-flex;
+    align-items: center;
   }
   :host([display='default']) .mls_alert_grid {
     display: none;

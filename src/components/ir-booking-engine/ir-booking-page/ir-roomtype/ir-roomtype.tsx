@@ -2,7 +2,7 @@ import { RoomType } from '@/models/property';
 import app_store from '@/stores/app.store';
 import booking_store, { getVisibleInventory } from '@/stores/booking';
 import localizedWords from '@/stores/localization.store';
-import { Component, Prop, h } from '@stencil/core';
+import { Component, Prop, State, Watch, h } from '@stencil/core';
 
 @Component({
   tag: 'ir-roomtype',
@@ -12,6 +12,23 @@ import { Component, Prop, h } from '@stencil/core';
 export class IrRoomtype {
   @Prop({ reflect: true }) display: 'grid' | 'default' = 'default';
   @Prop() roomtype: RoomType;
+
+  @State() shouldHideMlsRateplans: boolean;
+
+  componentWillLoad() {
+    this.checkRateplans();
+  }
+
+  @Watch('roomtype')
+  handleRoomTypeChange() {
+    this.checkRateplans();
+  }
+
+  private checkRateplans() {
+    this.shouldHideMlsRateplans =
+      this.roomtype.rateplans.some(rp => rp.not_available_reason?.includes('MLS')) && // Check for MLS issues
+      this.roomtype.rateplans.some(rp => rp.is_available_to_book); // Check for available rate plans
+  }
 
   render() {
     return (
@@ -59,6 +76,9 @@ export class IrRoomtype {
                 <div>
                   {this.roomtype?.rateplans?.map(ratePlan => {
                     if (!ratePlan.is_available_to_book && !ratePlan.not_available_reason?.includes('MLS')) {
+                      return null;
+                    }
+                    if (ratePlan.not_available_reason?.includes('MLS') && this.shouldHideMlsRateplans) {
                       return null;
                     }
                     const visibleInventory = getVisibleInventory(this.roomtype.id, ratePlan.id);

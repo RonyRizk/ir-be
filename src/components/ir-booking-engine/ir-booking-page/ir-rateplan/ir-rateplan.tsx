@@ -120,8 +120,9 @@ export class IrRateplan {
               </Fragment>
             )}
           </div>
-          <div class={'flex items-center'}>
+          <div class={'flex items-center'} style={{ alignItems: 'center' }}>
             <div class="rateplan-description flex-1">
+              <p class="rateplan-custom-text grid-view" innerHTML={this.ratePlan.custom_text}></p>
               <div class="flex items-center justify-between">
                 {this.ratePlan.is_non_refundable ? (
                   <p class="rateplan-tooltip text-xs" style={{ color: 'var(--ir-green)' }}>
@@ -147,12 +148,12 @@ export class IrRateplan {
                   <p class="rateplan-amount-per-night grid-view">{`${formatAmount(this.visibleInventory?.selected_variation?.amount_per_night, app_store.userPreferences.currency_id, 0)}/${localizedWords.entries.Lcz_night}`}</p>
                 )}
               </div>
-              <p class="rateplan-custom-text" innerHTML={this.ratePlan.custom_text}></p>
+              {this.display === 'default' && <p class="rateplan-custom-text" innerHTML={this.ratePlan.custom_text}></p>}
             </div>
-            {!this.ratePlan.is_available_to_book && this.ratePlan.not_available_reason.includes('MLS') && (
-              <p class="mls_alert_grid">{localizedWords.entries.Lcz_MLS_Alert.replace('{0}', this.ratePlan.not_available_reason?.replace('MLS-', ''))}</p>
-            )}
           </div>
+          {!this.ratePlan.is_available_to_book && this.ratePlan.not_available_reason.includes('MLS') && (
+            <p class="mls_alert_grid">{localizedWords.entries.Lcz_MLS_Alert.replace('{0}', this.ratePlan.not_available_reason?.replace('MLS-', ''))}</p>
+          )}
         </div>
         {this.isRatePlanAvailable && (
           <div class={`rateplan-details ${this.ratePlan.custom_text ? 'rateplan-details-no-custom-text' : ''}`}>
