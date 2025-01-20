@@ -5,7 +5,7 @@ import { ISetupEntries } from '@/models/property';
 import app_store from '@/stores/app.store';
 import booking_store, { IRatePlanSelection } from '@/stores/booking';
 import { checkout_store, ICardProcessingWithCVC, updateUserFormData } from '@/stores/checkout.store';
-import { getDateDifference, injectHTML } from '@/utils/utils';
+import { injectHTML } from '@/utils/utils';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { Colors } from '../app/colors.service';
@@ -170,12 +170,16 @@ export class PropertyService {
               from_date: format(booking_store.bookingAvailabilityParams.from_date, 'yyyy-MM-dd'),
               to_date: format(booking_store.bookingAvailabilityParams.to_date, 'yyyy-MM-dd'),
               notes: null,
-              days: this.propertyHelpers.generateDays(
-                booking_store.bookingAvailabilityParams.from_date,
-                booking_store.bookingAvailabilityParams.to_date,
-                Number(variation.discounted_amount) / getDateDifference(booking_store.bookingAvailabilityParams.from_date, booking_store.bookingAvailabilityParams.to_date),
-              ),
-              // days: variation.nights,
+              // days: this.propertyHelpers.generateDays(
+              //   booking_store.bookingAvailabilityParams.from_date,
+              //   booking_store.bookingAvailabilityParams.to_date,
+              //   Number(variation.discounted_amount) / getDateDifference(booking_store.bookingAvailabilityParams.from_date, booking_store.bookingAvailabilityParams.to_date),
+              // ),
+              days: variation.nights.map(n => ({
+                date: n.night,
+                amount: n.discounted_amount,
+                cost: null,
+              })),
               guest: {
                 email: null,
                 first_name,
