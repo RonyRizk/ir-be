@@ -11,7 +11,7 @@
 | ----------------------- | -------------- | ----------- | ------------------------------------------------------------------------------------------------- | ----------- |
 | `aff`                   | `aff`          |             | `string`                                                                                          | `null`      |
 | `contentContainerStyle` | --             |             | `{ color?: string; height?: string; width?: string; borderColor?: string; background?: string; }` | `undefined` |
-| `delay`                 | `delay`        |             | `number`                                                                                          | `200`       |
+| `delay`                 | `delay`        |             | `number`                                                                                          | `300`       |
 | `language`              | `language`     |             | `string`                                                                                          | `'en'`      |
 | `p`                     | `p`            |             | `string`                                                                                          | `null`      |
 | `perma_link`            | `perma_link`   |             | `string`                                                                                          | `null`      |

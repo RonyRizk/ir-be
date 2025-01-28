@@ -255,7 +255,7 @@ export class IrPhoneInput {
     inputValue = inputValue.replace(/[^+\d]+/g, '');
     inputElement.value = inputValue;
     this.inputValue = inputValue;
-    this.textChange.emit({ phone_prefix: this.selectedItem?.id.toString(), mobile: this.inputValue });
+    this.textChange.emit({ phone_prefix: this.selectedItem?.phone_prefix.toString(), mobile: this.inputValue });
   }
   render() {
     return (

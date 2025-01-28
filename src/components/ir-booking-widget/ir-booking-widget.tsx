@@ -24,7 +24,7 @@ export class IrBookingWidget {
   @Prop() language: string = 'en';
   @Prop() roomTypeId: string | null = null;
   @Prop() aff: string = null;
-  @Prop() delay: number = 200;
+  @Prop() delay: number = 300;
 
   @State() isPopoverOpen: boolean;
   @State() dateModifiers: any;
@@ -50,23 +50,17 @@ export class IrBookingWidget {
   private guestPopover: HTMLIrPopoverElement;
   private containerRef: HTMLDivElement;
   private elTimout: NodeJS.Timeout;
-  error: boolean;
+  private error: boolean;
 
-  private initApp() {
-    this.modifyContainerStyle();
-    axios.defaults.withCredentials = true;
-    axios.defaults.baseURL = this.baseUrl;
-  }
-  async componentWillLoad() {
+  componentWillLoad() {
     this.initApp();
-    const token = await this.commonService.getBEToken();
     app_store.userPreferences = {
       language_id: this.language,
       currency_id: 'usd',
     };
-    this.token.setToken(token);
     this.initProperty();
   }
+
   componentDidLoad() {
     console.log('the widget is loaded');
     if (this.position === 'fixed') {
@@ -74,10 +68,24 @@ export class IrBookingWidget {
       document.body.appendChild(this.el);
     }
   }
+  private initApp() {
+    this.modifyContainerStyle();
+    axios.defaults.withCredentials = true;
+    axios.defaults.baseURL = this.baseUrl;
+    this.resetPageFontSize();
+  }
+
+  private resetPageFontSize() {
+    const styleEl = document.createElement('style');
+    styleEl.innerHTML = 'html { font-size: 16px; }';
+    document.head.appendChild(styleEl);
+  }
+
   async initProperty() {
     try {
       this.isLoading = true;
-
+      const token = await this.commonService.getBEToken();
+      this.token.setToken(token);
       await Promise.all([
         this.propertyService.getExposedProperty({
           id: this.propertyId,
