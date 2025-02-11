@@ -30,7 +30,6 @@ export class PropertyHelpers {
       const { adult_nbr, child_nbr } = data.My_Params_Check_Availability;
       const sortedRoomTypes = this.sortRoomTypes(newRoomtypes, { adult_nbr, child_nbr });
       booking_store.roomTypes = [...sortedRoomTypes.map(rt => ({ ...rt, rateplans: rt.rateplans?.map(rp => ({ ...rp, variations: this.sortVariations(rp?.variations ?? []) })) }))];
-      booking_store.tax_statement = { message: data.My_Result.tax_statement };
       booking_store.enableBooking = true;
     } catch (error) {
       console.error(error);

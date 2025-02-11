@@ -74,6 +74,7 @@ export class PropertyService {
     app_store.app_data.displayMode = result.My_Result.be_listing_mode === 'grid' ? 'grid' : 'default';
     app_store.property = { ...result.My_Result };
     app_store.app_data.property_id = result.My_Result.id;
+    booking_store.tax_statement = { message: data.My_Result.tax_statement };
     if (initTheme) {
       this.colors.initTheme(result.My_Result);
     }

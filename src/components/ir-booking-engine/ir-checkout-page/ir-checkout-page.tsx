@@ -10,7 +10,7 @@ import app_store from '@/stores/app.store';
 import booking_store, { calculateTotalRooms, validateBooking } from '@/stores/booking';
 import { checkout_store } from '@/stores/checkout.store';
 import localizedWords from '@/stores/localization.store';
-import { destroyBookingCookie, detectCardType, generateCheckoutUrl, getDateDifference, injectHTMLAndRunScript } from '@/utils/utils';
+import { destroyBookingCookie, generateCheckoutUrl, getDateDifference, injectHTMLAndRunScript } from '@/utils/utils';
 import { ZCreditCardSchemaWithCvc } from '@/validators/checkout.validator';
 import { Component, Host, Listen, State, h, Event, EventEmitter } from '@stencil/core';
 import { ZodError, ZodIssue } from 'zod';
@@ -101,10 +101,10 @@ export class IrCheckoutPage {
         expiryDate: (checkout_store.payment as any)?.expiry_month,
         cvc: (checkout_store.payment as any)?.cvc,
       });
-      const cardType = detectCardType((checkout_store.payment as any)?.cardNumber?.replace(/ /g, ''));
-      if (!app_store.property.allowed_cards.find(c => c.name.toLowerCase().includes(cardType?.toLowerCase()))) {
-        return false;
-      }
+      // const cardType = detectCardType((checkout_store.payment as any)?.cardNumber?.replace(/ /g, ''));
+      // if (!app_store.property.allowed_cards.find(c => c.name.toLowerCase().includes((cardType === 'AMEX' ? 'American Express' : cardType)?.toLowerCase()))) {
+      //   return false;
+      // }
       return true;
     } catch (error) {
       if (error instanceof ZodError) {
