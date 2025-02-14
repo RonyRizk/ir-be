@@ -120,9 +120,17 @@ export class IrRateplan {
               </Fragment>
             )}
           </div>
+
           <div class={'flex items-center'} style={{ alignItems: 'center' }}>
             <div class="rateplan-description flex-1">
-              <p class="rateplan-custom-text grid-view" innerHTML={this.ratePlan.custom_text}></p>
+              <div class="flex justify-between gap-4">
+                <p class="rateplan-custom-text grid-view" innerHTML={this.ratePlan.custom_text}></p>
+                {this.visibleInventory?.selected_variation?.discount_pct > 0 && this.ratePlan.custom_text && (
+                  <p
+                    class={`rateplan-discount ${app_store.app_data.displayMode === 'default' ? 'ir-default' : ''}`}
+                  >{`-${Number(this.visibleInventory?.selected_variation?.discount_pct).toPrecision(2)}%`}</p>
+                )}
+              </div>
               <div class="flex items-center justify-between">
                 {this.ratePlan.is_non_refundable ? (
                   <p class="rateplan-tooltip text-xs" style={{ color: 'var(--ir-green)' }}>
@@ -144,9 +152,16 @@ export class IrRateplan {
                     ></ir-tooltip>
                   )
                 )}
-                {getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date()) > 1 && (
-                  <p class="rateplan-amount-per-night grid-view">{`${formatAmount(this.visibleInventory?.selected_variation?.amount_per_night, app_store.userPreferences.currency_id, 0)}/${localizedWords.entries.Lcz_night}`}</p>
-                )}
+                <div class="flex gap-4">
+                  {getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date()) > 1 && (
+                    <p class="rateplan-amount-per-night grid-view">{`${formatAmount(this.visibleInventory?.selected_variation?.amount_per_night, app_store.userPreferences.currency_id, 0)}/${localizedWords.entries.Lcz_night}`}</p>
+                  )}
+                  {this.visibleInventory?.selected_variation?.discount_pct > 0 && !this.ratePlan.custom_text && (
+                    <p
+                      class={`rateplan-discount ${app_store.app_data.displayMode === 'default' ? 'ir-default' : ''}`}
+                    >{`-${Number(this.visibleInventory?.selected_variation?.discount_pct).toPrecision(2)}%`}</p>
+                  )}
+                </div>
               </div>
               {this.display === 'default' && <p class="rateplan-custom-text" innerHTML={this.ratePlan.custom_text}></p>}
             </div>

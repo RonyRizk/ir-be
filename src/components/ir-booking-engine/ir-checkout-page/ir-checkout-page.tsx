@@ -7,7 +7,7 @@ import { AuthService } from '@/services/api/auth.service';
 import { PaymentService } from '@/services/api/payment.service';
 import { PropertyService } from '@/services/api/property.service';
 import app_store from '@/stores/app.store';
-import booking_store, { calculateTotalRooms, validateBooking } from '@/stores/booking';
+import booking_store, { calculateTotalRooms, clearCheckoutRooms, validateBooking } from '@/stores/booking';
 import { checkout_store } from '@/stores/checkout.store';
 import localizedWords from '@/stores/localization.store';
 import { destroyBookingCookie, generateCheckoutUrl, getDateDifference, injectHTMLAndRunScript } from '@/utils/utils';
@@ -278,6 +278,7 @@ export class IrCheckoutPage {
                   e.stopPropagation();
                   e.stopImmediatePropagation();
                   this.routing.emit('booking');
+                  clearCheckoutRooms();
                 }}
                 iconName={app_store.dir === 'RTL' ? 'angle_right' : ('angle_left' as any)}
               ></ir-button>

@@ -107,6 +107,7 @@
 .rateplan-header.not-available {
   width: 100% !important;
 }
+
 .rateplan-header.not-available .rateplan-details-wrapper {
   width: 100% !important;
 }
@@ -129,6 +130,9 @@
   :host([display='default']) .rateplan-description .rateplan-tooltip,
   :host([display='default']) .rateplan-custom-text.grid-view,
   :host([display='default']) .rateplan-amount-per-night.grid-view {
+    display: none;
+  }
+  .rateplan-discount.ir-default {
     display: none;
   }
   :host([display='default']) .rateplan-custom-text,

@@ -11,6 +11,9 @@ export default class VariationService {
    * @returns {string} A formatted string describing the variation adjusted for infants.
    */
   public formatVariationBasedOnInfants(params: { baseVariation: Variation; variations: Variation[]; infants: number }): string {
+    if (!params.baseVariation) {
+      return;
+    }
     const variation = this.getVariationBasedOnInfants(params);
     return this.formatVariation(variation, params.infants);
   }
@@ -36,6 +39,9 @@ export default class VariationService {
    * @returns {Variation} The matching variation or the base variation if no match is found.
    */
   public getVariationBasedOnInfants({ variations, baseVariation, infants }: { baseVariation: Variation; variations: Variation[]; infants: number }): Variation {
+    if (!baseVariation) {
+      return;
+    }
     const { adult_nbr, child_nbr } = baseVariation;
     return variations.find(v => v.adult_nbr === adult_nbr && v.child_nbr === Math.max(0, child_nbr - Math.max(0, infants))) || baseVariation;
   }

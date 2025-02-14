@@ -50,6 +50,7 @@ export class IrBookingDetails {
     for (const roomtypeId in booking_store.ratePlanSelections) {
       for (const rateplanId in booking_store.ratePlanSelections[roomtypeId]) {
         const rateplan = booking_store.ratePlanSelections[roomtypeId][rateplanId];
+        console.log(rateplan.checkoutVariations);
         rateplan.checkoutVariations.map((v, index) => {
           const variation = this.variationService.getVariationBasedOnInfants({ baseVariation: v, variations: rateplan.ratePlan.variations, infants: rateplan.infant_nbr[index] });
           total += variation.prepayment_amount_gross;

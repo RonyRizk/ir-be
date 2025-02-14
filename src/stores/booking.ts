@@ -361,4 +361,22 @@ export function calculateTotalRooms() {
     );
   }, 0);
 }
+export function clearCheckoutRooms() {
+  booking_store.ratePlanSelections = Object.fromEntries(
+    Object.entries(booking_store.ratePlanSelections).map(([roomTypeId, roomTypeSelection]) => [
+      roomTypeId,
+      Object.fromEntries(
+        Object.entries(roomTypeSelection).map(([ratePlanId, ratePlan]) => [
+          ratePlanId,
+          {
+            ...ratePlan,
+            checkoutVariations: [],
+            checkoutBedSelection: [],
+            checkoutSmokingSelection: [],
+          },
+        ]),
+      ),
+    ]),
+  );
+}
 export default booking_store;

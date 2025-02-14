@@ -1,6 +1,6 @@
 import { CheckoutErrors, pages } from '@/models/common';
 import app_store from '@/stores/app.store';
-import booking_store, { calculateTotalCost } from '@/stores/booking';
+import booking_store, { calculateTotalCost, clearCheckoutRooms } from '@/stores/booking';
 import { checkout_store } from '@/stores/checkout.store';
 import { isRequestPending } from '@/stores/ir-interceptor.store';
 import localizedWords from '@/stores/localization.store';
@@ -75,7 +75,15 @@ export class IrBookingSummary {
               </div>
             </div>
 
-            <ir-button onButtonClick={() => this.routing.emit('booking')} label={localizedWords.entries.Lcz_ChangeDetails} variants="outline-primary" class="w-full"></ir-button>
+            <ir-button
+              onButtonClick={() => {
+                this.routing.emit('booking');
+                clearCheckoutRooms();
+              }}
+              label={localizedWords.entries.Lcz_ChangeDetails}
+              variants="outline-primary"
+              class="w-full"
+            ></ir-button>
             <div class={'mt-4  w-full'}>
               <ul class={'w-full space-y-2'}>
                 <li class={'flex w-full items-center justify-between'}>
