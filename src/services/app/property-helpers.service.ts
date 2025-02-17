@@ -90,14 +90,6 @@ export class PropertyHelpers {
       if (a.is_available_to_book && !b.is_available_to_book) return -1;
       if (!a.is_available_to_book && b.is_available_to_book) return 1;
 
-      // Check for variations where is_calculated is true and amount is 0 or null
-      const zeroCalculatedA = a.rateplans?.some(plan => plan.variations?.some(variation => variation.discounted_amount === 0 || variation.discounted_amount === null));
-      const zeroCalculatedB = b.rateplans?.some(plan => plan.variations?.some(variation => variation.discounted_amount === 0 || variation.discounted_amount === null));
-
-      // Prioritize these types to be before inventory 0 but after all available ones
-      if (zeroCalculatedA && !zeroCalculatedB) return 1;
-      if (!zeroCalculatedA && zeroCalculatedB) return -1;
-
       // Check for exact matching variations based on user criteria
       const matchA = a.rateplans?.some(plan =>
         plan.variations?.some(variation => variation.adult_nbr === userCriteria.adult_nbr && variation.child_nbr === userCriteria.child_nbr),
@@ -105,7 +97,6 @@ export class PropertyHelpers {
       const matchB = b.rateplans?.some(plan =>
         plan.variations?.some(variation => variation.adult_nbr === userCriteria.adult_nbr && variation.child_nbr === userCriteria.child_nbr),
       );
-
       if (matchA && !matchB) return -1;
       if (!matchA && matchB) return 1;
 
@@ -116,9 +107,55 @@ export class PropertyHelpers {
       if (maxVariationA < maxVariationB) return -1;
       if (maxVariationA > maxVariationB) return 1;
 
+      //Sort by roomtype name
+      const rtName1 = a.name.toLowerCase();
+      const rtName2 = b.name.toLowerCase();
+      if (rtName1 < rtName2) {
+        return -1;
+      }
+      if (rtName1 > rtName2) {
+        return 1;
+      }
+
       return 0;
     });
   }
+  // private sortRoomTypes(roomTypes: RoomType[], userCriteria: { adult_nbr: number; child_nbr: number }): RoomType[] {
+  //   return roomTypes.sort((a, b) => {
+  //     // Priority to available rooms
+  //     if (a.is_available_to_book && !b.is_available_to_book) return -1;
+  //     if (!a.is_available_to_book && b.is_available_to_book) return 1;
+
+  //     // Check for variations where is_calculated is true and amount is 0 or null
+  //     const zeroCalculatedA = a.rateplans?.some(plan => plan.variations?.some(variation => variation.discounted_amount === 0 || variation.discounted_amount === null));
+  //     const zeroCalculatedB = b.rateplans?.some(plan => plan.variations?.some(variation => variation.discounted_amount === 0 || variation.discounted_amount === null));
+
+  //     // Prioritize these types to be before inventory 0 but after all available ones
+  //     if (zeroCalculatedA && !zeroCalculatedB) return 1;
+  //     if (!zeroCalculatedA && zeroCalculatedB) return -1;
+
+  //     // Check for exact matching variations based on user criteria
+  //     const matchA = a.rateplans?.some(plan =>
+  //       plan.variations?.some(variation => variation.adult_nbr === userCriteria.adult_nbr && variation.child_nbr === userCriteria.child_nbr),
+  //     );
+  //     const matchB = b.rateplans?.some(plan =>
+  //       plan.variations?.some(variation => variation.adult_nbr === userCriteria.adult_nbr && variation.child_nbr === userCriteria.child_nbr),
+  //     );
+
+  //     if (matchA && !matchB) return -1;
+  //     if (!matchA && matchB) return 1;
+
+  //     // Sort by the highest variation amount
+  //     const maxVariationA = Math.max(...a.rateplans.flatMap(plan => plan.variations?.map(variation => variation.discounted_amount ?? 0)));
+  //     const maxVariationB = Math.max(...b.rateplans.flatMap(plan => plan.variations?.map(variation => variation.discounted_amount ?? 0)));
+
+  //     if (maxVariationA < maxVariationB) return -1;
+  //     if (maxVariationA > maxVariationB) return 1;
+
+  //     return 0;
+  //   });
+  // }
+
   private sortVariations(variations: Variation[]): Variation[] {
     return variations.sort((a, b) => {
       // Sort by adult_nbr in descending order first
