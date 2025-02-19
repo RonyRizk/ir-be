@@ -14,6 +14,7 @@ export type TLocaleLocalizedWordsEntries = {
   Lcz_Adult: string;
   Lcz_PriceDrop: string;
   Lcz_enterchildage: string;
+  Lcz_PayToGuarantee: string;
   Lcz_OnCredit: string;
   Lcz_Bedconfiguration: string;
   Lcz_IfYouCancelNow: string;

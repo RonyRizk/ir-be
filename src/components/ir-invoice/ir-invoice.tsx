@@ -75,17 +75,6 @@ export class IrInvoice {
 
     this.fetchData();
   }
-  private detectPaymentOrigin() {
-    console.log(this.booking.extras);
-    if (!this.booking.extras) {
-      return null;
-    }
-    const code = this.booking.extras.find(e => e.key === 'payment_code')?.value;
-    if (!code) {
-      return null;
-    }
-    return app_store.property.allowed_payment_methods.find(apm => apm.code === code) ?? null;
-  }
 
   @Watch('bookingNbr')
   async handleBookingNumberChange(newValue, oldValue) {
@@ -117,7 +106,7 @@ export class IrInvoice {
 
     const results = await Promise.all(requests);
     this.booking = results[0];
-    this.payment_option = this.detectPaymentOrigin();
+    this.payment_option = this.bookingListingAppService.detectPaymentOrigin(this.booking);
     const book_date = new Date(this.booking.booked_on.date);
     book_date.setHours(this.booking.booked_on.hour + 1);
     book_date.setMinutes(this.booking.booked_on.minute);
@@ -262,8 +251,7 @@ export class IrInvoice {
     }
     const google_maps_url = `http://maps.google.com/maps?q=${app_store.property.location.latitude},${app_store.property.location.longitude}`;
 
-    const { cancel } = this.bookingListingAppService.getBookingActions(this.booking);
-
+    const { cancel, payment } = this.bookingListingAppService.getBookingActions(this.booking);
     return (
       <Host>
         <ir-interceptor></ir-interceptor>
@@ -296,13 +284,20 @@ export class IrInvoice {
             <div class={`flex  ${this.locationShown ? 'w-full' : 'w-full'} gap-16 `}>
               <div class={`invoice-container ${this.locationShown ? 'w-full' : 'w-full'}`}>
                 <section class="flex flex-col gap-4 md:flex-row md:items-center">
+                  {payment.show && this.status === 1 && (
+                    <ir-button label={payment.label} class={'w-full text-center md:w-fit'} onButtonClick={() => this.processPayment()}></ir-button>
+                  )}
                   {this.status === 1 ? (
                     <a href={google_maps_url} target="_blank" class={cn(`button-outline`, 'flex items-center justify-center')} data-size="sm">
                       {localizedWords.entries.Lcz_GetDirections}
                     </a>
                   ) : (
                     this.payment_option.is_payment_gateway && (
-                      <ir-button variants="outline" label={localizedWords.entries.Lcz_RetryPayment} onButtonClick={() => this.processPayment()}></ir-button>
+                      <ir-button
+                        class={'w-full text-center md:w-fit'}
+                        label={localizedWords.entries.Lcz_RetryPayment + ' ' + payment.formattedAmount}
+                        onButtonClick={() => this.processPayment()}
+                      ></ir-button>
                     )
                   )}
                   <a href={this.getPropertyEmail()} target="_blank" class={cn(`button-outline`, 'flex items-center justify-center')} data-size="sm">
