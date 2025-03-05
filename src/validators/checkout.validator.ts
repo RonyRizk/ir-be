@@ -56,7 +56,7 @@ export const ZCreditCardSchemaWithCvc = z.object({
   cardNumber: z.string().refine(arg => validateCreditCardNumber(arg), {
     message: 'Invalid credit card number',
   }),
-  cvc: z.string().regex(/^\d{3,4}$/, 'CVV must be 3 or 4 digits'),
+  // cvc: z.string().regex(/^\d{3,4}$/, 'CVV must be 3 or 4 digits'),
   cardHolderName: z.string().min(1, 'Holder name is required'),
   expiryDate: z.string().regex(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Expiry date must be in MM/YY format'),
 });

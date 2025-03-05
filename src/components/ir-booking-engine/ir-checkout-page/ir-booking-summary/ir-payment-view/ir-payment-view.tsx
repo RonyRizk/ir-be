@@ -198,7 +198,7 @@ export class IrPaymentView {
                   </svg>
                 </ir-input>
               </fieldset>
-              <fieldset class="w-full">
+              {/* <fieldset class="w-full">
                 <ir-input
                   autocomplete="cc-csc"
                   onInputBlur={e => {
@@ -238,7 +238,7 @@ export class IrPaymentView {
                     <path d="M11 11H15V13H11V11Z" fill="#EAECF0" />
                   </svg>
                 </ir-input>
-              </fieldset>
+              </fieldset> */}
             </div>
           </div>
         </form>

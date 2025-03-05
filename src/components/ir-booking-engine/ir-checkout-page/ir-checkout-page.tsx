@@ -99,7 +99,7 @@ export class IrCheckoutPage {
         cardNumber: (checkout_store.payment as any)?.cardNumber?.replace(/ /g, ''),
         cardHolderName: (checkout_store.payment as any).cardHolderName,
         expiryDate: (checkout_store.payment as any)?.expiry_month,
-        cvc: (checkout_store.payment as any)?.cvc,
+        // cvc: (checkout_store.payment as any)?.cvc,
       });
       // const cardType = detectCardType((checkout_store.payment as any)?.cardNumber?.replace(/ /g, ''));
       // if (!app_store.property.allowed_cards.find(c => c.name.toLowerCase().includes((cardType === 'AMEX' ? 'American Express' : cardType)?.toLowerCase()))) {
