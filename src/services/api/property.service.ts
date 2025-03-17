@@ -7,7 +7,6 @@ import booking_store, { IRatePlanSelection } from '@/stores/booking';
 import { checkout_store, ICardProcessingWithCVC, updateUserFormData } from '@/stores/checkout.store';
 import { injectHTML } from '@/utils/utils';
 import axios from 'axios';
-import { format } from 'date-fns';
 import { Colors } from '../app/colors.service';
 import { TGuest } from '@/models/user_form';
 import { DataStructure } from '@/models/common';
@@ -168,8 +167,8 @@ export class PropertyService {
                 infant_nbr: rp.infant_nbr[index],
               },
               bed_preference: rp.is_bed_configuration_enabled ? rp.checkoutBedSelection[index] : null,
-              from_date: format(booking_store.bookingAvailabilityParams.from_date, 'yyyy-MM-dd'),
-              to_date: format(booking_store.bookingAvailabilityParams.to_date, 'yyyy-MM-dd'),
+              from_date: booking_store.bookingAvailabilityParams.from_date.locale('en').format('YYYY-MM-DD'),
+              to_date: booking_store.bookingAvailabilityParams.to_date.locale('en').format('YYYY-MM-DD'),
               notes: null,
               // days: this.propertyHelpers.generateDays(
               //   booking_store.bookingAvailabilityParams.from_date,
@@ -246,8 +245,8 @@ export class PropertyService {
         promo_key: booking_store.bookingAvailabilityParams.coupon ?? null,
         booking: {
           booking_nbr: '',
-          from_date: format(booking_store.bookingAvailabilityParams.from_date, 'yyyy-MM-dd'),
-          to_date: format(booking_store.bookingAvailabilityParams.to_date, 'yyyy-MM-dd'),
+          from_date: booking_store.bookingAvailabilityParams.from_date.locale('en').format('YYYY-MM-DD'),
+          to_date: booking_store.bookingAvailabilityParams.to_date.locale('en').format('YYYY-MM-DD'),
           remark: checkout_store.userFormData.message || null,
           property: {
             id: app_store.app_data.property_id,

@@ -1,6 +1,5 @@
 import { Component, Event, EventEmitter, h, Listen, Prop, State, Watch } from '@stencil/core';
 import { ExposedBookingAvailability, TExposedBookingAvailability } from './availability';
-import { format } from 'date-fns';
 import { ZodError } from 'zod';
 import { onAppDataChange } from '@/stores/app.store';
 import { PropertyService } from '@/services/api/property.service';
@@ -10,6 +9,7 @@ import localizedWords from '@/stores/localization.store';
 import { QueryStringValidator } from '@/validators/querystring.validator';
 import { calculateInfantNumber, modifyQueryParam } from '@/utils/utils';
 import { AddAdultsAndChildrenEvent } from '../ir-adult-child-counter/ir-adult-child-counter';
+import moment from 'moment/min/moment-with-locales';
 
 @Component({
   tag: 'ir-availability-header',
@@ -57,13 +57,13 @@ export class IrAvailabilityHeader {
       ...this.exposedBookingAvailabilityParams,
       adult_nbr: this.setDefaultAdultCount(),
       child_nbr: this.setDefaultChildCount(),
-      from_date: validatedFromDate ? this.fromDate : null,
-      to_date: this.validator.validateCheckout(this.toDate, validatedFromDate) ? this.toDate : null,
+      from_date: validatedFromDate ? moment(this.fromDate, 'YYYY-MM-DD') : null,
+      to_date: this.validator.validateCheckout(this.toDate, validatedFromDate) ? moment(this.toDate, 'YYYY-MM-DD') : null,
     };
 
     if (booking_store.bookingAvailabilityParams.from_date) {
-      this.exposedBookingAvailabilityParams.from_date = format(booking_store.bookingAvailabilityParams.from_date, 'yyyy-MM-dd');
-      this.exposedBookingAvailabilityParams.to_date = format(booking_store.bookingAvailabilityParams.to_date, 'yyyy-MM-dd');
+      this.exposedBookingAvailabilityParams.from_date = moment(booking_store.bookingAvailabilityParams.from_date);
+      this.exposedBookingAvailabilityParams.to_date = moment(booking_store.bookingAvailabilityParams.to_date);
     }
     if (booking_store.bookingAvailabilityParams.adult_nbr) {
       this.exposedBookingAvailabilityParams.adult_nbr = booking_store.bookingAvailabilityParams.adult_nbr;
@@ -108,7 +108,7 @@ export class IrAvailabilityHeader {
       if (this.validator.validateCheckin(newValue)) {
         this.exposedBookingAvailabilityParams = {
           ...this.exposedBookingAvailabilityParams,
-          from_date: newValue,
+          from_date: moment(newValue, 'YYYY-MM-DD'),
         };
         if (this.fromDate && this.toDate && !this.validator.validateAdultCount(this.adultCount)) {
           this.checkAvailability();
@@ -125,7 +125,7 @@ export class IrAvailabilityHeader {
         if (this.validator.validateCheckout(newValue, validatedFromDate)) {
           this.exposedBookingAvailabilityParams = {
             ...this.exposedBookingAvailabilityParams,
-            to_date: newValue,
+            to_date: moment(newValue, 'YYYY-MM-DD'),
           };
           this.recheckAvailability();
         }
@@ -167,19 +167,19 @@ export class IrAvailabilityHeader {
     const { start, end } = e.detail;
     if (end) {
       this.changeExposedAvailabilityParams({
-        from_date: format(start, 'yyyy-MM-dd').toString(),
-        to_date: format(end, 'yyyy-MM-dd').toString(),
+        from_date: moment(start).locale('en'),
+        to_date: moment(end).locale('en'),
       });
     } else if (this.exposedBookingAvailabilityParams.to_date && !end) {
       this.changeExposedAvailabilityParams({
-        from_date: format(start, 'yyyy-MM-dd').toString(),
+        from_date: moment(start).locale('en'),
         to_date: null,
       });
     } else {
-      this.changeExposedAvailabilityParams({ from_date: format(start, 'yyyy-MM-dd') });
+      this.changeExposedAvailabilityParams({ from_date: moment(start).locale('en') });
     }
-    modifyQueryParam('checkin', this.exposedBookingAvailabilityParams.from_date);
-    modifyQueryParam('checkout', this.exposedBookingAvailabilityParams.to_date);
+    modifyQueryParam('checkin', this.exposedBookingAvailabilityParams.from_date?.locale('en')?.format('YYYY-MM-DD'));
+    modifyQueryParam('checkout', this.exposedBookingAvailabilityParams.to_date?.locale('en')?.format('YYYY-MM-DD'));
     if (
       !!this.exposedBookingAvailabilityParams.adult_nbr &&
       !!this.exposedBookingAvailabilityParams.from_date &&
@@ -286,8 +286,8 @@ export class IrAvailabilityHeader {
     }
     booking_store.bookingAvailabilityParams = {
       ...booking_store.bookingAvailabilityParams,
-      from_date: new Date(params.from_date),
-      to_date: new Date(params.to_date),
+      from_date: params.from_date,
+      to_date: params.to_date,
       adult_nbr: params.adult_nbr,
       child_nbr: params.child_nbr,
     };
@@ -380,8 +380,8 @@ export class IrAvailabilityHeader {
           <ir-date-popup
             data-state={this.errorCause?.find(c => c === 'date') ? 'error' : ''}
             dates={{
-              start: this.exposedBookingAvailabilityParams?.from_date ? new Date(this.exposedBookingAvailabilityParams.from_date) : null,
-              end: this.exposedBookingAvailabilityParams?.to_date ? new Date(this.exposedBookingAvailabilityParams.to_date) : null,
+              start: this.exposedBookingAvailabilityParams?.from_date ? moment(this.exposedBookingAvailabilityParams.from_date, 'YYYY-MM-DD') : null,
+              end: this.exposedBookingAvailabilityParams?.to_date ? moment(this.exposedBookingAvailabilityParams.to_date, 'YYYY-MM-DD') : null,
             }}
             class="date-popup"
           ></ir-date-popup>

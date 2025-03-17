@@ -11,8 +11,8 @@ import { TSource } from "./stores/app.store";
 import { Booking } from "./models/booking.dto";
 import { CheckoutErrors, ICurrency, IExposedLanguages, pages } from "./models/common";
 import { TIcons } from "./components/ui/ir-icons/icons";
+import { Moment } from "moment/min/moment-with-locales";
 import { IDateModifiers } from "./components/ui/ir-date-range/ir-date-range.types";
-import { Locale } from "date-fns";
 import { TCarouselSlides } from "./components/ui/ir-carousel/carousel";
 import { ZodIssue } from "zod";
 import { Placement } from "@popperjs/core";
@@ -27,8 +27,8 @@ export { TSource } from "./stores/app.store";
 export { Booking } from "./models/booking.dto";
 export { CheckoutErrors, ICurrency, IExposedLanguages, pages } from "./models/common";
 export { TIcons } from "./components/ui/ir-icons/icons";
+export { Moment } from "moment/min/moment-with-locales";
 export { IDateModifiers } from "./components/ui/ir-date-range/ir-date-range.types";
-export { Locale } from "date-fns";
 export { TCarouselSlides } from "./components/ui/ir-carousel/carousel";
 export { ZodIssue } from "zod";
 export { Placement } from "@popperjs/core";
@@ -192,15 +192,15 @@ export namespace Components {
         "variants": 'default' | 'outline' | 'secondary' | 'destructive' | 'ghost' | 'link' | 'icon' | 'ghost-primary' | 'outline-primary' | 'icon-primary';
     }
     interface IrCalendar {
-        "date": Date;
+        "date": Moment;
         "dateModifiers": IDateModifiers;
-        "fromDate": Date | null;
-        "locale": Locale;
-        "maxDate": Date;
+        "fromDate": Moment | null;
+        "locale": string;
+        "maxDate": Moment;
         "maxSpanDays": number;
-        "minDate": Date;
+        "minDate": Moment;
         "showPrice": boolean;
-        "toDate": Date | null;
+        "toDate": Moment | null;
     }
     interface IrCarousel {
         "activeIndex": number;
@@ -226,17 +226,17 @@ export namespace Components {
         "value": string;
     }
     interface IrDatePopup {
-        "dates": { start: Date | null; end: Date | null };
+        "dates": { start: Moment | null; end: Moment | null };
     }
     interface IrDateRange {
         "dateModifiers": IDateModifiers;
-        "fromDate": Date | null;
-        "locale": Locale;
-        "maxDate": Date;
+        "fromDate": Moment | null;
+        "locale": string;
+        "maxDate": Moment;
         "maxSpanDays": number;
-        "minDate": Date;
+        "minDate": Moment;
         "showPrice": boolean;
-        "toDate": Date | null;
+        "toDate": Moment | null;
     }
     interface IrDialog {
         "closeButton": boolean;
@@ -364,6 +364,7 @@ export namespace Components {
         "perma_link": string;
         "propertyId": number;
         "status": 0 | 1;
+        "ticket": string;
         "version": string;
     }
     interface IrLanguagePicker {
@@ -1044,7 +1045,7 @@ declare global {
         new (): HTMLIrButtonElement;
     };
     interface HTMLIrCalendarElementEventMap {
-        "dateChange": Date;
+        "dateChange": Moment;
     }
     interface HTMLIrCalendarElement extends Components.IrCalendar, HTMLStencilElement {
         addEventListener<K extends keyof HTMLIrCalendarElementEventMap>(type: K, listener: (this: HTMLIrCalendarElement, ev: IrCalendarCustomEvent<HTMLIrCalendarElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -1153,7 +1154,7 @@ declare global {
         new (): HTMLIrCreditCardInputElement;
     };
     interface HTMLIrDatePopupElementEventMap {
-        "dateChange": { start: Date | null; end: Date | null };
+        "dateChange": { start: Moment | null; end: Moment | null };
     }
     interface HTMLIrDatePopupElement extends Components.IrDatePopup, HTMLStencilElement {
         addEventListener<K extends keyof HTMLIrDatePopupElementEventMap>(type: K, listener: (this: HTMLIrDatePopupElement, ev: IrDatePopupCustomEvent<HTMLIrDatePopupElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -2014,16 +2015,16 @@ declare namespace LocalJSX {
         "variants"?: 'default' | 'outline' | 'secondary' | 'destructive' | 'ghost' | 'link' | 'icon' | 'ghost-primary' | 'outline-primary' | 'icon-primary';
     }
     interface IrCalendar {
-        "date"?: Date;
+        "date"?: Moment;
         "dateModifiers"?: IDateModifiers;
-        "fromDate"?: Date | null;
-        "locale"?: Locale;
-        "maxDate"?: Date;
+        "fromDate"?: Moment | null;
+        "locale"?: string;
+        "maxDate"?: Moment;
         "maxSpanDays"?: number;
-        "minDate"?: Date;
-        "onDateChange"?: (event: IrCalendarCustomEvent<Date>) => void;
+        "minDate"?: Moment;
+        "onDateChange"?: (event: IrCalendarCustomEvent<Moment>) => void;
         "showPrice"?: boolean;
-        "toDate"?: Date | null;
+        "toDate"?: Moment | null;
     }
     interface IrCarousel {
         "activeIndex"?: number;
@@ -2055,19 +2056,19 @@ declare namespace LocalJSX {
         "value"?: string;
     }
     interface IrDatePopup {
-        "dates"?: { start: Date | null; end: Date | null };
-        "onDateChange"?: (event: IrDatePopupCustomEvent<{ start: Date | null; end: Date | null }>) => void;
+        "dates"?: { start: Moment | null; end: Moment | null };
+        "onDateChange"?: (event: IrDatePopupCustomEvent<{ start: Moment | null; end: Moment | null }>) => void;
     }
     interface IrDateRange {
         "dateModifiers"?: IDateModifiers;
-        "fromDate"?: Date | null;
-        "locale"?: Locale;
-        "maxDate"?: Date;
+        "fromDate"?: Moment | null;
+        "locale"?: string;
+        "maxDate"?: Moment;
         "maxSpanDays"?: number;
-        "minDate"?: Date;
+        "minDate"?: Moment;
         "onDateChange"?: (event: IrDateRangeCustomEvent<{ start: Date | null; end: Date | null }>) => void;
         "showPrice"?: boolean;
-        "toDate"?: Date | null;
+        "toDate"?: Moment | null;
     }
     interface IrDialog {
         "closeButton"?: boolean;
@@ -2220,6 +2221,7 @@ declare namespace LocalJSX {
         "perma_link"?: string;
         "propertyId"?: number;
         "status"?: 0 | 1;
+        "ticket"?: string;
         "version"?: string;
     }
     interface IrLanguagePicker {

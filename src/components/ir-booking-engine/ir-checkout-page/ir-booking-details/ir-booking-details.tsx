@@ -261,7 +261,7 @@ export class IrBookingDetails {
     return count;
   }
   render() {
-    const total_nights = getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date());
+    const total_nights = getDateDifference(booking_store.bookingAvailabilityParams.from_date, booking_store.bookingAvailabilityParams.to_date);
     // const this.total_rooms = calculateTotalRooms();
     const total_persons = this.calculateTotalPersons();
     return (

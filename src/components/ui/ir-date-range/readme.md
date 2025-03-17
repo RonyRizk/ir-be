@@ -7,16 +7,16 @@
 
 ## Properties
 
-| Property        | Attribute       | Description | Type             | Default                     |
-| --------------- | --------------- | ----------- | ---------------- | --------------------------- |
-| `dateModifiers` | --              |             | `IDateModifiers` | `undefined`                 |
-| `fromDate`      | --              |             | `Date`           | `null`                      |
-| `locale`        | --              |             | `Locale`         | `enUS`                      |
-| `maxDate`       | --              |             | `Date`           | `addYears(new Date(), 24)`  |
-| `maxSpanDays`   | `max-span-days` |             | `number`         | `90`                        |
-| `minDate`       | --              |             | `Date`           | `addYears(new Date(), -24)` |
-| `showPrice`     | `show-price`    |             | `boolean`        | `false`                     |
-| `toDate`        | --              |             | `Date`           | `null`                      |
+| Property        | Attribute       | Description | Type             | Default                      |
+| --------------- | --------------- | ----------- | ---------------- | ---------------------------- |
+| `dateModifiers` | --              |             | `IDateModifiers` | `undefined`                  |
+| `fromDate`      | --              |             | `Moment`         | `null`                       |
+| `locale`        | `locale`        |             | `string`         | `'en'`                       |
+| `maxDate`       | --              |             | `Moment`         | `moment().add(24, 'years')`  |
+| `maxSpanDays`   | `max-span-days` |             | `number`         | `90`                         |
+| `minDate`       | --              |             | `Moment`         | `moment().add(-24, 'years')` |
+| `showPrice`     | `show-price`    |             | `boolean`        | `false`                      |
+| `toDate`        | --              |             | `Moment`         | `null`                       |
 
 
 ## Events

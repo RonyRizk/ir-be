@@ -1,43 +1,25 @@
 import { Component, h, State, Prop, EventEmitter, Event, Watch } from '@stencil/core';
-import {
-  addMonths,
-  eachDayOfInterval,
-  endOfMonth,
-  endOfWeek,
-  format,
-  isSameMonth,
-  startOfMonth,
-  startOfWeek,
-  addDays,
-  isSameDay,
-  isBefore,
-  isAfter,
-  addYears,
-  isToday,
-  Locale,
-} from 'date-fns';
 import { IDateModifiers, IDateModifierOptions } from './ir-date-range.types';
-import { enUS } from 'date-fns/locale';
+import moment, { Moment } from 'moment/min/moment-with-locales';
 import { getAbbreviatedWeekdays } from '@/utils/utils';
 import localizedWords from '@/stores/localization.store';
-
 @Component({
   tag: 'ir-date-range',
   styleUrl: 'ir-date-range.css',
   shadow: true,
 })
 export class IrDateRange {
-  @Prop() fromDate: Date | null = null;
-  @Prop() toDate: Date | null = null;
-  @Prop() minDate: Date = addYears(new Date(), -24);
-  @Prop() maxDate: Date = addYears(new Date(), 24);
+  @Prop() fromDate: Moment | null = null;
+  @Prop() toDate: Moment | null = null;
+  @Prop() minDate: Moment = moment().add(-24, 'years');
+  @Prop() maxDate: Moment = moment().add(24, 'years');
   @Prop() dateModifiers: IDateModifiers;
   @Prop() maxSpanDays: number = 90;
   @Prop() showPrice = false;
-  @Prop({ reflect: true }) locale: Locale = enUS;
-  @State() selectedDates: { start: Date | null; end: Date | null } = { start: new Date(), end: new Date() };
-  @State() displayedDaysArr: { month: Date; days: Date[] }[] = [];
-  @State() hoveredDate: Date | null = null;
+  @Prop({ reflect: true }) locale: string = 'en';
+  @State() selectedDates: { start: Moment | null; end: Moment | null } = { start: moment(), end: moment() };
+  @State() displayedDaysArr: { month: Moment; days: Moment[] }[] = [];
+  @State() hoveredDate: Moment | null = null;
 
   @Event({ bubbles: true, composed: true }) dateChange: EventEmitter<{ start: Date | null; end: Date | null }>;
 
@@ -49,20 +31,21 @@ export class IrDateRange {
       start: this.fromDate,
       end: this.toDate,
     };
-    const currentMonth = this.fromDate ?? new Date();
-    const nextMonth = addMonths(currentMonth, 1);
+    const currentMonth = this.fromDate ? this.fromDate.clone() : moment();
+    const nextMonth = currentMonth.clone().add(1, 'month');
 
     this.displayedDaysArr = [this.getMonthDays(currentMonth), this.getMonthDays(nextMonth)];
   }
   @Watch('locale')
-  handleLocale(newValue: Locale, oldLocale: Locale) {
+  handleLocale(newValue: string, oldLocale: string) {
     if (newValue !== oldLocale) {
+      moment.locale(newValue);
       this.weekdays = getAbbreviatedWeekdays(newValue);
     }
   }
   @Watch('fromDate')
-  handleFromDateChange(newValue: Date, oldValue: Date) {
-    if (!isSameDay(newValue || new Date(), oldValue || new Date())) {
+  handleFromDateChange(newValue: Moment | null, oldValue: Moment | null) {
+    if (!(newValue ?? moment()).isSame(oldValue ?? moment(), 'days')) {
       this.selectedDates = {
         ...this.selectedDates,
         start: newValue,
@@ -70,8 +53,8 @@ export class IrDateRange {
     }
   }
   @Watch('toDate')
-  handleToDateChange(newValue: Date, oldValue: Date) {
-    if (!isSameDay(newValue || new Date(), oldValue || new Date())) {
+  handleToDateChange(newValue: Moment | null, oldValue: Moment | null) {
+    if (!(newValue ?? moment()).isSame(oldValue ?? moment(), 'days')) {
       this.selectedDates = {
         ...this.selectedDates,
         end: newValue,
@@ -79,13 +62,10 @@ export class IrDateRange {
     }
   }
 
-  getMonthDays(month: Date) {
+  getMonthDays(month: Moment) {
     return {
-      month,
-      days: eachDayOfInterval({
-        start: startOfWeek(startOfMonth(month), { weekStartsOn: 1, locale: this.locale }),
-        end: endOfWeek(endOfMonth(month), { weekStartsOn: 1, locale: this.locale }),
-      }),
+      month: month.clone(),
+      days: Array.from({ length: month.daysInMonth() }, (_, i) => month.clone().startOf('month').add(i, 'days')),
     };
   }
 
@@ -100,8 +80,8 @@ export class IrDateRange {
   decrementDate() {
     if (this.selectedDates.start && this.selectedDates.end) {
       this.selectedDates = {
-        start: addDays(new Date(this.selectedDates.start), -1),
-        end: new Date(this.selectedDates.end),
+        start: this.selectedDates.start.clone().add(-1, 'days'),
+        end: this.selectedDates.end.clone(),
       };
     }
   }
@@ -109,8 +89,8 @@ export class IrDateRange {
   incrementDate() {
     if (this.selectedDates.start && this.selectedDates.end) {
       this.selectedDates = {
-        start: new Date(this.selectedDates.start),
-        end: addDays(new Date(this.selectedDates.end), 1),
+        start: this.selectedDates.start.clone(),
+        end: this.selectedDates.end.clone().add(1, 'days'),
       };
     }
   }
@@ -119,8 +99,8 @@ export class IrDateRange {
     e.stopPropagation();
     e.stopImmediatePropagation();
     const currentSecondMonth = this.displayedDaysArr[1].month;
-    const newSecondMonth = addMonths(currentSecondMonth, 1);
-    if (isBefore(endOfMonth(newSecondMonth), this.minDate) || isAfter(startOfMonth(newSecondMonth), this.maxDate)) {
+    const newSecondMonth = currentSecondMonth.clone().add(1, 'months');
+    if (newSecondMonth.endOf('month').isBefore(this.minDate) || newSecondMonth.startOf('month').isAfter(this.maxDate)) {
       return;
     }
     this.displayedDaysArr = [this.displayedDaysArr[1], this.getMonthDays(newSecondMonth)];
@@ -130,76 +110,80 @@ export class IrDateRange {
     e.stopPropagation();
     e.stopImmediatePropagation();
     const currentFirstMonth = this.displayedDaysArr[0].month;
-    const newFirstMonth = addMonths(currentFirstMonth, -1);
-    if (isBefore(endOfMonth(newFirstMonth), this.minDate) || isAfter(startOfMonth(newFirstMonth), this.maxDate)) {
+    const newFirstMonth = currentFirstMonth.clone().add(-1, 'month');
+    if (newFirstMonth.endOf('month').isBefore(this.minDate) || newFirstMonth.startOf('month').isAfter(this.maxDate)) {
       return;
     }
     this.displayedDaysArr = [this.getMonthDays(newFirstMonth), this.displayedDaysArr[0]];
   }
 
-  selectDay(day: Date) {
+  selectDay(day: Moment) {
     let isDateDisabled = false;
     if (this.dateModifiers) {
-      isDateDisabled = !!this.dateModifiers[format(day, 'yyyy-MM-dd')];
+      isDateDisabled = !!this.dateModifiers[day.format('YYYY-MM-DD')];
     }
     if (isDateDisabled && !this.selectedDates.start) {
       return;
     }
-    if (isSameDay(new Date(this.selectedDates.start), new Date(day)) || isSameDay(new Date(this.selectedDates.end), new Date(day))) {
-      this.selectedDates = { start: day, end: null };
+
+    if ((this.selectedDates.start && day.isSame(this.selectedDates.start, 'day')) || (this.selectedDates.end && day.isSame(this.selectedDates.end, 'day'))) {
+      this.selectedDates = { start: day.clone(), end: null };
     } else {
       if (this.selectedDates.start === null) {
-        this.selectedDates = { start: day, end: null };
+        this.selectedDates = { start: day.clone(), end: null };
       } else {
         if (this.selectedDates.end === null) {
-          if (isBefore(day, this.selectedDates.start)) {
+          if (day.isBefore(this.selectedDates.start)) {
             if (isDateDisabled) {
               return;
             }
-            this.selectedDates = { start: day, end: null };
+            this.selectedDates = { start: day.clone(), end: null };
           } else {
-            this.selectedDates = { ...this.selectedDates, end: day };
+            this.selectedDates = { start: this.selectedDates.start.clone(), end: day.clone() };
           }
         } else {
           if (!isDateDisabled) {
-            this.selectedDates = { start: day, end: null };
+            this.selectedDates = { start: day.clone(), end: null };
           }
         }
       }
     }
-    this.dateChange.emit(this.selectedDates);
+
+    // Convert Moment to Date for the event emission
+    const startDate = this.selectedDates.start ? this.selectedDates.start.toDate() : null;
+    const endDate = this.selectedDates.end ? this.selectedDates.end.toDate() : null;
+    this.dateChange.emit({ start: startDate, end: endDate });
   }
+
   resetHours() {
-    this.minDate.setHours(0, 0, 0, 0);
-    this.maxDate.setHours(0, 0, 0, 0);
+    this.minDate.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+    this.maxDate.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
     if (this.fromDate) {
-      this.fromDate.setHours(0, 0, 0, 0);
+      this.fromDate.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
     }
     if (this.toDate) {
-      this.toDate.setHours(0, 0, 0, 0);
+      this.toDate.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
     }
   }
-  handleMouseEnter(day: Date) {
-    this.hoveredDate = day;
+
+  handleMouseEnter(day: Moment) {
+    this.hoveredDate = day.clone();
   }
 
   handleMouseLeave() {
     this.hoveredDate = null;
   }
 
-  isDaySelected(day: Date): boolean {
-    const date = new Date(day);
-    date.setHours(0, 0, 0, 0);
-    const start = new Date(this.selectedDates.start ?? new Date());
-    start.setHours(0, 0, 0, 0);
-    const end = this.selectedDates.end ? new Date(this.selectedDates.end) : this.hoveredDate;
-    end?.setHours(0, 0, 0, 0);
+  isDaySelected(day: Moment): boolean {
+    const date = day.clone();
+    const start = this.selectedDates.start ? this.selectedDates.start.clone() : moment();
+    const end = this.selectedDates.end ? this.selectedDates.end.clone() : this.hoveredDate;
 
-    if (this.selectedDates.start && !this.selectedDates.end && this.hoveredDate && isAfter(this.hoveredDate, start)) {
-      if (isAfter(date, start) && isBefore(date, end)) {
+    if (this.selectedDates.start && !this.selectedDates.end && this.hoveredDate && this.hoveredDate.isAfter(start)) {
+      if (date.isAfter(start) && date.isBefore(end)) {
         return true;
       }
-    } else if (isAfter(date, start) && this.selectedDates.end && isBefore(date, end)) {
+    } else if (date.isAfter(start) && this.selectedDates.end && date.isBefore(end)) {
       return true;
     }
     return false;
@@ -207,23 +191,23 @@ export class IrDateRange {
 
   getMonthStyles(index: number) {
     if (index === 0) {
-      if (!isAfter(startOfMonth(this.displayedDaysArr[0].month), this.minDate)) {
+      if (!this.displayedDaysArr[0].month.clone().startOf('month').isAfter(this.minDate)) {
         return 'margin-horizontal';
       }
       return 'margin-right';
     } else {
-      if (!isBefore(endOfMonth(this.displayedDaysArr[1].month), this.maxDate)) {
+      if (!this.displayedDaysArr[1].month.clone().endOf('month').isBefore(this.maxDate)) {
         return 'margin-right margin-left';
       }
       return 'margin-left';
     }
   }
 
-  checkDatePresence(day: Date) {
+  checkDatePresence(day: Moment) {
     if (!this.dateModifiers) {
       return;
     }
-    const formatedDate = format(day, 'yyyy-MM-dd');
+    const formatedDate = day.format('YYYY-MM-DD');
     const result: IDateModifierOptions = this.dateModifiers[formatedDate];
     if (result) {
       return result;
@@ -232,7 +216,7 @@ export class IrDateRange {
   }
 
   render() {
-    const maxSpanDays = this.selectedDates.start && addDays(this.selectedDates.start, this.maxSpanDays);
+    const maxSpanDays = this.selectedDates.start ? this.selectedDates.start.clone().add(this.maxSpanDays, 'days') : null;
     return (
       <div class={'date-picker'}>
         {this.displayedDaysArr.map((month, index) => (
@@ -241,7 +225,7 @@ export class IrDateRange {
               <tr class="calendar-header">
                 <th colSpan={7}>
                   <div class="month-navigation">
-                    {index === 0 && isAfter(startOfMonth(this.displayedDaysArr[0].month), this.minDate) && (
+                    {index === 0 && this.displayedDaysArr[0].month.clone().startOf('month').isAfter(this.minDate) && (
                       <button name="previous month" class="navigation-buttons previous-month" type="button" onClick={this.goToPreviousMonth.bind(this)}>
                         <p class="sr-only">previous month</p>
                         <svg xmlns="http://www.w3.org/2000/svg" height="16" width="25.6" viewBox="0 0 320 512">
@@ -252,7 +236,7 @@ export class IrDateRange {
                         </svg>
                       </button>
                     )}
-                    <span class={'capitalize'}>{format(month.month, 'MMMM yyyy', { locale: this.locale })}</span>
+                    <span class={'capitalize'}>{month.month.locale(this.locale ?? 'en').format('MMMM YYYY')}</span>
                     {index === 0 && (
                       <button name="next month" class="navigation-buttons button-next" type="button" onClick={this.goToNextMonth.bind(this)}>
                         <p slot="icon" class="sr-only">
@@ -263,7 +247,7 @@ export class IrDateRange {
                         </svg>
                       </button>
                     )}
-                    {index === 1 && isBefore(endOfMonth(this.displayedDaysArr[1].month), this.maxDate) && (
+                    {index === 1 && this.displayedDaysArr[1].month.clone().endOf('month').isBefore(this.maxDate) && (
                       <button name="next month" class="navigation-buttons button-next-main" type="button" onClick={this.goToNextMonth.bind(this)}>
                         <p class="sr-only ">next month</p>
                         <svg xmlns="http://www.w3.org/2000/svg" height="16" width="25.6" viewBox="0 0 320 512">
@@ -297,15 +281,16 @@ export class IrDateRange {
                 }, [])
                 .map(week => (
                   <tr class="week-row" role="row">
-                    {week.map((day: Date) => {
-                      day.setHours(0, 0, 0, 0);
+                    {week.map((day: Moment) => {
                       const checkedDate = this.checkDatePresence(day);
                       return (
-                        <td class="day-cell" key={format(day, 'yyyy-MM-dd')} role="gridcell">
-                          {isSameMonth(day, month.month) && (
+                        <td class="day-cell" key={day.format('YYYY-MM-DD')} role="gridcell">
+                          {day.isSame(month.month, 'month') && (
                             <button
                               disabled={
-                                isBefore(day, this.minDate) || isAfter(day, this.maxDate) || (this.selectedDates.start && isAfter(day, maxSpanDays) && !this.selectedDates.end)
+                                day.isBefore(this.minDate) ||
+                                day.isAfter(this.maxDate) ||
+                                (this.selectedDates.start && maxSpanDays && day.isAfter(maxSpanDays) && !this.selectedDates.end)
                               }
                               onMouseEnter={() => this.handleMouseEnter(day)}
                               onMouseLeave={() => this.handleMouseLeave()}
@@ -315,23 +300,23 @@ export class IrDateRange {
                                 this.selectDay(day);
                               }}
                               style={checkedDate?.disabled && this.selectedDates.start && { cursor: 'pointer' }}
-                              title={checkedDate?.disabled ? localizedWords?.entries?.Lcz_NoAvailability ?? 'No availability' : ''}
+                              title={checkedDate?.disabled ? (localizedWords?.entries?.Lcz_NoAvailability ?? 'No availability') : ''}
                               aria-unavailable={checkedDate?.disabled ? 'true' : 'false'}
-                              aria-label={`${format(day, 'EEEE, MMMM do yyyy', { locale: this.locale })} ${
-                                isBefore(day, this.minDate) || isAfter(day, this.maxDate) ? localizedWords.entries.Lcz_NotAvailable : ''
+                              aria-label={`${day.format('dddd, MMMM Do YYYY')} ${
+                                day.isBefore(this.minDate) || day.isAfter(this.maxDate) ? localizedWords.entries.Lcz_NotAvailable : ''
                               }`}
-                              aria-disabled={isBefore(day, this.minDate) || isAfter(day, this.maxDate) || checkedDate?.disabled ? 'true' : 'false'}
+                              aria-disabled={day.isBefore(this.minDate) || day.isAfter(this.maxDate) || checkedDate?.disabled ? 'true' : 'false'}
                               aria-selected={
-                                (this.selectedDates.start && isSameDay(new Date(this.selectedDates.start), new Date(day))) ||
+                                (this.selectedDates.start && day.isSame(this.selectedDates.start, 'day')) ||
                                 this.isDaySelected(day) ||
-                                (this.selectedDates.end && isSameDay(new Date(this.selectedDates.end ?? new Date()), new Date(day)))
+                                (this.selectedDates.end && day.isSame(this.selectedDates.end, 'day'))
                               }
-                              class={`day-button  ${this.selectedDates.start && isSameDay(new Date(this.selectedDates.start), new Date(day)) ? 'day-range-start' : ''}
-                          ${this.selectedDates.end && isSameDay(new Date(this.selectedDates.end ?? new Date()), new Date(day)) ? 'day-range-end' : ''}  
+                              class={`day-button  ${this.selectedDates.start && day.isSame(this.selectedDates.start, 'day') ? 'day-range-start' : ''}
+                          ${this.selectedDates.end && day.isSame(this.selectedDates.end, 'day') ? 'day-range-end' : ''}  
                             ${this.isDaySelected(day) ? 'highlight' : ''}
                             `}
                             >
-                              <p class={`day ${isToday(day) ? 'current-date' : ''}`}>{format(day, 'd', { locale: this.locale })}</p>
+                              <p class={`day ${day.isSame(moment(), 'day') ? 'current-date' : ''}`}>{day.locale(this.locale).format('D')}</p>
                               {this.showPrice && <p class="price">{checkedDate?.withPrice.price ? '_' : checkedDate.withPrice.price}</p>}
                             </button>
                           )}

@@ -3,29 +3,37 @@ import { Assignableunit, IExposedProperty } from '@/models/property';
 import app_store, { changeLocale, updateUserPreference } from '@/stores/app.store';
 import booking_store, { modifyBookingStore } from '@/stores/booking';
 import clsx, { ClassValue } from 'clsx';
-import { addDays, differenceInCalendarDays, format, isBefore, Locale } from 'date-fns';
-import { ar, es, fr, de, pl, uk, ru, el, enUS } from 'date-fns/locale';
+import { addDays, isBefore } from 'date-fns';
 import { twMerge } from 'tailwind-merge';
-// import DOMPurify from 'dompurify';
-const localeMap: { [key: string]: Locale } = {
-  en: enUS,
-  ar: ar,
-  fr: fr,
-  es: es,
-  de: de,
-  pl: pl,
-  ua: uk,
-  ru: ru,
-  el: el,
+import moment, { Moment } from 'moment/min/moment-with-locales';
+import 'moment/locale/ar';
+import 'moment/locale/es';
+import 'moment/locale/fr';
+import 'moment/locale/de';
+import 'moment/locale/pl';
+import 'moment/locale/uk';
+import 'moment/locale/ru';
+import 'moment/locale/el';
+
+const localeMap: { [key: string]: string } = {
+  en: 'en',
+  ar: 'ar',
+  fr: 'fr',
+  es: 'es',
+  de: 'de',
+  pl: 'pl',
+  ua: 'uk',
+  ru: 'ru',
+  el: 'el',
 };
-export function matchLocale(locale: string): Locale {
-  return localeMap[locale.toLowerCase()] || enUS;
+export function matchLocale(locale: string): string {
+  return localeMap[locale.toLowerCase()] || 'en';
 }
-export function getAbbreviatedWeekdays(locale: Locale) {
-  const baseDate = new Date(2020, 5, 7);
+export function getAbbreviatedWeekdays(locale: string) {
+  const baseDate = moment();
   let weekdays = [];
   for (let i = 0; i < 7; i++) {
-    const weekday = format(addDays(baseDate, i), 'eee', { locale });
+    const weekday = baseDate.clone().add(i, 'days').locale(locale).format('ddd');
     weekdays.push(weekday);
   }
   return weekdays.slice(1, 7).concat(weekdays.slice(0, 1));
@@ -70,8 +78,9 @@ export const formatAmount = (amount: any, currency: string = 'USD', decimals = 2
 
   return numberFormatter.format(amount);
 };
-export function getDateDifference(date1: Date, date2: Date) {
-  return differenceInCalendarDays(date2, date1);
+export function getDateDifference(date1: Moment, date2: Moment) {
+  // return differenceInCalendarDays(date2, date1);
+  return date2.diff(date1, 'days');
 }
 export function renderTime(time: number) {
   return time < 10 ? time.toString().padStart(2, '0') : time.toString();
@@ -382,7 +391,7 @@ export function modifyQueryParam(param: string, value: string | null, options: M
   }
   const url = new URL(window.location.href);
 
-  if (value === null) {
+  if (!value) {
     url.searchParams.delete(param); // Remove the query parameter
   } else {
     url.searchParams.set(param, value); // Add or update the query parameter

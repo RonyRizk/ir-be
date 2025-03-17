@@ -4,10 +4,9 @@ import booking_store, { calculateTotalCost, clearCheckoutRooms } from '@/stores/
 import { checkout_store } from '@/stores/checkout.store';
 import { isRequestPending } from '@/stores/ir-interceptor.store';
 import localizedWords from '@/stores/localization.store';
+import localization_store from '@/stores/app.store';
 import { formatAmount, getDateDifference } from '@/utils/utils';
 import { Component, Host, h, Event, EventEmitter, Prop } from '@stencil/core';
-import { format } from 'date-fns';
-import localization_store from '@/stores/app.store';
 @Component({
   tag: 'ir-booking-summary',
   styleUrl: 'ir-booking-summary.css',
@@ -26,7 +25,7 @@ export class IrBookingSummary {
   }
 
   render() {
-    const total_nights = getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date());
+    const total_nights = getDateDifference(booking_store.bookingAvailabilityParams.from_date, booking_store.bookingAvailabilityParams.to_date);
     const { totalAmount } = calculateTotalCost({
       gross: true,
       infants: true,
@@ -52,11 +51,7 @@ export class IrBookingSummary {
             <div class="flex w-full flex-1 items-center ">
               <div class="w-56 rounded-md border border-gray-300 bg-white p-2 text-center text-xs">
                 <p>{localizedWords.entries.Lcz_CheckIn}</p>
-                <p class="text-sm font-semibold">
-                  {format(booking_store.bookingAvailabilityParams?.from_date ? new Date(booking_store.bookingAvailabilityParams?.from_date) : new Date(), 'eee, dd MMM yyyy', {
-                    locale: localization_store.selectedLocale,
-                  })}
-                </p>
+                <p class="text-sm font-semibold">{booking_store.bookingAvailabilityParams?.from_date.locale(localization_store.selectedLocale).format('ddd, DD MMM YYYY')}</p>
                 <p>
                   {localizedWords.entries.Lcz_From} {app_store.property?.time_constraints.check_in_from}
                 </p>
@@ -64,11 +59,7 @@ export class IrBookingSummary {
               <div class="h-[1px] w-full min-w-[1rem] flex-1 bg-gray-300 "></div>
               <div class="w-56 rounded-md border border-gray-300 bg-white p-2 text-center text-xs">
                 <p>{localizedWords.entries.Lcz_CheckOut}</p>
-                <p class="text-sm font-semibold">
-                  {format(booking_store.bookingAvailabilityParams?.to_date ? new Date(booking_store.bookingAvailabilityParams?.to_date) : new Date(), 'eee, dd MMM yyyy', {
-                    locale: localization_store.selectedLocale,
-                  })}
-                </p>
+                <p class="text-sm font-semibold">{booking_store.bookingAvailabilityParams?.to_date.locale(localization_store.selectedLocale).format('ddd, DD MMM YYYY')}</p>
                 <p>
                   {localizedWords.entries.Lcz_Before} {app_store.property?.time_constraints.check_out_till}
                 </p>

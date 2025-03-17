@@ -153,7 +153,7 @@ export class IrRateplan {
                   )
                 )}
                 <div class="flex gap-4">
-                  {getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date()) > 1 && (
+                  {getDateDifference(booking_store.bookingAvailabilityParams.from_date, booking_store.bookingAvailabilityParams.to_date) > 1 && (
                     <p class="rateplan-amount-per-night grid-view">{`${formatAmount(this.visibleInventory?.selected_variation?.amount_per_night, app_store.userPreferences.currency_id, 0)}/${localizedWords.entries.Lcz_night}`}</p>
                   )}
                   {this.visibleInventory?.selected_variation?.discount_pct > 0 && !this.ratePlan.custom_text && (
@@ -214,8 +214,7 @@ export class IrRateplan {
                         )}
                         <div class="rateplan-final-pricing" data-style={this.visibleInventory?.selected_variation?.discount_pct > 0 ? '' : 'full-width'}>
                           <p class="rateplan-amount">{formatAmount(this.visibleInventory?.selected_variation?.discounted_amount, app_store.userPreferences.currency_id, 0)}</p>
-                          {getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date()) >
-                            1 && (
+                          {getDateDifference(booking_store.bookingAvailabilityParams.from_date, booking_store.bookingAvailabilityParams.to_date) > 1 && (
                             <p class="rateplan-amount-per-night">{`${formatAmount(this.visibleInventory?.selected_variation?.amount_per_night, app_store.userPreferences.currency_id, 0)}/${localizedWords.entries.Lcz_night}`}</p>
                           )}
                         </div>

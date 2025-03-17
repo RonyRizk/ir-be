@@ -86,7 +86,7 @@ export class IrBookingPage {
     }
   }
   private renderTotalNights() {
-    const diff = getDateDifference(booking_store.bookingAvailabilityParams.from_date ?? new Date(), booking_store.bookingAvailabilityParams.to_date ?? new Date());
+    const diff = getDateDifference(booking_store.bookingAvailabilityParams.from_date, booking_store.bookingAvailabilityParams.to_date);
     return `${diff} ${diff > 1 ? localizedWords.entries.Lcz_Nights : localizedWords.entries.Lcz_night}`;
   }
   // private checkMaxAmount() {

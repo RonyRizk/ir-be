@@ -23,6 +23,7 @@
 | `perma_link`         | `perma_link`           |             | `string`  | `null`                                  |
 | `propertyId`         | `property-id`          |             | `number`  | `undefined`                             |
 | `status`             | `status`               |             | `0 \| 1`  | `1`                                     |
+| `ticket`             | `ticket`               |             | `string`  | `undefined`                             |
 | `version`            | `version`              |             | `string`  | `'2.0'`                                 |
 
 

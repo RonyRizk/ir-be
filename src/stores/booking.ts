@@ -2,6 +2,7 @@ import { Booking } from '@/models/booking.dto';
 import { Agent, BeddingSetup, ISmokingOption, RatePlan, RoomType, Variation } from '@/models/property';
 import VariationService from '@/services/app/variation.service';
 import { createStore } from '@stencil/store';
+import { Moment } from 'moment';
 
 export interface IRatePlanSelection {
   reserved: number;
@@ -35,8 +36,8 @@ export interface ISelectedVariation {
   state: 'default' | 'modified';
 }
 export interface IBookinAvailabilityParams {
-  from_date: Date | null;
-  to_date: Date | null;
+  from_date: Moment | null;
+  to_date: Moment | null;
   adult_nbr: number;
   child_nbr: number;
   coupon?: string;

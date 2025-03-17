@@ -7,24 +7,24 @@
 
 ## Properties
 
-| Property        | Attribute       | Description | Type             | Default                     |
-| --------------- | --------------- | ----------- | ---------------- | --------------------------- |
-| `date`          | --              |             | `Date`           | `new Date()`                |
-| `dateModifiers` | --              |             | `IDateModifiers` | `undefined`                 |
-| `fromDate`      | --              |             | `Date`           | `null`                      |
-| `locale`        | --              |             | `Locale`         | `enUS`                      |
-| `maxDate`       | --              |             | `Date`           | `addYears(new Date(), 24)`  |
-| `maxSpanDays`   | `max-span-days` |             | `number`         | `90`                        |
-| `minDate`       | --              |             | `Date`           | `addYears(new Date(), -24)` |
-| `showPrice`     | `show-price`    |             | `boolean`        | `false`                     |
-| `toDate`        | --              |             | `Date`           | `null`                      |
+| Property        | Attribute       | Description | Type             | Default                      |
+| --------------- | --------------- | ----------- | ---------------- | ---------------------------- |
+| `date`          | --              |             | `Moment`         | `moment()`                   |
+| `dateModifiers` | --              |             | `IDateModifiers` | `undefined`                  |
+| `fromDate`      | --              |             | `Moment`         | `null`                       |
+| `locale`        | `locale`        |             | `string`         | `'en'`                       |
+| `maxDate`       | --              |             | `Moment`         | `moment().add(24, 'years')`  |
+| `maxSpanDays`   | `max-span-days` |             | `number`         | `90`                         |
+| `minDate`       | --              |             | `Moment`         | `moment().add(-24, 'years')` |
+| `showPrice`     | `show-price`    |             | `boolean`        | `false`                      |
+| `toDate`        | --              |             | `Moment`         | `null`                       |
 
 
 ## Events
 
-| Event        | Description | Type                |
-| ------------ | ----------- | ------------------- |
-| `dateChange` |             | `CustomEvent<Date>` |
+| Event        | Description | Type                  |
+| ------------ | ----------- | --------------------- |
+| `dateChange` |             | `CustomEvent<Moment>` |
 
 
 ## Dependencies

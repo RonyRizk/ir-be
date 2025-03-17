@@ -55,7 +55,7 @@
 .ir-table-head {
   height: 2.5rem;
   padding: 0.75rem 1.5rem;
-  text-align: left;
+  text-align: start;
   vertical-align: middle;
   font-weight: 500;
 }

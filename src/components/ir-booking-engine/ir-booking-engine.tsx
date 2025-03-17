@@ -52,7 +52,7 @@ export class IrBookingEngine {
   @State() router = new Stack<HTMLElement>();
   @State() bookingListingScreenOptions: { screen: 'bookings' | 'booking-details'; params: unknown } = { params: null, screen: 'bookings' };
 
-  private version: string = '2.596';
+  private version: string = '2.597';
   private baseUrl: string = 'https://gateway.igloorooms.com/IRBE';
 
   private commonService = new CommonService();
@@ -295,8 +295,8 @@ export class IrBookingEngine {
     booking_store.resetBooking = false;
     await this.propertyService.getExposedBookingAvailability({
       propertyid: app_store.app_data.property_id,
-      from_date: format(booking_store.bookingAvailabilityParams.from_date, 'yyyy-MM-dd'),
-      to_date: format(booking_store.bookingAvailabilityParams.to_date, 'yyyy-MM-dd'),
+      from_date: booking_store.bookingAvailabilityParams.from_date,
+      to_date: booking_store.bookingAvailabilityParams.to_date,
       room_type_ids: [],
       adult_nbr: booking_store.bookingAvailabilityParams.adult_nbr,
       child_nbr: booking_store.bookingAvailabilityParams.child_nbr,

@@ -1,7 +1,8 @@
 import { TPickupFormData } from '@/models/pickup';
 import { TUserFormData } from '@/models/user_form';
 import { createStore } from '@stencil/store';
-import { format } from 'date-fns';
+import booking_store from './booking';
+import moment from 'moment';
 export interface ICardProcessing {
   code: string;
   cardNumber: string;
@@ -32,7 +33,7 @@ const initialState: CheckoutStore = {
   prepaymentAmount: 0,
   modifiedGuestName: false,
   pickup: {
-    arrival_date: format(new Date(), 'yyyy-MM-dd'),
+    arrival_date: moment(booking_store.bookingAvailabilityParams.from_date),
   },
   payment: null,
   agreed_to_services: true,
@@ -49,7 +50,7 @@ export function updateUserFormData(key: keyof TUserFormData, value: any) {
 export function updatePickupFormData(key: keyof TPickupFormData, value: any) {
   if (key === 'location' && value === null) {
     checkout_store.pickup = {
-      arrival_date: format(new Date(), 'yyyy-MM-dd'),
+      arrival_date: moment(booking_store.bookingAvailabilityParams.from_date),
       location: null,
     };
   } else {

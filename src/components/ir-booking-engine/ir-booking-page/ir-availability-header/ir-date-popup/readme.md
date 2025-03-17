@@ -7,16 +7,16 @@
 
 ## Properties
 
-| Property | Attribute | Description | Type                          | Default                                 |
-| -------- | --------- | ----------- | ----------------------------- | --------------------------------------- |
-| `dates`  | --        |             | `{ start: Date; end: Date; }` | `{     start: null,     end: null,   }` |
+| Property | Attribute | Description | Type                              | Default                                 |
+| -------- | --------- | ----------- | --------------------------------- | --------------------------------------- |
+| `dates`  | --        |             | `{ start: Moment; end: Moment; }` | `{     start: null,     end: null,   }` |
 
 
 ## Events
 
-| Event        | Description | Type                                       |
-| ------------ | ----------- | ------------------------------------------ |
-| `dateChange` |             | `CustomEvent<{ start: Date; end: Date; }>` |
+| Event        | Description | Type                                           |
+| ------------ | ----------- | ---------------------------------------------- |
+| `dateChange` |             | `CustomEvent<{ start: Moment; end: Moment; }>` |
 
 
 ## Dependencies

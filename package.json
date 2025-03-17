@@ -20,7 +20,7 @@
   ],
   "scripts": {
     "build": "stencil build",
-    "start": "stencil build --dev --watch --serve -p 7741",
+    "start": "stencil build --dev --watch --serve -p 7594",
     "test": "stencil test --spec --e2e",
     "test.watch": "stencil test --spec --e2e --watchAll",
     "generate": "stencil generate"
@@ -37,6 +37,7 @@
     "google-maps": "^4.3.3",
     "imask": "^7.6.0",
     "install": "^0.13.0",
+    "moment": "^2.30.1",
     "postcss": "^8.4.38",
     "socket.io-client": "^4.7.5",
     "swiper": "^11.0.7",

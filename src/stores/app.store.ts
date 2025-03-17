@@ -1,7 +1,7 @@
 import { ICurrency, IExposedLanguages, pages, TCurrency, TDirection } from '@/models/common';
 import { Affiliate, IEntries, IExposedProperty } from '@/models/property';
 import { createStore } from '@stencil/store';
-import { enUS, Locale } from 'date-fns/locale';
+import moment from 'moment/min/moment-with-locales';
 export type UserPreference = {
   language_id: string;
   currency_id: string;
@@ -28,7 +28,7 @@ export interface IAppStore {
   currencies: TCurrency[];
   localizedWords: string[];
   dir: TDirection;
-  selectedLocale: Locale;
+  selectedLocale: string;
   userPreferences: UserPreference;
   app_data: {
     view: 'extended' | 'default';
@@ -72,7 +72,7 @@ const initialState: IAppStore = {
   childrenStartAge: 3,
   currentPage: 'booking',
   dir: 'LTR',
-  selectedLocale: enUS,
+  selectedLocale: 'en',
   localizedWords: [],
   userPreferences: {
     currency_id: 'usd',
@@ -109,10 +109,11 @@ const initialState: IAppStore = {
 };
 const { state: app_store, onChange: onAppDataChange } = createStore<IAppStore>(initialState);
 
-export function changeLocale(dir: TDirection, locale: Locale) {
+export function changeLocale(dir: TDirection, locale: string) {
   document.body.dir = dir;
   app_store.dir = dir;
   app_store.selectedLocale = locale;
+  moment.locale(locale);
 }
 export function updateUserPreference(params: Partial<UserPreference>) {
   app_store.userPreferences = {

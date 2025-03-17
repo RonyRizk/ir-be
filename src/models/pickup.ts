@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ZCurrency } from './common';
+import moment, { Moment } from 'moment';
 
 export const ZAllowedLocation = z.object({
   description: z.string(),
@@ -33,7 +34,9 @@ export const PickupFormData = z.object({
   number_of_vehicles: z.number().min(1),
   currency: ZCurrency,
   arrival_time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format. Please use HH:MM.'),
-  arrival_date: z.string(),
+  arrival_date: z.custom<Moment>((val): val is Moment => moment.isMoment(val), {
+    message: 'arrival date must be a valid Moment value',
+  }),
   selected_option: ZAllowedOptions,
   vehicle_type_code: z.string(),
 });

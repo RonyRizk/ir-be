@@ -5,6 +5,7 @@ import localizedWords from '@/stores/localization.store';
 import { format } from 'date-fns';
 import { formatAmount, getDateDifference } from '@/utils/utils';
 import { BookingListingAppService } from '@/services/app/booking-listing.service';
+import moment from 'moment';
 
 @Component({
   tag: 'ir-booking-details-view',
@@ -27,7 +28,7 @@ export class IrBookingDetailsView {
   }
 
   renderBookingDetailHeader() {
-    const total_nights = getDateDifference(new Date(this.booking.from_date), new Date(this.booking.to_date));
+    const total_nights = getDateDifference(moment(this.booking.from_date, 'YYYY-MM-DD'), moment(this.booking.to_date, 'YYYY-MM-DD'));
     const nbr_of_persons = this.booking.occupancy.adult_nbr + this.booking.occupancy.children_nbr;
     const total_rooms = this.booking.rooms.length;
     return `${total_nights} ${total_nights > 1 ? localizedWords.entries.Lcz_Nights : localizedWords.entries.Lcz_night} - ${nbr_of_persons}

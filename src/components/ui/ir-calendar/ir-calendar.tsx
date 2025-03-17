@@ -1,22 +1,5 @@
 import { Component, h, State, Prop, EventEmitter, Event, Watch } from '@stencil/core';
-import {
-  addMonths,
-  eachDayOfInterval,
-  endOfMonth,
-  endOfWeek,
-  format,
-  isSameMonth,
-  startOfMonth,
-  startOfWeek,
-  addDays,
-  isSameDay,
-  isBefore,
-  isAfter,
-  addYears,
-  isToday,
-  Locale,
-} from 'date-fns';
-import { enUS } from 'date-fns/locale';
+import moment, { Moment } from 'moment/min/moment-with-locales';
 import { getAbbreviatedWeekdays } from '@/utils/utils';
 import { IDateModifierOptions, IDateModifiers } from '../ir-date-range/ir-date-range.types';
 import localizedWords from '@/stores/localization.store';
@@ -27,51 +10,62 @@ import localizedWords from '@/stores/localization.store';
   shadow: true,
 })
 export class IrCalendar {
-  @Prop() fromDate: Date | null = null;
-  @Prop() toDate: Date | null = null;
-  @Prop() minDate: Date = addYears(new Date(), -24);
-  @Prop() maxDate: Date = addYears(new Date(), 24);
+  @Prop({ mutable: true }) fromDate: Moment | null = null;
+  @Prop({ mutable: true }) toDate: Moment | null = null;
+  @Prop({ mutable: true }) minDate: Moment = moment().add(-24, 'years');
+  @Prop({ mutable: true }) maxDate: Moment = moment().add(24, 'years');
   @Prop() dateModifiers: IDateModifiers;
   @Prop() maxSpanDays: number = 90;
   @Prop() showPrice = false;
-  @Prop({ reflect: true }) locale: Locale = enUS;
-  @Prop() date: Date = new Date();
-  @State() selectedDate: Date = null;
-  @State() displayedDays: { month: Date; days: Date[] };
-  @State() hoveredDate: Date | null = null;
+  @Prop({ reflect: true }) locale: string = 'en';
+  @Prop() date: Moment = moment();
+  @State() selectedDate: Moment = null;
+  @State() displayedDays: { month: Moment; days: Moment[] };
+  @State() hoveredDate: Moment | null = null;
 
-  @Event({ bubbles: true, composed: true }) dateChange: EventEmitter<Date>;
+  @Event({ bubbles: true, composed: true }) dateChange: EventEmitter<Moment>;
 
   @State() weekdays: string[] = [];
 
   componentWillLoad() {
     this.weekdays = getAbbreviatedWeekdays(this.locale);
     this.resetHours();
-    const currentMonth = this.fromDate ?? new Date();
-    console.log('currentMonth', currentMonth);
+    const currentMonth = this.fromDate ?? moment();
     this.displayedDays = { ...this.getMonthDays(currentMonth) };
     this.selectedDate = this.date;
+    moment.locale(this.locale);
   }
+
   @Watch('date')
-  handleDateChange(newDate: Date, oldDate: Date) {
-    if (!isSameDay(newDate, oldDate)) {
+  handleDateChange(newDate: Moment, oldDate: Moment) {
+    if (!newDate.isSame(oldDate, 'day')) {
       this.selectedDate = newDate;
     }
   }
+
   @Watch('locale')
-  handleLocale(newValue: Locale, oldLocale: Locale) {
+  handleLocale(newValue: string, oldLocale: string) {
     if (newValue !== oldLocale) {
+      moment.locale(this.locale);
       this.weekdays = getAbbreviatedWeekdays(newValue);
     }
   }
 
-  getMonthDays(month: Date) {
+  getMonthDays(month: Moment) {
+    const startDate = month.clone().startOf('month').startOf('week').add(1, 'day');
+    const endDate = month.clone().endOf('month').endOf('week').add(1, 'day');
+
+    const days = [];
+    let day = startDate.clone();
+
+    while (day.isBefore(endDate)) {
+      days.push(day.clone());
+      day = day.clone().add(1, 'day');
+    }
+
     return {
       month,
-      days: eachDayOfInterval({
-        start: startOfWeek(startOfMonth(month), { weekStartsOn: 1, locale: this.locale }),
-        end: endOfWeek(endOfMonth(month), { weekStartsOn: 1, locale: this.locale }),
-      }),
+      days,
     };
   }
 
@@ -81,9 +75,9 @@ export class IrCalendar {
     } else if (e.key === 'ArrowRight') {
       this.incrementDate();
     } else if (e.key === 'ArrowUp') {
-      this.selectedDate = addDays(new Date(this.selectedDate), -7);
+      this.selectedDate = this.selectedDate.clone().add(-7, 'days');
     } else if (e.key === 'ArrowDown') {
-      this.selectedDate = addDays(new Date(this.selectedDate), 7);
+      this.selectedDate = this.selectedDate.clone().add(7, 'days');
     } else if (e.key === ' ' || e.key === 'Enter') {
       this.selectDay(this.selectedDate);
     }
@@ -91,53 +85,60 @@ export class IrCalendar {
 
   decrementDate() {
     if (this.selectedDate) {
-      this.selectedDate = addDays(new Date(this.selectedDate), -1);
+      this.selectedDate = this.selectedDate.clone().add(-1, 'days');
     }
   }
 
   incrementDate() {
     if (this.selectedDate) {
-      this.selectedDate = addDays(new Date(this.selectedDate), 1);
+      this.selectedDate = this.selectedDate.clone().add(1, 'days');
     }
   }
 
   goToNextMonth(e: MouseEvent) {
     e.stopPropagation();
     e.stopImmediatePropagation();
-    const currentSecondMonth = this.displayedDays.month;
-    const newSecondMonth = addMonths(currentSecondMonth, 1);
-    if (isBefore(endOfMonth(newSecondMonth), this.minDate) || isAfter(startOfMonth(newSecondMonth), this.maxDate)) {
+    const currentMonth = this.displayedDays.month;
+    const newMonth = currentMonth.clone().add(1, 'month');
+
+    if (newMonth.endOf('month').isBefore(this.minDate) || newMonth.startOf('month').isAfter(this.maxDate)) {
       return;
     }
-    this.displayedDays = { ...this.getMonthDays(newSecondMonth) };
+
+    this.displayedDays = { ...this.getMonthDays(newMonth) };
   }
 
   goToPreviousMonth(e: MouseEvent) {
     e.stopPropagation();
     e.stopImmediatePropagation();
-    const currentFirstMonth = this.displayedDays.month;
-    const newFirstMonth = addMonths(currentFirstMonth, -1);
-    if (isBefore(endOfMonth(newFirstMonth), this.minDate) || isAfter(startOfMonth(newFirstMonth), this.maxDate)) {
+    const currentMonth = this.displayedDays.month;
+    const newMonth = currentMonth.clone().add(-1, 'month');
+
+    if (newMonth.endOf('month').isBefore(this.minDate) || newMonth.startOf('month').isAfter(this.maxDate)) {
       return;
     }
-    this.displayedDays = { ...this.getMonthDays(newFirstMonth) };
+
+    this.displayedDays = { ...this.getMonthDays(newMonth) };
   }
 
-  selectDay(day: Date) {
+  selectDay(day: Moment) {
     this.selectedDate = day;
     this.dateChange.emit(this.selectedDate);
   }
+
   resetHours() {
-    this.minDate.setHours(0, 0, 0, 0);
-    this.maxDate.setHours(0, 0, 0, 0);
+    this.minDate = this.minDate.clone().startOf('day');
+    this.maxDate = this.maxDate.clone().startOf('day');
+
     if (this.fromDate) {
-      this.fromDate.setHours(0, 0, 0, 0);
+      this.fromDate = this.fromDate.clone().startOf('day');
     }
     if (this.toDate) {
-      this.toDate.setHours(0, 0, 0, 0);
+      this.toDate = this.toDate.clone().startOf('day');
     }
   }
-  handleMouseEnter(day: Date) {
+
+  handleMouseEnter(day: Moment) {
     this.hoveredDate = day;
   }
 
@@ -145,19 +146,15 @@ export class IrCalendar {
     this.hoveredDate = null;
   }
 
-  isDaySelected(day: Date): boolean {
-    const date = new Date(day);
-    date.setHours(0, 0, 0, 0);
-    const start = new Date(this.selectedDate ?? new Date());
-    start.setHours(0, 0, 0, 0);
-    return isSameDay(date, start);
+  isDaySelected(day: Moment): boolean {
+    return day.isSame(this.selectedDate, 'day');
   }
 
-  checkDatePresence(day: Date) {
+  checkDatePresence(day: Moment) {
     if (!this.dateModifiers) {
       return;
     }
-    const formatedDate = format(day, 'yyyy-MM-dd');
+    const formatedDate = day.format('YYYY-MM-DD');
     const result: IDateModifierOptions = this.dateModifiers[formatedDate];
     if (result) {
       return result;
@@ -167,6 +164,7 @@ export class IrCalendar {
 
   render() {
     const { month, days } = this.displayedDays;
+
     return (
       <div class={'date-picker'}>
         <table class="calendar " role="grid">
@@ -183,7 +181,7 @@ export class IrCalendar {
                       />
                     </svg>
                   </button>
-                  <span>{format(month, 'MMMM yyyy', { locale: this.locale })}</span>
+                  <span>{month.locale(this.locale).format('MMMM YYYY')}</span>
                   <button name="next month" class="navigation-buttons" type="button" onClick={this.goToNextMonth.bind(this)}>
                     <p class="sr-only ">next month</p>
                     <svg xmlns="http://www.w3.org/2000/svg" height="16" width="25.6" viewBox="0 0 320 512">
@@ -216,30 +214,28 @@ export class IrCalendar {
               }, [])
               .map(week => (
                 <tr class="week-row" role="row">
-                  {week.map((day: Date) => {
-                    day.setHours(0, 0, 0, 0);
+                  {week.map((day: Moment) => {
                     const checkedDate = this.checkDatePresence(day);
                     return (
-                      <td class="day-cell" key={format(day, 'yyyy-MM-dd')} role="gridcell">
-                        {isSameMonth(day, month) && (
+                      <td class="day-cell" key={day.format('YYYY-MM-DD')} role="gridcell">
+                        {day.isSame(month, 'month') && (
                           <button
-                            disabled={isBefore(day, this.minDate) || isAfter(day, this.maxDate) || checkedDate?.disabled}
+                            disabled={day.isBefore(this.minDate) || day.isAfter(this.maxDate) || checkedDate?.disabled}
                             onMouseEnter={() => this.handleMouseEnter(day)}
                             onMouseLeave={() => this.handleMouseLeave()}
-                            // onKeyDown={this.handleKeyDown.bind(this)}
                             onClick={e => {
                               e.stopImmediatePropagation();
                               e.stopPropagation();
                               this.selectDay(day);
                             }}
-                            aria-label={`${format(day, 'EEEE, MMMM do yyyy', { locale: this.locale })} ${
-                              isBefore(day, this.minDate) || isAfter(day, this.maxDate) ? localizedWords.entries.Lcz_NotAvailable : ''
+                            aria-label={`${day.locale(this.locale).format('dddd, MMMM Do YYYY')} ${
+                              day.isBefore(this.minDate) || day.isAfter(this.maxDate) ? localizedWords.entries.Lcz_NotAvailable : ''
                             }`}
-                            aria-disabled={isBefore(day, this.minDate) || isAfter(day, this.maxDate) || checkedDate?.disabled ? 'true' : 'false'}
+                            aria-disabled={day.isBefore(this.minDate) || day.isAfter(this.maxDate) || checkedDate?.disabled ? 'true' : 'false'}
                             aria-selected={this.isDaySelected(day)}
                             class={`day-button`}
                           >
-                            <p class={`day ${isToday(day) ? 'current-date' : ''}`}>{format(day, 'd', { locale: this.locale })}</p>
+                            <p class={`day ${day.isSame(moment(), 'day') ? 'current-date' : ''}`}>{day.format('D')}</p>
                             {this.showPrice && <p class="price">{checkedDate?.withPrice.price ? '_' : checkedDate.withPrice.price}</p>}
                           </button>
                         )}

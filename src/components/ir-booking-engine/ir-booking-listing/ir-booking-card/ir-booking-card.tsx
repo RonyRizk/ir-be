@@ -3,8 +3,7 @@ import { BookingListingAppService } from '@/services/app/booking-listing.service
 import localizedWords from '@/stores/localization.store';
 import { formatAmount, formatFullLocation } from '@/utils/utils';
 import { Component, Event, EventEmitter, Prop, Watch, h } from '@stencil/core';
-import { differenceInCalendarDays, format } from 'date-fns';
-import localization_store from '@/stores/app.store';
+import moment from 'moment/min/moment-with-locales';
 
 @Component({
   tag: 'ir-booking-card',
@@ -42,7 +41,7 @@ export class IrBookingCard {
   }
 
   private init() {
-    this.totalNights = differenceInCalendarDays(new Date(this.booking.to_date), new Date(this.booking.from_date));
+    this.totalNights = moment(this.booking.to_date).diff(moment(this.booking.from_date), 'days');
   }
 
   render() {
@@ -63,11 +62,11 @@ export class IrBookingCard {
         </div>
         <p>
           <span class="font-medium">{localizedWords.entries.Lcz_BookedOn}: </span>
-          {format(new Date(this.booking.booked_on.date), 'dd-MMM-yyyy', { locale: localization_store.selectedLocale })}
+          {moment(this.booking.booked_on.date, 'YYYY-MM-DD').format('DD-MMM-YYYY')}
         </p>
         <p>
           <span class="font-medium">{localizedWords.entries.Lcz_CheckIn}: </span>
-          {format(new Date(this.booking.from_date), 'EEE, dd MMM yyyy', { locale: localization_store.selectedLocale })}
+          {moment(this.booking.from_date, 'YYYY-MM-DD').format('ddd, DD MMM YYYY')}
         </p>
         <p>
           <span class="font-medium lowercase">{localizedWords.entries.Lcz_Duration}: </span>

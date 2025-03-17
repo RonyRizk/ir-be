@@ -13,6 +13,7 @@ import localizedWords from '@/stores/localization.store';
 import { destroyBookingCookie, generateCheckoutUrl, getDateDifference, injectHTMLAndRunScript } from '@/utils/utils';
 import { ZCreditCardSchemaWithCvc } from '@/validators/checkout.validator';
 import { Component, Host, Listen, State, h, Event, EventEmitter } from '@stencil/core';
+import moment from 'moment';
 import { ZodError, ZodIssue } from 'zod';
 
 @Component({
@@ -226,7 +227,10 @@ export class IrCheckoutPage {
   private modifyConversionTag(tag: string) {
     const booking = booking_store.booking;
     tag = tag.replace(/\$\$total_price\$\$/g, booking.financial.total_amount.toString());
-    tag = tag.replace(/\$\$total_roomnights\$\$/g, (getDateDifference(new Date(booking.from_date), new Date(booking.to_date)) * calculateTotalRooms()).toString());
+    tag = tag.replace(
+      /\$\$total_roomnights\$\$/g,
+      (getDateDifference(moment(booking.from_date, 'YYYY-MM-DD'), moment(booking.to_date, 'YYYY-MM-DD')) * calculateTotalRooms()).toString(),
+    );
     tag = tag.replace(/\$\$booking_xref\$\$/g, booking.booking_nbr.toString());
     tag = tag.replace(/\$\$curr\$\$/g, app_store.userPreferences?.currency_id?.toString());
     tag = tag.replace(/\$\$cur_code\$\$/g, app_store.userPreferences?.currency_id?.toString());

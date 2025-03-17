@@ -2,14 +2,14 @@ import app_store from '@/stores/app.store';
 import localization_store from '@/stores/app.store';
 import localizedWords from '@/stores/localization.store';
 import { Component, Host, h, Element, Prop, Watch, State, Event, EventEmitter } from '@stencil/core';
-import { addDays, format } from 'date-fns';
+import moment, { Moment } from 'moment/min/moment-with-locales';
 @Component({
   tag: 'ir-date-popup',
   styleUrl: 'ir-date-popup.css',
   shadow: true,
 })
 export class IrDatePopup {
-  @Prop() dates: { start: Date | null; end: Date | null } = {
+  @Prop() dates: { start: Moment | null; end: Moment | null } = {
     start: null,
     end: null,
   };
@@ -17,17 +17,14 @@ export class IrDatePopup {
   @Element() el: HTMLIrDatePopupElement;
 
   private popover: HTMLIrPopoverElement;
-  private minDate: Date = addDays(new Date(), 0);
-  @Event() dateChange: EventEmitter<{ start: Date | null; end: Date | null }>;
+  private minDate: Moment = moment();
+  @Event() dateChange: EventEmitter<{ start: Moment | null; end: Moment | null }>;
 
   @Watch('dates')
   handleDatesChange() {
     if (this.dates.end && this.isPopoverOpen) {
       this.popover.toggleVisibility();
     }
-  }
-  componentWillLoad() {
-    this.minDate.setHours(0, 0, 0, 0);
   }
   dateTrigger() {
     return (
@@ -50,14 +47,16 @@ export class IrDatePopup {
           <p class="label">{localizedWords.entries.Lcz_Dates}</p>
           <div class="dates">
             {this.dates.start ? (
-              format(this.dates.start, 'MMM dd', { locale: localization_store.selectedLocale })
+              this.dates.start.locale(localization_store.selectedLocale).format('MMM DD')
             ) : (
+              // format(this.dates.start, 'MMM dd', { locale: localization_store.selectedLocale })
               <span class="text-slate-500">{localizedWords.entries.Lcz_CheckIn}</span>
             )}
             <span> - </span>
             {this.dates.end ? (
-              format(this.dates.end, 'MMM dd', { locale: localization_store.selectedLocale })
+              this.dates.end.locale(localization_store.selectedLocale).format('MMM DD')
             ) : (
+              // format(this.dates.end, 'MMM dd', { locale: localization_store.selectedLocale })
               <span class="text-slate-500">{localizedWords.entries.Lcz_CheckOut}</span>
             )}
           </div>
@@ -75,7 +74,7 @@ export class IrDatePopup {
           onOpenChange={e => {
             this.isPopoverOpen = e.detail;
             if (!this.isPopoverOpen && !this.dates.end && this.dates.start) {
-              this.dateChange.emit({ ...this.dates, end: addDays(this.dates.start, 1) });
+              this.dateChange.emit({ ...this.dates, end: this.dates.start.add(1, 'days') });
             }
           }}
         >

@@ -5,7 +5,7 @@ import { CommonService } from '@/services/api/common.service';
 import { PropertyService } from '@/services/api/property.service';
 import axios from 'axios';
 import app_store from '@/stores/app.store';
-import { addDays, addYears, format } from 'date-fns';
+import moment from 'moment/min/moment-with-locales';
 import localizedWords from '@/stores/localization.store';
 import Token from '@/models/Token';
 @Component({
@@ -96,8 +96,8 @@ export class IrBookingWidget {
         this.commonService.getExposedLanguage(),
         this.propertyService.getExposedNonBookableNights({
           porperty_id: this.propertyId,
-          from_date: format(new Date(), 'yyyy-MM-dd'),
-          to_date: format(addYears(new Date(), 1), 'yyyy-MM-dd'),
+          from_date: moment().format('YYYY-MM-DD'),
+          to_date: moment().add(1, 'years').format('YYYY-MM-DD'),
           perma_link: this.perma_link,
           aname: this.p,
         }),
@@ -129,8 +129,8 @@ export class IrBookingWidget {
     const currentDomain = `${app_store.property.perma_link}.${subdomainURL}`;
     const { from_date, to_date } = this.dates;
     const { adultCount, childrenCount } = this.guests;
-    const fromDate = from_date ? `checkin=${format(from_date, 'yyyy-MM-dd')}` : '';
-    const toDate = to_date ? `checkout=${format(to_date, 'yyyy-MM-dd')}` : '';
+    const fromDate = from_date ? `checkin=${moment(from_date).format('YYYY-MM-DD')}` : '';
+    const toDate = to_date ? `checkout=${moment(to_date).format('YYYY-MM-DD')}` : '';
     const adults = adultCount > 0 ? `adults=${adultCount}` : '';
     const children = childrenCount > 0 ? `children=${childrenCount}` : '';
     const roomTypeId = this.roomTypeId ? `rtid=${this.roomTypeId}` : '';
@@ -153,15 +153,25 @@ export class IrBookingWidget {
     return nights;
   }
   private renderDateTrigger() {
+    const from = this.dates?.from_date;
+    const to = this.dates?.to_date;
+    let fromLabel = '';
+    let toLabel = '';
+    if (from) {
+      fromLabel = moment(from).format('DD MMM YYYY');
+    }
+    if (to) {
+      toLabel = moment(to).format('DD MMM YYYY');
+    }
     return (
       <div class="date-trigger" slot="trigger">
         <ir-icons name="calendar" svgClassName="size-4"></ir-icons>
-        {this.dates && this.dates.from_date && this.dates.to_date ? (
+        {fromLabel && toLabel ? (
           <div>
             <p>
-              <span>{format(this.dates.from_date, 'MMM dd')}</span>
+              <span>{fromLabel}</span>
               <span> - </span>
-              <span>{format(this.dates.to_date, 'MMM dd')}</span>
+              <span>{toLabel}</span>
             </p>
           </div>
         ) : (
@@ -241,10 +251,10 @@ export class IrBookingWidget {
             onOpenChange={e => {
               this.isPopoverOpen = e.detail;
               if (!this.isPopoverOpen) {
-                if (!this.dates.to_date && this.dates.from_date) {
+                if (this.dates.from_date && !this.dates.to_date) {
                   this.dates = {
                     ...this.dates,
-                    to_date: addDays(this.dates.from_date, 1),
+                    to_date: moment(this.dates.from_date).add(1, 'days').toDate(),
                   };
                 }
               }
@@ -254,10 +264,10 @@ export class IrBookingWidget {
             <div slot="popover-content" class="popup-container w-full border-0 bg-white p-4  shadow-none sm:w-auto sm:border  ">
               <ir-date-range
                 dateModifiers={this.dateModifiers}
-                minDate={addDays(new Date(), -1)}
+                minDate={moment().add(-1, 'days')}
                 style={{ '--radius': 'var(--ir-widget-radius)' }}
-                fromDate={this.dates?.from_date}
-                toDate={this.dates?.to_date}
+                fromDate={this.dates?.from_date ? moment(this.dates.from_date) : null}
+                toDate={this.dates?.to_date ? moment(this.dates.to_date) : null}
                 locale={localization_store.selectedLocale}
                 maxSpanDays={app_store.property.max_nights}
                 onDateChange={e => {

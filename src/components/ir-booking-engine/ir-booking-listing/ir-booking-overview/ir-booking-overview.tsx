@@ -5,11 +5,11 @@ import { CommonService } from '@/services/api/common.service';
 import { PropertyService } from '@/services/api/property.service';
 import { BookingListingAppService } from '@/services/app/booking-listing.service';
 import { cn, formatAmount, formatFullLocation, runScriptAndRemove } from '@/utils/utils';
-import { differenceInCalendarDays, format } from 'date-fns';
+import { differenceInCalendarDays } from 'date-fns';
 import app_store from '@/stores/app.store';
 import { PaymentService } from '@/services/api/payment.service';
 import localizedWords from '@/stores/localization.store';
-import localization_store from '@/stores/app.store';
+import moment from 'moment/min/moment-with-locales';
 @Component({
   tag: 'ir-booking-overview',
   styleUrl: 'ir-booking-overview.css',
@@ -339,11 +339,11 @@ export class IrBookingOverview {
                           <td class="ir-table-cell" data-state={this.aff ? 'booking-affiliate' : ''}>
                             {booking.booking_nbr}
                           </td>
-                          <td class="ir-table-cell  md:hidden lg:table-cell" data-state={this.aff ? 'booking-affiliate' : ''}>
-                            {format(new Date(booking.booked_on.date), 'dd-MMM-yyyy', { locale: localization_store.selectedLocale })}
+                          <td class="ir-table-cell text-start  md:hidden lg:table-cell" data-state={this.aff ? 'booking-affiliate' : ''}>
+                            {moment(booking.booked_on.date, 'YYYY-MM-DD').format('DD-MMM-YYYY')}
                           </td>
                           <td class="ir-table-cell" data-state={this.aff ? 'booking-affiliate' : ''}>
-                            {format(new Date(booking.from_date), 'dd-MMM-yyyy', { locale: localization_store.selectedLocale })}
+                            {moment(booking.from_date, 'YYYY-MM-DD').format('DD-MMM-YYYY')}
                           </td>
                           <td class="ir-table-cell lowercase" data-state={this.aff ? 'booking-affiliate' : ''}>
                             {totalNights} {totalNights > 1 ? localizedWords.entries.Lcz_Nights : localizedWords.entries.Lcz_night}

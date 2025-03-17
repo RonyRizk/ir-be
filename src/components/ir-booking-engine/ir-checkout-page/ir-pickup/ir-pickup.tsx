@@ -6,9 +6,9 @@ import { checkout_store, onCheckoutDataChange, updatePartialPickupFormData, upda
 import localizedWords from '@/stores/localization.store';
 import { formatAmount } from '@/utils/utils';
 import { Component, h, Element, State, Listen, Prop } from '@stencil/core';
-import { format } from 'date-fns';
 import IMask from 'imask';
 import { ZodIssue } from 'zod';
+import localization_store from '@/stores/app.store';
 @Component({
   tag: 'ir-pickup',
   styleUrl: 'ir-pickup.css',
@@ -48,7 +48,7 @@ export class IrPickup {
   componentWillLoad() {
     this.oldCurrencyValue = app_store.userPreferences.currency_id;
     this.updateCurrency();
-    updatePickupFormData('arrival_date', format(booking_store.bookingAvailabilityParams?.from_date, 'yyyy-MM-dd'));
+    updatePickupFormData('arrival_date', booking_store.bookingAvailabilityParams?.from_date);
     onAppDataChange('userPreferences', newValue => {
       if (newValue.currency_id !== this.oldCurrencyValue) {
         this.updateCurrency();
@@ -83,7 +83,7 @@ export class IrPickup {
         </svg>
         <div>
           <p class="trigger-label">{localizedWords.entries.Lcz_ArrivalDate}</p>
-          <p class={'date'}>{format(new Date(checkout_store.pickup.arrival_date), 'MMM dd, yyyy')}</p>
+          <p class={'date'}>{checkout_store?.pickup?.arrival_date?.format('MMM DD, YYYY')}</p>
         </div>
       </div>
     );
@@ -92,7 +92,7 @@ export class IrPickup {
   handleChangeDate(e: CustomEvent) {
     e.stopImmediatePropagation();
     e.stopPropagation();
-    updatePickupFormData('arrival_date', format(e.detail, 'yyyy-MM-dd'));
+    updatePickupFormData('arrival_date', e.detail);
     this.popover.toggleVisibility();
   }
   handleVehicleTypeChange(e: CustomEvent) {
@@ -192,7 +192,11 @@ export class IrPickup {
                 <ir-popover ref={el => (this.popover = el)} class="w-fit sm:w-full lg:w-fit">
                   {this.dateTrigger()}
                   <div slot="popover-content" class="date-range-container w-full border-0 p-2 shadow-none sm:w-auto sm:border sm:shadow-sm md:p-4 ">
-                    <ir-calendar date={new Date(checkout_store.pickup.arrival_date)} fromDate={booking_store.bookingAvailabilityParams?.from_date}></ir-calendar>
+                    <ir-calendar
+                      locale={localization_store.selectedLocale}
+                      date={checkout_store.pickup.arrival_date}
+                      fromDate={booking_store.bookingAvailabilityParams?.from_date}
+                    ></ir-calendar>
                   </div>
                 </ir-popover>
                 <ir-input

@@ -1,5 +1,5 @@
 import { Component, Host, Listen, Prop, State, Watch, h } from '@stencil/core';
-import { format, isBefore } from 'date-fns';
+import { isBefore } from 'date-fns';
 import { cn, formatAmount, getDateDifference, getUserPreference as getUserPreference, runScriptAndRemove } from '@/utils/utils';
 import localizedWords from '@/stores/localization.store';
 import app_store from '@/stores/app.store';
@@ -12,6 +12,7 @@ import { AllowedPaymentMethod } from '@/models/property';
 import { BookingListingAppService } from '@/services/app/booking-listing.service';
 import InvoiceSkeleton from './InvoiceSkeleton';
 import Token from '@/models/Token';
+import moment from 'moment/min/moment-with-locales';
 
 @Component({
   tag: 'ir-invoice',
@@ -33,6 +34,7 @@ export class IrInvoice {
   @Prop() headerMessageShown: boolean = true;
   @Prop() locationShown: boolean = true;
   @Prop() be: boolean = false;
+  @Prop() ticket: string;
   @Prop() version: string = '2.0';
 
   @State() booking: Booking;
@@ -69,6 +71,11 @@ export class IrInvoice {
       this.token.setToken(isAuthenticated.token);
       this.isAuthenticated = true;
     } else {
+      if (this.ticket) {
+        this.token.setToken(this.ticket);
+        this.isAuthenticated = true;
+        return;
+      }
       const token = await this.commonService.getBEToken();
       this.token.setToken(token);
     }
@@ -83,6 +90,13 @@ export class IrInvoice {
         { booking_nbr: this.bookingNbr, language: this.language || app_store.userPreferences.language_id, currency: null },
         true,
       );
+    }
+  }
+  @Watch('ticket')
+  async handleTicketChange(newValue, oldValue) {
+    if (newValue !== oldValue) {
+      this.token.setToken(this.ticket);
+      this.isAuthenticated = true;
     }
   }
 
@@ -107,6 +121,7 @@ export class IrInvoice {
     const results = await Promise.all(requests);
     this.booking = results[0];
     this.payment_option = this.bookingListingAppService.detectPaymentOrigin(this.booking);
+
     const book_date = new Date(this.booking.booked_on.date);
     book_date.setHours(this.booking.booked_on.hour + 1);
     book_date.setMinutes(this.booking.booked_on.minute);
@@ -142,7 +157,7 @@ export class IrInvoice {
   }
 
   renderBookingDetailHeader() {
-    const total_nights = getDateDifference(new Date(this.booking.from_date), new Date(this.booking.to_date));
+    const total_nights = getDateDifference(moment(this.booking.from_date, 'YYYY-MM-DD'), moment(this.booking.to_date, 'YYYY-MM-DD'));
     // const nbr_of_persons = this.booking.occupancy.adult_nbr + this.booking.occupancy.children_nbr;
     const nbr_of_persons = this.booking.rooms.reduce(
       (prev, room) => prev + Number(room.rateplan.selected_variation.adult_nbr) + Number(room.rateplan.selected_variation.child_nbr),
@@ -252,6 +267,7 @@ export class IrInvoice {
     const google_maps_url = `http://maps.google.com/maps?q=${app_store.property.location.latitude},${app_store.property.location.longitude}`;
 
     const { cancel, payment } = this.bookingListingAppService.getBookingActions(this.booking);
+    console.log(app_store.userPreferences.language_id);
     return (
       <Host>
         <ir-interceptor></ir-interceptor>
@@ -325,13 +341,13 @@ export class IrInvoice {
                     </span>
                   </p>
                   <p class="booking-info-text">
-                    {localizedWords.entries.Lcz_CheckIn}: <span>{format(this.booking.from_date, 'eee, dd MMM yyyy')} </span>
+                    {localizedWords.entries.Lcz_CheckIn}: <span>{moment(this.booking.from_date, 'YYYY-MM-DD').format('ddd, DD MMM YYYY')} </span>
                     <span>
                       {localizedWords.entries.Lcz_From} {app_store.property?.time_constraints.check_in_from}
                     </span>
                   </p>
                   <p class="booking-info-text">
-                    {localizedWords.entries.Lcz_CheckOut}: <span>{format(this.booking.to_date, 'eee, dd MMM yyyy')} </span>
+                    {localizedWords.entries.Lcz_CheckOut}: <span>{moment(this.booking.to_date).format('ddd, DD MMM YYYY')} </span>
                     <span>
                       {localizedWords.entries.Lcz_Before} {app_store.property?.time_constraints.check_out_till}
                     </span>
@@ -389,7 +405,7 @@ export class IrInvoice {
                       <div class="flex w-full items-center justify-between">
                         <p class="flex items-center gap-4">
                           <p class="room-info-text">
-                            {`${localizedWords.entries.Lcz_Date}:`} <span>{format(new Date(this.booking.pickup_info.date), 'eee, dd MMM yyyy')}</span>
+                            {`${localizedWords.entries.Lcz_Date}:`} <span>{moment(this.booking.pickup_info.date, 'YYYY-MM-DD').format('ddd, DD MMM YYYY')}</span>
                           </p>
                           <p class="room-info-text">
                             {`${localizedWords.entries.Lcz_Time}:`}{' '}
