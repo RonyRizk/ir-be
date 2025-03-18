@@ -3,11 +3,7 @@ import { IDateModifiers, IDateModifierOptions } from './ir-date-range.types';
 import moment, { Moment } from 'moment/min/moment-with-locales';
 import { getAbbreviatedWeekdays } from '@/utils/utils';
 import localizedWords from '@/stores/localization.store';
-@Component({
-  tag: 'ir-date-range',
-  styleUrl: 'ir-date-range.css',
-  shadow: true,
-})
+@Component({ tag: 'ir-date-range', styleUrl: 'ir-date-range.css', shadow: true })
 export class IrDateRange {
   @Prop() fromDate: Moment | null = null;
   @Prop() toDate: Moment | null = null;
@@ -27,10 +23,7 @@ export class IrDateRange {
   componentWillLoad() {
     this.weekdays = getAbbreviatedWeekdays(this.locale);
     this.resetHours();
-    this.selectedDates = {
-      start: this.fromDate,
-      end: this.toDate,
-    };
+    this.selectedDates = { start: this.fromDate, end: this.toDate };
     const currentMonth = this.fromDate ? this.fromDate.clone() : moment();
     const nextMonth = currentMonth.clone().add(1, 'month');
 
@@ -46,27 +39,29 @@ export class IrDateRange {
   @Watch('fromDate')
   handleFromDateChange(newValue: Moment | null, oldValue: Moment | null) {
     if (!(newValue ?? moment()).isSame(oldValue ?? moment(), 'days')) {
-      this.selectedDates = {
-        ...this.selectedDates,
-        start: newValue,
-      };
+      this.selectedDates = { ...this.selectedDates, start: newValue };
     }
   }
   @Watch('toDate')
   handleToDateChange(newValue: Moment | null, oldValue: Moment | null) {
     if (!(newValue ?? moment()).isSame(oldValue ?? moment(), 'days')) {
-      this.selectedDates = {
-        ...this.selectedDates,
-        end: newValue,
-      };
+      this.selectedDates = { ...this.selectedDates, end: newValue };
     }
   }
 
   getMonthDays(month: Moment) {
-    return {
-      month: month.clone(),
-      days: Array.from({ length: month.daysInMonth() }, (_, i) => month.clone().startOf('month').add(i, 'days')),
-    };
+    const startDate = moment(month).startOf('month').startOf('week');
+    const endDate = moment(month).endOf('month').endOf('week');
+
+    const days = [];
+    let day = startDate.clone();
+
+    while (day.isSameOrBefore(endDate)) {
+      days.push(day.clone());
+      day.add(1, 'day');
+    }
+
+    return { month, days };
   }
 
   handleKeyDown = (e: KeyboardEvent) => {
@@ -79,19 +74,13 @@ export class IrDateRange {
 
   decrementDate() {
     if (this.selectedDates.start && this.selectedDates.end) {
-      this.selectedDates = {
-        start: this.selectedDates.start.clone().add(-1, 'days'),
-        end: this.selectedDates.end.clone(),
-      };
+      this.selectedDates = { start: this.selectedDates.start.clone().add(-1, 'days'), end: this.selectedDates.end.clone() };
     }
   }
 
   incrementDate() {
     if (this.selectedDates.start && this.selectedDates.end) {
-      this.selectedDates = {
-        start: this.selectedDates.start.clone(),
-        end: this.selectedDates.end.clone().add(1, 'days'),
-      };
+      this.selectedDates = { start: this.selectedDates.start.clone(), end: this.selectedDates.end.clone().add(1, 'days') };
     }
   }
 
@@ -179,11 +168,11 @@ export class IrDateRange {
     const start = this.selectedDates.start ? this.selectedDates.start.clone() : moment();
     const end = this.selectedDates.end ? this.selectedDates.end.clone() : this.hoveredDate;
 
-    if (this.selectedDates.start && !this.selectedDates.end && this.hoveredDate && this.hoveredDate.isAfter(start)) {
-      if (date.isAfter(start) && date.isBefore(end)) {
+    if (this.selectedDates.start && !this.selectedDates.end && this.hoveredDate && this.hoveredDate.isAfter(start, 'day')) {
+      if (date.isAfter(start, 'day') && date.isBefore(end, 'day')) {
         return true;
       }
-    } else if (date.isAfter(start) && this.selectedDates.end && date.isBefore(end)) {
+    } else if (date.isAfter(start) && this.selectedDates.end && date.isBefore(end, 'day')) {
       return true;
     }
     return false;
@@ -283,15 +272,16 @@ export class IrDateRange {
                   <tr class="week-row" role="row">
                     {week.map((day: Moment) => {
                       const checkedDate = this.checkDatePresence(day);
+                      const isDaySelected = this.isDaySelected(day);
+                      const isDaySameEnd = day.isSame(this.selectedDates.end, 'day');
+                      const isDaySameStart = day.isSame(this.selectedDates.start, 'day');
+                      const isDayAfterMaxDate = day.isAfter(this.maxDate, 'day');
+                      const isDayBeforeMinDate = day.isBefore(this.minDate, 'day');
                       return (
                         <td class="day-cell" key={day.format('YYYY-MM-DD')} role="gridcell">
                           {day.isSame(month.month, 'month') && (
                             <button
-                              disabled={
-                                day.isBefore(this.minDate) ||
-                                day.isAfter(this.maxDate) ||
-                                (this.selectedDates.start && maxSpanDays && day.isAfter(maxSpanDays) && !this.selectedDates.end)
-                              }
+                              disabled={isDayBeforeMinDate || isDayAfterMaxDate || (this.selectedDates.start && maxSpanDays && day.isAfter(maxSpanDays) && !this.selectedDates.end)}
                               onMouseEnter={() => this.handleMouseEnter(day)}
                               onMouseLeave={() => this.handleMouseLeave()}
                               onClick={e => {
@@ -302,19 +292,15 @@ export class IrDateRange {
                               style={checkedDate?.disabled && this.selectedDates.start && { cursor: 'pointer' }}
                               title={checkedDate?.disabled ? (localizedWords?.entries?.Lcz_NoAvailability ?? 'No availability') : ''}
                               aria-unavailable={checkedDate?.disabled ? 'true' : 'false'}
-                              aria-label={`${day.format('dddd, MMMM Do YYYY')} ${
-                                day.isBefore(this.minDate) || day.isAfter(this.maxDate) ? localizedWords.entries.Lcz_NotAvailable : ''
-                              }`}
-                              aria-disabled={day.isBefore(this.minDate) || day.isAfter(this.maxDate) || checkedDate?.disabled ? 'true' : 'false'}
-                              aria-selected={
-                                (this.selectedDates.start && day.isSame(this.selectedDates.start, 'day')) ||
-                                this.isDaySelected(day) ||
-                                (this.selectedDates.end && day.isSame(this.selectedDates.end, 'day'))
-                              }
-                              class={`day-button  ${this.selectedDates.start && day.isSame(this.selectedDates.start, 'day') ? 'day-range-start' : ''}
-                          ${this.selectedDates.end && day.isSame(this.selectedDates.end, 'day') ? 'day-range-end' : ''}  
-                            ${this.isDaySelected(day) ? 'highlight' : ''}
-                            `}
+                              aria-label={`${day.format('dddd, MMMM Do YYYY')} ${isDayBeforeMinDate || isDayAfterMaxDate ? localizedWords.entries.Lcz_NotAvailable : ''}`}
+                              aria-disabled={isDayBeforeMinDate || isDayAfterMaxDate || checkedDate?.disabled ? 'true' : 'false'}
+                              aria-selected={(this.selectedDates.start && isDaySameStart) || isDaySelected || (this.selectedDates.end && isDaySameEnd)}
+                              class={{
+                                'day-button': true,
+                                'day-range-start': this.selectedDates.start && isDaySameStart,
+                                'day-range-end': this.selectedDates.end && isDaySameEnd,
+                                'highlight': isDaySelected && !isDaySameStart,
+                              }}
                             >
                               <p class={`day ${day.isSame(moment(), 'day') ? 'current-date' : ''}`}>{day.locale(this.locale).format('D')}</p>
                               {this.showPrice && <p class="price">{checkedDate?.withPrice.price ? '_' : checkedDate.withPrice.price}</p>}

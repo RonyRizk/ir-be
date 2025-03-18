@@ -11,11 +11,7 @@ import { checkout_store } from '@/stores/checkout.store';
 import Token from '@/models/Token';
 import { ICurrency, IExposedLanguages } from '@/models/common';
 
-@Component({
-  tag: 'ir-be',
-  styleUrl: 'ir-booking-engine.css',
-  shadow: true,
-})
+@Component({ tag: 'ir-be', styleUrl: 'ir-booking-engine.css', shadow: true })
 export class IrBookingEngine {
   @Prop() propertyId: number;
   @Prop() injected: boolean;
@@ -52,7 +48,7 @@ export class IrBookingEngine {
   @State() router = new Stack<HTMLElement>();
   @State() bookingListingScreenOptions: { screen: 'bookings' | 'booking-details'; params: unknown } = { params: null, screen: 'bookings' };
 
-  private version: string = '2.597';
+  private version: string = '2.598';
   private baseUrl: string = 'https://gateway.igloorooms.com/IRBE';
 
   private commonService = new CommonService();
@@ -88,9 +84,7 @@ export class IrBookingEngine {
   @Watch('cur')
   handleCurrencyChange(newValue: string, oldValue: string) {
     if (newValue !== oldValue) {
-      updateUserPreference({
-        currency_id: newValue,
-      });
+      updateUserPreference({ currency_id: newValue });
     }
   }
   @Watch('coupon')
@@ -128,9 +122,7 @@ export class IrBookingEngine {
       return;
     }
     changeLocale(this.languages.find(l => l.code.toLowerCase() === code)?.direction || 'LTR', matchLocale(code));
-    updateUserPreference({
-      language_id: code,
-    });
+    updateUserPreference({ language_id: code });
   }
 
   private initializeApp() {
@@ -160,11 +152,7 @@ export class IrBookingEngine {
     let requests = [
       this.commonService.getCurrencies(),
       this.commonService.getExposedLanguages(),
-      this.commonService.getExposedCountryByIp({
-        id: this.propertyId?.toString(),
-        perma_link: this.perma_link,
-        aname: this.p,
-      }),
+      this.commonService.getExposedCountryByIp({ id: this.propertyId?.toString(), perma_link: this.perma_link, aname: this.p }),
       this.commonService.getExposedLanguage(),
       this.propertyService.getExposedProperty({ id: this.propertyId, language: app_store.userPreferences?.language_id || 'en', aname: this.p, perma_link: this.perma_link }),
       this.propertyService.getExposedNonBookableNights({
@@ -196,10 +184,7 @@ export class IrBookingEngine {
     }
     this.checkAndApplyDiscounts();
 
-    app_store.app_data = {
-      ...app_store.app_data,
-      affiliate: checkAffiliate(this.aff?.toLowerCase().trim()),
-    };
+    app_store.app_data = { ...app_store.app_data, affiliate: checkAffiliate(this.aff?.toLowerCase().trim()) };
     this.isLoading = false;
   }
   private checkAndApplyDiscounts() {
@@ -224,11 +209,7 @@ export class IrBookingEngine {
   //   updateRoomParams({ params: { selected_variation: { variation: selectedVariation, state: 'modified' } }, ratePlanId: rateplanId, roomTypeId });
   // }
   private modifyLoyalty() {
-    modifyBookingStore('bookingAvailabilityParams', {
-      ...booking_store.bookingAvailabilityParams,
-      coupon: null,
-      loyalty: this.loyalty,
-    });
+    modifyBookingStore('bookingAvailabilityParams', { ...booking_store.bookingAvailabilityParams, coupon: null, loyalty: this.loyalty });
   }
 
   @Listen('routing')
@@ -256,13 +237,7 @@ export class IrBookingEngine {
     const { state, payload } = e.detail;
     if (state === 'success') {
       if (payload.method === 'direct') {
-        this.bookingListingScreenOptions = {
-          screen: 'booking-details',
-          params: {
-            booking_nbr: payload.booking_nbr,
-            email: payload.email,
-          },
-        };
+        this.bookingListingScreenOptions = { screen: 'booking-details', params: { booking_nbr: payload.booking_nbr, email: payload.email } };
         app_store.currentPage = 'booking-listing';
       }
     }
