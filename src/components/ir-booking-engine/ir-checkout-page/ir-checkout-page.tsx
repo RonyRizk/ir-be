@@ -10,7 +10,7 @@ import app_store from '@/stores/app.store';
 import booking_store, { calculateTotalRooms, clearCheckoutRooms, validateBooking } from '@/stores/booking';
 import { checkout_store } from '@/stores/checkout.store';
 import localizedWords from '@/stores/localization.store';
-import { destroyBookingCookie, generateCheckoutUrl, getDateDifference, injectHTMLAndRunScript } from '@/utils/utils';
+import { generateCheckoutUrl, getDateDifference, injectHTMLAndRunScript } from '@/utils/utils';
 import { ZCreditCardSchemaWithCvc } from '@/validators/checkout.validator';
 import { Component, Host, Listen, State, h, Event, EventEmitter } from '@stencil/core';
 import moment from 'moment';
@@ -183,9 +183,9 @@ export class IrCheckoutPage {
       const result = await this.propertyService.bookUser();
       this.isBookingConfirmed = true;
       booking_store.booking = result;
-      if (app_store.app_data.isFromGhs) {
-        destroyBookingCookie();
-      }
+      // if (app_store.app_data.isFromGhs) {
+      //   destroyBookingCookie();
+      // }
       const conversionTag = app_store.property?.tags.find(t => t.key === 'conversion');
       if (conversionTag && conversionTag.value) {
         this.modifyConversionTag(conversionTag.value);
