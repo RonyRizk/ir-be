@@ -28,7 +28,7 @@
 }
 
 .swiper {
-  border-radius: min(var(--radius, 0.5rem), 1rem);
+  border-radius: var(--image-radius, min(var(--radius, 0.5rem), 1rem));
   /* background: var(--gray-300, #d0d5dd); */
   overflow: hidden;
   margin: 0;

@@ -223,7 +223,7 @@ export class IrPropertyGallery {
             slot="modal-body"
             class={
               this.property_state !== 'carousel'
-                ? 'modal-container relative max-h-[80vh] overflow-y-auto px-4 pb-4  pt-0 md:p-4'
+                ? 'modal-container relative max-h-[80vh] overflow-y-auto p-0'
                 : 'modal-container max-h-[90vh] overflow-y-auto px-4 pb-4  pt-0 md:p-4 md:pt-0'
             }
             dir="ltr"
@@ -253,6 +253,7 @@ export class IrPropertyGallery {
                     activeIndex={this.activeIndex}
                     dir={app_store.dir}
                     key={this.roomType?.id + '_' + app_store.dir}
+                    style={this.property_state !== 'carousel' && { '--image-radius': ' min(var(--radius, 0.5rem), 0.5rem)' }}
                     slides={images?.map(img => ({
                       alt: formatImageAlt(img.tooltip, this.roomType?.name),
                       id: v4(),
