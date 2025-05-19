@@ -74,7 +74,10 @@ export class IrDatePopup {
           onOpenChange={e => {
             this.isPopoverOpen = e.detail;
             if (!this.isPopoverOpen && !this.dates.end && this.dates.start) {
-              this.dateChange.emit({ ...this.dates, end: this.dates.start.add(1, 'days') });
+              const startClone = this.dates.start.clone();
+              const end = startClone.add(1, 'days');
+              const newDates = { start: this.dates.start, end };
+              this.dateChange.emit(newDates);
             }
           }}
         >

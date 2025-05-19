@@ -258,8 +258,8 @@ export class IrAvailabilityHeader {
     const params = ExposedBookingAvailability.parse(this.exposedBookingAvailabilityParams);
     if (app_store.app_data.injected) {
       const { from_date, to_date, adult_nbr, child_nbr, infant_nbr } = params;
-      const fromDate = `checkin=${from_date}`;
-      const toDate = `checkout=${to_date}`;
+      const fromDate = `checkin=${from_date?.format('YYYY-MM-DD')}`;
+      const toDate = `checkout=${to_date?.format('YYYY-MM-DD')}`;
       const adults = `adults=${adult_nbr}`;
       const children = child_nbr > 0 ? `children=${child_nbr}` : '';
       const affiliate = app_store.app_data.affiliate ? `aff=${app_store.app_data.affiliate.afname}` : '';
