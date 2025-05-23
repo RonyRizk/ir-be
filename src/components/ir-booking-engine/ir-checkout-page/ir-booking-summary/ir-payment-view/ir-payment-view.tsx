@@ -308,13 +308,14 @@ export class IrPaymentView {
         {!hasAgentWithCode001 && this.renderPaymentOptions()}
         {!hasAgentWithCode001 && this.renderPaymentMethod()}
         {hasAgentWithCode001 && <p class={'text-center'}>{localizedWords.entries.Lcz_OnCredit}</p>}
-        {/* {this.cardType !== '' &&
+        {this.cardType !== '' &&
+          this.cardType === 'AMEX' &&
           !app_store.property.allowed_cards.find(c => c.name.toLowerCase().includes(this.cardType === 'AMEX' ? 'american express' : this.cardType?.toLowerCase())) && (
             <p class={'text-red-500'}>
               {localizedWords.entries.Lcz_CardTypeNotSupport}{' '}
               {app_store.property?.allowed_cards?.map((c, i) => `${c.name}${i < app_store.property?.allowed_cards.length - 1 ? ', ' : ''}`)}
             </p>
-          )} */}
+          )}
       </div>
     );
   }
