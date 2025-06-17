@@ -57,6 +57,8 @@ export class IrInterceptor {
         this.handleError(response.data.ExceptionMsg);
         this.lastFailedRequest = response.config;
       }
+      const code = response.data.ExceptionCode ?? 'NO_CODE';
+      console.error(`[${new Date().toISOString()}] [${code}]: ${response.data.ExceptionMsg}`);
       throw new Error(response.data.ExceptionMsg);
     }
     return response;

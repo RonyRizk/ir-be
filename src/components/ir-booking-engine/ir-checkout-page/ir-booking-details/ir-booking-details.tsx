@@ -66,14 +66,26 @@ export class IrBookingDetails {
   }
   private modifyBookings() {
     try {
-      let isInfantNumberSet = false;
+      // let isInfantNumberSet = false;
       const result: any = {};
-      const totalPersons = this.getTotalPersons();
-      const setInfantNumber = (child_nbr: number, adult_nbr: number) => {
-        if (isInfantNumberSet || child_nbr === 0 || this.total_rooms > 1 || totalPersons > child_nbr + adult_nbr) {
-          return -1;
-        }
-        isInfantNumberSet = true;
+      // const totalPersons = this.getTotalPersons();
+      // const setInfantNumber = (child_nbr: number, adult_nbr: number) => {
+      //   if (isInfantNumberSet||child_nbr === 0 || this.total_rooms > 1 || totalPersons > child_nbr + adult_nbr) {
+      //     return -1;
+      //   }
+      //   isInfantNumberSet = true;
+      //   console.log(adult_nbr)
+      //   return Math.min(
+      //     booking_store.childrenAges.reduce((prev, cur) => {
+      //       if (Number(cur) < app_store.childrenStartAge) {
+      //         return prev + 1;
+      //       }
+      //       return prev;
+      //     }, 0),
+      //     child_nbr,
+      //   );
+      // };
+      const setInfantNumber = (child_nbr: number) => {
         return Math.min(
           booking_store.childrenAges.reduce((prev, cur) => {
             if (Number(cur) < app_store.childrenStartAge) {
@@ -105,9 +117,10 @@ export class IrBookingDetails {
                   checkoutVariations: Array(ratePlan.reserved).fill(ratePlan.selected_variation),
                   checkoutBedSelection: ratePlan.is_bed_configuration_enabled ? Array(ratePlan.reserved).fill('-1') : [],
                   checkoutSmokingSelection: Array(ratePlan.reserved).fill(ratePlan.roomtype.smoking_option[0]),
-                  infant_nbr: Array(ratePlan.reserved).fill(
-                    ratePlan.selected_variation.child_nbr > 0 ? setInfantNumber(ratePlan.selected_variation.child_nbr, ratePlan.selected_variation.adult_nbr) : 0,
-                  ),
+                  // infant_nbr: Array(ratePlan.reserved).fill(
+                  //   ratePlan.selected_variation.child_nbr > 0 ? setInfantNumber(ratePlan.selected_variation.child_nbr, ratePlan.selected_variation.adult_nbr) : 0,
+                  // ),
+                  infant_nbr: Array(ratePlan.reserved).fill(ratePlan.selected_variation.child_nbr > 0 ? setInfantNumber(ratePlan.selected_variation.child_nbr) : 0),
                 };
               }
               if (!checkout_store.modifiedGuestName && ratePlan.guestName?.length === 0) {
@@ -132,6 +145,7 @@ export class IrBookingDetails {
       console.error('modify Booking error', error);
     }
   }
+
   private updateGuestNames(isBookingForSomeoneElse: boolean, firstName: string, lastName: string) {
     const result: any = {};
 
@@ -199,7 +213,8 @@ export class IrBookingDetails {
       },
     };
   }
-  private async fetchCancelationMessage(applicable_policies) {
+
+  private async fetchCancellationMessage(applicable_policies) {
     this.cancelationMessage = this.cancelationMessage = this.paymentService.getCancelationMessage(applicable_policies, true)?.message;
   }
   private renderSmokingView(smoking_option: ISmokingOption, index: number, ratePlanId: string, roomTypeId: string, checkoutSmokingSelection: string[]) {
@@ -261,6 +276,7 @@ export class IrBookingDetails {
     return count;
   }
   render() {
+    console.log(booking_store.ratePlanSelections);
     const total_nights = getDateDifference(booking_store.bookingAvailabilityParams.from_date, booking_store.bookingAvailabilityParams.to_date);
     // const this.total_rooms = calculateTotalRooms();
     const total_persons = this.calculateTotalPersons();
@@ -279,7 +295,7 @@ export class IrBookingDetails {
             <p class=" text-right text-xs text-gray-500">{booking_store.tax_statement?.message}</p>
           </section>
           <section class={'space-y-9'}>
-            {Object.keys(booking_store.ratePlanSelections).map(roomTypeId => {
+            {Object.keys(booking_store?.ratePlanSelections)?.map(roomTypeId => {
               return Object.keys(booking_store.ratePlanSelections[roomTypeId]).map(ratePlanId => {
                 const r: IRatePlanSelection = booking_store.ratePlanSelections[roomTypeId][ratePlanId];
                 if (r.reserved === 0) {
@@ -308,7 +324,7 @@ export class IrBookingDetails {
                                     buttonStyles={{ paddingLeft: '0', fontSize: '12px', paddingTop: '0', paddingBottom: '0' }}
                                     onButtonClick={async () => {
                                       this.currentRatePlan = r.ratePlan;
-                                      await this.fetchCancelationMessage(r.checkoutVariations[index].applicable_policies);
+                                      await this.fetchCancellationMessage(r.checkoutVariations[index].applicable_policies);
                                       this.dialogRef.openModal();
                                     }}
                                     label={localizedWords.entries.Lcz_IfICancel}

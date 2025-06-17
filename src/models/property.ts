@@ -150,6 +150,7 @@ export interface CalendarLegend {
 export interface City {
   id: number;
   name: string;
+  gmt_offset: number;
 }
 
 export interface Country {
@@ -158,6 +159,7 @@ export interface Country {
   id: number;
   name: string;
   phone_prefix: any; // More specific type if known
+  gmt_offset: number;
 }
 export interface Description {
   food_and_beverage: string;

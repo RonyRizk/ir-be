@@ -10,7 +10,7 @@ import app_store from '@/stores/app.store';
 import booking_store, { calculateTotalRooms, clearCheckoutRooms, validateBooking } from '@/stores/booking';
 import { checkout_store } from '@/stores/checkout.store';
 import localizedWords from '@/stores/localization.store';
-import { detectCardType, generateCheckoutUrl, getDateDifference, injectHTMLAndRunScript } from '@/utils/utils';
+import { detectCardType, generateCheckoutUrl, getDateDifference, injectHTMLAndRunScript, passedBookingCutoff } from '@/utils/utils';
 import { ZCreditCardSchemaWithCvc } from '@/validators/checkout.validator';
 import { Component, Host, Listen, State, h, Event, EventEmitter } from '@stencil/core';
 import moment from 'moment';
@@ -38,9 +38,13 @@ export class IrCheckoutPage {
   private bookingDetails: HTMLIrBookingDetailsElement;
   private pickupForm: HTMLIrPickupElement;
   private errorElement: HTMLElement;
+  alertRef: HTMLIrAlertDialogElement;
 
   async componentWillLoad() {
     this.calculateTotalPrepaymentAmount();
+    if (app_store?.property?.allowed_payment_methods?.find(e => e.id === 13 && e.is_active)) {
+      checkout_store.agreed_to_services = false;
+    }
   }
   private async calculateTotalPrepaymentAmount() {
     try {
@@ -62,7 +66,10 @@ export class IrCheckoutPage {
     e.stopImmediatePropagation();
     e.stopPropagation();
     this.resetErrorState();
-
+    if (passedBookingCutoff()) {
+      this.alertRef.openModal();
+      return;
+    }
     if (!this.validateUserForm() || !this.validateBookingDetails() || !this.validatePickupForm() || !this.validatePayment() || this.validatePolicyAcceptance()) {
       return;
     }
@@ -315,6 +322,23 @@ export class IrCheckoutPage {
             <ir-booking-summary isBookingConfirmed={this.isBookingConfirmed} prepaymentAmount={this.prepaymentAmount} error={this.error}></ir-booking-summary>
           </section>
         </main>
+        <ir-alert-dialog ref={el => (this.alertRef = el)}>
+          <div slot="modal-title" class={'flex items-center gap-4 pb-2'}>
+            {/* <ir-icons name="danger" class={'text-red-500'} svgClassName="size-6"></ir-icons> */}
+            <h1 class={'text-lg font-semibold'}>{localizedWords?.entries?.Lcz_SomethingWentWrong ?? 'Something went wrong'}!</h1>
+          </div>
+          <p slot="modal-body">{localizedWords?.entries?.Lcz_BookingIsNotAvailable}</p>
+          <div slot="modal-footer">
+            {/* <ir-button label="Cancel" variants="outline" onButtonClick={() => this.alertRef.closeModal()}></ir-button> */}
+            <ir-button
+              label={localizedWords?.entries?.Lcz_GoBack}
+              onButtonClick={() => {
+                this.routing.emit('booking');
+                clearCheckoutRooms();
+              }}
+            ></ir-button>
+          </div>
+        </ir-alert-dialog>
       </Host>
     );
   }

@@ -70,6 +70,12 @@ export class PropertyService {
     if (params.aname || params.perma_link) {
       app_store.app_data = { ...app_store.app_data, property_id: result.My_Result.id };
     }
+    // if (!app_store.app_data.geoTimezone) {
+    //   const { data } = await axios.get(
+    //     `https://api.geotimezone.com/public/timezone?latitude=${result.My_Result.location.latitude}&longitude=${result.My_Result.location.longitude}`,
+    //   );
+    //   app_store.app_data.geoTimezone = data;
+    // }
     app_store.app_data.displayMode = result.My_Result.be_listing_mode === 'grid' ? 'grid' : 'default';
     app_store.property = { ...result.My_Result };
     app_store.app_data.property_id = result.My_Result.id;
@@ -288,7 +294,6 @@ export class PropertyService {
         ].filter(f => f !== null),
         pickup_info: checkout_store.pickup.location ? this.propertyHelpers.convertPickup(checkout_store.pickup) : null,
       };
-
       const { data } = await axios.post(`/DoReservation`, body);
       if (data.ExceptionMsg !== '') {
         throw new Error(data.ExceptionMsg);

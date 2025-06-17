@@ -3,7 +3,7 @@ import { isBefore } from 'date-fns';
 import { cn, formatAmount, getDateDifference, getUserPreference as getUserPreference, runScriptAndRemove } from '@/utils/utils';
 import localizedWords from '@/stores/localization.store';
 import app_store from '@/stores/app.store';
-import { Booking } from '@/models/booking.dto';
+import { Booking, IVariations, Occupancy } from '@/models/booking.dto';
 import { PropertyService } from '@/services/api/property.service';
 import { CommonService } from '@/services/api/common.service';
 import { AuthService } from '@/services/api/auth.service';
@@ -379,7 +379,7 @@ export class IrInvoice {
                         <p class="room-info-text">
                           {localizedWords.entries.Lcz_GuestName}{' '}
                           <span>
-                            {room.guest.first_name} {room.guest.last_name} ({room.rateplan.selected_variation.adult_child_offering})
+                            {room.guest.first_name} {room.guest.last_name} (<span innerHTML={this.formatOccupancy(room.rateplan.selected_variation, room.occupancy)}></span>)
                           </span>
                         </p>
                         <p class="room-info-text">
@@ -509,5 +509,27 @@ export class IrInvoice {
         </main>
       </Host>
     );
+  }
+  private formatOccupancy({ adult_nbr, child_nbr }: IVariations, { infant_nbr }: Occupancy) {
+    const adultCount = adult_nbr > 0 ? adult_nbr : 0;
+    const childCount = child_nbr > 0 ? child_nbr : 0;
+    const infantCount = infant_nbr > 0 ? infant_nbr : 0;
+
+    const adultLabel = adultCount > 1 ? localizedWords.entries.Lcz_Adults.toLowerCase() : localizedWords.entries.Lcz_Adult.toLowerCase();
+    const childLabel = childCount > 1 ? localizedWords.entries.Lcz_Children.toLowerCase() : localizedWords.entries.Lcz_Child.toLowerCase();
+    const infantLabel = infantCount > 1 ? (localizedWords.entries.Lcz_Infants || 'Infants').toLowerCase() : (localizedWords.entries.Lcz_infant || 'Infant').toLowerCase();
+
+    const parts = [];
+    if (adultCount > 0) {
+      parts.push(`${adultCount} ${adultLabel}`);
+    }
+    if (childCount > 0) {
+      parts.push(`${childCount} ${childLabel}`);
+    }
+    if (infantCount > 0) {
+      parts.push(`${infantCount} ${infantLabel}`);
+    }
+
+    return parts.join('&nbsp&nbsp&nbsp&nbsp');
   }
 }

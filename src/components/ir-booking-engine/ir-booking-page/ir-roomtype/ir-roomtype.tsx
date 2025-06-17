@@ -2,7 +2,8 @@ import { RoomType } from '@/models/property';
 import app_store from '@/stores/app.store';
 import booking_store, { getVisibleInventory } from '@/stores/booking';
 import localizedWords from '@/stores/localization.store';
-import { Component, Prop, State, Watch, h } from '@stencil/core';
+import { passedBookingCutoff } from '@/utils/utils';
+import { Component, Fragment, Prop, State, Watch, h } from '@stencil/core';
 
 @Component({
   tag: 'ir-roomtype',
@@ -70,37 +71,43 @@ export class IrRoomtype {
               )}
             </div>
             {/* </div> */}
-            {booking_store.enableBooking ? (
-              this.roomtype.is_available_to_book ||
-              (!this.roomtype.is_available_to_book && this.roomtype?.rateplans?.some(rp => !rp.is_available_to_book && rp.not_available_reason?.includes('MLS'))) ? (
-                <div>
-                  {this.roomtype?.rateplans?.map(ratePlan => {
-                    if (!ratePlan.is_available_to_book && !ratePlan.not_available_reason?.includes('MLS')) {
-                      return null;
-                    }
-                    if (ratePlan.not_available_reason?.includes('MLS') && this.shouldHideMlsRateplans) {
-                      return null;
-                    }
-                    const visibleInventory = getVisibleInventory(this.roomtype.id, ratePlan.id);
-                    return (
-                      <ir-rateplan
-                        display={this.display}
-                        key={ratePlan.id}
-                        ratePlan={ratePlan}
-                        visibleInventory={visibleInventory}
-                        roomTypeId={this.roomtype.id}
-                        roomTypeInventory={this.roomtype.inventory}
-                      ></ir-rateplan>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p class={`unavailable-roomtype text-base ${this.display === 'default' ? '' : 'pt-4'}`}>{localizedWords.entries.Lcz_NotAvailable}</p>
-              )
+            {passedBookingCutoff() ? (
+              <p class={`unavailable-roomtype text-base ${this.display === 'default' ? '' : 'pt-4'}`}>{localizedWords.entries.Lcz_NotAvailable}</p>
             ) : (
-              <div class="app_container flex w-full  flex-col justify-between space-y-1 rounded-md bg-gray-100  text-sm md:flex-row">
-                <p>{this.roomtype.description}</p>
-              </div>
+              <Fragment>
+                {booking_store.enableBooking ? (
+                  this.roomtype.is_available_to_book ||
+                  (!this.roomtype.is_available_to_book && this.roomtype?.rateplans?.some(rp => !rp.is_available_to_book && rp.not_available_reason?.includes('MLS'))) ? (
+                    <div>
+                      {this.roomtype?.rateplans?.map(ratePlan => {
+                        if (!ratePlan.is_available_to_book && !ratePlan.not_available_reason?.includes('MLS')) {
+                          return null;
+                        }
+                        if (ratePlan.not_available_reason?.includes('MLS') && this.shouldHideMlsRateplans) {
+                          return null;
+                        }
+                        const visibleInventory = getVisibleInventory(this.roomtype.id, ratePlan.id);
+                        return (
+                          <ir-rateplan
+                            display={this.display}
+                            key={ratePlan.id}
+                            ratePlan={ratePlan}
+                            visibleInventory={visibleInventory}
+                            roomTypeId={this.roomtype.id}
+                            roomTypeInventory={this.roomtype.inventory}
+                          ></ir-rateplan>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p class={`unavailable-roomtype text-base ${this.display === 'default' ? '' : 'pt-4'}`}>{localizedWords.entries.Lcz_NotAvailable}</p>
+                  )
+                ) : (
+                  <div class="app_container flex w-full  flex-col justify-between space-y-1 rounded-md bg-gray-100  text-sm md:flex-row">
+                    <p>{this.roomtype.description}</p>
+                  </div>
+                )}
+              </Fragment>
             )}
           </div>
         </div>

@@ -338,6 +338,13 @@ export function validateBooking() {
   return Object.values(booking_store.ratePlanSelections).every(roomTypeSelection =>
     Object.values(roomTypeSelection).every(ratePlan => {
       // console.log(ratePlan);
+      console.log({
+        ratePlan,
+        'Check guestName: All names must be non-empty': ratePlan.guestName.every(name => name.trim() !== ''),
+        'Check bed configuration: If enabled, all selections must be valid':
+          !ratePlan.is_bed_configuration_enabled || ratePlan.checkoutBedSelection.every(selection => selection !== '-1'),
+        'Check infant_nbr: Must be greater than -1': ratePlan.infant_nbr.every(nb => Number(nb) > -1),
+      });
       return (
         // Check guestName: All names must be non-empty
         ratePlan.guestName.every(name => name.trim() !== '') &&

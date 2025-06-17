@@ -27,6 +27,7 @@
 - [ir-booking-details](ir-booking-details)
 - [ir-pickup](ir-pickup)
 - [ir-booking-summary](ir-booking-summary)
+- [ir-alert-dialog](../../ui/ir-alert-dialog)
 
 ### Graph
 ```mermaid
@@ -38,6 +39,7 @@ graph TD;
   ir-checkout-page --> ir-booking-details
   ir-checkout-page --> ir-pickup
   ir-checkout-page --> ir-booking-summary
+  ir-checkout-page --> ir-alert-dialog
   ir-button --> ir-icons
   ir-quick-auth --> ir-icons
   ir-quick-auth --> ir-button

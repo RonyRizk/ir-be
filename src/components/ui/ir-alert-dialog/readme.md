@@ -40,12 +40,14 @@ Type: `Promise<void>`
 ### Used by
 
  - [ir-booking-cancellation](../../ir-booking-cancellation)
+ - [ir-checkout-page](../../ir-booking-engine/ir-checkout-page)
  - [ir-interceptor](../../ir-interceptor)
 
 ### Graph
 ```mermaid
 graph TD;
   ir-booking-cancellation --> ir-alert-dialog
+  ir-checkout-page --> ir-alert-dialog
   ir-interceptor --> ir-alert-dialog
   style ir-alert-dialog fill:#f9f,stroke:#333,stroke-width:4px
 ```
