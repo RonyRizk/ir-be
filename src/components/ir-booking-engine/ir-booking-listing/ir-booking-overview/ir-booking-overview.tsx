@@ -105,18 +105,18 @@ export class IrBookingOverview {
       this.isLoading = false;
     }
   }
-  modifyCancelBooking(booking_nbr: string) {
+  private async fetchBooking(booking_nbr: string) {
+    return await this.propertyService.getExposedBooking({ booking_nbr, language: this.language || app_store.userPreferences.language_id, currency: null }, true);
+  }
+  private async modifyCancelBooking(booking_nbr: string) {
     const bookings = [...this.bookings];
     const selectedBookingIdx = bookings.findIndex(b => b.booking_nbr === booking_nbr);
     if (selectedBookingIdx === -1) {
       return;
     }
+    const newBooking = await this.fetchBooking(bookings[selectedBookingIdx].booking_nbr.toString());
     bookings[selectedBookingIdx] = {
-      ...bookings[selectedBookingIdx],
-      status: {
-        code: '003',
-        description: 'Cancelled',
-      },
+      ...newBooking,
     };
     this.bookings = [...bookings];
   }

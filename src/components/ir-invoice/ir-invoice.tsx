@@ -86,10 +86,7 @@ export class IrInvoice {
   @Watch('bookingNbr')
   async handleBookingNumberChange(newValue, oldValue) {
     if (newValue !== oldValue) {
-      this.booking = await this.propertyService.getExposedBooking(
-        { booking_nbr: this.bookingNbr, language: this.language || app_store.userPreferences.language_id, currency: null },
-        true,
-      );
+      this.fetchBooking();
     }
   }
   @Watch('ticket')
@@ -99,7 +96,12 @@ export class IrInvoice {
       this.isAuthenticated = true;
     }
   }
-
+  private async fetchBooking() {
+    this.booking = await this.propertyService.getExposedBooking(
+      { booking_nbr: this.bookingNbr, language: this.language || app_store.userPreferences.language_id, currency: null },
+      true,
+    );
+  }
   async fetchData(language = this.language?.toLowerCase() || app_store.userPreferences.language_id, resetLanguage = false) {
     if (!this.isAuthenticated) {
       const token = await this.authService.login({ option: 'direct', params: { email: this.email, booking_nbr: this.bookingNbr } }, false);
@@ -505,7 +507,21 @@ export class IrInvoice {
           </section>
           {this.footerShown && <ir-footer version={this.version}></ir-footer>}
           {this.footerShown && <ir-privacy-policy hideTrigger ref={el => (this.privacyPolicyRef = el)}></ir-privacy-policy>}
-          <ir-booking-cancellation booking={this.booking} ref={el => (this.bookingCancelation = el)}></ir-booking-cancellation>
+          <ir-booking-cancellation
+            booking={this.booking}
+            ref={el => (this.bookingCancelation = el)}
+            onCancellationResult={async e => {
+              e.stopImmediatePropagation();
+              e.stopPropagation();
+              if (e.detail.state === 'success') {
+                await this.fetchBooking();
+
+                const url = new URL(window.location.href);
+                url.searchParams.delete('s');
+                window.history.replaceState({}, document.title, url.toString());
+              }
+            }}
+          ></ir-booking-cancellation>
         </main>
       </Host>
     );
