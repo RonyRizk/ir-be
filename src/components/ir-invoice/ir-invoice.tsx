@@ -286,7 +286,7 @@ export class IrInvoice {
             </section>
           )}
           <section class={`flex-1 ${this.be ? '' : 'invoice-container mx-auto w-full max-w-6xl'}`}>
-            {this.headerMessageShown && isBefore(new Date(), new Date(this.booking.to_date)) ? (
+            {this.headerMessageShown && this.booking?.status.code !== '003' && isBefore(new Date(), new Date(this.booking.to_date)) ? (
               <div class={'invoice-container'}>
                 <p class={`flex items-center gap-4 text-xl font-medium ${this.status === 1 ? 'text-green-600' : 'text-red-500'} ${this.be ? '' : ''}`}>
                   <ir-icons name={this.status === 1 ? 'check' : 'xmark'} />
