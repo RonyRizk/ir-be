@@ -104,7 +104,7 @@ export class IrRoomtype {
                   )
                 ) : (
                   <div class="app_container flex w-full  flex-col justify-between space-y-1 rounded-md bg-gray-100  text-sm md:flex-row">
-                    <p>{this.roomtype.description}</p>
+                    <p innerHTML={this.roomtype.description}></p>
                   </div>
                 )}
               </Fragment>

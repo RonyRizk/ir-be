@@ -31,7 +31,11 @@ export class IrBookingCard {
       this.init();
     }
   }
-  getBadgeVariant(code: string) {
+  getBadgeVariant(booking: Booking) {
+    const { code } = booking.status;
+    if (booking.is_requested_to_cancel || code === '003') {
+      return 'error';
+    }
     if (code === '001') {
       return 'pending';
     } else if (code === '002') {
@@ -73,7 +77,13 @@ export class IrBookingCard {
           {this.totalNights} {this.totalNights > 1 ? localizedWords.entries.Lcz_Nights : localizedWords.entries.Lcz_night}
         </p>
         <p class="flex items-center">
-          {<ir-badge backgroundShown={false} label={this.booking.status.description} variant={this.getBadgeVariant(this.booking.status.code)}></ir-badge>}
+          {
+            <ir-badge
+              backgroundShown={false}
+              label={this.booking?.is_requested_to_cancel ? localizedWords.entries.Lcz_Cancellation_Requested : this.booking.status.description}
+              variant={this.getBadgeVariant(this.booking)}
+            ></ir-badge>
+          }
         </p>
 
         {(view.show || payment.show || cancel.show) && (

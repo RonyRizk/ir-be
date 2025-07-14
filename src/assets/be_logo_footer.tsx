@@ -2,8 +2,8 @@ import { FunctionalComponent, h } from '@stencil/core';
 // import { JSXBase } from '@stencil/core/internal';
 
 interface BeLogoFooterProps {
-  height?: number;
-  width?: number;
+  height?: number | 'auto';
+  width?: number | 'auto';
 }
 // interface BeLogoFooterProps extends JSXBase.SVGAttributes<SVGElement> {}
 const BeLogoFooter: FunctionalComponent<BeLogoFooterProps> = ({ width, height }) => {
@@ -11,8 +11,8 @@ const BeLogoFooter: FunctionalComponent<BeLogoFooterProps> = ({ width, height })
     <img
       src="https://x.igloorooms.com/app-assets/images/logo/logo-dark.png"
       style={{
-        width: width ? width?.toString() + 'px' : '200px',
-        height: height ? height?.toString() + 'px' : '70px',
+        width: width ? (width === 'auto' ? 'auto' : width?.toString() + 'px') : '200px',
+        height: height ? (height === 'auto' ? 'auto' : height?.toString() + 'px') : '70px',
       }}
       alt="logo"
     />

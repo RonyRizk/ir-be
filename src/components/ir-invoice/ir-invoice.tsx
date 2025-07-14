@@ -269,7 +269,6 @@ export class IrInvoice {
     const google_maps_url = `http://maps.google.com/maps?q=${app_store.property.location.latitude},${app_store.property.location.longitude}`;
 
     const { cancel, payment } = this.bookingListingAppService.getBookingActions(this.booking);
-    console.log(app_store.userPreferences.language_id);
     return (
       <Host>
         <ir-interceptor></ir-interceptor>
@@ -286,7 +285,11 @@ export class IrInvoice {
             </section>
           )}
           <section class={`flex-1 ${this.be ? '' : 'invoice-container mx-auto w-full max-w-6xl'}`}>
-            {this.headerMessageShown && this.booking?.status.code !== '003' && isBefore(new Date(), new Date(this.booking.to_date)) ? (
+            {this.booking.is_requested_to_cancel ? (
+              <div class={'invoice-container'}>
+                <p class={'text-xl font-medium'}>{localizedWords.entries.Lcz_ThisBookingIs.replace('%1', localizedWords.entries?.Lcz_Cancelled)}</p>
+              </div>
+            ) : this.headerMessageShown && this.booking?.status.code !== '003' && isBefore(new Date(), new Date(this.booking.to_date)) ? (
               <div class={'invoice-container'}>
                 <p class={`flex items-center gap-4 text-xl font-medium ${this.status === 1 ? 'text-green-600' : 'text-red-500'} ${this.be ? '' : ''}`}>
                   <ir-icons name={this.status === 1 ? 'check' : 'xmark'} />

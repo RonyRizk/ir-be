@@ -93,7 +93,7 @@ export class IrFooter {
           <li>
             <p class="text-end text-xs text-gray-400">V{this.version} - Powered by</p>
             <a href="https://info.igloorooms.com/" target="_blank" title="igloorooms cloud booking solutions for hotels">
-              <BeLogoFooter width={130} height={30} />
+              <BeLogoFooter width={110} height={'auto'} />
             </a>
           </li>
         </ul>

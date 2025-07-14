@@ -120,7 +120,11 @@ export class IrBookingOverview {
     };
     this.bookings = [...bookings];
   }
-  getBadgeVariant(code: string) {
+  getBadgeVariant(booking: Booking) {
+    const { code } = booking.status;
+    if (booking.is_requested_to_cancel || code === '003') {
+      return 'error';
+    }
     if (code === '001') {
       return 'pending';
     } else if (code === '002') {
@@ -334,7 +338,12 @@ export class IrBookingOverview {
                           data-state={this.hoveredBooking === booking.booking_nbr ? 'hovered' : ''}
                         >
                           <td class="ir-table-cell" data-state={this.aff ? 'booking-affiliate' : ''}>
-                            {<ir-badge label={booking.status.description} variant={this.getBadgeVariant(booking.status.code)}></ir-badge>}
+                            {
+                              <ir-badge
+                                label={booking?.is_requested_to_cancel ? localizedWords.entries.Lcz_Cancellation_Requested : booking.status.description}
+                                variant={this.getBadgeVariant(booking)}
+                              ></ir-badge>
+                            }
                           </td>
                           <td class="ir-table-cell" data-state={this.aff ? 'booking-affiliate' : ''}>
                             {booking.booking_nbr}
