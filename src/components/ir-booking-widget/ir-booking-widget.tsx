@@ -8,6 +8,7 @@ import app_store from '@/stores/app.store';
 import moment from 'moment/min/moment-with-locales';
 import localizedWords from '@/stores/localization.store';
 import Token from '@/models/Token';
+import { IExposedProperty } from '@/models/property';
 @Component({
   tag: 'ir-widget',
   styleUrl: 'ir-booking-widget.css',
@@ -27,6 +28,7 @@ export class IrBookingWidget {
   @Prop() delay: number = 300;
 
   @State() isPopoverOpen: boolean;
+  @State() property: IExposedProperty;
   @State() dateModifiers: any;
   @State() isLoading: boolean;
   @State() isGuestPopoverOpen: boolean;
@@ -86,7 +88,7 @@ export class IrBookingWidget {
       this.isLoading = true;
       const token = await this.commonService.getBEToken();
       this.token.setToken(token);
-      await Promise.all([
+      const [property] = await Promise.all([
         this.propertyService.getExposedProperty({
           id: this.propertyId,
           language: this.language,
@@ -102,6 +104,7 @@ export class IrBookingWidget {
           aname: this.p,
         }),
       ]);
+      this.property = property;
       this.dateModifiers = this.getDateModifiers();
     } catch (error) {
       console.log(error);
@@ -126,7 +129,7 @@ export class IrBookingWidget {
   handleBooknow() {
     if (!this.validateChildrenAges()) return;
     let subdomainURL = `bookingmystay.com`;
-    const currentDomain = `${app_store.property.perma_link}.${subdomainURL}`;
+    const currentDomain = `${this.property.perma_link}.${subdomainURL}`;
     const { from_date, to_date } = this.dates;
     const { adultCount, childrenCount } = this.guests;
     const fromDate = from_date ? `checkin=${moment(from_date).format('YYYY-MM-DD')}` : '';
@@ -193,7 +196,7 @@ export class IrBookingWidget {
               <span class="lowercase">
                 {adultCount} {adultCount === 1 ? localizedWords.entries.Lcz_Adult : localizedWords.entries.Lcz_Adults}
               </span>
-              {app_store.property.adult_child_constraints.child_max_age > 0 && (
+              {this.property.adult_child_constraints.child_max_age > 0 && (
                 <span class="lowercase">
                   , {childrenCount} {childrenCount === 1 ? localizedWords.entries.Lcz_Child : localizedWords.entries.Lcz_Children}
                 </span>
@@ -269,7 +272,7 @@ export class IrBookingWidget {
                 fromDate={this.dates?.from_date ? moment(this.dates.from_date) : null}
                 toDate={this.dates?.to_date ? moment(this.dates.to_date) : null}
                 locale={localization_store.selectedLocale}
-                maxSpanDays={app_store.property.max_nights}
+                maxSpanDays={this.property.max_nights}
                 onDateChange={e => {
                   e.stopImmediatePropagation();
                   e.stopPropagation();
@@ -303,9 +306,9 @@ export class IrBookingWidget {
               adults={this.guests?.adultCount}
               child={this.guests?.childrenCount}
               minAdultCount={0}
-              maxAdultCount={app_store?.property?.adult_child_constraints.adult_max_nbr}
-              maxChildrenCount={app_store?.property?.adult_child_constraints.child_max_nbr}
-              childMaxAge={app_store.property?.adult_child_constraints.child_max_age}
+              maxAdultCount={this.property?.adult_child_constraints.adult_max_nbr}
+              maxChildrenCount={this.property?.adult_child_constraints.child_max_nbr}
+              childMaxAge={this.property?.adult_child_constraints.child_max_age}
               onUpdateCounts={e => (this.guests = { ...e.detail })}
               class={'h-full'}
               onCloseGuestCounter={() => this.guestPopover.forceClose()}
