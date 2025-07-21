@@ -136,7 +136,7 @@ export class IrBookingWidget {
     const toDate = to_date ? `checkout=${moment(to_date).format('YYYY-MM-DD')}` : '';
     const adults = adultCount > 0 ? `adults=${adultCount}` : '';
     const children = childrenCount > 0 ? `children=${childrenCount}` : '';
-    const roomTypeId = this.roomTypeId ? `rtid=${this.roomTypeId}` : '';
+    const roomTypeId = this.roomTypeId ? `u=${this.roomTypeId}` : '';
     const affiliate = this.aff ? `aff=${this.aff}` : '';
     const ages = this.guests.childrenCount > 0 && this.guests.childrenAges.length > 0 ? `ages=${this.guests.childrenAges.join('_')}` : '';
     const queryParams = [fromDate, toDate, adults, children, roomTypeId, affiliate, ages];
