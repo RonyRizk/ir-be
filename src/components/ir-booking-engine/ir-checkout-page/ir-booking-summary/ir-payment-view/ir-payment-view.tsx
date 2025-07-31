@@ -19,6 +19,7 @@ export class IrPaymentView {
   @State() selectedPaymentMethod: string;
   @State() cardType: string = '';
   @State() paymentDetails: { paymentMethods: AllowedPaymentMethod[]; filteredMap: { id: string; value: string }[] };
+  @State() imageLoadError: boolean = false;
 
   componentWillLoad() {
     this.setPaymentMethod();
@@ -102,6 +103,7 @@ export class IrPaymentView {
     e.stopPropagation();
     const payment_code = e.detail;
     this.selectedPaymentMethod = payment_code;
+    this.imageLoadError = false;
     checkout_store.payment.code = payment_code;
   }
 
@@ -302,6 +304,7 @@ export class IrPaymentView {
 
   render() {
     const hasAgentWithCode001 = booking_store.bookingAvailabilityParams.agent && booking_store.bookingAvailabilityParams.agent.payment_mode.code === '001';
+    const selectedPaymentMethodImage = app_store?.property?.allowed_payment_methods?.find(p => p.code === this.selectedPaymentMethod)?.img_url;
     return (
       <div class="w-full space-y-4 rounded-md border border-solid bg-white  p-4">
         {!hasAgentWithCode001 && this.prepaymentAmount === 0 && this.selectedPaymentMethod === '001' && <p>{localizedWords.entries.Lcz_PaymentSecurity}</p>}
@@ -316,6 +319,22 @@ export class IrPaymentView {
               {app_store.property?.allowed_cards?.map((c, i) => `${c.name}${i < app_store.property?.allowed_cards.length - 1 ? ', ' : ''}`)}
             </p>
           )}
+        {selectedPaymentMethodImage && !this.imageLoadError && (
+          <img
+            style={{
+              maxWidth: '270px',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }}
+            src={selectedPaymentMethodImage}
+            onError={() => {
+              this.imageLoadError = true;
+            }}
+            onLoad={() => {
+              this.imageLoadError = false;
+            }}
+          />
+        )}
       </div>
     );
   }
