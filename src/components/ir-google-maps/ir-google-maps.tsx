@@ -15,7 +15,7 @@ export class IrGoogleMaps {
       return;
     }
 
-    const loader = new Loader('AIzaSyCJ5P4SraJdZzcBi9Ue16hyg_iWJv-aHpk', {});
+    const loader = new Loader('AIzaSyBNvKTcZZ9Mf3JQg_qkMAutFT1tP4BpGtc', {});
     const google = await loader.load();
     this.map = new google.maps.Map(this.el.shadowRoot.getElementById('map'), {
       center: { lat: app_store.property?.location.latitude || 34.022, lng: app_store.property?.location.longitude || 35.628 },

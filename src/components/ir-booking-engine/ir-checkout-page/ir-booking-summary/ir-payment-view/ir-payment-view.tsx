@@ -325,6 +325,7 @@ export class IrPaymentView {
               maxWidth: '270px',
               marginLeft: 'auto',
               marginRight: 'auto',
+              height: '24px',
             }}
             src={selectedPaymentMethodImage}
             onError={() => {
