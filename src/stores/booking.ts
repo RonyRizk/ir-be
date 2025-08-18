@@ -106,7 +106,8 @@ onRoomTypeChange('roomTypes', (newValue: RoomType[]) => {
               ...currentRatePlanSelection,
               ratePlan,
               selected_variation: checkVariation(ratePlan.variations, currentRatePlanSelection.selected_variation) ?? null,
-              visibleInventory: roomType.inventory === 1 ? 2 : roomType.inventory,
+              // visibleInventory: roomType.inventory === 1 ? 2 : roomType.inventory,
+              visibleInventory: roomType.inventory,
               reserved: roomType.inventory === 0 ? 0 : booking_store.resetBooking ? 0 : currentRatePlanSelection.reserved,
               checkoutVariations: roomType.inventory === 0 ? [] : currentRatePlanSelection.checkoutVariations,
               checkoutBedSelection: roomType.inventory === 0 ? [] : currentRatePlanSelection.checkoutBedSelection,
@@ -119,7 +120,8 @@ onRoomTypeChange('roomTypes', (newValue: RoomType[]) => {
           : {
               reserved: 0,
               infant_nbr: [],
-              visibleInventory: roomType.inventory === 1 ? 2 : roomType.inventory,
+              // visibleInventory: roomType.inventory === 1 ? 2 : roomType.inventory,
+              visibleInventory: roomType.inventory,
               selected_variation: ratePlan?.variations[0] ?? null,
               ratePlan,
               guestName: [],
@@ -151,7 +153,8 @@ export function updateInventory(roomTypeId: number) {
     Object.entries(roomTypeSelection).map(([ratePlanId, ratePlan]) => {
       const totalSelectedRoomsExcludingCurrent = calculateTotalSelectedRoomsExcludingIndex(Number(ratePlanId));
       const roomTypeData = booking_store.roomTypes.find(rt => rt.id === roomTypeId);
-      const availableRooms = roomTypeData ? (roomTypeData.inventory === 1 ? 2 : roomTypeData.inventory) - totalSelectedRoomsExcludingCurrent : 0;
+      // const availableRooms = roomTypeData ? (roomTypeData.inventory === 1 ? 2 : roomTypeData.inventory) - totalSelectedRoomsExcludingCurrent : 0;
+      const availableRooms = roomTypeData ? roomTypeData.inventory - totalSelectedRoomsExcludingCurrent : 0;
 
       return [
         ratePlanId,
