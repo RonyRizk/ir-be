@@ -128,7 +128,7 @@ export class IrRateplan {
                 {this.visibleInventory?.selected_variation?.discount_pct > 0 && this.ratePlan.custom_text && (
                   <p
                     class={`rateplan-discount ${app_store.app_data.displayMode === 'default' ? 'ir-default' : ''}`}
-                  >{`-${Number(this.visibleInventory?.selected_variation?.discount_pct).toPrecision(2)}%`}</p>
+                  >{`-${Number(this.visibleInventory?.selected_variation?.discount_pct)}%`}</p>
                 )}
               </div>
               <div class="flex items-center justify-between">
@@ -159,7 +159,7 @@ export class IrRateplan {
                   {this.visibleInventory?.selected_variation?.discount_pct > 0 && !this.ratePlan.custom_text && (
                     <p
                       class={`rateplan-discount ${app_store.app_data.displayMode === 'default' ? 'ir-default' : ''}`}
-                    >{`-${Number(this.visibleInventory?.selected_variation?.discount_pct).toPrecision(2)}%`}</p>
+                    >{`-${Number(this.visibleInventory?.selected_variation?.discount_pct)}%`}</p>
                   )}
                 </div>
               </div>
@@ -209,7 +209,7 @@ export class IrRateplan {
                         {this.visibleInventory?.selected_variation?.discount_pct > 0 && (
                           <div class="rateplan-pricing">
                             <p class="rateplan-discounted-amount">{formatAmount(this.visibleInventory?.selected_variation?.amount, app_store.userPreferences.currency_id, 0)}</p>
-                            <p class="rateplan-discount">{`-${Number(this.visibleInventory?.selected_variation?.discount_pct).toPrecision(2)}%`}</p>
+                            <p class="rateplan-discount">{`-${Number(this.visibleInventory?.selected_variation?.discount_pct)}%`}</p>
                           </div>
                         )}
                         <div class="rateplan-final-pricing" data-style={this.visibleInventory?.selected_variation?.discount_pct > 0 ? '' : 'full-width'}>

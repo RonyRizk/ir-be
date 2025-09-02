@@ -490,7 +490,7 @@ export class IrInvoice {
                   <a class="mapLink" target="_blank" href={google_maps_url}>
                     <img
                       alt="property_location"
-                      src={`https://maps.googleapis.com/maps/api/staticmap?center=${app_store.property?.location.latitude || 34.022},${app_store.property?.location.longitude || 35.628}&zoom=15&size=1024x768&maptype=roadmap&markers=color:red%7Clabel:${app_store.property.name}%7C34.022,35.628&key=AIzaSyCJ5P4SraJdZzcBi9Ue16hyg_iWJv-aHpk`}
+                      src={`https://maps.googleapis.com/maps/api/staticmap?center=${app_store.property?.location.latitude || 34.022},${app_store.property?.location.longitude || 35.628}&zoom=15&size=1024x768&maptype=roadmap&markers=color:red%7Clabel:${app_store.property.name}%7C34.022,35.628&key=AIzaSyBNvKTcZZ9Mf3JQg_qkMAutFT1tP4BpGtc`}
                       loading="lazy"
                     ></img>
                   </a>
