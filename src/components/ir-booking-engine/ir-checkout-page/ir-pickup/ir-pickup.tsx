@@ -183,8 +183,7 @@ export class IrPickup {
     return count;
   }
   render() {
-    console.log(this.calculateTotalPersons());
-    if (!app_store.property.pickup_service.allowed_options) {
+    if (!app_store.property.pickup_service.allowed_options || !app_store.property.pickup_service.is_enabled) {
       return null;
     }
     return (
