@@ -460,7 +460,7 @@ export namespace Components {
       };
     }
     interface IrRoomTypeAmenities {
-        "aminities": Amenity[];
+        "amenities": Amenity[];
         "roomType": RoomType;
     }
     interface IrRoomtype {
@@ -2335,7 +2335,7 @@ declare namespace LocalJSX {
       };
     }
     interface IrRoomTypeAmenities {
-        "aminities"?: Amenity[];
+        "amenities"?: Amenity[];
         "roomType"?: RoomType;
     }
     interface IrRoomtype {

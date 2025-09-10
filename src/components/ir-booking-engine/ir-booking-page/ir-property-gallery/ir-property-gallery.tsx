@@ -271,7 +271,7 @@ export class IrPropertyGallery {
               )}
               {this.property_state === 'carousel' && (
                 <section class={'z-0 py-4 text-sm'} dir={app_store.dir}>
-                  <ir-room-type-amenities aminities={app_store.property?.amenities} roomType={this.roomType}></ir-room-type-amenities>
+                  <ir-room-type-amenities amenities={app_store.property?.amenities} roomType={this.roomType}></ir-room-type-amenities>
                 </section>
               )}
             </section>

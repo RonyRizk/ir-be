@@ -7,7 +7,7 @@ import localizedWords from '@/stores/localization.store';
   shadow: true,
 })
 export class IrRoomTypeAmenities {
-  @Prop() aminities: Amenity[];
+  @Prop() amenities: Amenity[];
   @Prop() roomType: RoomType;
   @State() _amenities = [];
 
@@ -15,7 +15,7 @@ export class IrRoomTypeAmenities {
     this.setupAmenities();
   }
 
-  @Watch('aminities')
+  @Watch('amenities')
   handleAmenitiesChange(newValue, oldValue) {
     if (newValue !== oldValue) {
       this.setupAmenities();
@@ -27,12 +27,35 @@ export class IrRoomTypeAmenities {
       this.setupAmenities();
     }
   }
+  // private setupAmenities() {
+  //   this._amenities = [...this.roomType.amenities, ...(this.amenities ?? [])]
+  //     .filter(aminity => aminity.amenity_type === 'room')
+  //     ?.sort((a, b) => {
+  //       if (a.description < b.description) return -1;
+  //       if (a.description > b.description) return 1;
+  //       return 0;
+  //     });
+
+  // }
   private setupAmenities() {
-    this._amenities = [...this.roomType.amenities, ...(this.aminities ?? [])]?.sort((a, b) => {
+    const merged: Amenity[] = [...(this.roomType?.amenities ?? []), ...(this.amenities ?? [])].filter(Boolean).filter(aminity => aminity.amenity_type === 'room') as Amenity[];
+
+    const seen = new Set<string>();
+    const deduped: Amenity[] = [];
+    for (const item of merged) {
+      const code = (item?.code ?? '').toLowerCase();
+      if (!code || seen.has(code)) continue;
+      seen.add(code);
+      deduped.push(item);
+    }
+
+    deduped.sort((a, b) => {
       if (a.description < b.description) return -1;
       if (a.description > b.description) return 1;
       return 0;
     });
+
+    this._amenities = deduped;
   }
 
   private renderOccupancyView() {
@@ -81,7 +104,7 @@ export class IrRoomTypeAmenities {
     );
   }
   private checkAmenity(code: string) {
-    return this.aminities.find(a => a.code === code);
+    return this.amenities.find(a => a.code === code);
   }
   render() {
     const freeWifi = this.checkAmenity('freewifi');

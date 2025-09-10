@@ -9,7 +9,7 @@
 
 | Property    | Attribute | Description | Type        | Default     |
 | ----------- | --------- | ----------- | ----------- | ----------- |
-| `aminities` | --        |             | `Amenity[]` | `undefined` |
+| `amenities` | --        |             | `Amenity[]` | `undefined` |
 | `roomType`  | --        |             | `RoomType`  | `undefined` |
 
 
