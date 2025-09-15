@@ -1,6 +1,6 @@
 import { DataStructure } from '@/models/common';
 import { TPickupFormData } from '@/models/pickup';
-import { RoomType, Variation } from '@/models/property';
+import { RatePlan, RoomType, Variation } from '@/models/property';
 import booking_store from '@/stores/booking';
 import axios from 'axios';
 import { addDays, format } from 'date-fns';
@@ -87,6 +87,9 @@ export class PropertyHelpers {
   }
 
   private sortRoomTypes(roomTypes: RoomType[], userCriteria: { adult_nbr: number; child_nbr: number }): RoomType[] {
+    const getRatePlanPrices = (rateplan: RatePlan[]) => {
+      return rateplan.flatMap(plan => plan.variations?.map(variation => variation.discounted_amount ?? 0))?.filter(Boolean);
+    };
     return roomTypes.sort((a, b) => {
       // Priority to available rooms
       if (a.is_available_to_book && !b.is_available_to_book) return -1;
@@ -101,15 +104,14 @@ export class PropertyHelpers {
       );
       if (matchA && !matchB) return -1;
       if (!matchA && matchB) return 1;
-
       // Sort by the highest variation amount
-      const maxVariationA = Math.max(...a.rateplans.flatMap(plan => plan.variations?.map(variation => variation.discounted_amount ?? 0)));
-      const maxVariationB = Math.max(...b.rateplans.flatMap(plan => plan.variations?.map(variation => variation.discounted_amount ?? 0)));
-
+      const maxVariationA = Math.max(...getRatePlanPrices(a.rateplans));
+      const maxVariationB = Math.max(...getRatePlanPrices(b.rateplans));
       if (maxVariationA < maxVariationB) return -1;
       if (maxVariationA > maxVariationB) return 1;
 
       //Sort by roomtype name
+
       const rtName1 = a.name.toLowerCase();
       const rtName2 = b.name.toLowerCase();
       if (rtName1 < rtName2) {
