@@ -390,7 +390,8 @@ export class IrInvoice {
                         <p class="room-info-text">
                           {localizedWords.entries.Lcz_MealPlan}{' '}
                           <span>
-                            {room.rateplan.name}
+                            {room.rateplan.short_name}
+                            {room.rateplan.is_non_refundable ? ' - ' + localizedWords.entries.Lcz_NonRefundable : ''}
                             {/* <span>{"- Non-smoking"}</span> */}
                           </span>
                         </p>

@@ -184,6 +184,7 @@ export interface RatePlan {
   id: number;
   name: string;
   rate_restrictions: null;
+  short_name: string;
   variations: null;
   selected_variation: IVariations;
   is_non_refundable: boolean;
