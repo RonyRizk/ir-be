@@ -185,6 +185,25 @@ export function updateRoomParams({ ratePlanId, roomTypeId, params }: { roomTypeI
   };
 }
 
+export function getPrepaymentAmount() {
+  const variationService = new VariationService();
+  const agent = booking_store.bookingAvailabilityParams.agent;
+  if (agent && agent.payment_mode.code === '001') {
+    return 0;
+  }
+  let total = 0;
+  for (const roomtypeId in booking_store.ratePlanSelections) {
+    for (const rateplanId in booking_store.ratePlanSelections[roomtypeId]) {
+      const rateplan = booking_store.ratePlanSelections[roomtypeId][rateplanId];
+      rateplan.checkoutVariations.map((v, index) => {
+        const variation = variationService.getVariationBasedOnInfants({ baseVariation: v, variations: rateplan.ratePlan.variations, infants: rateplan.infant_nbr[index] });
+        total += variation.prepayment_amount_gross;
+      });
+    }
+  }
+  return total;
+}
+
 export function reserveRooms(roomTypeId: number, ratePlanId: number, rooms: number) {
   if (!booking_store.ratePlanSelections[roomTypeId]) {
     booking_store.ratePlanSelections[roomTypeId] = {};

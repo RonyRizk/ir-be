@@ -307,6 +307,7 @@ export class IrAvailabilityHeader {
       is_in_loyalty_mode: booking_store.bookingAvailabilityParams.loyalty ? true : !!booking_store.bookingAvailabilityParams.coupon,
       is_in_affiliate_mode: !!app_store.app_data.affiliate,
       affiliate_id: app_store.app_data.affiliate ? app_store.app_data.affiliate.id : null,
+      update_store: true,
     });
     app_store.fetchedBooking = true;
   }

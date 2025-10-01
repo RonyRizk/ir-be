@@ -17,7 +17,6 @@
 | `footerShown`        | `footer-shown`         |             | `boolean` | `true`                                  |
 | `headerMessageShown` | `header-message-shown` |             | `boolean` | `true`                                  |
 | `headerShown`        | `header-shown`         |             | `boolean` | `true`                                  |
-| `isConfermation`     | `is-confermation`      |             | `boolean` | `true`                                  |
 | `language`           | `language`             |             | `string`  | `undefined`                             |
 | `locationShown`      | `location-shown`       |             | `boolean` | `true`                                  |
 | `perma_link`         | `perma_link`           |             | `string`  | `null`                                  |

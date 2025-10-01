@@ -101,7 +101,9 @@ export class PropertyService {
     const roomtypeIds = this.propertyHelpers.collectRoomTypeIds(props);
     const rateplanIds = this.propertyHelpers.collectRatePlanIds(props);
     const data = await this.propertyHelpers.fetchAvailabilityData(props, roomtypeIds, rateplanIds);
-    this.propertyHelpers.updateBookingStore(data);
+    if (props.update_store) {
+      this.propertyHelpers.updateBookingStore(data);
+    }
     return data;
   }
 

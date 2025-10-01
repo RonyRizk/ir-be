@@ -283,6 +283,7 @@ export class IrBookingEngine {
       agent_id: booking_store.bookingAvailabilityParams.agent?.id || 0,
       is_in_affiliate_mode: !!app_store.app_data.affiliate,
       affiliate_id: app_store.app_data.affiliate ? app_store.app_data.affiliate.id : null,
+      update_store: true,
     });
   }
 

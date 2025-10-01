@@ -358,7 +358,6 @@ export namespace Components {
         "footerShown": boolean;
         "headerMessageShown": boolean;
         "headerShown": boolean;
-        "isConfermation": boolean;
         "language": string;
         "locationShown": boolean;
         "perma_link": string;
@@ -2215,7 +2214,6 @@ declare namespace LocalJSX {
         "footerShown"?: boolean;
         "headerMessageShown"?: boolean;
         "headerShown"?: boolean;
-        "isConfermation"?: boolean;
         "language"?: string;
         "locationShown"?: boolean;
         "perma_link"?: string;

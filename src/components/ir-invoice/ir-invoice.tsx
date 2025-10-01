@@ -7,7 +7,7 @@ import { Booking, IVariations, Occupancy } from '@/models/booking.dto';
 import { PropertyService } from '@/services/api/property.service';
 import { CommonService } from '@/services/api/common.service';
 import { AuthService } from '@/services/api/auth.service';
-import { PaymentService, TBookingInfo } from '@/services/api/payment.service';
+import { PaymentService } from '@/services/api/payment.service';
 import { AllowedPaymentMethod } from '@/models/property';
 import { BookingListingAppService } from '@/services/app/booking-listing.service';
 import InvoiceSkeleton from './InvoiceSkeleton';
@@ -25,7 +25,6 @@ export class IrInvoice {
   @Prop() baseUrl: string = 'https://gateway.igloorooms.com/IRBE';
   @Prop() language: string;
   @Prop() bookingNbr: string;
-  @Prop() isConfermation = true;
   @Prop() status: 0 | 1 = 1;
   @Prop() perma_link: string = null;
   @Prop() aName: string = null;
@@ -40,11 +39,8 @@ export class IrInvoice {
   @State() booking: Booking;
   @State() isAuthenticated = false;
   @State() isLoading = false;
-  @State() cancelation_message: string = null;
+  @State() cancellation_message: string = null;
   @State() guarantee_message: string = null;
-  @State() cancelationMessage: string;
-  @State() amountToBePayed: number;
-  @State() cancelation_policies: TBookingInfo[] = [];
 
   private token = new Token();
   private propertyService = new PropertyService();
@@ -55,7 +51,7 @@ export class IrInvoice {
 
   private payment_option: AllowedPaymentMethod = null;
   private amount: number = null;
-  private bookingCancelation: HTMLIrBookingCancellationElement;
+  private bookingCancellation: HTMLIrBookingCancellationElement;
   private privacyPolicyRef: HTMLIrPrivacyPolicyElement;
 
   async componentWillLoad() {
@@ -330,7 +326,7 @@ export class IrInvoice {
                       variants="outline"
                       label={localizedWords.entries.Lcz_CancelBooking}
                       onButtonClick={async () => {
-                        this.bookingCancelation.openDialog();
+                        this.bookingCancellation.openDialog();
                       }}
                     ></ir-button>
                   )}
@@ -395,7 +391,7 @@ export class IrInvoice {
                             {/* <span>{"- Non-smoking"}</span> */}
                           </span>
                         </p>
-                        {this.cancelation_message && <p class="room-info-text" innerHTML={`${localizedWords.entries.Lcz_Cancelation}: ${this.cancelation_message}`}></p>}
+                        {this.cancellation_message && <p class="room-info-text" innerHTML={`${localizedWords.entries.Lcz_Cancelation}: ${this.cancellation_message}`}></p>}
                         {this.guarantee_message && <p class="room-info-text" innerHTML={`${localizedWords.entries.Lcz_Guarantee}: ${this.guarantee_message}`}></p>}
                       </div>
                     ))}
@@ -513,7 +509,7 @@ export class IrInvoice {
           {this.footerShown && <ir-privacy-policy hideTrigger ref={el => (this.privacyPolicyRef = el)}></ir-privacy-policy>}
           <ir-booking-cancellation
             booking={this.booking}
-            ref={el => (this.bookingCancelation = el)}
+            ref={el => (this.bookingCancellation = el)}
             onCancellationResult={async e => {
               e.stopImmediatePropagation();
               e.stopPropagation();

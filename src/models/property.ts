@@ -104,6 +104,7 @@ export interface AllowedCard {
 export interface AllowedPaymentMethod {
   is_active: boolean;
   code: string;
+  allowed_currencies: string | null;
   description: string;
   icon_class_name: any;
   img_url: any;

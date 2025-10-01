@@ -3,7 +3,7 @@ import { PaymentService } from '@/services/api/payment.service';
 import VariationService from '@/services/app/variation.service';
 // import { PropertyService } from '@/services/api/property.service';
 import app_store from '@/stores/app.store';
-import booking_store, { calculateTotalRooms, IRatePlanSelection } from '@/stores/booking';
+import booking_store, { calculateTotalRooms, getPrepaymentAmount, IRatePlanSelection } from '@/stores/booking';
 import { checkout_store, onCheckoutDataChange } from '@/stores/checkout.store';
 import localizedWords from '@/stores/localization.store';
 import { formatAmount, getDateDifference } from '@/utils/utils';
@@ -41,25 +41,11 @@ export class IrBookingDetails {
       }
     });
   }
-  private calculatePrepaymentAmount() {
-    const agent = booking_store.bookingAvailabilityParams.agent;
-    if (agent && agent.payment_mode.code === '001') {
-      return this.prepaymentChange.emit(0);
-    }
-    let total = 0;
-    for (const roomtypeId in booking_store.ratePlanSelections) {
-      for (const rateplanId in booking_store.ratePlanSelections[roomtypeId]) {
-        const rateplan = booking_store.ratePlanSelections[roomtypeId][rateplanId];
-        console.log(rateplan.checkoutVariations);
-        rateplan.checkoutVariations.map((v, index) => {
-          const variation = this.variationService.getVariationBasedOnInfants({ baseVariation: v, variations: rateplan.ratePlan.variations, infants: rateplan.infant_nbr[index] });
-          total += variation.prepayment_amount_gross;
-        });
-      }
-    }
 
-    this.prepaymentChange.emit(total);
+  private calculatePrepaymentAmount() {
+    this.prepaymentChange.emit(getPrepaymentAmount());
   }
+
   private getTotalPersons() {
     const { adult_nbr, child_nbr } = booking_store.bookingAvailabilityParams;
     return Number(adult_nbr) + Number(child_nbr);

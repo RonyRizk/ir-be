@@ -24,4 +24,4 @@ export const ExposedBookingAvailability = z.object({
   affiliate_id: z.number().default(0).optional(),
 });
 
-export type TExposedBookingAvailability = z.infer<typeof ExposedBookingAvailability>;
+export type TExposedBookingAvailability = z.infer<typeof ExposedBookingAvailability> & { update_store?: boolean };
