@@ -1,17 +1,16 @@
 import { Booking, Currency } from '@/models/booking.dto';
 import { CheckoutErrors, pages } from '@/models/common';
 import { PickupFormData } from '@/models/pickup';
-import { AllowedPaymentMethod, RoomType } from '@/models/property';
+import { AllowedPaymentMethod } from '@/models/property';
 import { IrUserFormData } from '@/models/user_form';
 import { AuthService } from '@/services/api/auth.service';
 import { PaymentService } from '@/services/api/payment.service';
 import { PropertyService } from '@/services/api/property.service';
-import VariationService from '@/services/app/variation.service';
 import app_store from '@/stores/app.store';
-import booking_store, { calculateTotalRooms, clearCheckoutRooms, IRoomTypeSelection, validateBooking } from '@/stores/booking';
+import booking_store, { calculateTotalRooms, clearCheckoutRooms, validateBooking } from '@/stores/booking';
 import { checkout_store } from '@/stores/checkout.store';
 import localizedWords from '@/stores/localization.store';
-import { detectCardType, generateCheckoutUrl, getDateDifference, injectHTMLAndRunScript, passedBookingCutoff } from '@/utils/utils';
+import { detectCardType, generateCheckoutUrl, getCurrencyByCode, getDateDifference, injectHTMLAndRunScript, normalize, passedBookingCutoff } from '@/utils/utils';
 import { ZCreditCardSchemaWithCvc } from '@/validators/checkout.validator';
 import { Component, Host, Listen, State, h, Event, EventEmitter } from '@stencil/core';
 import moment from 'moment';
@@ -39,7 +38,7 @@ export class IrCheckoutPage {
   private bookingDetails: HTMLIrBookingDetailsElement;
   private pickupForm: HTMLIrPickupElement;
   private errorElement: HTMLElement;
-  alertRef: HTMLIrAlertDialogElement;
+  private alertRef: HTMLIrAlertDialogElement;
 
   async componentWillLoad() {
     this.calculateTotalPrepaymentAmount();
@@ -191,9 +190,11 @@ export class IrCheckoutPage {
 
   private async processBooking() {
     try {
-      const result = await this.propertyService.bookUser();
+      let paymentAmount = this.prepaymentAmount;
+      const { booking, prepaymentAmount, mostEffectiveCurrency } = await this.propertyService.bookUser(this.selectedPaymentMethod);
+      paymentAmount = prepaymentAmount;
       this.isBookingConfirmed = true;
-      booking_store.booking = result;
+      booking_store.booking = booking;
       // if (app_store.app_data.isFromGhs) {
       //   destroyBookingCookie();
       // }
@@ -208,8 +209,8 @@ export class IrCheckoutPage {
           booking_number: booking_store.booking.booking_nbr,
         };
         return (window.location.href = generateCheckoutUrl(app_store.property.perma_link, {
-          e: result.guest.email,
-          b: result.booking_nbr,
+          e: booking.guest.email,
+          b: booking.booking_nbr,
           lang: app_store.userPreferences.language_id,
           s: '1',
         }));
@@ -220,127 +221,15 @@ export class IrCheckoutPage {
             {
               option: 'direct',
               params: {
-                email: result.guest.email,
-                booking_nbr: result.booking_nbr,
+                email: booking.guest.email,
+                booking_nbr: booking.booking_nbr,
               },
             },
             false,
           );
         }
-        let paymentAmount = this.prepaymentAmount;
-        const normalize = (s?: string) => (s || '').trim().toLowerCase();
-        const getCurrencyByCode = (code: string) => app_store.currencies.find(c => normalize(c.code) === normalize(code)) || null;
-
-        // Returns a Currency object from app_store.currencies or null if no change is needed.
-        // Priority: user's currency (if allowed) → hotel's currency (if allowed) → first allowed currency.
-        // If the chosen currency equals the user's currency, returns null to indicate no switch is needed.
-        const getMostEffectiveCurrency = (): (typeof app_store.currencies)[number] | null => {
-          const allowed = normalize(this.selectedPaymentMethod?.allowed_currencies || '');
-          if (!allowed) return null;
-
-          const allowedList = allowed
-            .split(',')
-            .map(c => normalize(c))
-            .filter(Boolean);
-
-          if (allowedList.length === 0) return null;
-
-          // Resolve user + hotel currency objects (fall back to 'usd' only if needed)
-          const userCode = normalize(app_store.userPreferences?.currency_id) || 'usd';
-          const hotelCode = normalize(app_store.property?.currency?.code);
-          const hotelCurrency = hotelCode ? getCurrencyByCode(hotelCode) : null;
-
-          // 1) If the user's currency is allowed → no change.
-          if (allowedList.includes(userCode)) return null;
-
-          // 2) If the hotel's currency is allowed → switch to hotel currency.
-          if (hotelCode && allowedList.includes(hotelCode) && hotelCurrency) return hotelCurrency;
-
-          // 3) Otherwise, pick the first allowed currency we can resolve from the store.
-          for (const code of allowedList) {
-            const cur = getCurrencyByCode(code);
-            if (cur) {
-              // If this equals user currency (rare: user not in allowedList but store normalization mismatch), treat as no change.
-              if (normalize(cur.code) === userCode) return null;
-              return cur;
-            }
-          }
-
-          // If none of the allowed codes exist in app_store.currencies, don't switch.
-          return null;
-        };
-        /*
-
-        1- before creating the payment
-            1- check if there is prepayment amount and the user chose an online payment
-                - if user currency diff than payment method currency
-                    -   check availability with the payment method currency
-                        if payment method have multiple currencies
-                        check which one is the hotel currency
-                        if didn't find any choose the first one
-                    - recalculate the new prepayment amount;
-                    - do payment
-
-            
-        */
-        const mostEffectiveCurrency = getMostEffectiveCurrency();
-        console.log({ mostEffectiveCurrency, paymentAmount });
-        if (paymentAmount > 0 && mostEffectiveCurrency) {
-          const variationService = new VariationService();
-          if (normalize(mostEffectiveCurrency.code) !== (normalize(app_store.userPreferences?.currency_id) || 'usd')) {
-            //check availability
-            const data = await this.propertyService.getExposedBookingAvailability({
-              propertyid: app_store.app_data.property_id,
-              from_date: booking_store.bookingAvailabilityParams.from_date,
-              to_date: booking_store.bookingAvailabilityParams.to_date,
-              room_type_ids: [],
-              adult_nbr: booking_store.bookingAvailabilityParams.adult_nbr,
-              child_nbr: booking_store.bookingAvailabilityParams.child_nbr,
-              language: app_store.userPreferences.language_id,
-              currency_ref: mostEffectiveCurrency.code,
-              is_in_loyalty_mode: booking_store.bookingAvailabilityParams.loyalty ? true : !!booking_store.bookingAvailabilityParams.coupon,
-              promo_key: booking_store.bookingAvailabilityParams.coupon || '',
-              is_in_agent_mode: !!booking_store.bookingAvailabilityParams.agent || false,
-              agent_id: booking_store.bookingAvailabilityParams.agent?.id || 0,
-              is_in_affiliate_mode: !!app_store.app_data.affiliate,
-              affiliate_id: app_store.app_data.affiliate ? app_store.app_data.affiliate.id : null,
-              update_store: false,
-            });
-            //recalculate the new prepayment amount
-            let total = 0;
-            for (const roomType of data.My_Result as RoomType[]) {
-              const selectedRoomType = booking_store.ratePlanSelections[roomType.id] as IRoomTypeSelection | undefined;
-              if (!selectedRoomType) continue;
-
-              for (const ratePlan of roomType.rateplans) {
-                const selectedRatePlan = selectedRoomType[ratePlan.id];
-                if (!selectedRatePlan) continue;
-
-                const { checkoutVariations, infant_nbr } = selectedRatePlan;
-                checkoutVariations.forEach((checkoutVariation, index) => {
-                  const baseVariation =
-                    ratePlan.variations.find(
-                      v => v.adult_nbr === checkoutVariation.adult_nbr && v.child_nbr === checkoutVariation.child_nbr && v.infant_nbr === checkoutVariation.infant_nbr,
-                    ) ?? checkoutVariation;
-
-                  if (!baseVariation) return;
-
-                  const variation = variationService.getVariationBasedOnInfants({
-                    baseVariation,
-                    variations: ratePlan.variations,
-                    infants: infant_nbr?.[index] ?? 0,
-                  });
-
-                  total += variation?.prepayment_amount_gross ?? 0;
-                });
-              }
-            }
-
-            paymentAmount = total;
-          }
-        }
         await this.processPayment({
-          booking: result,
+          booking,
           paymentMethod: this.selectedPaymentMethod,
           paymentAmount,
           token,

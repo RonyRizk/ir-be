@@ -4,22 +4,52 @@ import { RatePlan, RoomType, Variation } from '@/models/property';
 import booking_store from '@/stores/booking';
 import axios from 'axios';
 import { addDays, format } from 'date-fns';
+import { PropertyService } from '../api/property.service';
+import app_store from '@/stores/app.store';
+import { PickupService } from './pickup.service';
 
 export class PropertyHelpers {
-  public convertPickup(pickup: TPickupFormData) {
+  public async convertPickup(pickup: TPickupFormData, hasDifferentCurrency: boolean) {
+    let selected_option = pickup.selected_option;
+    let total = Number(pickup.due_upon_booking);
+    let currency = app_store.property.currency;
+    if (hasDifferentCurrency) {
+      const pickupService = new PickupService();
+      const propertyService = new PropertyService();
+      const { pickup_service } = await propertyService.getExposedProperty({
+        sync: false,
+        id: app_store.property.id,
+        currency_id: app_store.property.currency.code,
+        aname: '',
+        language: 'en',
+        perma_link: '',
+      });
+
+      selected_option = pickup_service.allowed_options.find(o => o.id === pickup.selected_option.id);
+      total = Number(
+        pickupService
+          .updateDue({
+            amount: selected_option.amount,
+            code: selected_option.pricing_model.code,
+            numberOfPersons: pickupService.calculateTotalPersons(),
+            number_of_vehicles: pickup.number_of_vehicles,
+          })
+          .toFixed(2),
+      );
+    }
     let res: any = {};
     const [hour, minute] = pickup.arrival_time.split(':');
     res = {
       booking_nbr: null,
       is_remove: false,
-      currency: pickup.currency,
+      currency,
       date: pickup.arrival_date.format('YYYY-MM-DD'),
       details: pickup.flight_details || null,
       hour: Number(hour),
       minute: Number(minute),
       nbr_of_units: pickup.number_of_vehicles,
-      selected_option: pickup.selected_option,
-      total: Number(pickup.due_upon_booking),
+      selected_option,
+      total,
     };
     return res;
   }

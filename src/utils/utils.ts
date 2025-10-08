@@ -441,3 +441,19 @@ export function passedBookingCutoff(): boolean {
   const cutoffToday: Moment = nowInOffset.clone().hour(cutoffHour).minute(cutoffMinute).second(0).millisecond(0);
   return nowInOffset.isSameOrAfter(cutoffToday);
 }
+
+/**
+ * Normalizes a string by trimming whitespace and converting it to lowercase.
+ *
+ * @param {string} [s] - The input string to normalize.
+ * @returns {string} The normalized string (empty string if input is null/undefined).
+ */
+export const normalize = (s?: string): string => (s || '').trim().toLowerCase();
+
+/**
+ * Retrieves a currency object from the app store by its currency code.
+ *
+ * @param {string} code - The currency code to search for (case-insensitive).
+ * @returns {ICurrency | null} The matching currency object if found, otherwise null.
+ */
+export const getCurrencyByCode = (code: string) => app_store.currencies.find(c => normalize(c.code) === normalize(code)) || null;

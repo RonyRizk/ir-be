@@ -10,7 +10,8 @@ export const ExposedBookingAvailability = z.object({
   to_date: z.custom<Moment>((val): val is Moment => moment.isMoment(val), {
     message: 'to_date must be a valid Moment value',
   }),
-  room_type_ids: z.string().array().optional().default([]),
+  room_type_ids: z.coerce.number().array().optional().default([]),
+  rate_plan_ids: z.coerce.number().array().optional().default([]),
   adult_nbr: z.number().min(1),
   child_nbr: z.number().min(0),
   infant_nbr: z.number().min(0),
