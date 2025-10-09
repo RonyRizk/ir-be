@@ -107,7 +107,7 @@ export class IrBookingPage {
       return null;
     }
     // console.log(this.checkMaxAmount());
-    const { totalAmount } = calculateTotalCost();
+    const { totalAmount } = calculateTotalCost({ gross: true, infants: false });
     const isInjected = app_store.app_data.injected;
     return (
       <Host>

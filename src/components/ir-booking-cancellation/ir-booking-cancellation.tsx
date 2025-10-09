@@ -146,7 +146,7 @@ export class IrBookingCancellation {
               isLoading={isRequestPending('/Request_Booking_Cancelation')}
               onButtonClick={async () => {
                 try {
-                  await this.paymentService.RequestBookingCancellation(this.booking.booking_nbr);
+                  await this.paymentService.requestBookingCancellation(this.booking.booking_nbr);
                   this.cancellationResult.emit({ state: 'success', booking_nbr: this.booking.booking_nbr });
                   this.closeAlertDialog();
                 } catch (error) {

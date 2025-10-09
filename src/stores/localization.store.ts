@@ -14,6 +14,7 @@ export type TLocaleLocalizedWordsEntries = {
   Lcz_Activities: string;
   Lcz_Address: string;
   Lcz_Infants: string;
+  Lcz_IncludingTaxesAndFees: string;
   Lcz_infant: string;
   Lcz_Adult: string;
   Lcz_BookingIsNotAvailable: string;

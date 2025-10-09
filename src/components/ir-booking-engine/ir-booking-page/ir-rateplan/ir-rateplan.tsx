@@ -25,7 +25,7 @@ export class IrRateplan {
   @Prop() roomTypeId: number;
 
   @State() isLoading = false;
-  @State() cancelationMessage = '';
+  @State() cancellationMessage = '';
   @State() isRatePlanAvailable: boolean = true;
 
   @Event() animateBookingButton: EventEmitter<null>;
@@ -57,8 +57,8 @@ export class IrRateplan {
     selectedVariation = booking_store.roomTypes.find(rt => rt.id === roomTypeId).rateplans.find(rp => rp.id === rateplanId).variations[value];
     updateRoomParams({ params: { selected_variation: selectedVariation }, ratePlanId: rateplanId, roomTypeId });
   }
-  private async fetchCancelationMessage() {
-    this.cancelationMessage = this.paymentService.getCancelationMessage(this.visibleInventory.selected_variation?.applicable_policies, true)?.message;
+  private async fetchCancellationMessage() {
+    this.cancellationMessage = this.paymentService.getCancellationMessage(this.visibleInventory.selected_variation?.applicable_policies, true)?.message;
   }
   render() {
     if (!this.ratePlan.is_targeting_travel_agency && booking_store.bookingAvailabilityParams.agent) {
@@ -67,10 +67,11 @@ export class IrRateplan {
     if (this.ratePlan.is_targeting_travel_agency && !app_store.app_data.isAgentMode) {
       return null;
     }
-    const isInFreeCancelationZone = this.paymentService.checkFreeCancelationZone(this.visibleInventory?.selected_variation?.applicable_policies);
+    console.log(this.visibleInventory.selected_variation);
+    const isInFreeCancellationZone = this.paymentService.checkFreeCancellationZone(this.visibleInventory?.selected_variation?.applicable_policies);
     const isInventoryFull =
       this.visibleInventory?.visibleInventory === 0 ||
-      !this.visibleInventory?.selected_variation?.discounted_amount ||
+      !this.visibleInventory?.selected_variation?.discounted_gross_amount ||
       Object.values(booking_store.ratePlanSelections[this.roomTypeId]).some(f => f.visibleInventory === f.reserved);
     return (
       <div class="rateplan-container">
@@ -85,14 +86,14 @@ export class IrRateplan {
               ) : (
                 this.ratePlan.is_available_to_book && (
                   <ir-tooltip
-                    labelColors={isInFreeCancelationZone ? 'green' : 'default'}
+                    labelColors={isInFreeCancellationZone ? 'green' : 'default'}
                     class={`rateplan-tooltip`}
                     open_behavior="click"
-                    label={isInFreeCancelationZone ? localizedWords.entries.Lcz_FreeCancellation : localizedWords.entries.Lcz_IfICancel}
-                    message={`${this.cancelationMessage || this.ratePlan.cancelation} ${this.ratePlan.guarantee ?? ''}`}
+                    label={isInFreeCancellationZone ? localizedWords.entries.Lcz_FreeCancellation : localizedWords.entries.Lcz_IfICancel}
+                    message={`${this.cancellationMessage || this.ratePlan.cancelation} ${this.ratePlan.guarantee ?? ''}`}
                     onTooltipOpenChange={e => {
                       if (e.detail) {
-                        this.fetchCancelationMessage();
+                        this.fetchCancellationMessage();
                       }
                     }}
                   ></ir-tooltip>
@@ -106,12 +107,12 @@ export class IrRateplan {
             ) : (
               <Fragment>
                 {this.isRatePlanAvailable ? (
-                  this.visibleInventory?.selected_variation?.discounted_amount && (
+                  this.visibleInventory?.selected_variation?.discounted_gross_amount && (
                     <div class="rateplan-pricing-mobile">
                       {this.visibleInventory?.selected_variation?.discount_pct > 0 && (
                         <p class="rateplan-discounted-amount">{formatAmount(this.visibleInventory?.selected_variation?.amount, app_store.userPreferences.currency_id, 0)}</p>
                       )}
-                      <p class="rateplan-amount">{formatAmount(this.visibleInventory?.selected_variation?.discounted_amount, app_store.userPreferences.currency_id, 0)}</p>
+                      <p class="rateplan-amount">{formatAmount(this.visibleInventory?.selected_variation?.discounted_gross_amount, app_store.userPreferences.currency_id, 0)}</p>
                     </div>
                   )
                 ) : (
@@ -139,14 +140,14 @@ export class IrRateplan {
                 ) : (
                   this.ratePlan.is_available_to_book && (
                     <ir-tooltip
-                      labelColors={isInFreeCancelationZone ? 'green' : 'default'}
+                      labelColors={isInFreeCancellationZone ? 'green' : 'default'}
                       class={`rateplan-tooltip`}
                       open_behavior="click"
-                      label={isInFreeCancelationZone ? localizedWords.entries.Lcz_FreeCancellation : localizedWords.entries.Lcz_IfICancel}
-                      message={`${(this.cancelationMessage ?? '') || (this.ratePlan.cancelation ?? '')} ${this.ratePlan.guarantee ?? ''}`}
+                      label={isInFreeCancellationZone ? localizedWords.entries.Lcz_FreeCancellation : localizedWords.entries.Lcz_IfICancel}
+                      message={`${(this.cancellationMessage ?? '') || (this.ratePlan.cancelation ?? '')} ${this.ratePlan.guarantee ?? ''}`}
                       onTooltipOpenChange={e => {
                         if (e.detail) {
-                          this.fetchCancelationMessage();
+                          this.fetchCancellationMessage();
                         }
                       }}
                     ></ir-tooltip>
@@ -205,7 +206,7 @@ export class IrRateplan {
 
                 {!this.ratePlan.not_available_reason?.includes('MLS') ? (
                   <Fragment>
-                    {this.visibleInventory?.selected_variation?.discounted_amount && (
+                    {this.visibleInventory?.selected_variation?.discounted_gross_amount && (
                       <Fragment>
                         {this.visibleInventory?.selected_variation?.discount_pct > 0 && (
                           <div class="rateplan-pricing">
@@ -214,7 +215,9 @@ export class IrRateplan {
                           </div>
                         )}
                         <div class="rateplan-final-pricing" data-style={this.visibleInventory?.selected_variation?.discount_pct > 0 ? '' : 'full-width'}>
-                          <p class="rateplan-amount">{formatAmount(this.visibleInventory?.selected_variation?.discounted_amount, app_store.userPreferences.currency_id, 0)}</p>
+                          <p class="rateplan-amount">
+                            {formatAmount(this.visibleInventory?.selected_variation?.discounted_gross_amount, app_store.userPreferences.currency_id, 0)}
+                          </p>
                           {this.visibleInventory?.selected_variation &&
                             getDateDifference(booking_store.bookingAvailabilityParams.from_date, booking_store.bookingAvailabilityParams.to_date) > 1 && (
                               <p class="rateplan-amount-per-night">{`${formatAmount(this.visibleInventory?.selected_variation?.amount_per_night, app_store.userPreferences.currency_id, 0)}/${localizedWords.entries.Lcz_night}`}</p>
@@ -236,7 +239,7 @@ export class IrRateplan {
                           value:
                             i === 0
                               ? `0`
-                              : `${i}&nbsp;&nbsp;&nbsp;${i === 0 ? '' : formatAmount(this.visibleInventory?.selected_variation?.discounted_amount * i, app_store.userPreferences.currency_id, 0)}`,
+                              : `${i}&nbsp;&nbsp;&nbsp;${i === 0 ? '' : formatAmount(this.visibleInventory?.selected_variation?.discounted_gross_amount * i, app_store.userPreferences.currency_id, 0)}`,
                           disabled: i >= this.visibleInventory?.visibleInventory + 1,
                           html: true,
                         }))}

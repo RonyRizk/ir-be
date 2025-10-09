@@ -18,7 +18,7 @@ export class IrBookingDetails {
   @Prop() errors: string;
   @State() currentRatePlan: RatePlan | null = null;
   @State() isLoading: number = null;
-  @State() cancelationMessage: string;
+  @State() cancellationMessage: string;
   @State() prepaymentAmount: number = 0;
 
   private dialogRef: HTMLIrDialogElement;
@@ -201,7 +201,7 @@ export class IrBookingDetails {
   }
 
   private async fetchCancellationMessage(applicable_policies) {
-    this.cancelationMessage = this.cancelationMessage = this.paymentService.getCancelationMessage(applicable_policies, true)?.message;
+    this.cancellationMessage = this.paymentService.getCancellationMessage(applicable_policies, true)?.message;
   }
   private renderSmokingView(smoking_option: ISmokingOption, index: number, ratePlanId: string, roomTypeId: string, checkoutSmokingSelection: string[]) {
     if (smoking_option.code === '002') {
@@ -291,11 +291,16 @@ export class IrBookingDetails {
                   if (this.isLoading === r.ratePlan.id) {
                     return <div class="h-16 animate-pulse rounded-md bg-gray-200"></div>;
                   }
+                  const { amount, gross } = this.variationService.calculateVariationAmount({
+                    baseVariation: r.checkoutVariations[index],
+                    variations: r.ratePlan.variations,
+                    infants: r.infant_nbr[index],
+                  });
                   return (
                     <div class="flex items-center justify-between">
-                      <div class="flex-1 space-y-2">
+                      <div class="flex-1 ">
                         <div>
-                          <div class="flex items-center gap-3">
+                          <div class="flex items-start gap-3">
                             <div class="flex flex-row items-center gap-3 ">
                               <h3 class="font-semibold">{r.roomtype.name}</h3>
                               {r.ratePlan.is_non_refundable ? (
@@ -321,28 +326,25 @@ export class IrBookingDetails {
                               )}
                             </div>
                             <div class="ml-1 flex-1 ">
-                              <p class="text-end text-base font-medium xl:text-xl">
-                                {formatAmount(
-                                  this.variationService.calculateVariationAmount({
-                                    baseVariation: r.checkoutVariations[index],
-                                    variations: r.ratePlan.variations,
-                                    infants: r.infant_nbr[index],
-                                  }),
-                                  app_store.userPreferences.currency_id,
-                                )}
+                              <p class="text-end text-base xl:text-lg" style={{ fontWeight: gross > amount ? '400' : '700' }}>
+                                {formatAmount(amount, app_store.userPreferences.currency_id)}
                                 {/* {formatAmount(r.checkoutVariations[index].discounted_amount, app_store.userPreferences.currency_id)} */}
                               </p>
+                              {gross > amount && <p class="text-end text-base font-bold xl:text-lg">{formatAmount(gross, app_store.userPreferences.currency_id)}</p>}
                             </div>
                           </div>
                         </div>
-                        <div class="flex items-center gap-1 pb-2 text-sm">
-                          <ir-icons name="utencils" svgClassName="size-4"></ir-icons>
-                          <p class="line-clamp-3">
-                            <span>{r.ratePlan.short_name}</span>
-                            {r.ratePlan.custom_text && <span class="mx-1 max-w-[60%] text-right  text-gray-500 md:w-full md:max-w-full">{r.ratePlan.custom_text}</span>}
-                          </p>
+                        <div class={'mb-2 flex items-center  gap-3 pb-2'}>
+                          <div class="flex flex-1 items-center gap-1 text-sm">
+                            <ir-icons name="utencils" svgClassName="size-4"></ir-icons>
+                            <p class="line-clamp-3">
+                              <span>{r.ratePlan.short_name}</span>
+                              {r.ratePlan.custom_text && <span class="mx-1 max-w-[60%] text-right text-xs  text-gray-500 md:w-full md:max-w-full">{r.ratePlan.custom_text}</span>}
+                            </p>
+                          </div>
+                          {gross > amount && <p class="m-0 p-0 text-end text-xs font-light text-gray-400">{localizedWords.entries.Lcz_IncludingTaxesAndFees}</p>}
                         </div>
-                        <div class="flex items-center gap-2.5 pb-1.5">
+                        <div class="mb-2 flex items-center gap-2.5 pb-1.5">
                           <ir-input
                             onInput={e => {
                               if (index === 0 && !checkout_store.modifiedGuestName && this.firstRoom.ratePlanId === ratePlanId && this.firstRoom.roomtypeId === roomTypeId) {
@@ -466,7 +468,7 @@ export class IrBookingDetails {
           }}
         >
           <div slot="modal-body" class="p-6 ">
-            <p class={'px-6'} innerHTML={this.cancelationMessage || this.currentRatePlan?.cancelation}></p>
+            <p class={'px-6'} innerHTML={this.cancellationMessage || this.currentRatePlan?.cancelation}></p>
             <p class={'px-6'} innerHTML={this.currentRatePlan?.guarantee}></p>
           </div>
         </ir-dialog>
