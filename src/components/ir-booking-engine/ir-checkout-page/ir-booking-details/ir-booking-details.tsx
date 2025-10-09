@@ -269,7 +269,7 @@ export class IrBookingDetails {
     return (
       <Host>
         <div class="w-full">
-          <section class="mb-5 flex flex-col flex-wrap items-center gap-2 rounded-md bg-gray-100 px-4 py-2 lg:flex-row">
+          <section class="mb-5 flex flex-col flex-wrap gap-2 rounded-md bg-gray-100 px-4 py-2 xl:flex-row xl:items-center">
             <div class="flex flex-1 items-center gap-2">
               <ir-icons name="bed"></ir-icons>
               <p>
@@ -296,6 +296,8 @@ export class IrBookingDetails {
                     variations: r.ratePlan.variations,
                     infants: r.infant_nbr[index],
                   });
+                  const isInFreeCancellationZone = this.paymentService.checkFreeCancellationZone(r.checkoutVariations[index]?.applicable_policies);
+
                   return (
                     <div class="flex items-center justify-between">
                       <div class="flex-1 ">
@@ -312,15 +314,15 @@ export class IrBookingDetails {
                                     variants="link"
                                     class="text-sm"
                                     buttonClassName="pl-0"
-                                    buttonStyles={{ paddingLeft: '0', fontSize: '12px', paddingTop: '0', paddingBottom: '0' }}
+                                    buttonStyles={{ paddingLeft: '0', fontSize: '12px', paddingTop: '0', paddingBottom: '0', color: '#227950' }}
                                     onButtonClick={async () => {
                                       this.currentRatePlan = r.ratePlan;
                                       await this.fetchCancellationMessage(r.checkoutVariations[index].applicable_policies);
                                       this.dialogRef.openModal();
                                     }}
-                                    label={localizedWords.entries.Lcz_IfICancel}
+                                    label={isInFreeCancellationZone ? localizedWords.entries.Lcz_FreeCancellation : localizedWords.entries.Lcz_IfICancel}
                                   >
-                                    <ir-icons svgClassName="size-4" slot="right-icon" name="circle_info" />
+                                    <ir-icons svgClassName="size-4" slot="right-icon" name="circle_info" style={{ color: '#98a2b3' }} />
                                   </ir-button>
                                 </div>
                               )}
@@ -334,17 +336,17 @@ export class IrBookingDetails {
                             </div>
                           </div>
                         </div>
-                        <div class={'mb-2 flex items-center  gap-3 pb-2'}>
-                          <div class="flex flex-1 items-center gap-1 text-sm">
+                        <div class={'mb-2 flex items-center  gap-3 pb-2'} style={{ marginTop: '-5px' }}>
+                          <div class="flex flex-1 items-center gap-1 text-xs">
                             <ir-icons name="utencils" svgClassName="size-4"></ir-icons>
                             <p class="line-clamp-3">
                               <span>{r.ratePlan.short_name}</span>
-                              {r.ratePlan.custom_text && <span class="mx-1 max-w-[60%] text-right text-xs  text-gray-500 md:w-full md:max-w-full">{r.ratePlan.custom_text}</span>}
+                              {r.ratePlan.custom_text && <span class="mx-1 max-w-[70%] text-right text-xs  text-gray-500 md:w-full md:max-w-full">{r.ratePlan.custom_text}</span>}
                             </p>
                           </div>
-                          {gross > amount && <p class="m-0 p-0 text-end text-xs font-light text-gray-400">{localizedWords.entries.Lcz_IncludingTaxesAndFees}</p>}
+                          {gross > amount && <p class="m-0 p-0 text-end text-xs font-light ">{localizedWords.entries.Lcz_IncludingTaxesAndFees}</p>}
                         </div>
-                        <div class="mb-2 flex items-center gap-2.5 pb-1.5">
+                        <div class="mb-2 flex flex-1 items-center gap-2.5 pb-1.5 lg:max-w-[60%]">
                           <ir-input
                             onInput={e => {
                               if (index === 0 && !checkout_store.modifiedGuestName && this.firstRoom.ratePlanId === ratePlanId && this.firstRoom.roomtypeId === roomTypeId) {
@@ -398,7 +400,7 @@ export class IrBookingDetails {
                             }}
                           ></ir-select> */}
                           <p
-                            class={'w-full'}
+                            class={'w-max whitespace-nowrap'}
                             innerHTML={this.variationService.formatVariationBasedOnInfants({
                               baseVariation: r.checkoutVariations[index],
                               variations: r.ratePlan.variations,
