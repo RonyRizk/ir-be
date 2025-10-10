@@ -514,7 +514,7 @@ export class PropertyService {
 
     if (needsPropertyAvailability) {
       availabilityCalls.push(
-        this.getExposedBookingAvailability({ ...checkAvailabilityPayload, currency_ref: '' }).then(data => {
+        this.getExposedBookingAvailability({ ...checkAvailabilityPayload, currency_ref: app_store.property.currency.code }).then(data => {
           propertyAvailability = data;
           if (!roomTypes) {
             roomTypes = [...data.My_Result];
@@ -617,6 +617,7 @@ export class PropertyService {
       // if (f) {
       //   throw new Error('');
       // }
+
       const { data } = await axios.post(`/DoReservation`, body);
       if (data.ExceptionMsg !== '') {
         throw new Error(data.ExceptionMsg);
