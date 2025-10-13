@@ -7,7 +7,7 @@ import app_store from '@/stores/app.store';
 import booking_store from '@/stores/booking';
 import localizedWords from '@/stores/localization.store';
 import { QueryStringValidator } from '@/validators/querystring.validator';
-import { calculateInfantNumber, modifyQueryParam, passedBookingCutoff } from '@/utils/utils';
+import { calculateInfantNumber, modifyQueryParam } from '@/utils/utils';
 import { AddAdultsAndChildrenEvent } from '../ir-adult-child-counter/ir-adult-child-counter';
 import moment from 'moment/min/moment-with-locales';
 
@@ -291,9 +291,9 @@ export class IrAvailabilityHeader {
       adult_nbr: params.adult_nbr,
       child_nbr: params.child_nbr,
     };
-    if (passedBookingCutoff()) {
-      return;
-    }
+    // if (passedBookingCutoff()) {
+    //   return;
+    // }
     this.scrollToRoomType.emit(null);
     booking_store.resetBooking = true;
     const { infant_nbr, ...rest } = this.exposedBookingAvailabilityParams;
@@ -411,7 +411,7 @@ export class IrAvailabilityHeader {
                 this.handleCheckAvailability();
               }}
               size="pill"
-              disabled={passedBookingCutoff()}
+              // disabled={passedBookingCutoff()}
               variants="icon-primary"
               iconName="search"
               label="Check availability"

@@ -38,7 +38,7 @@ export class IrCheckoutPage {
   private bookingDetails: HTMLIrBookingDetailsElement;
   private pickupForm: HTMLIrPickupElement;
   private errorElement: HTMLElement;
-  private alertRef: HTMLIrAlertDialogElement;
+  // private alertRef: HTMLIrAlertDialogElement;
 
   async componentWillLoad() {
     this.calculateTotalPrepaymentAmount();
@@ -67,7 +67,7 @@ export class IrCheckoutPage {
     e.stopPropagation();
     this.resetErrorState();
     if (passedBookingCutoff()) {
-      this.alertRef.openModal();
+      // this.alertRef.openModal();
       return;
     }
     if (!this.validateUserForm() || !this.validateBookingDetails() || !this.validatePickupForm() || !this.validatePayment() || this.validatePolicyAcceptance()) {
@@ -341,7 +341,9 @@ export class IrCheckoutPage {
             <ir-booking-summary isBookingConfirmed={this.isBookingConfirmed} prepaymentAmount={this.prepaymentAmount} error={this.error}></ir-booking-summary>
           </section>
         </main>
-        <ir-alert-dialog ref={el => (this.alertRef = el)}>
+        <ir-alert-dialog
+        // ref={el => (this.alertRef = el)}
+        >
           <div slot="modal-title" class={'flex items-center gap-4 pb-2'}>
             {/* <ir-icons name="danger" class={'text-red-500'} svgClassName="size-6"></ir-icons> */}
             <h1 class={'text-lg font-semibold'}>{localizedWords?.entries?.Lcz_SomethingWentWrong ?? 'Something went wrong'}!</h1>
