@@ -143,7 +143,8 @@ export class IrBookingCancellation {
               disabled={isPending}
               size="md"
               label={localizedWords.entries.Lcz_AcceptAndConfirm}
-              isLoading={isRequestPending('/Request_Booking_Cancelation')}
+              isLoading={isRequestPending('/Change_Exposed_Booking_Status')}
+              // isLoading={isRequestPending('/Request_Booking_Cancelation')}
               onButtonClick={async () => {
                 try {
                   await this.paymentService.requestBookingCancellation(this.booking.booking_nbr);

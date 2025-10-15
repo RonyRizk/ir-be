@@ -64,7 +64,16 @@ export class PaymentService {
     return res;
   }
   public async requestBookingCancellation(booking_nbr: string) {
-    const { data } = await axios.post(`/Request_Booking_Cancelation`, { BOOK_NBR: booking_nbr });
+    // const { data } = await axios.post(`/Request_Booking_Cancelation`, { BOOK_NBR: booking_nbr });
+    // if (data['ExceptionMsg'] !== '') {
+    //   throw new Error(data.ExceptionMsg);
+    // }
+
+    // return data['My_Result'];
+    const { data } = await axios.post(`/Change_Exposed_Booking_Status`, {
+      book_nbr: booking_nbr,
+      status: 'CANC_RA',
+    });
     if (data['ExceptionMsg'] !== '') {
       throw new Error(data.ExceptionMsg);
     }
