@@ -110,7 +110,7 @@ export class IrRateplan {
                   this.visibleInventory?.selected_variation?.discounted_gross_amount && (
                     <div class="rateplan-pricing-mobile">
                       {this.visibleInventory?.selected_variation?.discount_pct > 0 && (
-                        <p class="rateplan-discounted-amount">{formatAmount(this.visibleInventory?.selected_variation?.amount, app_store.userPreferences.currency_id, 0)}</p>
+                        <p class="rateplan-discounted-amount">{formatAmount(this.visibleInventory?.selected_variation?.amount_gross, app_store.userPreferences.currency_id, 0)}</p>
                       )}
                       <p class="rateplan-amount">{formatAmount(this.visibleInventory?.selected_variation?.discounted_gross_amount, app_store.userPreferences.currency_id, 0)}</p>
                     </div>
@@ -210,7 +210,9 @@ export class IrRateplan {
                       <Fragment>
                         {this.visibleInventory?.selected_variation?.discount_pct > 0 && (
                           <div class="rateplan-pricing">
-                            <p class="rateplan-discounted-amount">{formatAmount(this.visibleInventory?.selected_variation?.amount, app_store.userPreferences.currency_id, 0)}</p>
+                            <p class="rateplan-discounted-amount">
+                              {formatAmount(this.visibleInventory?.selected_variation?.amount_gross, app_store.userPreferences.currency_id, 0)}
+                            </p>
                             <p class="rateplan-discount">{`-${Number(this.visibleInventory?.selected_variation?.discount_pct)}%`}</p>
                           </div>
                         )}
