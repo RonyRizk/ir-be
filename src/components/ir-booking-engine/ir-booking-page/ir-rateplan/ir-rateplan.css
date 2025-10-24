@@ -61,6 +61,10 @@
 .rateplan-custom-text {
   font-size: 0.75rem;
   color: #64748b;
+  color: white;
+  background-color: #8ab7d7;
+  padding: 1px 6px 2px 6px;
+  border-radius: 0.5rem;
 }
 .rateplan-details {
   display: flex;

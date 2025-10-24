@@ -46,7 +46,6 @@ Type: `Promise<void>`
 
 ### Used by
 
- - [ir-booking-details](../../ir-booking-engine/ir-checkout-page/ir-booking-details)
  - [ir-coupon-dialog](../../ir-booking-engine/ir-booking-page/ir-availability-header/ir-coupon-dialog)
  - [ir-footer](../../ir-booking-engine/ir-footer)
  - [ir-modal](../ir-modal)
@@ -64,7 +63,6 @@ Type: `Promise<void>`
 graph TD;
   ir-dialog --> ir-button
   ir-button --> ir-icons
-  ir-booking-details --> ir-dialog
   ir-coupon-dialog --> ir-dialog
   ir-footer --> ir-dialog
   ir-modal --> ir-dialog

@@ -51,16 +51,15 @@ graph TD;
   ir-phone-input --> ir-icons
   ir-booking-details --> ir-icons
   ir-booking-details --> ir-select
-  ir-booking-details --> ir-button
+  ir-booking-details --> ir-tooltip
   ir-booking-details --> ir-input
-  ir-booking-details --> ir-dialog
-  ir-dialog --> ir-button
   ir-pickup --> ir-icons
   ir-pickup --> ir-select
   ir-pickup --> ir-popover
   ir-pickup --> ir-calendar
   ir-pickup --> ir-input
   ir-popover --> ir-dialog
+  ir-dialog --> ir-button
   ir-booking-summary --> ir-button
   ir-booking-summary --> ir-payment-view
   ir-booking-summary --> ir-checkbox

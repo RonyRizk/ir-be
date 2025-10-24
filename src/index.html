@@ -83,7 +83,7 @@
 
   <!-- not injected mode -->
   <!-- <ir-be cur="eur" checkin="2025-06-01" checkout="2025-06-06"></ir-be> -->
-  <ir-be checkin="2025-10-16" origin="be" checkout="2025-10-17" adults="2" child="0" ages="01_12"></ir-be>
+  <ir-be origin="be" adults="2" child="0" ages="01_12"></ir-be>
   <!-- aff="AF6" a-name='A286' -->
   <!-- Injected mode -->
   <!-- <ir-be injected></ir-be> -->
@@ -93,7 +93,20 @@
     const testCmp = document.querySelector('ir-be');
     async function init() {
       testCmp.propertyId = getId()
-      testCmp.p = "A211"
+      // testCmp.p = "A211"
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+
+      const formatDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+
+      testCmp.checkin = formatDate(today);
+      testCmp.checkout = formatDate(tomorrow);
       //testCmp.p = "A276"
       // testCmp.p = "A560"
       // testCmp.p = "A322"
@@ -101,7 +114,7 @@
       // testCmp.p = "A237"
       // testCmp.p = 'A15'
       // testCmp.p = "A345"
-      // testCmp.p = "A222"
+      //testCmp.p = "A222"
       // testCmp.p = "A487"
       // testCmp.p = "A506"
       // testCmp.propertyId = 60 || getId()

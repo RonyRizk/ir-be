@@ -29,20 +29,16 @@
 
 - [ir-icons](../../../ui/ir-icons)
 - [ir-select](../../../ui/ir-select)
-- [ir-button](../../../ui/ir-button)
+- [ir-tooltip](../../../ui/ir-tooltip)
 - [ir-input](../../../ui/ir-input)
-- [ir-dialog](../../../ui/ir-dialog)
 
 ### Graph
 ```mermaid
 graph TD;
   ir-booking-details --> ir-icons
   ir-booking-details --> ir-select
-  ir-booking-details --> ir-button
+  ir-booking-details --> ir-tooltip
   ir-booking-details --> ir-input
-  ir-booking-details --> ir-dialog
-  ir-button --> ir-icons
-  ir-dialog --> ir-button
   ir-checkout-page --> ir-booking-details
   style ir-booking-details fill:#f9f,stroke:#333,stroke-width:4px
 ```

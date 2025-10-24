@@ -125,9 +125,8 @@ graph TD;
   ir-phone-input --> ir-icons
   ir-booking-details --> ir-icons
   ir-booking-details --> ir-select
-  ir-booking-details --> ir-button
+  ir-booking-details --> ir-tooltip
   ir-booking-details --> ir-input
-  ir-booking-details --> ir-dialog
   ir-pickup --> ir-icons
   ir-pickup --> ir-select
   ir-pickup --> ir-popover

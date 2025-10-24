@@ -142,6 +142,7 @@ export class IrUserForm {
                   id: entry.CODE_NAME,
                   value: entry[`CODE_VALUE_${app_store.userPreferences.language_id.toUpperCase()}`],
                 }))}
+                style={{ '--radius': '1rem' }}
                 class="user-form-input"
               ></ir-select>
               {/* <ir-input label="Your arrival time(check-in from 14:00)" onTextChanged={e => updateUserFormData('arrival_time', e.detail)} class="w-full" /> */}

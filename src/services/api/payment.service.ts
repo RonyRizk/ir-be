@@ -133,7 +133,7 @@ export class PaymentService {
    * }
    */
   public checkFreeCancellationZone(policies: IExposedApplicablePolicies[]): boolean {
-    const cancellationPolicies = policies.find(p => p.type === 'cancelation');
+    const cancellationPolicies = policies?.find(p => p.type === 'cancelation');
     if (!cancellationPolicies || !Array.isArray(cancellationPolicies.brackets) || cancellationPolicies.brackets.length === 0) {
       return false;
     }

@@ -21,7 +21,7 @@ export class IrBookingDetails {
   @State() cancellationMessage: string;
   @State() prepaymentAmount: number = 0;
 
-  private dialogRef: HTMLIrDialogElement;
+  // private dialogRef: HTMLIrDialogElement;
   private firstRoom: { roomtypeId: string; ratePlanId: string };
   // private propertyService = new PropertyService();
   private paymentService = new PaymentService();
@@ -209,8 +209,8 @@ export class IrBookingDetails {
     }
     if (smoking_option.code === '003') {
       return (
-        <div class="section-item-footer-text">
-          <ir-icons name={'ban_smoking'} svgClassName="size-4"></ir-icons>
+        <div class="ir-booking-details__footer-text">
+          <ir-icons name={'ban_smoking'} removeClassName height={16} width={16}></ir-icons>
           <p>{smoking_option.description}</p>
         </div>
       );
@@ -218,12 +218,13 @@ export class IrBookingDetails {
     return (
       <ir-select
         icon
+        style={{ '--radius': '1rem' }}
         onValueChange={e => this.handleSmokeConfiguration(roomTypeId, ratePlanId, e.detail, index)}
         value={checkoutSmokingSelection[index]}
         data={smoking_option.allowed_smoking_options.map(s => ({ id: s.code, value: s.description }))}
-        class="hidden md:block"
+        class="ir-booking-details__smoking-select"
       >
-        <ir-icons name={checkoutSmokingSelection[index] !== '002' ? 'smoking' : 'ban_smoking'} slot="icon"></ir-icons>
+        <ir-icons name={checkoutSmokingSelection[index] !== '002' ? 'smoking' : 'ban_smoking'} slot="icon" removeClassName height={16} width={16}></ir-icons>
       </ir-select>
     );
   }
@@ -262,25 +263,24 @@ export class IrBookingDetails {
     return count;
   }
   render() {
-    console.log(booking_store.ratePlanSelections);
     const total_nights = getDateDifference(booking_store.bookingAvailabilityParams.from_date, booking_store.bookingAvailabilityParams.to_date);
     // const this.total_rooms = calculateTotalRooms();
     const total_persons = this.calculateTotalPersons();
     return (
       <Host>
-        <div class="w-full">
-          <section class="mb-5 flex flex-col flex-wrap gap-2 rounded-md bg-gray-100 px-4 py-2 xl:flex-row xl:items-center">
-            <div class="flex flex-1 items-center gap-2">
-              <ir-icons name="bed"></ir-icons>
+        <div class="ir-booking-details__container">
+          <section class="ir-booking-details__summary">
+            <div class="ir-booking-details__summary-row">
+              <ir-icons name="bed" removeClassName height={20} width={20}></ir-icons>
               <p>
                 {total_nights} {total_nights > 1 ? localizedWords.entries.Lcz_Nights : localizedWords.entries.Lcz_night} - {total_persons}{' '}
                 {total_persons > 1 ? localizedWords.entries.Lcz_Persons : localizedWords.entries.Lcz_Person} - {this.total_rooms}{' '}
                 {this.total_rooms > 1 ? localizedWords.entries.Lcz_Rooms : localizedWords.entries.Lcz_Room}
               </p>
             </div>
-            <p class=" text-right text-xs text-gray-500">{booking_store.tax_statement?.message}</p>
+            <p class="ir-booking-details__summary-note">{booking_store.tax_statement?.message}</p>
           </section>
-          <section class={'space-y-9'}>
+          <section class="ir-booking-details__rooms">
             {Object.keys(booking_store?.ratePlanSelections)?.map(roomTypeId => {
               return Object.keys(booking_store.ratePlanSelections[roomTypeId]).map(ratePlanId => {
                 const r: IRatePlanSelection = booking_store.ratePlanSelections[roomTypeId][ratePlanId];
@@ -289,7 +289,7 @@ export class IrBookingDetails {
                 }
                 return [...new Array(r.reserved)].map((_, index) => {
                   if (this.isLoading === r.ratePlan.id) {
-                    return <div class="h-16 animate-pulse rounded-md bg-gray-200"></div>;
+                    return <div class="ir-booking-details__room-loading"></div>;
                   }
                   const { amount, gross } = this.variationService.calculateVariationAmount({
                     baseVariation: r.checkoutVariations[index],
@@ -299,92 +299,121 @@ export class IrBookingDetails {
                   const isInFreeCancellationZone = this.paymentService.checkFreeCancellationZone(r.checkoutVariations[index]?.applicable_policies);
 
                   return (
-                    <div class="flex items-center justify-between">
-                      <div class="flex-1 ">
-                        <div>
-                          <div class="flex items-start gap-3">
-                            <div class="flex flex-row items-center gap-3 ">
-                              <h3 class="font-semibold">{r.roomtype.name}</h3>
-                              {r.ratePlan.is_non_refundable ? (
-                                <p class="text-xs text-[var(--ir-green)]">{localizedWords.entries.Lcz_NonRefundable}</p>
-                              ) : (
-                                <div class={'inline-flex  h-6 items-center justify-center pt-0.5'}>
-                                  <ir-button
-                                    haveRightIcon
-                                    variants="link"
-                                    class="text-sm"
-                                    buttonClassName="pl-0"
-                                    buttonStyles={{ paddingLeft: '0', fontSize: '12px', paddingTop: '0', paddingBottom: '0', color: '#227950' }}
-                                    onButtonClick={async () => {
-                                      this.currentRatePlan = r.ratePlan;
-                                      await this.fetchCancellationMessage(r.checkoutVariations[index].applicable_policies);
-                                      this.dialogRef.openModal();
-                                    }}
-                                    label={isInFreeCancellationZone ? localizedWords.entries.Lcz_FreeCancellation : localizedWords.entries.Lcz_IfICancel}
-                                  >
-                                    <ir-icons svgClassName="size-4" slot="right-icon" name="circle_info" style={{ color: '#98a2b3' }} />
-                                  </ir-button>
-                                </div>
-                              )}
-                            </div>
-                            <div class="ml-1 flex-1 ">
-                              <p class="text-end text-base xl:text-lg" style={{ fontWeight: gross > amount ? '400' : '700' }}>
+                    <div class="ir-booking-details__room-block">
+                      <div class="ir-booking-details__room">
+                        <div class="ir-booking-details__room-content">
+                          <div>
+                            <div class="ir-booking-details__room-header">
+                              <div class="ir-booking-details__room-title">
+                                <h3 class="ir-booking-details__room-name">{r.roomtype.name}</h3>
+                                {r.ratePlan.is_non_refundable ? (
+                                  <p class="ir-booking-details__badge">{localizedWords.entries.Lcz_NonRefundable}</p>
+                                ) : (
+                                  <div class="ir-booking-details__policy-container">
+                                    {/* <ir-button
+                                      haveRightIcon
+                                      variants="link"
+                                      class="ir-booking-details__policy-button"
+                                      buttonClassName="ir-booking-details__policy-button-inner"
+                                      buttonStyles={{ paddingLeft: '0', fontSize: '12px', paddingTop: '0', paddingBottom: '0', color: '#227950' }}
+                                      onButtonClick={async () => {
+                                        this.currentRatePlan = r.ratePlan;
+                                        await this.fetchCancellationMessage(r.checkoutVariations[index].applicable_policies);
+                                        this.dialogRef.openModal();
+                                      }}
+                                      label={isInFreeCancellationZone ? localizedWords.entries.Lcz_FreeCancellation : localizedWords.entries.Lcz_IfICancel}
+                                    >
+                                      <ir-icons slot="right-icon" name="circle_info" removeClassName height={16} width={16} style={{ color: '#98a2b3' }} />
+                                    </ir-button> */}
+                                    <ir-tooltip
+                                      labelColors={isInFreeCancellationZone ? 'green' : 'default'}
+                                      class={`rateplan-tooltip`}
+                                      style={{ color: '#98a2b3' }}
+                                      open_behavior="hover"
+                                      label={isInFreeCancellationZone ? localizedWords.entries.Lcz_FreeCancellation : localizedWords.entries.Lcz_IfICancel}
+                                      message={this.cancellationMessage}
+                                      onTooltipOpenChange={async e => {
+                                        if (e.detail) {
+                                          this.currentRatePlan = r.ratePlan;
+                                          await this.fetchCancellationMessage(r.checkoutVariations[index].applicable_policies);
+                                        }
+                                      }}
+                                    ></ir-tooltip>
+                                  </div>
+                                )}
+                              </div>
+                              {/* <div class="ir-booking-details__price-wrapper">
+                              <p class="ir-booking-details__price" style={{ fontWeight: gross > amount ? '400' : '700' }}>
                                 {formatAmount(amount, app_store.userPreferences.currency_id)}
-                                {/* {formatAmount(r.checkoutVariations[index].discounted_amount, app_store.userPreferences.currency_id)} */}
                               </p>
-                              {gross > amount && <p class="text-end text-base font-bold xl:text-lg">{formatAmount(gross, app_store.userPreferences.currency_id)}</p>}
+                              {gross > amount && (
+                                <p class="ir-booking-details__price ir-booking-details__price--gross">{formatAmount(gross, app_store.userPreferences.currency_id)}</p>
+                              )}
+                            </div> */}
                             </div>
                           </div>
-                        </div>
-                        <div class={'mb-2 flex items-center  gap-3 pb-2'} style={{ marginTop: '-5px' }}>
-                          <div class="flex flex-1 items-center gap-1 text-xs">
-                            <ir-icons name="utencils" svgClassName="size-4"></ir-icons>
-                            <p class="line-clamp-3">
-                              <span>{r.ratePlan.short_name}</span>
-                              {r.ratePlan.custom_text && <span class="mx-1 max-w-[70%] text-right text-xs  text-gray-500 md:w-full md:max-w-full">{r.ratePlan.custom_text}</span>}
-                            </p>
+                          <div class="ir-booking-details__rate-info">
+                            <div class="ir-booking-details__rate-description">
+                              <ir-icons name="utencils" removeClassName height={16} width={16}></ir-icons>
+                              <p class="ir-booking-details__rate-text">
+                                <span>{r.ratePlan.short_name}</span>
+                              </p>
+                            </div>
+                            {r.ratePlan.custom_text && (
+                              <span class="ir-booking-details__rate-custom-text" title={r.ratePlan.custom_text}>
+                                {r.ratePlan.custom_text}
+                              </span>
+                            )}
+                            {/* {gross > amount && <p class="ir-booking-details__tax-note">{localizedWords.entries.Lcz_IncludingTaxesAndFees}</p>} */}
                           </div>
-                          {gross > amount && <p class="m-0 p-0 text-end text-xs font-light ">{localizedWords.entries.Lcz_IncludingTaxesAndFees}</p>}
                         </div>
-                        <div class="mb-2 flex flex-1 items-center gap-2.5 pb-1.5 lg:max-w-[60%]">
-                          <ir-input
-                            onInput={e => {
-                              if (index === 0 && !checkout_store.modifiedGuestName && this.firstRoom.ratePlanId === ratePlanId && this.firstRoom.roomtypeId === roomTypeId) {
-                                checkout_store.modifiedGuestName = true;
+                        <div class="ir-booking-details__price-wrapper">
+                          <p class="ir-booking-details__price" style={{ fontWeight: gross > amount ? '400' : '700' }}>
+                            {formatAmount(amount, app_store.userPreferences.currency_id)}
+                          </p>
+                          {gross > amount && <p class="ir-booking-details__price ir-booking-details__price--gross">{formatAmount(gross, app_store.userPreferences.currency_id)}</p>}
+                          {gross > amount && <p class="ir-booking-details__tax-note">{localizedWords.entries.Lcz_IncludingTaxesAndFees}</p>}
+                        </div>
+                      </div>
+                      <div class="ir-booking-details__guest-row">
+                        <ir-input
+                          onInput={e => {
+                            if (index === 0 && !checkout_store.modifiedGuestName && this.firstRoom.ratePlanId === ratePlanId && this.firstRoom.roomtypeId === roomTypeId) {
+                              checkout_store.modifiedGuestName = true;
+                            }
+                            this.handleGuestNameChange(index, e, Number(ratePlanId), Number(roomTypeId));
+                          }}
+                          value={r.guestName[index]}
+                          label={localizedWords.entries.Lcz_GuestFullName}
+                          leftIcon
+                          class="ir-booking-details__guest-input"
+                          placeholder=""
+                          maxlength={50}
+                          error={this.errors && r.guestName[index] === ''}
+                          onInputBlur={e => {
+                            if (!checkout_store.modifiedGuestName) {
+                              return;
+                            }
+                            const target = e.target as HTMLIrInputElement;
+                            if (r.guestName[index].length < 2) {
+                              target.setAttribute('data-state', 'error');
+                              target.setAttribute('aria-invalid', 'true');
+                            } else {
+                              if (target.hasAttribute('aria-invalid')) {
+                                target.setAttribute('aria-invalid', 'false');
                               }
-                              this.handleGuestNameChange(index, e, Number(ratePlanId), Number(roomTypeId));
-                            }}
-                            value={r.guestName[index]}
-                            label={localizedWords.entries.Lcz_GuestFullName}
-                            leftIcon
-                            class="w-full"
-                            placeholder=""
-                            maxlength={50}
-                            error={this.errors && r.guestName[index] === ''}
-                            onInputBlur={e => {
-                              if (!checkout_store.modifiedGuestName) {
-                                return;
-                              }
-                              const target = e.target as HTMLIrInputElement;
-                              if (r.guestName[index].length < 2) {
-                                target.setAttribute('data-state', 'error');
-                                target.setAttribute('aria-invalid', 'true');
-                              } else {
-                                if (target.hasAttribute('aria-invalid')) {
-                                  target.setAttribute('aria-invalid', 'false');
-                                }
-                              }
-                            }}
-                            onInputFocus={e => {
-                              const target = e.target as HTMLIrInputElement;
-                              if (target.hasAttribute('data-state')) {
-                                target.removeAttribute('data-state');
-                              }
-                            }}
-                          >
-                            <ir-icons name="user" slot="left-icon" svgClassName="size-4"></ir-icons>
-                          </ir-input>
-                          {/* <ir-select
+                            }
+                          }}
+                          onInputFocus={e => {
+                            const target = e.target as HTMLIrInputElement;
+                            if (target.hasAttribute('data-state')) {
+                              target.removeAttribute('data-state');
+                            }
+                          }}
+                        >
+                          <ir-icons name="user" slot="left-icon" removeClassName height={16} width={16}></ir-icons>
+                        </ir-input>
+                        {/* <ir-select
                             variant="double-line"
                             value={r.ratePlan.variations
                               .findIndex(v => `${v.adult_nbr}_a_${v.child_nbr}_c` === `${r.checkoutVariations[index].adult_nbr}_a_${r.checkoutVariations[index].child_nbr}_c`)
@@ -394,65 +423,67 @@ export class IrBookingDetails {
                               id: i.toString(),
                               value: this.formatVariation(v),
                             }))}
-                            class="w-full"
+                            class="ir-booking-details__guest-input"
                             onValueChange={e => {
                               this.handleVariationChange(index, e, r.ratePlan.variations, Number(ratePlanId), Number(roomTypeId));
                             }}
                           ></ir-select> */}
-                          <p
-                            class={'w-max whitespace-nowrap'}
-                            innerHTML={this.variationService.formatVariationBasedOnInfants({
-                              baseVariation: r.checkoutVariations[index],
-                              variations: r.ratePlan.variations,
-                              infants: r.infant_nbr[index],
-                            })}
-                          ></p>
-                        </div>
+                        <p
+                          class="ir-booking-details__capacity"
+                          innerHTML={this.variationService.formatVariationBasedOnInfants({
+                            baseVariation: r.checkoutVariations[index],
+                            variations: r.ratePlan.variations,
+                            infants: r.infant_nbr[index],
+                          })}
+                        ></p>
+                      </div>
 
-                        {/* Infants row */}
-                        {r.selected_variation.child_nbr > 0 &&
-                          booking_store.childrenAges.some(age => Number(age) < app_store.childrenStartAge) &&
-                          (this.totalPersons > r.checkoutVariations[index].adult_nbr + r.checkoutVariations[index].child_nbr || this.total_rooms > 1) && (
-                            <div class="flex items-center gap-4">
-                              <div class="flex items-center gap-1 text-sm">
-                                <ir-icons name="baby" svgClassName="size-4"></ir-icons>
-                                <p class="line-clamp-3">{localizedWords.entries?.Lcz_AnyInfant}</p>
-                              </div>
-
-                              <ir-select
-                                data-state={this.errors && Number(r.infant_nbr) === -1 ? 'error' : ''}
-                                class={'w-16'}
-                                value={r.infant_nbr[index]}
-                                onValueChange={e => this.handleInfantNumberChange(roomTypeId, ratePlanId, e.detail, index)}
-                                data={[
-                                  { id: -1, value: '...' },
-                                  { id: 0, value: localizedWords.entries?.Lcz_No },
-                                  ...[...Array(Math.min(r.selected_variation.child_nbr, 3))].map((_, i) => ({ id: i + 1, value: (i + 1).toString() })),
-                                ]}
-                              ></ir-select>
+                      {/* Infants row */}
+                      {r.selected_variation.child_nbr > 0 &&
+                        booking_store.childrenAges.some(age => Number(age) < app_store.childrenStartAge) &&
+                        (this.totalPersons > r.checkoutVariations[index].adult_nbr + r.checkoutVariations[index].child_nbr || this.total_rooms > 1) && (
+                          <div class="ir-booking-details__infant-row">
+                            <div class="ir-booking-details__infant-label">
+                              <ir-icons name="baby" removeClassName height={16} width={16}></ir-icons>
+                              <p class="ir-booking-details__infant-text">{localizedWords.entries?.Lcz_AnyInfant}</p>
                             </div>
-                          )}
 
-                        <div class="flex items-center gap-4">
-                          {this.renderSmokingView(r.roomtype.smoking_option, index, ratePlanId, roomTypeId, r.checkoutSmokingSelection)}
-                          {r.is_bed_configuration_enabled && app_store.setup_entries?.bedPreferenceType.length > 0 && (
                             <ir-select
-                              data-state={this.errors && r.checkoutBedSelection[index] === '-1' ? 'error' : ''}
-                              value={r.checkoutBedSelection[index]}
-                              onValueChange={e => this.handleBedConfiguration(roomTypeId, ratePlanId, e.detail, index)}
+                              style={{ '--radius': '1rem' }}
+                              data-state={this.errors && Number(r.infant_nbr) === -1 ? 'error' : ''}
+                              class="ir-booking-details__infant-select"
+                              value={r.infant_nbr[index]}
+                              onValueChange={e => this.handleInfantNumberChange(roomTypeId, ratePlanId, e.detail, index)}
                               data={[
-                                { id: '-1', value: `${localizedWords.entries.Lcz_Bedconfiguration}...` },
-                                ...app_store.setup_entries?.bedPreferenceType?.map(b => ({
-                                  id: b.CODE_NAME,
-                                  value: b[`CODE_VALUE_${(app_store.userPreferences.language_id ?? 'en').toUpperCase()}`],
-                                })),
+                                { id: -1, value: '...' },
+                                { id: 0, value: localizedWords.entries?.Lcz_No },
+                                ...[...Array(Math.min(r.selected_variation.child_nbr, 3))].map((_, i) => ({ id: i + 1, value: (i + 1).toString() })),
                               ]}
-                              icon
-                            >
-                              <ir-icons name={r.checkoutBedSelection[index] === 'kingsizebed' ? 'double_bed' : 'bed'} slot="icon"></ir-icons>
-                            </ir-select>
-                          )}
-                        </div>
+                            ></ir-select>
+                          </div>
+                        )}
+
+                      <div class="ir-booking-details__options-row">
+                        {this.renderSmokingView(r.roomtype.smoking_option, index, ratePlanId, roomTypeId, r.checkoutSmokingSelection)}
+                        {r.is_bed_configuration_enabled && app_store.setup_entries?.bedPreferenceType.length > 0 && (
+                          <ir-select
+                            style={{ '--radius': '1rem' }}
+                            data-state={this.errors && r.checkoutBedSelection[index] === '-1' ? 'error' : ''}
+                            value={r.checkoutBedSelection[index]}
+                            onValueChange={e => this.handleBedConfiguration(roomTypeId, ratePlanId, e.detail, index)}
+                            data={[
+                              { id: '-1', value: `${localizedWords.entries.Lcz_Bedconfiguration}...` },
+                              ...app_store.setup_entries?.bedPreferenceType?.map(b => ({
+                                id: b.CODE_NAME,
+                                value: b[`CODE_VALUE_${(app_store.userPreferences.language_id ?? 'en').toUpperCase()}`],
+                              })),
+                            ]}
+                            class="ir-booking-details__bed-select"
+                            icon
+                          >
+                            <ir-icons name={r.checkoutBedSelection[index] === 'kingsizebed' ? 'double_bed' : 'bed'} slot="icon" removeClassName height={16} width={16}></ir-icons>
+                          </ir-select>
+                        )}
                       </div>
                     </div>
                   );
@@ -461,19 +492,19 @@ export class IrBookingDetails {
             })}
           </section>
         </div>
-        <ir-dialog
-          ref={el => (this.dialogRef = el)}
+        {/* <ir-dialog
+          // ref={el => (this.dialogRef = el)}
           onOpenChange={e => {
             if (!e.detail) {
               this.currentRatePlan = null;
             }
           }}
         >
-          <div slot="modal-body" class="p-6 ">
-            <p class={'px-6'} innerHTML={this.cancellationMessage || this.currentRatePlan?.cancelation}></p>
-            <p class={'px-6'} innerHTML={this.currentRatePlan?.guarantee}></p>
+          <div slot="modal-body" class="ir-booking-details__dialog-body">
+            <p class="ir-booking-details__dialog-text" innerHTML={this.cancellationMessage || this.currentRatePlan?.cancelation}></p>
+            <p class="ir-booking-details__dialog-text" innerHTML={this.currentRatePlan?.guarantee}></p>
           </div>
-        </ir-dialog>
+        </ir-dialog> */}
       </Host>
     );
   }

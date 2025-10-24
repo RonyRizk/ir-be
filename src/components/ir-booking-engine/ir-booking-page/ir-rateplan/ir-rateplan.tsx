@@ -67,7 +67,7 @@ export class IrRateplan {
     if (this.ratePlan.is_targeting_travel_agency && !app_store.app_data.isAgentMode) {
       return null;
     }
-    console.log(this.visibleInventory.selected_variation);
+
     const isInFreeCancellationZone = this.paymentService.checkFreeCancellationZone(this.visibleInventory?.selected_variation?.applicable_policies);
     const isInventoryFull =
       this.visibleInventory?.visibleInventory === 0 ||
@@ -125,7 +125,7 @@ export class IrRateplan {
           <div class={'flex items-center'} style={{ alignItems: 'center' }}>
             <div class="rateplan-description flex-1">
               <div class="flex justify-between gap-4">
-                <p class="rateplan-custom-text grid-view" innerHTML={this.ratePlan.custom_text}></p>
+                {this.ratePlan.custom_text && <p class="rateplan-custom-text grid-view" innerHTML={this.ratePlan.custom_text}></p>}
                 {this.visibleInventory?.selected_variation?.discount_pct > 0 && this.ratePlan.custom_text && (
                   <p
                     class={`rateplan-discount ${app_store.app_data.displayMode === 'default' ? 'ir-default' : ''}`}
@@ -165,7 +165,7 @@ export class IrRateplan {
                   )}
                 </div>
               </div>
-              {this.display === 'default' && <p class="rateplan-custom-text" innerHTML={this.ratePlan.custom_text}></p>}
+              {this.display === 'default' && this.ratePlan.custom_text && <p class="rateplan-custom-text" innerHTML={this.ratePlan.custom_text}></p>}
             </div>
           </div>
           {!this.ratePlan.is_available_to_book && this.ratePlan.not_available_reason.includes('MLS') && (

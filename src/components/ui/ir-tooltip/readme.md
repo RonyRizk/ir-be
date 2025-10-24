@@ -27,12 +27,14 @@
 
 ### Used by
 
+ - [ir-booking-details](../../ir-booking-engine/ir-checkout-page/ir-booking-details)
  - [ir-booking-page](../../ir-booking-engine/ir-booking-page)
  - [ir-rateplan](../../ir-booking-engine/ir-booking-page/ir-rateplan)
 
 ### Graph
 ```mermaid
 graph TD;
+  ir-booking-details --> ir-tooltip
   ir-booking-page --> ir-tooltip
   ir-rateplan --> ir-tooltip
   style ir-tooltip fill:#f9f,stroke:#333,stroke-width:4px

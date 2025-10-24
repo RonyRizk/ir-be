@@ -45,7 +45,6 @@
  - [ir-booking-cancellation](../../ir-booking-cancellation)
  - [ir-booking-card](../../ir-booking-engine/ir-booking-listing/ir-booking-card)
  - [ir-booking-code](../../ir-booking-engine/ir-booking-page/ir-booking-code)
- - [ir-booking-details](../../ir-booking-engine/ir-checkout-page/ir-booking-details)
  - [ir-booking-details-view](../../ir-booking-engine/ir-booking-listing/ir-booking-details-view)
  - [ir-booking-listing](../../ir-booking-engine/ir-booking-listing)
  - [ir-booking-page](../../ir-booking-engine/ir-booking-page)
@@ -83,7 +82,6 @@ graph TD;
   ir-booking-cancellation --> ir-button
   ir-booking-card --> ir-button
   ir-booking-code --> ir-button
-  ir-booking-details --> ir-button
   ir-booking-details-view --> ir-button
   ir-booking-listing --> ir-button
   ir-booking-page --> ir-button
