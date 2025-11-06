@@ -87,7 +87,7 @@
   object-fit: contain;
 }
 
-.ir-nav-property-details {
+.ir-nav-property-details[data-show-mobile='false'] {
   display: none;
 }
 
@@ -97,7 +97,7 @@
 }
 
 .ir-property-location {
-  display: flex;
+  display: none;
   align-items: center;
   font-size: 0.875rem;
   color: #475467;
@@ -172,8 +172,11 @@
   .ir-burger-menu {
     display: none;
   }
-  .ir-nav-property-details {
+  .ir-nav-property-details[data-show-mobile='false'] {
     display: block;
+  }
+  .ir-property-location {
+    display: flex;
   }
 }
 @media (min-width: 1190px) {

@@ -171,7 +171,7 @@ export class IrNav {
                   </a>
                 )}
                 {!this.logoOnly && (
-                  <div class="ir-nav-property-details">
+                  <div class="ir-nav-property-details" data-show-mobile={String(_logo ? false : true)}>
                     <h3 class="ir-property-name">{app_store.property?.name}</h3>
                     <button onClick={() => this.handleButtonClick(undefined, 'map')} class="ir-property-location">
                       {renderPropertyLocation()}
