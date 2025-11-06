@@ -79,8 +79,6 @@
 </head>
 
 <body>
-
-
   <!-- not injected mode -->
   <!-- <ir-be cur="eur" checkin="2025-06-01" checkout="2025-06-06"></ir-be> -->
   <ir-be origin="be" adults="2" child="0" ages="01_12"></ir-be>
@@ -94,6 +92,7 @@
     async function init() {
       testCmp.propertyId = getId()
       // testCmp.p = "A211"
+      //testCmp.p = "A662"
       const today = new Date();
       const tomorrow = new Date(today);
       tomorrow.setDate(today.getDate() + 1);

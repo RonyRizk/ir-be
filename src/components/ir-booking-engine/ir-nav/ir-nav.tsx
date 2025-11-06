@@ -157,6 +157,7 @@ export class IrNav {
   }
   render() {
     const currentPage = app_store.currentPage;
+    const _logo = app_store.app_data?.affiliate ? app_store.app_data?.affiliate.sites[0]?.logo : this.logo;
     const isInjected = app_store.app_data.injected && currentPage === 'booking';
     return (
       <Fragment>
@@ -164,14 +165,11 @@ export class IrNav {
           <div class="ir-nav-container" data-state={isInjected ? 'injected' : 'default'}>
             {!isInjected && (
               <div class="ir-nav-left">
-                <a aria-label="home" target="_blank" href={`https://${this.website}`}>
-                  <img
-                    loading="lazy"
-                    src={app_store.app_data?.affiliate ? app_store.app_data?.affiliate.sites[0]?.logo : this.logo}
-                    alt={`${app_store.property?.name}, ${app_store.property?.country.name}`}
-                    class="ir-nav-logo"
-                  ></img>
-                </a>
+                {_logo && (
+                  <a aria-label="home" target="_blank" href={`https://${this.website}`}>
+                    <img loading="lazy" src={_logo} alt={`${app_store.property?.name}, ${app_store.property?.country.name}`} class="ir-nav-logo"></img>
+                  </a>
+                )}
                 {!this.logoOnly && (
                   <div class="ir-nav-property-details">
                     <h3 class="ir-property-name">{app_store.property?.name}</h3>
