@@ -81,6 +81,9 @@ export class IrGallery {
     this.openGallery.emit(index);
   }
   render() {
+    if (this.totalImages === 0) {
+      return;
+    }
     return (
       <div class="gallery-container">
         {this.totalImages > 1 && (
