@@ -256,7 +256,7 @@ export class IrBookingWidget {
       <Host data-multi={isMultiProperties ? 'true' : 'false'}>
         <div class="booking-widget-container" data-multi={isMultiProperties ? 'true' : 'false'} ref={el => (this.containerRef = el)} style={this.contentContainerStyle}>
           <div class={'hovered-container'}></div>
-          {isMultiProperties ? (
+          {isMultiProperties && (
             <select
               class="booking-widget__linked-properties"
               onChange={e => {
@@ -270,80 +270,79 @@ export class IrBookingWidget {
                 </option>
               ))}
             </select>
-          ) : (
-            <Fragment>
-              <ir-popover
-                autoAdjust={false}
-                allowFlip={false}
-                class={'ir-popover'}
-                showCloseButton={false}
-                placement={this.position === 'fixed' ? 'top-start' : 'auto'}
-                ref={el => (this.popover = el)}
-                onOpenChange={e => {
-                  this.isPopoverOpen = e.detail;
-                  if (!this.isPopoverOpen) {
-                    if (this.dates.from_date && !this.dates.to_date) {
-                      this.dates = {
-                        ...this.dates,
-                        to_date: moment(this.dates.from_date).add(1, 'days').toDate(),
-                      };
-                    }
-                  }
-                }}
-              >
-                {this.renderDateTrigger()}
-                <div slot="popover-content" class="popup-container w-full border-0 bg-white p-4  shadow-none sm:w-auto sm:border  ">
-                  <ir-date-range
-                    dateModifiers={this.dateModifiers}
-                    minDate={moment().add(-1, 'days')}
-                    style={{ '--radius': 'var(--ir-widget-radius)' }}
-                    fromDate={this.dates?.from_date ? moment(this.dates.from_date) : null}
-                    toDate={this.dates?.to_date ? moment(this.dates.to_date) : null}
-                    locale={localization_store.selectedLocale}
-                    maxSpanDays={this.property.max_nights}
-                    onDateChange={e => {
-                      e.stopImmediatePropagation();
-                      e.stopPropagation();
-                      const { end, start } = e.detail;
-                      if (end && this.isPopoverOpen) {
-                        this.popover.toggleVisibility();
-                      }
-                      this.dates = {
-                        from_date: start,
-                        to_date: end,
-                      };
-                    }}
-                  ></ir-date-range>
-                </div>
-              </ir-popover>
-              <ir-popover
-                outsideEvents="none"
-                autoAdjust={false}
-                allowFlip={false}
-                ref={el => (this.guestPopover = el)}
-                class={'ir-popover'}
-                showCloseButton={false}
-                placement={this.position === 'fixed' ? 'top-start' : 'auto'}
-                onOpenChange={this.handlePopoverToggle.bind(this)}
-              >
-                {this.renderAdultChildTrigger()}
-
-                <ir-guest-counter
-                  slot="popover-content"
-                  error={this.error}
-                  adults={this.guests?.adultCount}
-                  child={this.guests?.childrenCount}
-                  minAdultCount={0}
-                  maxAdultCount={this.property?.adult_child_constraints.adult_max_nbr}
-                  maxChildrenCount={this.property?.adult_child_constraints.child_max_nbr}
-                  childMaxAge={this.property?.adult_child_constraints.child_max_age}
-                  onUpdateCounts={e => (this.guests = { ...e.detail })}
-                  class={'h-full'}
-                  onCloseGuestCounter={() => this.guestPopover.forceClose()}
-                ></ir-guest-counter>
-              </ir-popover>
-            </Fragment>
           )}
+          <Fragment>
+            <ir-popover
+              autoAdjust={false}
+              allowFlip={false}
+              class={'ir-popover'}
+              showCloseButton={false}
+              placement={this.position === 'fixed' ? 'top-start' : 'auto'}
+              ref={el => (this.popover = el)}
+              onOpenChange={e => {
+                this.isPopoverOpen = e.detail;
+                if (!this.isPopoverOpen) {
+                  if (this.dates.from_date && !this.dates.to_date) {
+                    this.dates = {
+                      ...this.dates,
+                      to_date: moment(this.dates.from_date).add(1, 'days').toDate(),
+                    };
+                  }
+                }
+              }}
+            >
+              {this.renderDateTrigger()}
+              <div slot="popover-content" class="popup-container w-full border-0 bg-white p-4  shadow-none sm:w-auto sm:border  ">
+                <ir-date-range
+                  dateModifiers={this.dateModifiers}
+                  minDate={moment().add(-1, 'days')}
+                  style={{ '--radius': 'var(--ir-widget-radius)' }}
+                  fromDate={this.dates?.from_date ? moment(this.dates.from_date) : null}
+                  toDate={this.dates?.to_date ? moment(this.dates.to_date) : null}
+                  locale={localization_store.selectedLocale}
+                  maxSpanDays={this.property.max_nights}
+                  onDateChange={e => {
+                    e.stopImmediatePropagation();
+                    e.stopPropagation();
+                    const { end, start } = e.detail;
+                    if (end && this.isPopoverOpen) {
+                      this.popover.toggleVisibility();
+                    }
+                    this.dates = {
+                      from_date: start,
+                      to_date: end,
+                    };
+                  }}
+                ></ir-date-range>
+              </div>
+            </ir-popover>
+            <ir-popover
+              outsideEvents="none"
+              autoAdjust={false}
+              allowFlip={false}
+              ref={el => (this.guestPopover = el)}
+              class={'ir-popover'}
+              showCloseButton={false}
+              placement={this.position === 'fixed' ? 'top-start' : 'auto'}
+              onOpenChange={this.handlePopoverToggle.bind(this)}
+            >
+              {this.renderAdultChildTrigger()}
+
+              <ir-guest-counter
+                slot="popover-content"
+                error={this.error}
+                adults={this.guests?.adultCount}
+                child={this.guests?.childrenCount}
+                minAdultCount={0}
+                maxAdultCount={this.property?.adult_child_constraints.adult_max_nbr}
+                maxChildrenCount={this.property?.adult_child_constraints.child_max_nbr}
+                childMaxAge={this.property?.adult_child_constraints.child_max_age}
+                onUpdateCounts={e => (this.guests = { ...e.detail })}
+                class={'h-full'}
+                onCloseGuestCounter={() => this.guestPopover.forceClose()}
+              ></ir-guest-counter>
+            </ir-popover>
+          </Fragment>
           <button class="btn-flip" onClick={this.handleBooknow.bind(this)}>
             {isMultiProperties ? (
               <svg xmlns="http://www.w3.org/2000/svg" height={24} width={24} viewBox="0 0 640 640">
