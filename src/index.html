@@ -81,13 +81,13 @@
 <body>
   <!-- not injected mode -->
   <!-- <ir-be cur="eur" checkin="2025-06-01" checkout="2025-06-06"></ir-be> -->
-  <ir-be origin="be" adults="2" child="0" ages="01_12"></ir-be>
+  <!-- <ir-be origin="be" adults="2" child="0" ages="01_12"></ir-be> -->
   <!-- aff="AF6" a-name='A286' -->
   <!-- Injected mode -->
   <!-- <ir-be injected></ir-be> -->
-  <!-- <ir-widget></ir-widget> -->
+  <ir-widget p="A35"></ir-widget>
 
-  <script>
+  <!-- <script>
     const testCmp = document.querySelector('ir-be');
     async function init() {
       testCmp.propertyId = getId()
@@ -106,6 +106,7 @@
 
       testCmp.checkin = formatDate(today);
       testCmp.checkout = formatDate(tomorrow);
+      testCmp.p = 'A455'
       //testCmp.p = "A276"
       // testCmp.p = "A560"
       // testCmp.p = "A322"
@@ -125,7 +126,7 @@
 
     }
     init()
-  </script>
+  </script> -->
 </body>
 
 </html>

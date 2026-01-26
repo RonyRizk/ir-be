@@ -18,7 +18,14 @@ export class PropertyService {
   private propertyHelpers = new PropertyHelpers();
   private static initialized = false;
   colors: Colors = new Colors();
-
+  public async getExposedProperties(props: { anames: string[],language:string}) {
+    const { data } = await axios.post('/Get_Exposed_Properties', props);
+    const result = data as DataStructure;
+    if (result.ExceptionMsg !== '') {
+      throw new Error(result.ExceptionMsg);
+    }
+    return result.My_Result
+}
   public async getExposedProperty(
     {
       sync = true,
