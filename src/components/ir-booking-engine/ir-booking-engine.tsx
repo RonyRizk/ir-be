@@ -44,7 +44,7 @@ export class IrBookingEngine {
   @State() selectedLocale: Locale;
   @State() currencies: ICurrency[];
   @State() languages: IExposedLanguages[];
-  @State() isLoading: boolean = false;
+  @State() isLoading: boolean = true;
   @State() router = new Stack<HTMLElement>();
   @State() bookingListingScreenOptions: { screen: 'bookings' | 'booking-details'; params: unknown } = { params: null, screen: 'bookings' };
 
@@ -56,7 +56,7 @@ export class IrBookingEngine {
   private token = new Token();
   privacyPolicyRef: any;
 
-  async componentWillLoad() {
+  componentWillLoad() {
     console.log(`version:${this.version}`);
     getUserPreference(this.language);
     if (this.property) {
@@ -67,9 +67,6 @@ export class IrBookingEngine {
     if (isAuthenticated) {
       app_store.is_signed_in = true;
       this.token.setToken(isAuthenticated.token);
-    } else {
-      const token = await this.commonService.getBEToken();
-      this.token.setToken(token);
     }
     this.initializeApp();
   }
@@ -125,7 +122,7 @@ export class IrBookingEngine {
     updateUserPreference({ language_id: code });
   }
 
-  private initializeApp() {
+  private async initializeApp() {
     app_store.app_data = {
       view: this.view,
       aName: this.p,
@@ -143,6 +140,10 @@ export class IrBookingEngine {
       hideGoogleSignIn: this.hideGoogleSignIn,
       stag: this.stag,
     };
+    if (!this.token.getToken()) {
+      const token = await this.commonService.getBEToken();
+      this.token.setToken(token);
+    }
     this.initRequest();
   }
 

@@ -56,7 +56,6 @@ Type: `Promise<CustomEvent<boolean>>`
  - [ir-adult-child-counter](../../ir-booking-engine/ir-booking-page/ir-adult-child-counter)
  - [ir-date-popup](../../ir-booking-engine/ir-booking-page/ir-availability-header/ir-date-popup)
  - [ir-pickup](../../ir-booking-engine/ir-checkout-page/ir-pickup)
- - [ir-widget](../../ir-booking-widget)
 
 ### Depends on
 
@@ -71,7 +70,6 @@ graph TD;
   ir-adult-child-counter --> ir-popover
   ir-date-popup --> ir-popover
   ir-pickup --> ir-popover
-  ir-widget --> ir-popover
   style ir-popover fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

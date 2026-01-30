@@ -13,19 +13,36 @@ import { DataStructure } from '@/models/common';
 import VariationService from '../app/variation.service';
 
 type AvailabilityResponse = Awaited<ReturnType<PropertyService['getExposedBookingAvailability']>>;
-
+export type PropertiesByLevel2Response = {
+  city_id: number;
+  city_perma_link: string;
+  country_code: string;
+  country_id: number;
+  country_nane: string;
+  property_id: number;
+  property_name: string;
+};
 export class PropertyService {
   private propertyHelpers = new PropertyHelpers();
   private static initialized = false;
   colors: Colors = new Colors();
-  public async getExposedProperties(props: { anames: string[],language:string}) {
+  public async getExposedProperties(props: { anames: string[]; language: string }) {
     const { data } = await axios.post('/Get_Exposed_Properties', props);
     const result = data as DataStructure;
     if (result.ExceptionMsg !== '') {
       throw new Error(result.ExceptionMsg);
     }
-    return result.My_Result
-}
+    return result.My_Result;
+  }
+
+  public async fetchPropertiesByLevel2(props: { pool: string; city_perma_links: string[] }): Promise<PropertiesByLevel2Response[] | null> {
+    const { data } = await axios.post('/Fetch_Properties_By_Level2', props);
+    const result = data as DataStructure;
+    if (result.ExceptionMsg !== '') {
+      throw new Error(result.ExceptionMsg);
+    }
+    return result.My_Result;
+  }
   public async getExposedProperty(
     {
       sync = true,
@@ -112,7 +129,7 @@ export class PropertyService {
     data.My_Result?.forEach(nbn => {
       nights[nbn.night] = true;
     });
-    app_store.nonBookableNights = nights;
+    app_store.nonBookableNights = { ...nights };
     return data.My_Result;
   }
   public async getExposedBookingAvailability(props: TExposedBookingAvailability): Promise<DataStructure> {

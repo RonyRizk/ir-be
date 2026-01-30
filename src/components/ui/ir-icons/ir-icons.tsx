@@ -5,7 +5,7 @@ import { cn } from '@/utils/utils';
 @Component({
   tag: 'ir-icons',
   styleUrl: 'ir-icons.css',
-  scoped: true,
+  shadow: false,
 })
 export class IrIcons {
   @Prop() name: TIcons;
@@ -20,6 +20,7 @@ export class IrIcons {
     }
     return (
       <svg
+        part="icon"
         height={this.height}
         width={this.width}
         xmlns="http://www.w3.org/2000/svg"

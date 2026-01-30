@@ -35,6 +35,7 @@
  - [ir-booking-details](../../ir-booking-engine/ir-checkout-page/ir-booking-details)
  - [ir-guest-counter](../../ir-guest-counter)
  - [ir-language-picker](../../ir-booking-engine/ir-nav/ir-language-picker)
+ - [ir-multi-property-widget](../../ir-booking-widget/ir-multi-property-widget)
  - [ir-payment-view](../../ir-booking-engine/ir-checkout-page/ir-booking-summary/ir-payment-view)
  - [ir-pickup](../../ir-booking-engine/ir-checkout-page/ir-pickup)
  - [ir-rateplan](../../ir-booking-engine/ir-booking-page/ir-rateplan)
@@ -48,6 +49,7 @@ graph TD;
   ir-booking-details --> ir-select
   ir-guest-counter --> ir-select
   ir-language-picker --> ir-select
+  ir-multi-property-widget --> ir-select
   ir-payment-view --> ir-select
   ir-pickup --> ir-select
   ir-rateplan --> ir-select

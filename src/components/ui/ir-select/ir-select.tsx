@@ -44,7 +44,7 @@ export class IrSelect {
         <select
           onInput={e => this.valueChange.emit((e.target as HTMLSelectElement).value)}
           id={this.select_id}
-          data-stid={this.select_id}
+          data-testid={this.select_id}
           class={`select-el ${this.variant} ${this.customStyles} ${this.icon ? 'icon' : ''}`}
         >
           {this.addDummyOption && <option value="" class={'hidden'} aria-selected="false"></option>}

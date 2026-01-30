@@ -27,7 +27,9 @@ class Token {
 
     Token.isInterceptorAdded = true;
   }
-
+  public getToken(): string {
+    return Token.token;
+  }
   public setToken(token: string) {
     if (token === Token.token) {
       return;

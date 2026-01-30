@@ -14,13 +14,13 @@ import { TIcons } from "./components/ui/ir-icons/icons";
 import { Moment } from "moment/min/moment-with-locales";
 import { IDateModifiers } from "./components/ui/ir-date-range/ir-date-range.types";
 import { TCarouselSlides } from "./components/ui/ir-carousel/carousel";
+import { CombinedLevel2Properties } from "./components/ir-booking-widget/ir-booking-widget";
 import { ZodIssue } from "zod";
 import { Placement } from "@popperjs/core";
 import { IRatePlanSelection } from "./stores/booking";
 import { TAuthNavigation } from "./components/ir-booking-engine/ir-nav/ir-auth/auth.types";
 import { TSignInAuthTrigger, TSignUpAuthTrigger } from "./validators/auth.validator";
 import { TGuest } from "./models/user_form";
-import { TContainerStyle } from "./components/ir-booking-widget/types";
 export { Amenity, BeddingSetup, IExposedProperty, RatePlan, RoomType, Variation } from "./models/property";
 export { AddAdultsAndChildrenEvent } from "./components/ir-booking-engine/ir-booking-page/ir-adult-child-counter/ir-adult-child-counter";
 export { TSource } from "./stores/app.store";
@@ -30,13 +30,13 @@ export { TIcons } from "./components/ui/ir-icons/icons";
 export { Moment } from "moment/min/moment-with-locales";
 export { IDateModifiers } from "./components/ui/ir-date-range/ir-date-range.types";
 export { TCarouselSlides } from "./components/ui/ir-carousel/carousel";
+export { CombinedLevel2Properties } from "./components/ir-booking-widget/ir-booking-widget";
 export { ZodIssue } from "zod";
 export { Placement } from "@popperjs/core";
 export { IRatePlanSelection } from "./stores/booking";
 export { TAuthNavigation } from "./components/ir-booking-engine/ir-nav/ir-auth/auth.types";
 export { TSignInAuthTrigger, TSignUpAuthTrigger } from "./validators/auth.validator";
 export { TGuest } from "./models/user_form";
-export { TContainerStyle } from "./components/ir-booking-widget/types";
 export namespace Components {
     interface IrAccomodations {
         "amenities": Amenity[];
@@ -381,6 +381,21 @@ export namespace Components {
         "element": HTMLElement;
         "openModal": () => Promise<void>;
     }
+    interface IrMultiPropertyWidget {
+        "dateModifiers": any;
+        "dates": { from_date: Date | null; to_date: Date | null };
+        "error": boolean;
+        "guests": { adultCount: number; childrenCount: number; infants: number; childrenAges: string[] };
+        "isFetchingProperty": boolean;
+        "level2Properties": CombinedLevel2Properties;
+        "linkedProperties": IExposedProperty[];
+        "locale": string;
+        "locations": string[];
+        "position": string;
+        "property": IExposedProperty;
+        "selectedCity": string;
+        "selectedPropertyId": string | number;
+    }
     interface IrNav {
         "currencies": ICurrency[];
         "isBookingListing": boolean;
@@ -422,6 +437,54 @@ export namespace Components {
         "stopListeningForOutsideClicks": boolean;
         "toggleVisibility": () => Promise<CustomEvent<boolean>>;
         "trigger_label": string;
+    }
+    interface IrPopup {
+        /**
+          * Enable or disable flip behavior.
+         */
+        "allowFlip": boolean;
+        "close": () => Promise<void>;
+        /**
+          * Distance between the anchor and popup in pixels (used when offsetDistance is not provided).
+         */
+        "distance": number;
+        /**
+          * Comma-separated list of fallback placements used when flipping.
+         */
+        "fallbackPlacements": string;
+        /**
+          * Whether this dialog is modal.
+         */
+        "modal": boolean;
+        /**
+          * Offset distance in pixels away from the reference element.
+         */
+        "offsetDistance"?: number;
+        /**
+          * Offset skid in pixels along the reference element.
+         */
+        "offsetSkid": number;
+        "open": () => Promise<void>;
+        /**
+          * Padding for the preventOverflow modifier.
+         */
+        "overflowPadding": number;
+        /**
+          * Popper placement, e.g. "bottom-start".
+         */
+        "placement": Placement;
+        /**
+          * Positioning strategy ("absolute" or "fixed").
+         */
+        "strategy": Strategy;
+        /**
+          * Syncs the popup's width or height to that of the anchor element.
+         */
+        "sync": 'width' | 'height' | 'both';
+        /**
+          * Enable or disable the arrow element.
+         */
+        "withArrow": boolean;
     }
     interface IrPortal {
         "offset": number;
@@ -543,14 +606,32 @@ export namespace Components {
     }
     interface IrWidget {
         "aff": string;
-        "contentContainerStyle": TContainerStyle;
         "delay": number;
+        "l": string;
         "language": string;
         "p": string;
         "perma_link": string;
+        "pool": string;
         "position": 'fixed' | 'block';
         "propertyId": number;
         "roomTypeId": string | null;
+    }
+    interface IrWidgetDatePopup {
+        "absoluteIcon": boolean;
+        "dateModifiers": any;
+        "dates": { from_date: Date | null; to_date: Date | null };
+        "disabled": boolean;
+        "isLoading": boolean;
+        "locale": string;
+        "maxSpanDays": number;
+    }
+    interface IrWidgetOccupancyPopup {
+        "absoluteIcon": boolean;
+        "disabled": boolean;
+        "error": boolean;
+        "guests": { adultCount: number; childrenCount: number; infants: number; childrenAges: string[] };
+        "isLoading": boolean;
+        "property": IExposedProperty;
     }
 }
 export interface IrAdultChildCounterCustomEvent<T> extends CustomEvent<T> {
@@ -685,6 +766,10 @@ export interface IrModalCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLIrModalElement;
 }
+export interface IrMultiPropertyWidgetCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLIrMultiPropertyWidgetElement;
+}
 export interface IrNavCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLIrNavElement;
@@ -700,6 +785,10 @@ export interface IrPhoneInputCustomEvent<T> extends CustomEvent<T> {
 export interface IrPopoverCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLIrPopoverElement;
+}
+export interface IrPopupCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLIrPopupElement;
 }
 export interface IrRadioCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -744,6 +833,14 @@ export interface IrTooltipCustomEvent<T> extends CustomEvent<T> {
 export interface IrUserFormCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLIrUserFormElement;
+}
+export interface IrWidgetDatePopupCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLIrWidgetDatePopupElement;
+}
+export interface IrWidgetOccupancyPopupCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLIrWidgetOccupancyPopupElement;
 }
 declare global {
     interface HTMLIrAccomodationsElement extends Components.IrAccomodations, HTMLStencilElement {
@@ -1417,6 +1514,27 @@ declare global {
         prototype: HTMLIrModalElement;
         new (): HTMLIrModalElement;
     };
+    interface HTMLIrMultiPropertyWidgetElementEventMap {
+        "propertyChange": string | number;
+        "cityChange": string;
+        "dateChange": { from_date: Date | null; to_date: Date | null };
+        "guestsChange": { adultCount: number; childrenCount: number; infants: number; childrenAges: string[] };
+        "bookNow": void;
+    }
+    interface HTMLIrMultiPropertyWidgetElement extends Components.IrMultiPropertyWidget, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLIrMultiPropertyWidgetElementEventMap>(type: K, listener: (this: HTMLIrMultiPropertyWidgetElement, ev: IrMultiPropertyWidgetCustomEvent<HTMLIrMultiPropertyWidgetElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLIrMultiPropertyWidgetElementEventMap>(type: K, listener: (this: HTMLIrMultiPropertyWidgetElement, ev: IrMultiPropertyWidgetCustomEvent<HTMLIrMultiPropertyWidgetElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLIrMultiPropertyWidgetElement: {
+        prototype: HTMLIrMultiPropertyWidgetElement;
+        new (): HTMLIrMultiPropertyWidgetElement;
+    };
     interface HTMLIrNavElementEventMap {
         "routing": pages;
         "signOut": null;
@@ -1500,6 +1618,24 @@ declare global {
     var HTMLIrPopoverElement: {
         prototype: HTMLIrPopoverElement;
         new (): HTMLIrPopoverElement;
+    };
+    interface HTMLIrPopupElementEventMap {
+        "opened": void;
+        "closed": void;
+    }
+    interface HTMLIrPopupElement extends Components.IrPopup, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLIrPopupElementEventMap>(type: K, listener: (this: HTMLIrPopupElement, ev: IrPopupCustomEvent<HTMLIrPopupElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLIrPopupElementEventMap>(type: K, listener: (this: HTMLIrPopupElement, ev: IrPopupCustomEvent<HTMLIrPopupElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLIrPopupElement: {
+        prototype: HTMLIrPopupElement;
+        new (): HTMLIrPopupElement;
     };
     interface HTMLIrPortalElement extends Components.IrPortal, HTMLStencilElement {
     }
@@ -1761,6 +1897,40 @@ declare global {
         prototype: HTMLIrWidgetElement;
         new (): HTMLIrWidgetElement;
     };
+    interface HTMLIrWidgetDatePopupElementEventMap {
+        "dateChange": { from_date: Date | null; to_date: Date | null };
+    }
+    interface HTMLIrWidgetDatePopupElement extends Components.IrWidgetDatePopup, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLIrWidgetDatePopupElementEventMap>(type: K, listener: (this: HTMLIrWidgetDatePopupElement, ev: IrWidgetDatePopupCustomEvent<HTMLIrWidgetDatePopupElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLIrWidgetDatePopupElementEventMap>(type: K, listener: (this: HTMLIrWidgetDatePopupElement, ev: IrWidgetDatePopupCustomEvent<HTMLIrWidgetDatePopupElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLIrWidgetDatePopupElement: {
+        prototype: HTMLIrWidgetDatePopupElement;
+        new (): HTMLIrWidgetDatePopupElement;
+    };
+    interface HTMLIrWidgetOccupancyPopupElementEventMap {
+        "guestsChange": { adultCount: number; childrenCount: number; infants: number; childrenAges: string[] };
+    }
+    interface HTMLIrWidgetOccupancyPopupElement extends Components.IrWidgetOccupancyPopup, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLIrWidgetOccupancyPopupElementEventMap>(type: K, listener: (this: HTMLIrWidgetOccupancyPopupElement, ev: IrWidgetOccupancyPopupCustomEvent<HTMLIrWidgetOccupancyPopupElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLIrWidgetOccupancyPopupElementEventMap>(type: K, listener: (this: HTMLIrWidgetOccupancyPopupElement, ev: IrWidgetOccupancyPopupCustomEvent<HTMLIrWidgetOccupancyPopupElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLIrWidgetOccupancyPopupElement: {
+        prototype: HTMLIrWidgetOccupancyPopupElement;
+        new (): HTMLIrWidgetOccupancyPopupElement;
+    };
     interface HTMLElementTagNameMap {
         "ir-accomodations": HTMLIrAccomodationsElement;
         "ir-adult-child-counter": HTMLIrAdultChildCounterElement;
@@ -1808,12 +1978,14 @@ declare global {
         "ir-loyalty": HTMLIrLoyaltyElement;
         "ir-menu": HTMLIrMenuElement;
         "ir-modal": HTMLIrModalElement;
+        "ir-multi-property-widget": HTMLIrMultiPropertyWidgetElement;
         "ir-nav": HTMLIrNavElement;
         "ir-pagination": HTMLIrPaginationElement;
         "ir-payment-view": HTMLIrPaymentViewElement;
         "ir-phone-input": HTMLIrPhoneInputElement;
         "ir-pickup": HTMLIrPickupElement;
         "ir-popover": HTMLIrPopoverElement;
+        "ir-popup": HTMLIrPopupElement;
         "ir-portal": HTMLIrPortalElement;
         "ir-privacy-policy": HTMLIrPrivacyPolicyElement;
         "ir-property-gallery": HTMLIrPropertyGalleryElement;
@@ -1835,6 +2007,8 @@ declare global {
         "ir-user-form": HTMLIrUserFormElement;
         "ir-user-profile": HTMLIrUserProfileElement;
         "ir-widget": HTMLIrWidgetElement;
+        "ir-widget-date-popup": HTMLIrWidgetDatePopupElement;
+        "ir-widget-occupancy-popup": HTMLIrWidgetOccupancyPopupElement;
     }
 }
 declare namespace LocalJSX {
@@ -2250,6 +2424,26 @@ declare namespace LocalJSX {
   }>) => void;
         "onOpenChange"?: (event: IrModalCustomEvent<boolean>) => void;
     }
+    interface IrMultiPropertyWidget {
+        "dateModifiers"?: any;
+        "dates"?: { from_date: Date | null; to_date: Date | null };
+        "error"?: boolean;
+        "guests"?: { adultCount: number; childrenCount: number; infants: number; childrenAges: string[] };
+        "isFetchingProperty"?: boolean;
+        "level2Properties"?: CombinedLevel2Properties;
+        "linkedProperties"?: IExposedProperty[];
+        "locale"?: string;
+        "locations"?: string[];
+        "onBookNow"?: (event: IrMultiPropertyWidgetCustomEvent<void>) => void;
+        "onCityChange"?: (event: IrMultiPropertyWidgetCustomEvent<string>) => void;
+        "onDateChange"?: (event: IrMultiPropertyWidgetCustomEvent<{ from_date: Date | null; to_date: Date | null }>) => void;
+        "onGuestsChange"?: (event: IrMultiPropertyWidgetCustomEvent<{ adultCount: number; childrenCount: number; infants: number; childrenAges: string[] }>) => void;
+        "onPropertyChange"?: (event: IrMultiPropertyWidgetCustomEvent<string | number>) => void;
+        "position"?: string;
+        "property"?: IExposedProperty;
+        "selectedCity"?: string;
+        "selectedPropertyId"?: string | number;
+    }
     interface IrNav {
         "currencies"?: ICurrency[];
         "isBookingListing"?: boolean;
@@ -2297,6 +2491,54 @@ declare namespace LocalJSX {
         "showCloseButton"?: boolean;
         "stopListeningForOutsideClicks"?: boolean;
         "trigger_label"?: string;
+    }
+    interface IrPopup {
+        /**
+          * Enable or disable flip behavior.
+         */
+        "allowFlip"?: boolean;
+        /**
+          * Distance between the anchor and popup in pixels (used when offsetDistance is not provided).
+         */
+        "distance"?: number;
+        /**
+          * Comma-separated list of fallback placements used when flipping.
+         */
+        "fallbackPlacements"?: string;
+        /**
+          * Whether this dialog is modal.
+         */
+        "modal"?: boolean;
+        /**
+          * Offset distance in pixels away from the reference element.
+         */
+        "offsetDistance"?: number;
+        /**
+          * Offset skid in pixels along the reference element.
+         */
+        "offsetSkid"?: number;
+        "onClosed"?: (event: IrPopupCustomEvent<void>) => void;
+        "onOpened"?: (event: IrPopupCustomEvent<void>) => void;
+        /**
+          * Padding for the preventOverflow modifier.
+         */
+        "overflowPadding"?: number;
+        /**
+          * Popper placement, e.g. "bottom-start".
+         */
+        "placement"?: Placement;
+        /**
+          * Positioning strategy ("absolute" or "fixed").
+         */
+        "strategy"?: Strategy;
+        /**
+          * Syncs the popup's width or height to that of the anchor element.
+         */
+        "sync"?: 'width' | 'height' | 'both';
+        /**
+          * Enable or disable the arrow element.
+         */
+        "withArrow"?: boolean;
     }
     interface IrPortal {
         "offset"?: number;
@@ -2437,14 +2679,34 @@ declare namespace LocalJSX {
     }
     interface IrWidget {
         "aff"?: string;
-        "contentContainerStyle"?: TContainerStyle;
         "delay"?: number;
+        "l"?: string;
         "language"?: string;
         "p"?: string;
         "perma_link"?: string;
+        "pool"?: string;
         "position"?: 'fixed' | 'block';
         "propertyId"?: number;
         "roomTypeId"?: string | null;
+    }
+    interface IrWidgetDatePopup {
+        "absoluteIcon"?: boolean;
+        "dateModifiers"?: any;
+        "dates"?: { from_date: Date | null; to_date: Date | null };
+        "disabled"?: boolean;
+        "isLoading"?: boolean;
+        "locale"?: string;
+        "maxSpanDays"?: number;
+        "onDateChange"?: (event: IrWidgetDatePopupCustomEvent<{ from_date: Date | null; to_date: Date | null }>) => void;
+    }
+    interface IrWidgetOccupancyPopup {
+        "absoluteIcon"?: boolean;
+        "disabled"?: boolean;
+        "error"?: boolean;
+        "guests"?: { adultCount: number; childrenCount: number; infants: number; childrenAges: string[] };
+        "isLoading"?: boolean;
+        "onGuestsChange"?: (event: IrWidgetOccupancyPopupCustomEvent<{ adultCount: number; childrenCount: number; infants: number; childrenAges: string[] }>) => void;
+        "property"?: IExposedProperty;
     }
     interface IntrinsicElements {
         "ir-accomodations": IrAccomodations;
@@ -2493,12 +2755,14 @@ declare namespace LocalJSX {
         "ir-loyalty": IrLoyalty;
         "ir-menu": IrMenu;
         "ir-modal": IrModal;
+        "ir-multi-property-widget": IrMultiPropertyWidget;
         "ir-nav": IrNav;
         "ir-pagination": IrPagination;
         "ir-payment-view": IrPaymentView;
         "ir-phone-input": IrPhoneInput;
         "ir-pickup": IrPickup;
         "ir-popover": IrPopover;
+        "ir-popup": IrPopup;
         "ir-portal": IrPortal;
         "ir-privacy-policy": IrPrivacyPolicy;
         "ir-property-gallery": IrPropertyGallery;
@@ -2520,6 +2784,8 @@ declare namespace LocalJSX {
         "ir-user-form": IrUserForm;
         "ir-user-profile": IrUserProfile;
         "ir-widget": IrWidget;
+        "ir-widget-date-popup": IrWidgetDatePopup;
+        "ir-widget-occupancy-popup": IrWidgetOccupancyPopup;
     }
 }
 export { LocalJSX as JSX };
@@ -2572,12 +2838,14 @@ declare module "@stencil/core" {
             "ir-loyalty": LocalJSX.IrLoyalty & JSXBase.HTMLAttributes<HTMLIrLoyaltyElement>;
             "ir-menu": LocalJSX.IrMenu & JSXBase.HTMLAttributes<HTMLIrMenuElement>;
             "ir-modal": LocalJSX.IrModal & JSXBase.HTMLAttributes<HTMLIrModalElement>;
+            "ir-multi-property-widget": LocalJSX.IrMultiPropertyWidget & JSXBase.HTMLAttributes<HTMLIrMultiPropertyWidgetElement>;
             "ir-nav": LocalJSX.IrNav & JSXBase.HTMLAttributes<HTMLIrNavElement>;
             "ir-pagination": LocalJSX.IrPagination & JSXBase.HTMLAttributes<HTMLIrPaginationElement>;
             "ir-payment-view": LocalJSX.IrPaymentView & JSXBase.HTMLAttributes<HTMLIrPaymentViewElement>;
             "ir-phone-input": LocalJSX.IrPhoneInput & JSXBase.HTMLAttributes<HTMLIrPhoneInputElement>;
             "ir-pickup": LocalJSX.IrPickup & JSXBase.HTMLAttributes<HTMLIrPickupElement>;
             "ir-popover": LocalJSX.IrPopover & JSXBase.HTMLAttributes<HTMLIrPopoverElement>;
+            "ir-popup": LocalJSX.IrPopup & JSXBase.HTMLAttributes<HTMLIrPopupElement>;
             "ir-portal": LocalJSX.IrPortal & JSXBase.HTMLAttributes<HTMLIrPortalElement>;
             "ir-privacy-policy": LocalJSX.IrPrivacyPolicy & JSXBase.HTMLAttributes<HTMLIrPrivacyPolicyElement>;
             "ir-property-gallery": LocalJSX.IrPropertyGallery & JSXBase.HTMLAttributes<HTMLIrPropertyGalleryElement>;
@@ -2599,6 +2867,8 @@ declare module "@stencil/core" {
             "ir-user-form": LocalJSX.IrUserForm & JSXBase.HTMLAttributes<HTMLIrUserFormElement>;
             "ir-user-profile": LocalJSX.IrUserProfile & JSXBase.HTMLAttributes<HTMLIrUserProfileElement>;
             "ir-widget": LocalJSX.IrWidget & JSXBase.HTMLAttributes<HTMLIrWidgetElement>;
+            "ir-widget-date-popup": LocalJSX.IrWidgetDatePopup & JSXBase.HTMLAttributes<HTMLIrWidgetDatePopupElement>;
+            "ir-widget-occupancy-popup": LocalJSX.IrWidgetOccupancyPopup & JSXBase.HTMLAttributes<HTMLIrWidgetOccupancyPopupElement>;
         }
     }
 }

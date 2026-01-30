@@ -31,7 +31,7 @@
 
 ### Used by
 
- - [ir-widget](../ir-booking-widget)
+ - [ir-widget-occupancy-popup](../ir-booking-widget/ir-widget-occupancy-popup)
 
 ### Depends on
 
@@ -44,7 +44,7 @@ graph TD;
   ir-guest-counter --> ir-button
   ir-guest-counter --> ir-select
   ir-button --> ir-icons
-  ir-widget --> ir-guest-counter
+  ir-widget-occupancy-popup --> ir-guest-counter
   style ir-guest-counter fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

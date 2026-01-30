@@ -1,14 +1,19 @@
-import { Component, h, Element, Prop, Watch, Fragment, State, Host } from '@stencil/core';
-import { TContainerStyle } from './types';
+import { Component, h, Element, Prop, Fragment, State, Host, Watch } from '@stencil/core';
 import localization_store from '@/stores/app.store';
 import { CommonService } from '@/services/api/common.service';
-import { PropertyService } from '@/services/api/property.service';
+import { PropertiesByLevel2Response, PropertyService } from '@/services/api/property.service';
 import axios from 'axios';
 import app_store from '@/stores/app.store';
 import moment from 'moment/min/moment-with-locales';
-import localizedWords from '@/stores/localization.store';
 import Token from '@/models/Token';
 import { IExposedProperty } from '@/models/property';
+import localizedWords from '@/stores/localization.store';
+
+export type CombinedLevel2Properties = {
+  cities: string[];
+  properties: Map<string, PropertiesByLevel2Response[]>;
+};
+
 @Component({
   tag: 'ir-widget',
   styleUrl: 'ir-booking-widget.css',
@@ -17,8 +22,12 @@ import { IExposedProperty } from '@/models/property';
 export class IrBookingWidget {
   @Element() el: HTMLIrWidgetElement;
 
+  @Prop() pool: string;
+
+  //Level2 city names separated by
+  @Prop() l: string;
+
   @Prop({ reflect: true }) position: 'fixed' | 'block' = 'fixed';
-  @Prop() contentContainerStyle: TContainerStyle;
   @Prop() propertyId: number = 42;
   @Prop() perma_link: string = null;
   @Prop() p: string = null;
@@ -36,17 +45,17 @@ export class IrBookingWidget {
     from_date: null,
     to_date: null,
   };
-  @State() guests: { adultCount: number; childrenCount: number; infants: number; childrenAges: string[] } = {
-    adultCount: 2,
-    childrenCount: 0,
-    infants: 0,
-    childrenAges: [],
-  };
+
+  @State() level2Properties: CombinedLevel2Properties;
+  @State() selectedCity: string;
+
+  @State() guests: { adultCount: number; childrenCount: number; infants: number; childrenAges: string[] };
   @State() linkedProperties: IExposedProperty[] = [];
   @State() selectedProperty: IExposedProperty;
+  @State() isFetchingProperty: boolean = true;
 
   private baseUrl: string = 'https://gateway.igloorooms.com/IRBE';
-  private popover: HTMLIrPopoverElement;
+
   private token = new Token();
 
   private commonService = new CommonService();
@@ -55,9 +64,17 @@ export class IrBookingWidget {
   private containerRef: HTMLDivElement;
   private elTimout: NodeJS.Timeout;
   private error: boolean;
+  private baseGuests = {
+    adultCount: 2,
+    childrenCount: 0,
+    infants: 0,
+    childrenAges: [],
+  };
+  private mainWidgetPopupRef: HTMLIrPopupElement;
 
   componentWillLoad() {
     this.initApp();
+    this.guests = this.baseGuests;
     app_store.userPreferences = {
       language_id: this.language,
       currency_id: 'usd',
@@ -72,8 +89,92 @@ export class IrBookingWidget {
       document.body.appendChild(this.el);
     }
   }
+
+  @Watch('selectedCity')
+  handleCityChange(newValue: string) {
+    const firstCityPropertyRow = this.level2Properties.properties?.get(newValue)![0];
+    if (firstCityPropertyRow) {
+      this.selectedProperty = {
+        id: firstCityPropertyRow.property_id,
+      } as any;
+    } else {
+      this.selectedProperty = null;
+    }
+  }
+
+  @Watch('selectedProperty')
+  async handlePropertyChange(newValue, oldValue) {
+    if (!this.isMultiPropertyMode()) {
+      return;
+    }
+    if (newValue?.id === oldValue?.id || !newValue) {
+      return;
+    }
+    this.isFetchingProperty = true;
+    const [property] = await Promise.all([
+      this.propertyService.getExposedProperty({
+        id: newValue.id,
+        language: this.language,
+        aname: null,
+        perma_link: null,
+      }),
+      this.propertyService.getExposedNonBookableNights({
+        porperty_id: newValue.id,
+        from_date: moment().format('YYYY-MM-DD'),
+        to_date: moment().add(1, 'years').format('YYYY-MM-DD'),
+        perma_link: null,
+        aname: null,
+      }),
+    ]);
+    this.property = property;
+    this.selectedProperty = property;
+    this.dateModifiers = { ...this.getDateModifiers() };
+
+    if (this.property?.adult_child_constraints?.child_max_age === 0 && this.guests.childrenCount > 0) {
+      this.guests = { ...this.baseGuests, adultCount: this.guests.adultCount };
+    }
+
+    if (this.hasDisabledDateInRange(this.dates?.from_date, this.dates?.to_date, this.dateModifiers)) {
+      this.dates = {
+        from_date: null,
+        to_date: null,
+      };
+    }
+    this.isFetchingProperty = false;
+    if (this.isLoading) {
+      this.showWidget();
+    }
+  }
+  private hasDisabledDateInRange(from: Date | null, to: Date | null, dateModifiers?: Record<string, { disabled: boolean }>): boolean {
+    if (!from || !to || !dateModifiers) return false;
+
+    const cursor = moment(from);
+    const end = moment(to);
+
+    while (cursor.isSameOrBefore(end, 'day')) {
+      const key = cursor.format('YYYY-MM-DD');
+      if (dateModifiers[key]?.disabled) {
+        return true;
+      }
+      cursor.add(1, 'day');
+    }
+
+    return false;
+  }
+  private get isMultiProperties() {
+    return this.linkedProperties?.length > 1;
+  }
+  private get isLevel2Mode() {
+    const city_perma_links = this.parseCommaSeparated(this.l);
+    return city_perma_links?.length > 0 && !!this.pool && !this.isMultiProperties;
+  }
+
+  private get isSingleProperty() {
+    const properties = this.parseCommaSeparated(this.p);
+    return properties.length === 1 && (this.p || this.propertyId);
+  }
+
   private initApp() {
-    this.modifyContainerStyle();
     axios.defaults.withCredentials = true;
     axios.defaults.baseURL = this.baseUrl;
     this.resetPageFontSize();
@@ -85,59 +186,148 @@ export class IrBookingWidget {
     document.head.appendChild(styleEl);
   }
 
-  async initProperty() {
+  private parseCommaSeparated(value?: string | null): string[] {
+    return (
+      value
+        ?.split(',')
+        .map(v => v.trim())
+        .filter(Boolean) ?? []
+    );
+  }
+
+  private async initProperty() {
     try {
       this.isLoading = true;
       const token = await this.commonService.getBEToken();
       this.token.setToken(token);
-      const properties = this.p.split(',').map(t => t.trim());
-      const [property, linkedProperties] = await Promise.all([
-        this.propertyService.getExposedProperty({
-          id: this.propertyId,
-          language: this.language,
-          aname: properties.length > 0 ? properties[0] : this.p,
-          perma_link: this.perma_link,
-        }),
-        properties.length < 2
-          ? Promise.resolve(null)
-          : this.propertyService.getExposedProperties({
+
+      const properties = this.parseCommaSeparated(this.p);
+      const city_perma_links = this.parseCommaSeparated(this.l);
+
+      const isSingleProperty = this.isSingleProperty;
+      const isMultiProperty = properties.length > 1;
+
+      const [property, linkedProperties, level2SeparationsProperties] = await Promise.all([
+        // Single property only (NOT level-2)
+        isSingleProperty
+          ? this.propertyService.getExposedProperty({
+              id: this.propertyId,
+              language: this.language,
+              aname: properties[0],
+              perma_link: this.perma_link,
+            })
+          : Promise.resolve(null),
+
+        // Multi-property ONLY
+        isMultiProperty
+          ? this.propertyService.getExposedProperties({
               anames: properties,
               language: this.language,
-            }),
+            })
+          : Promise.resolve(null),
+
+        // Level-2 ONLY when single property
+        city_perma_links?.length > 0 && !!this.pool && !isMultiProperty
+          ? this.propertyService.fetchPropertiesByLevel2({
+              pool: this.pool,
+              city_perma_links,
+            })
+          : Promise.resolve(null),
+
         this.commonService.getExposedLanguage(),
-        this.propertyService.getExposedNonBookableNights({
-          porperty_id: this.propertyId,
-          from_date: moment().format('YYYY-MM-DD'),
-          to_date: moment().add(1, 'years').format('YYYY-MM-DD'),
-          perma_link: this.perma_link,
-          aname: properties.length > 0 ? properties[0] : this.p,
-        }),
+
+        // Non-bookable nights ONLY when not level-2
+        isSingleProperty
+          ? this.propertyService.getExposedNonBookableNights({
+              porperty_id: this.propertyId,
+              from_date: moment().format('YYYY-MM-DD'),
+              to_date: moment().add(1, 'years').format('YYYY-MM-DD'),
+              perma_link: this.perma_link,
+              aname: properties[0],
+            })
+          : Promise.resolve(null),
       ]);
-      this.linkedProperties = linkedProperties ?? [];
-      this.selectedProperty = this.linkedProperties.length > 0 ? this.linkedProperties[0] : property;
-      this.property = property;
+      if (city_perma_links?.length > 0 && !!this.pool && !isMultiProperty) {
+        this.setLevel2Properties(level2SeparationsProperties);
+      } else {
+        this.linkedProperties = linkedProperties ?? [];
+        this.selectedProperty = this.linkedProperties.length > 0 ? this.linkedProperties[0] : property;
+      }
+      if (property) {
+        this.property = property;
+      }
+      // this.property = property;
       this.dateModifiers = this.getDateModifiers();
     } catch (error) {
       console.log(error);
     } finally {
-      this.isLoading = false;
-      this.elTimout = setTimeout(() => {
-        this.containerRef.style.opacity = '1';
-      }, this.delay);
+      if (this.isSingleProperty) {
+        this.showWidget();
+      }
     }
   }
 
-  @Watch('contentContainerStyle')
-  handleContentContainerStyle() {
-    this.modifyContainerStyle();
+  private showWidget() {
+    this.isLoading = false;
+    this.elTimout = setTimeout(() => {
+      if (!this.containerRef) {
+        return;
+      }
+      this.containerRef.style.opacity = '1';
+    }, this.delay);
   }
 
-  private modifyContainerStyle() {
-    if (this.contentContainerStyle && this.contentContainerStyle.borderColor) {
-      this.el.style.setProperty('--ir-widget-border-color', this.contentContainerStyle.borderColor);
+  private setLevel2Properties(level2SeparationsProperties: PropertiesByLevel2Response[] | null) {
+    if (!level2SeparationsProperties || level2SeparationsProperties.length === 0) {
+      this.level2Properties = { cities: [], properties: new Map() };
+      return;
+    }
+
+    const citiesMap = new Map<string, string>();
+    const propertiesMap = new Map<string, PropertiesByLevel2Response[]>();
+
+    for (const row of level2SeparationsProperties) {
+      if (!citiesMap.has(row.city_perma_link)) {
+        // citiesMap.set(row.city_id, {
+        //   id: row.city_id,
+        //   name: row.city_perma_link,
+        // });
+        citiesMap.set(row.city_perma_link, row.city_perma_link);
+      }
+
+      const existing = propertiesMap.get(row.city_perma_link);
+      if (existing) {
+        existing.push(row);
+      } else {
+        propertiesMap.set(row.city_perma_link, [row]);
+      }
+    }
+
+    const cities = this.parseCommaSeparated(this.l);
+
+    for (const city of cities) {
+      if (!propertiesMap.has(city)) {
+        propertiesMap.set(city, []);
+      }
+    }
+
+    this.level2Properties = {
+      cities,
+      properties: propertiesMap,
+    };
+
+    const firstCity = cities.find(city => propertiesMap.get(city)?.length > 0);
+
+    if (firstCity) {
+      this.selectedCity = firstCity;
     }
   }
-  handleBooknow() {
+
+  private isMultiPropertyMode(): boolean {
+    return this.isLevel2Mode || this.isMultiProperties;
+  }
+
+  private handleBooknow() {
     if (!this.validateChildrenAges()) return;
     let subdomainURL = `bookingmystay.com`;
     const currentDomain = `${this.selectedProperty.perma_link}.${subdomainURL}`;
@@ -154,8 +344,9 @@ export class IrBookingWidget {
     const queryString = queryParams.filter(param => param !== '').join('&');
     window.open(`https://${currentDomain}?${queryString}`, '_blank');
   }
+
   private getDateModifiers() {
-    if (!Object.keys(app_store.nonBookableNights).length) {
+    if (!Object.keys(app_store?.nonBookableNights ?? {})?.length) {
       return undefined;
     }
     const nights = {};
@@ -166,79 +357,7 @@ export class IrBookingWidget {
     });
     return nights;
   }
-  private renderDateTrigger() {
-    const from = this.dates?.from_date;
-    const to = this.dates?.to_date;
-    let fromLabel = '';
-    let toLabel = '';
-    if (from) {
-      fromLabel = moment(from).format('DD MMM YYYY');
-    }
-    if (to) {
-      toLabel = moment(to).format('DD MMM YYYY');
-    }
-    return (
-      <div class="date-trigger" slot="trigger">
-        <ir-icons name="calendar" svgClassName="size-4"></ir-icons>
-        {fromLabel && toLabel ? (
-          <div>
-            <p>
-              <span>{fromLabel}</span>
-              <span> - </span>
-              <span>{toLabel}</span>
-            </p>
-          </div>
-        ) : (
-          <div>
-            <p>Your dates</p>
-          </div>
-        )}
-      </div>
-    );
-  }
-  private renderAdultChildTrigger() {
-    const { adultCount, childrenCount } = this.guests;
-    return (
-      <div class="guests-trigger" slot="trigger">
-        <ir-icons name="user" svgClassName="size-4"></ir-icons>
-        <p class={'guests'}>
-          {adultCount > 0 ? (
-            <Fragment>
-              <span class="lowercase">
-                {adultCount} {adultCount === 1 ? localizedWords.entries.Lcz_Adult : localizedWords.entries.Lcz_Adults}
-              </span>
-              {this.property.adult_child_constraints.child_max_age > 0 && (
-                <span class="lowercase">
-                  , {childrenCount} {childrenCount === 1 ? localizedWords.entries.Lcz_Child : localizedWords.entries.Lcz_Children}
-                </span>
-              )}
-            </Fragment>
-          ) : (
-            <span>Guests</span>
-          )}
-        </p>
-      </div>
-    );
-  }
-  disconnectedCallback() {
-    if (this.elTimout) {
-      clearTimeout(this.elTimout);
-    }
-  }
-  private handlePopoverToggle(e: CustomEvent) {
-    e.stopImmediatePropagation();
-    e.stopPropagation();
-    this.isGuestPopoverOpen = e.detail;
-    console.log('here');
 
-    if (!this.isGuestPopoverOpen) {
-      if (this.guests.childrenCount === 0) {
-        this.guestPopover?.forceClose();
-      } else {
-        this.validateChildrenAges();
-      }
-    }
-  }
   private validateChildrenAges() {
     if (this.guests.childrenAges.some(c => c === '')) {
       this.error = true;
@@ -247,18 +366,81 @@ export class IrBookingWidget {
     this.guestPopover?.forceClose();
     return true;
   }
+
+  private renderMultiWidget() {
+    return (
+      <ir-multi-property-widget
+        isFetchingProperty={this.isFetchingProperty}
+        selectedCity={this.selectedCity}
+        level2Properties={this.level2Properties}
+        linkedProperties={this.linkedProperties}
+        selectedPropertyId={this.selectedProperty?.id}
+        dateModifiers={this.dateModifiers}
+        property={this.selectedProperty as any}
+        locale={localization_store.selectedLocale}
+        dates={this.dates}
+        guests={this.guests}
+        error={this.error}
+        position={this.position}
+        exportparts="container, property-select, cta"
+        onCityChange={e => {
+          this.selectedCity = e.detail;
+        }}
+        onPropertyChange={e => {
+          const propertyId = Number(e.detail);
+          this.selectedProperty = { id: propertyId } as any;
+        }}
+        onDateChange={e => {
+          this.dates = e.detail;
+        }}
+        onGuestsChange={e => (this.guests = { ...e.detail })}
+        onBookNow={() => this.handleBooknow()}
+      ></ir-multi-property-widget>
+    );
+  }
+
+  disconnectedCallback() {
+    if (this.elTimout) {
+      clearTimeout(this.elTimout);
+    }
+  }
+
   render() {
     if (this.isLoading) {
       return null;
     }
-    const isMultiProperties = this.linkedProperties?.length > 1;
+
+    if (this.isLevel2Mode) {
+      if (this.position === 'block') {
+        return this.renderMultiWidget();
+      }
+      return (
+        <ir-popup sync="width" ref={el => (this.mainWidgetPopupRef = el)} distance={-45} class="ir-multi-property-widget__popup">
+          <ir-button slot="anchor" part="anchor" size="md" class="ir-multi-property-widget__anchor" label={localizedWords.entries.Lcz_BookNow}></ir-button>
+          <header class="ir-multi-property-widget__header" part="header">
+            <h5>{localizedWords.entries.Lcz_BookNow}</h5>
+            <ir-button
+              onButtonClick={e => {
+                e.stopImmediatePropagation();
+                e.stopPropagation();
+                this.mainWidgetPopupRef.close();
+              }}
+              iconName="xmark"
+              variants="icon"
+            ></ir-button>
+          </header>
+          {this.renderMultiWidget()}
+        </ir-popup>
+      );
+    }
     return (
-      <Host data-multi={isMultiProperties ? 'true' : 'false'}>
-        <div class="booking-widget-container" data-multi={isMultiProperties ? 'true' : 'false'} ref={el => (this.containerRef = el)} style={this.contentContainerStyle}>
-          <div class={'hovered-container'}></div>
-          {isMultiProperties && (
+      <Host data-multi={this.isMultiProperties ? 'true' : 'false'}>
+        <div part="container" class="ir-widget" data-multi={this.isMultiProperties ? 'true' : 'false'} ref={el => (this.containerRef = el)}>
+          <div part="hover" class={'ir-widget__hover'}></div>
+          {this.isMultiProperties && (
             <select
-              class="booking-widget__linked-properties"
+              part="property-select"
+              class="ir-widget__property-select"
               onChange={e => {
                 const propertyId = (e.target as HTMLSelectElement).value;
                 this.selectedProperty = this.linkedProperties.find(p => p.id.toString() === propertyId);
@@ -272,79 +454,28 @@ export class IrBookingWidget {
             </select>
           )}
           <Fragment>
-            <ir-popover
-              autoAdjust={false}
-              allowFlip={false}
-              class={'ir-popover'}
-              showCloseButton={false}
-              placement={this.position === 'fixed' ? 'top-start' : 'auto'}
-              ref={el => (this.popover = el)}
-              onOpenChange={e => {
-                this.isPopoverOpen = e.detail;
-                if (!this.isPopoverOpen) {
-                  if (this.dates.from_date && !this.dates.to_date) {
-                    this.dates = {
-                      ...this.dates,
-                      to_date: moment(this.dates.from_date).add(1, 'days').toDate(),
-                    };
-                  }
-                }
+            <ir-widget-date-popup
+              class="ir-widget__date-popup"
+              dateModifiers={this.dateModifiers}
+              exportparts="date-trigger"
+              dates={this.dates}
+              locale={localization_store.selectedLocale}
+              maxSpanDays={this.property?.max_nights}
+              onDateChange={e => {
+                this.dates = e.detail;
               }}
-            >
-              {this.renderDateTrigger()}
-              <div slot="popover-content" class="popup-container w-full border-0 bg-white p-4  shadow-none sm:w-auto sm:border  ">
-                <ir-date-range
-                  dateModifiers={this.dateModifiers}
-                  minDate={moment().add(-1, 'days')}
-                  style={{ '--radius': 'var(--ir-widget-radius)' }}
-                  fromDate={this.dates?.from_date ? moment(this.dates.from_date) : null}
-                  toDate={this.dates?.to_date ? moment(this.dates.to_date) : null}
-                  locale={localization_store.selectedLocale}
-                  maxSpanDays={this.property.max_nights}
-                  onDateChange={e => {
-                    e.stopImmediatePropagation();
-                    e.stopPropagation();
-                    const { end, start } = e.detail;
-                    if (end && this.isPopoverOpen) {
-                      this.popover.toggleVisibility();
-                    }
-                    this.dates = {
-                      from_date: start,
-                      to_date: end,
-                    };
-                  }}
-                ></ir-date-range>
-              </div>
-            </ir-popover>
-            <ir-popover
-              outsideEvents="none"
-              autoAdjust={false}
-              allowFlip={false}
-              ref={el => (this.guestPopover = el)}
-              class={'ir-popover'}
-              showCloseButton={false}
-              placement={this.position === 'fixed' ? 'top-start' : 'auto'}
-              onOpenChange={this.handlePopoverToggle.bind(this)}
-            >
-              {this.renderAdultChildTrigger()}
-
-              <ir-guest-counter
-                slot="popover-content"
-                error={this.error}
-                adults={this.guests?.adultCount}
-                child={this.guests?.childrenCount}
-                minAdultCount={0}
-                maxAdultCount={this.property?.adult_child_constraints.adult_max_nbr}
-                maxChildrenCount={this.property?.adult_child_constraints.child_max_nbr}
-                childMaxAge={this.property?.adult_child_constraints.child_max_age}
-                onUpdateCounts={e => (this.guests = { ...e.detail })}
-                class={'h-full'}
-                onCloseGuestCounter={() => this.guestPopover.forceClose()}
-              ></ir-guest-counter>
-            </ir-popover>
+            ></ir-widget-date-popup>
+            <ir-widget-occupancy-popup
+              exportparts="guests-trigger"
+              class="ir-widget__guests-popup"
+              error={this.error}
+              guests={this.guests}
+              property={this.property as any}
+              onGuestsChange={e => (this.guests = { ...e.detail })}
+            ></ir-widget-occupancy-popup>
           </Fragment>
-          <button class="btn-flip" onClick={this.handleBooknow.bind(this)}>
-            {isMultiProperties ? (
+          <button part="cta" class="ir-widget__cta" onClick={this.handleBooknow.bind(this)}>
+            {this.isMultiProperties ? (
               <svg xmlns="http://www.w3.org/2000/svg" height={24} width={24} viewBox="0 0 640 640">
                 <path
                   fill="currentColor"
@@ -352,7 +483,7 @@ export class IrBookingWidget {
                 />
               </svg>
             ) : (
-              'Book now'
+              localizedWords.entries.Lcz_BookNow
             )}
           </button>
         </div>
