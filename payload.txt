@@ -1,0 +1,300 @@
+{
+    "assign_units": false,
+    "check_in": false,
+    "is_pms": false,
+    "is_direct": true,
+    "language": "EN",
+    "agent": null,
+    "promo_key": null,
+    "booking": {
+        "booking_nbr": "",
+        "from_date": "2024-11-09",
+        "to_date": "2024-11-12",
+        "remark": null,
+        "property": {
+            "id": 42
+        },
+        "source": {
+            "code": "http://localhost:7594",
+            "description": ""
+        },
+        "referrer_site": "www.igloorooms.com",
+        "currency": {
+            "code": "USD",
+            "id": 4,
+            "symbol": "US$"
+        },
+        "arrival": {
+            "code": "001"
+        },
+        "guest": {
+            "email": "tesr@gamil.com",
+            "first_name": "tres",
+            "last_name": "testr",
+            "country_id": 2,
+            "city": null,
+            "mobile": "12312312312",
+            "address": "",
+            "country_phone_prefix": "2",
+            "dob": null,
+            "subscribe_to_news_letter": true,
+            "cci": null
+        },
+        "rooms": [
+            {
+                "identifier": null,
+                "roomtype": {
+                    "amenities": [
+                        {
+                            "amenity_type": "room",
+                            "code": "cablesatellitetv",
+                            "description": "Cable / Satellite TV"
+                        },
+                        {
+                            "amenity_type": "room",
+                            "code": "cdplayer",
+                            "description": "CD player"
+                        },
+                        {
+                            "amenity_type": "room",
+                            "code": "newspaperfree",
+                            "description": "Complimentary newspaper"
+                        },
+                        {
+                            "amenity_type": "room",
+                            "code": "faxmachine",
+                            "description": "Fax machine"
+                        },
+                        {
+                            "amenity_type": "room",
+                            "code": "directphone",
+                            "description": "Direct-dial phone"
+                        },
+                        {
+                            "amenity_type": "room",
+                            "code": "bathtub",
+                            "description": "Bathtub"
+                        },
+                        {
+                            "amenity_type": "room",
+                            "code": "hairdryeronrequest",
+                            "description": "Hair dryer on request"
+                        },
+                        {
+                            "amenity_type": "room",
+                            "code": "espressomachine",
+                            "description": "Espresso machine"
+                        }
+                    ],
+                    "availabilities": null,
+                    "bedding_setup": [
+                        {
+                            "code": "twinqueenbeds",
+                            "count": 4,
+                            "name": "Twin queen beds"
+                        },
+                        {
+                            "code": "bunkbeds",
+                            "count": 1,
+                            "name": "Bunk beds"
+                        },
+                        {
+                            "code": "twindoublechangeable",
+                            "count": 1,
+                            "name": "Twin/Double changeable beds"
+                        },
+                        {
+                            "code": "sofabed",
+                            "count": 6,
+                            "name": "Sofa bed"
+                        }
+                    ],
+                    "description": "",
+                    "exposed_inventory": null,
+                    "id": 2352,
+                    "images": [],
+                    "inventory": 1,
+                    "is_active": true,
+                    "is_available_to_book": null,
+                    "is_bed_configuration_enabled": true,
+                    "main_image": null,
+                    "name": "Penthouse",
+                    "not_available_reason": null,
+                    "occupancy_default": {
+                        "adult_nbr": 2,
+                        "children_nbr": 0,
+                        "infant_nbr": null
+                    },
+                    "occupancy_max": {
+                        "adult_nbr": 2,
+                        "children_nbr": 0,
+                        "infant_nbr": 0
+                    },
+                    "physicalrooms": null,
+                    "rate": null,
+                    "rateplans": null,
+                    "size": 100,
+                    "smoking_option": {
+                        "allowed_smoking_options": [
+                            {
+                                "code": "002",
+                                "description": "Non-smoking"
+                            }
+                        ],
+                        "code": "003",
+                        "description": "Non smoking"
+                    }
+                },
+                "rateplan": {
+                    "agents": [],
+                    "assignable_units": null,
+                    "cancelation": "<u><b>Cancellation</b></u>: 100% of the total price will be charged if cancelled after Wednesday, 30 Oct 2024, 22:00 or in case of no show.\r\n",
+                    "custom_text": "",
+                    "extra_bed_for_code": "001",
+                    "extra_bed_max": 0,
+                    "extra_bed_rate_per_night": 0,
+                    "extra_bed_rate_per_night_additional_child": 0,
+                    "extra_bed_rate_per_night_first_child": 0,
+                    "guarantee": "<u><b>Guarantee</b></u>: First night from your booking will be charged.",
+                    "id": 3766,
+                    "is_active": true,
+                    "is_available_to_book": false,
+                    "is_booking_engine_enabled": true,
+                    "is_channel_enabled": false,
+                    "is_closed": false,
+                    "is_extra_bed_free_for_children": false,
+                    "is_non_refundable": false,
+                    "is_targeting_travel_agency": false,
+                    "name": "Penthouse/Bed-&-breakfast",
+                    "not_available_reason": null,
+                    "pre_payment_amount": 120,
+                    "pre_payment_amount_gross": 133.2,
+                    "rate_restrictions": null,
+                    "selected_variation": {
+                        "IS_MLS_VIOLATED": false,
+                        "MLS_ALERT": null,
+                        "MLS_ALERT_VALUE": null,
+                        "adult_child_offering": "2 adults",
+                        "adult_nbr": 2,
+                        "amount": 360,
+                        "amount_gross": 399.6,
+                        "amount_per_night": 120,
+                        "applicable_policies": null,
+                        "bed_preference_code": null,
+                        "child_nbr": 0,
+                        "discount_pct": 0,
+                        "discounted_amount": null,
+                        "discounted_gross_amount": null,
+                        "extra_bed_free_nbr": null,
+                        "extra_bed_nbr": null,
+                        "extra_bed_rate_per_night": null,
+                        "food_nbr_upsell": 0,
+                        "infant_nbr": null,
+                        "is_lmd": false,
+                        "nights": null,
+                        "nights_nbr": 3,
+                        "prepayment_amount": null,
+                        "prepayment_amount_gross": null,
+                        "rate_plan_id": 3766,
+                        "smoking_code": null,
+                        "total_before_discount": 360
+                    },
+                    "sell_mode": {
+                        "code": "001",
+                        "description": "Per Room"
+                    },
+                    "short_name": "Bed & breakfast",
+                    "sleeps": 2,
+                    "variations": [
+                        {
+                            "adult_child_offering": "2 adults",
+                            "adult_nbr": 2,
+                            "amount": 360,
+                            "amount_gross": 399.6,
+                            "child_nbr": 0,
+                            "amount_per_night": "120",
+                            "discount_pct": 0,
+                            "is_lmd": false,
+                            "nights_nbr": 3,
+                            "total_before_discount": 360,
+                            "is_calculated": true,
+                            "MLS_ALERT": null,
+                            "IS_MLS_VIOLATED": false,
+                            "MLS_ALERT_VALUE": null
+                        },
+                        {
+                            "adult_child_offering": "1 adult",
+                            "adult_nbr": 1,
+                            "amount": null,
+                            "amount_gross": null,
+                            "child_nbr": 0,
+                            "amount_per_night": "0",
+                            "discount_pct": 0,
+                            "is_lmd": null,
+                            "nights_nbr": 3,
+                            "total_before_discount": 0,
+                            "is_calculated": false,
+                            "MLS_ALERT": null,
+                            "IS_MLS_VIOLATED": false,
+                            "MLS_ALERT_VALUE": null
+                        }
+                    ]
+                },
+                "unit": null,
+                "occupancy": {
+                    "adult_nbr": 2,
+                    "children_nbr": 0,
+                    "infant_nbr": null
+                },
+                "bed_preference": "twinqueenbeds",
+                "from_date": "2024-11-09",
+                "to_date": "2024-11-12",
+                "notes": null,
+                "days": [
+                    {
+                        "date": "2024-11-09",
+                        "amount": 120,
+                        "cost": null
+                    },
+                    {
+                        "date": "2024-11-10",
+                        "amount": 120,
+                        "cost": null
+                    },
+                    {
+                        "date": "2024-11-11",
+                        "amount": 120,
+                        "cost": null
+                    }
+                ],
+                "guest": {
+                    "email": null,
+                    "first_name": "tres",
+                    "last_name": "testr",
+                    "country_id": null,
+                    "city": null,
+                    "mobile": null,
+                    "address": null,
+                    "dob": null,
+                    "subscribe_to_news_letter": null,
+                    "cci": null
+                }
+            }
+        ]
+    },
+    "extras": [
+        {
+            "key": "payment_code",
+            "value": "005"
+        },
+        {
+            "key": "prepayment_amount",
+            "value": 399.6
+        },
+        {
+            "key": "selected_currency",
+            "value": "USD"
+        }
+    ],
+    "pickup_info": null
+}

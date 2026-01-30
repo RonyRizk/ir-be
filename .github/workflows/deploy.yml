@@ -1,0 +1,81 @@
+name: Build and deploy dist
+
+on:
+  push:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Install dependencies
+        run: |
+          if [ -d "node_modules" ]; then
+            echo "Using cached node_modules"
+          else
+            echo "Installing dependencies..."
+            npm ci --prefer-offline --no-audit --progress=false
+          fi
+
+      - name: Verify dependencies
+        run: npm ls --depth=0 || true
+
+      - name: Clean previous build
+        run: rm -rf dist
+
+      - name: Build project
+        run: npm run build
+        timeout-minutes: 10
+
+      - name: Verify build output
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "Build failed - dist directory not found"
+            exit 1
+          fi
+          echo "Build successful - dist directory created"
+
+      - name: Checkout target repo
+        uses: actions/checkout@v4
+        with:
+          repository: David1Chowaifaty/igloo-calendar-main-web
+          token: ${{ secrets.TARGET_REPO_TOKEN }}
+          path: target-repo
+
+      - name: Replace be-dist folder
+        run: |
+          rm -rf target-repo/be-dist
+          cp -R dist target-repo/be-dist
+
+      - name: Commit & push to target repo
+        run: |
+          cd target-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add dist
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Auto-update dist from ${{ github.repository }}@${{ github.sha }}"
+            git push
+          fi
+
+      - name: Done
+        run: echo "✅ dist has been pushed to the target repo"

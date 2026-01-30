@@ -3,17 +3,21 @@
   "check_in": false,
   "is_pms": false,
   "is_direct": true,
+  "language": "EN",
   "agent": null,
   "promo_key": null,
   "booking": {
     "booking_nbr": "",
-    "from_date": "2024-07-25",
-    "to_date": "2024-07-26",
+    "from_date": "2025-11-17",
+    "to_date": "2025-11-20",
     "remark": null,
     "property": {
       "id": 42
     },
-    "source": null,
+    "source": {
+      "code": "http://localhost:7594",
+      "description": ""
+    },
     "referrer_site": "www.igloorooms.com",
     "currency": {
       "code": "USD",
@@ -24,14 +28,14 @@
       "code": "001"
     },
     "guest": {
-      "email": "estest.test@gmail.com",
+      "email": "test@gmail.com",
       "first_name": "test",
-      "last_name": "test2",
-      "country_id": 486,
+      "last_name": "test",
+      "country_id": 2,
       "city": null,
-      "mobile": "12345678",
+      "mobile": "1213123123123",
       "address": "",
-      "country_phone_prefix": "+501",
+      "country_phone_prefix": "+961",
       "dob": null,
       "subscribe_to_news_letter": true,
       "cci": null
@@ -43,101 +47,496 @@
           "amenities": [
             {
               "amenity_type": "room",
-              "code": "jacuzzi",
-              "description": "Jacuzzi"
+              "code": "amenities",
+              "description": "Welcome amenities"
             },
             {
               "amenity_type": "room",
-              "code": "view",
-              "description": "Scenic view"
+              "code": "viewslopes",
+              "description": "Slopes view"
             },
             {
               "amenity_type": "room",
-              "code": "terracegrass",
-              "description": "Terrace with grass"
-            },
-            {
-              "amenity_type": "room",
-              "code": "bathroomshared",
-              "description": "Shared bathroom"
+              "code": "soundproof",
+              "description": "Soundproof"
             }
           ],
           "availabilities": null,
           "bedding_setup": [
+            {
+              "code": "singlebed",
+              "count": 1,
+              "name": "Single bed"
+            },
             {
               "code": "kingsizebed",
               "count": 1,
               "name": "King size bed"
             }
           ],
-          "description": "Large room with sitting area and Jacuzzi",
+          "description": "Our Modern and Classic Rooms averages 322 square feet with custom furnishings,every room in Hotel High Season includes the finest attention to detail, from the triple-sheeted 300 thread count sheets to the one-touch “Goodnight” button.Each room will be everything you are looking for in a Lebanon hotel, and drastically more than you thought possible and our custom beds by will make you want to snooze through your morning plans.When you enter our Modern and Classic Room, you’ll only have one thought: this is what all hotels at Lebanon should be like. ",
           "exposed_inventory": null,
-          "id": 111,
+          "id": 110,
           "images": [
             {
-              "tooltip": "Premium Suites",
-              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_221.jpg"
+              "thumbnail": "",
+              "tooltip": "Standard Rooms",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_235.jpg"
             },
             {
-              "tooltip": "Premium Suites",
-              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_222.jpg"
+              "thumbnail": "",
+              "tooltip": "Standard Rooms",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_251.jpg"
             },
             {
-              "tooltip": "Premium Suites",
-              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_223.jpg"
-            },
-            {
-              "tooltip": "Premium Suites",
-              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_224.jpg"
-            },
-            {
-              "tooltip": "Premium Suites",
+              "thumbnail": "",
+              "tooltip": "Standard Rooms",
               "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_225.jpg"
             },
             {
-              "tooltip": "Premium Suites",
-              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_226.jpg"
+              "thumbnail": "",
+              "tooltip": "Standard Rooms",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_236.jpg"
             },
             {
-              "tooltip": "Premium Suites",
-              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_229.jpg"
+              "thumbnail": "",
+              "tooltip": "Standard Rooms",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_238.jpg"
             },
             {
-              "tooltip": "Premium Suites",
+              "thumbnail": "",
+              "tooltip": "Standard Rooms",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_241.jpg"
+            },
+            {
+              "thumbnail": "",
+              "tooltip": "Standard Rooms",
               "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_231.jpg"
             },
             {
-              "tooltip": "Premium Suites",
-              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_234.jpg"
+              "thumbnail": "",
+              "tooltip": "Standard Rooms",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_226.jpg"
             },
             {
-              "tooltip": "Premium Suites",
-              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_251.jpg"
+              "thumbnail": "",
+              "tooltip": "Standard Rooms",
+              "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_229.jpg"
             }
           ],
-          "inventory": 1,
+          "inventory": 2,
           "is_active": true,
+          "is_available_to_book": true,
           "is_bed_configuration_enabled": false,
           "main_image": {
-            "tooltip": "Premium Suites",
-            "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_221.jpg"
+            "thumbnail": null,
+            "tooltip": "Standard Rooms",
+            "url": "https://dhl6m8m6g2w2j.cloudfront.net/ac/AcImage_42_235.jpg"
           },
-          "name": "Premium Suites",
+          "name": "Standard Rooms",
+          "not_available_reason": null,
           "occupancy_default": {
             "adult_nbr": 2,
             "children_nbr": 0,
             "infant_nbr": null
           },
           "occupancy_max": {
-            "adult_nbr": 5,
-            "children_nbr": 0,
+            "adult_nbr": 2,
+            "children_nbr": 1,
             "infant_nbr": 0
           },
-          "physicalrooms": null,
-          "pre_payment_amount": null,
+          "physicalrooms": [
+            {
+              "calendar_cell": null,
+              "hk_status": null,
+              "housekeeper": {
+                "assigned_units": null,
+                "id": 10,
+                "is_active": false,
+                "is_soft_deleted": false,
+                "mobile": null,
+                "name": "Bassamx Yzzz",
+                "note": null,
+                "password": null,
+                "phone_prefix": null,
+                "property_id": 0,
+                "username": null
+              },
+              "id": 16,
+              "is_active": true,
+              "name": "05"
+            },
+            {
+              "calendar_cell": null,
+              "hk_status": null,
+              "housekeeper": {
+                "assigned_units": null,
+                "id": 10,
+                "is_active": false,
+                "is_soft_deleted": false,
+                "mobile": null,
+                "name": "Bassamx Yzzz",
+                "note": null,
+                "password": null,
+                "phone_prefix": null,
+                "property_id": 0,
+                "username": null
+              },
+              "id": 17,
+              "is_active": true,
+              "name": "06"
+            },
+            {
+              "calendar_cell": null,
+              "hk_status": null,
+              "housekeeper": {
+                "assigned_units": null,
+                "id": 10,
+                "is_active": false,
+                "is_soft_deleted": false,
+                "mobile": null,
+                "name": "Bassamx Yzzz",
+                "note": null,
+                "password": null,
+                "phone_prefix": null,
+                "property_id": 0,
+                "username": null
+              },
+              "id": 26,
+              "is_active": true,
+              "name": "07"
+            },
+            {
+              "calendar_cell": null,
+              "hk_status": null,
+              "housekeeper": {
+                "assigned_units": null,
+                "id": 10,
+                "is_active": false,
+                "is_soft_deleted": false,
+                "mobile": null,
+                "name": "Bassamx Yzzz",
+                "note": null,
+                "password": null,
+                "phone_prefix": null,
+                "property_id": 0,
+                "username": null
+              },
+              "id": 509,
+              "is_active": true,
+              "name": "TEST"
+            }
+          ],
           "rate": null,
-          "rateplans": null,
-          "size": 50,
+          "rateplans": [
+            {
+              "agents": [],
+              "assignable_units": null,
+              "cancelation": null,
+              "custom_text": "Car Rental included",
+              "extra_bed_for_code": "002",
+              "extra_bed_max": 1,
+              "extra_bed_rate_per_night": 0,
+              "extra_bed_rate_per_night_additional_child": 0,
+              "extra_bed_rate_per_night_first_child": 0,
+              "guarantee": null,
+              "id": 123,
+              "is_active": true,
+              "is_available_to_book": true,
+              "is_booking_engine_enabled": true,
+              "is_channel_enabled": true,
+              "is_closed": null,
+              "is_derived": false,
+              "is_extra_bed_free_for_children": false,
+              "is_non_refundable": false,
+              "is_targeting_travel_agency": false,
+              "meal_plan": {
+                "code": "002",
+                "name": "Bed & breakfast"
+              },
+              "name": "Standard Rooms/Car Rental included/Bed-&-breakfast",
+              "not_available_reason": null,
+              "pre_payment_amount": null,
+              "pre_payment_amount_gross": null,
+              "rate_restrictions": null,
+              "selected_variation": null,
+              "sell_mode": {
+                "code": "001",
+                "description": "Per Room"
+              },
+              "short_name": "Bed & breakfast",
+              "sleeps": 2,
+              "variations": [
+                {
+                  "IS_MLS_VIOLATED": false,
+                  "MLS_ALERT": null,
+                  "MLS_ALERT_VALUE": null,
+                  "adult_child_offering": null,
+                  "adult_nbr": 1,
+                  "amount": 270,
+                  "amount_gross": 299.7,
+                  "amount_per_night": 90,
+                  "amount_per_night_gross": 99.9,
+                  "applicable_policies": [
+                    {
+                      "brackets": [
+                        {
+                          "amount": 0,
+                          "amount_formatted": "US$0.00",
+                          "code": "000",
+                          "currency_id": 4,
+                          "due_on": "2025-10-01",
+                          "due_on_formatted": "Wednesday, 1 Oct 2025, 14:00",
+                          "gross_amount": 0,
+                          "gross_amount_formatted": "US$0.00",
+                          "statement": "Do not use"
+                        },
+                        {
+                          "amount": 90,
+                          "amount_formatted": "US$90.00",
+                          "code": "001",
+                          "currency_id": 4,
+                          "due_on": "2025-11-02",
+                          "due_on_formatted": "Sunday, 2 Nov 2025, 14:00",
+                          "gross_amount": 99.9,
+                          "gross_amount_formatted": "US$99.90",
+                          "statement": "One night"
+                        },
+                        {
+                          "amount": 270,
+                          "amount_formatted": "US$270.00",
+                          "code": "004",
+                          "currency_id": 4,
+                          "due_on": "2025-11-07",
+                          "due_on_formatted": "Friday, 7 Nov 2025, 14:00",
+                          "gross_amount": 299.7,
+                          "gross_amount_formatted": "US$299.70",
+                          "statement": "100% of the total price"
+                        }
+                      ],
+                      "combined_statement": "No penalty if cancelled before Sunday, 2 Nov 2025, 14:00. US$99.90 if cancelled between Sunday, 2 Nov 2025, 14:00 and Friday, 7 Nov 2025, 14:00. US$299.70 if cancelled later or in case of no show.",
+                      "type": "cancelation"
+                    },
+                    {
+                      "brackets": [
+                        {
+                          "amount": 90,
+                          "amount_formatted": "US$90.00",
+                          "code": "001",
+                          "currency_id": 4,
+                          "due_on": "2025-10-01",
+                          "due_on_formatted": null,
+                          "gross_amount": 99.9,
+                          "gross_amount_formatted": "US$99.90",
+                          "statement": "First night from your booking will be charged."
+                        }
+                      ],
+                      "combined_statement": "First night from your booking will be charged.",
+                      "type": "guarantee"
+                    }
+                  ],
+                  "bed_preference_code": "001",
+                  "child_nbr": 0,
+                  "discount_pct": 0,
+                  "discounted_amount": 270,
+                  "discounted_gross_amount": 299.7,
+                  "extra_bed_free_nbr": 0,
+                  "extra_bed_nbr": 0,
+                  "extra_bed_rate_per_night": 0,
+                  "food_nbr_upsell": 0,
+                  "infant_nbr": null,
+                  "is_lmd": null,
+                  "nights": [
+                    {
+                      "amount": 90,
+                      "applied_promotion": null,
+                      "discounted_amount": 90,
+                      "discounted_gross_amount": 99.9,
+                      "extra_bed_nbr": 0,
+                      "extra_bed_nbr_child": 0,
+                      "extra_bed_nbr_child_addi": 0,
+                      "extra_bed_rate_per_night": 0,
+                      "extra_bed_rate_per_night_child": 0,
+                      "extra_bed_rate_per_night_child_addi": 0,
+                      "gross_amount": 99.9,
+                      "night": "2025-11-17",
+                      "night_index": 1
+                    },
+                    {
+                      "amount": 90,
+                      "applied_promotion": null,
+                      "discounted_amount": 90,
+                      "discounted_gross_amount": 99.9,
+                      "extra_bed_nbr": 0,
+                      "extra_bed_nbr_child": 0,
+                      "extra_bed_nbr_child_addi": 0,
+                      "extra_bed_rate_per_night": 0,
+                      "extra_bed_rate_per_night_child": 0,
+                      "extra_bed_rate_per_night_child_addi": 0,
+                      "gross_amount": 99.9,
+                      "night": "2025-11-18",
+                      "night_index": 2
+                    },
+                    {
+                      "amount": 90,
+                      "applied_promotion": null,
+                      "discounted_amount": 90,
+                      "discounted_gross_amount": 99.9,
+                      "extra_bed_nbr": 0,
+                      "extra_bed_nbr_child": 0,
+                      "extra_bed_nbr_child_addi": 0,
+                      "extra_bed_rate_per_night": 0,
+                      "extra_bed_rate_per_night_child": 0,
+                      "extra_bed_rate_per_night_child_addi": 0,
+                      "gross_amount": 99.9,
+                      "night": "2025-11-19",
+                      "night_index": 3
+                    }
+                  ],
+                  "nights_nbr": 3,
+                  "prepayment_amount": 90,
+                  "prepayment_amount_gross": 99.9,
+                  "rate_plan_id": 123,
+                  "smoking_code": "001",
+                  "total_before_discount": null
+                },
+                {
+                  "IS_MLS_VIOLATED": false,
+                  "MLS_ALERT": null,
+                  "MLS_ALERT_VALUE": null,
+                  "adult_child_offering": null,
+                  "adult_nbr": 2,
+                  "amount": 270,
+                  "amount_gross": 299.7,
+                  "amount_per_night": 90,
+                  "amount_per_night_gross": 99.9,
+                  "applicable_policies": [
+                    {
+                      "brackets": [
+                        {
+                          "amount": 0,
+                          "amount_formatted": "US$0.00",
+                          "code": "000",
+                          "currency_id": 4,
+                          "due_on": "2025-10-01",
+                          "due_on_formatted": "Wednesday, 1 Oct 2025, 14:00",
+                          "gross_amount": 0,
+                          "gross_amount_formatted": "US$0.00",
+                          "statement": "Do not use"
+                        },
+                        {
+                          "amount": 90,
+                          "amount_formatted": "US$90.00",
+                          "code": "001",
+                          "currency_id": 4,
+                          "due_on": "2025-11-02",
+                          "due_on_formatted": "Sunday, 2 Nov 2025, 14:00",
+                          "gross_amount": 99.9,
+                          "gross_amount_formatted": "US$99.90",
+                          "statement": "One night"
+                        },
+                        {
+                          "amount": 270,
+                          "amount_formatted": "US$270.00",
+                          "code": "004",
+                          "currency_id": 4,
+                          "due_on": "2025-11-07",
+                          "due_on_formatted": "Friday, 7 Nov 2025, 14:00",
+                          "gross_amount": 299.7,
+                          "gross_amount_formatted": "US$299.70",
+                          "statement": "100% of the total price"
+                        }
+                      ],
+                      "combined_statement": "No penalty if cancelled before Sunday, 2 Nov 2025, 14:00. US$99.90 if cancelled between Sunday, 2 Nov 2025, 14:00 and Friday, 7 Nov 2025, 14:00. US$299.70 if cancelled later or in case of no show.",
+                      "type": "cancelation"
+                    },
+                    {
+                      "brackets": [
+                        {
+                          "amount": 90,
+                          "amount_formatted": "US$90.00",
+                          "code": "001",
+                          "currency_id": 4,
+                          "due_on": "2025-10-01",
+                          "due_on_formatted": null,
+                          "gross_amount": 99.9,
+                          "gross_amount_formatted": "US$99.90",
+                          "statement": "First night from your booking will be charged."
+                        }
+                      ],
+                      "combined_statement": "First night from your booking will be charged.",
+                      "type": "guarantee"
+                    }
+                  ],
+                  "bed_preference_code": "001",
+                  "child_nbr": 0,
+                  "discount_pct": 0,
+                  "discounted_amount": 270,
+                  "discounted_gross_amount": 299.7,
+                  "extra_bed_free_nbr": 0,
+                  "extra_bed_nbr": 0,
+                  "extra_bed_rate_per_night": 0,
+                  "food_nbr_upsell": 0,
+                  "infant_nbr": null,
+                  "is_lmd": null,
+                  "nights": [
+                    {
+                      "amount": 90,
+                      "applied_promotion": null,
+                      "discounted_amount": 90,
+                      "discounted_gross_amount": 99.9,
+                      "extra_bed_nbr": 0,
+                      "extra_bed_nbr_child": 0,
+                      "extra_bed_nbr_child_addi": 0,
+                      "extra_bed_rate_per_night": 0,
+                      "extra_bed_rate_per_night_child": 0,
+                      "extra_bed_rate_per_night_child_addi": 0,
+                      "gross_amount": 99.9,
+                      "night": "2025-11-17",
+                      "night_index": 1
+                    },
+                    {
+                      "amount": 90,
+                      "applied_promotion": null,
+                      "discounted_amount": 90,
+                      "discounted_gross_amount": 99.9,
+                      "extra_bed_nbr": 0,
+                      "extra_bed_nbr_child": 0,
+                      "extra_bed_nbr_child_addi": 0,
+                      "extra_bed_rate_per_night": 0,
+                      "extra_bed_rate_per_night_child": 0,
+                      "extra_bed_rate_per_night_child_addi": 0,
+                      "gross_amount": 99.9,
+                      "night": "2025-11-18",
+                      "night_index": 2
+                    },
+                    {
+                      "amount": 90,
+                      "applied_promotion": null,
+                      "discounted_amount": 90,
+                      "discounted_gross_amount": 99.9,
+                      "extra_bed_nbr": 0,
+                      "extra_bed_nbr_child": 0,
+                      "extra_bed_nbr_child_addi": 0,
+                      "extra_bed_rate_per_night": 0,
+                      "extra_bed_rate_per_night_child": 0,
+                      "extra_bed_rate_per_night_child_addi": 0,
+                      "gross_amount": 99.9,
+                      "night": "2025-11-19",
+                      "night_index": 3
+                    }
+                  ],
+                  "nights_nbr": 3,
+                  "prepayment_amount": 90,
+                  "prepayment_amount_gross": 99.9,
+                  "rate_plan_id": 123,
+                  "smoking_code": "001",
+                  "total_before_discount": null
+                }
+              ]
+            }
+          ],
+          "size": 25,
           "smoking_option": {
             "allowed_smoking_options": [
               {
@@ -158,89 +557,344 @@
           }
         },
         "rateplan": {
+          "agents": [],
           "assignable_units": null,
-          "cancelation": "<u><b>Cancellation</b></u>: 100% of the total price will be charged if cancelled after Monday, 15 Jul 2024, 22:00 or in case of no show.\r\n",
-          "custom_text": null,
-          "guarantee": "<u><b>Guarantee</b></u>: First night from your booking will be charged.",
-          "id": 3755,
+          "cancelation": null,
+          "custom_text": "Car Rental included",
+          "extra_bed_for_code": "002",
+          "extra_bed_max": 1,
+          "extra_bed_rate_per_night": 0,
+          "extra_bed_rate_per_night_additional_child": 0,
+          "extra_bed_rate_per_night_first_child": 0,
+          "guarantee": null,
+          "id": 123,
           "is_active": true,
+          "is_available_to_book": true,
           "is_booking_engine_enabled": true,
-          "is_channel_enabled": false,
-          "is_closed": false,
+          "is_channel_enabled": true,
+          "is_closed": null,
+          "is_derived": false,
+          "is_extra_bed_free_for_children": false,
           "is_non_refundable": false,
           "is_targeting_travel_agency": false,
-          "name": "Premium Suites/Half-board",
-          "rate_restrictions": null,
-          "selected_variation": {
-            "IS_MLS_VIOLATED": false,
-            "MLS_ALERT": null,
-            "adult_child_offering": "2 adults",
-            "adult_nbr": 2,
-            "amount": 102,
-            "amount_per_night": 102,
-            "child_nbr": 0,
-            "discount_pct": 15,
-            "is_lmd": false,
-            "nights_nbr": 1,
-            "total_before_discount": 120
+          "meal_plan": {
+            "code": "002",
+            "name": "Bed & breakfast"
           },
+          "name": "Standard Rooms/Car Rental included/Bed-&-breakfast",
+          "not_available_reason": null,
+          "pre_payment_amount": null,
+          "pre_payment_amount_gross": null,
+          "rate_restrictions": null,
+          "selected_variation": null,
           "sell_mode": {
             "code": "001",
             "description": "Per Room"
           },
-          "short_name": "Half-board",
+          "short_name": "Bed & breakfast",
+          "sleeps": 2,
           "variations": [
             {
-              "adult_child_offering": "2 adults",
-              "adult_nbr": 2,
-              "amount": 102,
-              "child_nbr": 0,
-              "amount_per_night": "102",
-              "discount_pct": 15,
-              "is_lmd": false,
-              "nights_nbr": 1,
-              "total_before_discount": 120,
-              "is_calculated": true,
+              "IS_MLS_VIOLATED": false,
               "MLS_ALERT": null,
-              "IS_MLS_VIOLATED": false
+              "MLS_ALERT_VALUE": null,
+              "adult_child_offering": null,
+              "adult_nbr": 1,
+              "amount": 270,
+              "amount_gross": 299.7,
+              "amount_per_night": 90,
+              "amount_per_night_gross": 99.9,
+              "applicable_policies": [
+                {
+                  "brackets": [
+                    {
+                      "amount": 0,
+                      "amount_formatted": "US$0.00",
+                      "code": "000",
+                      "currency_id": 4,
+                      "due_on": "2025-10-01",
+                      "due_on_formatted": "Wednesday, 1 Oct 2025, 14:00",
+                      "gross_amount": 0,
+                      "gross_amount_formatted": "US$0.00",
+                      "statement": "Do not use"
+                    },
+                    {
+                      "amount": 90,
+                      "amount_formatted": "US$90.00",
+                      "code": "001",
+                      "currency_id": 4,
+                      "due_on": "2025-11-02",
+                      "due_on_formatted": "Sunday, 2 Nov 2025, 14:00",
+                      "gross_amount": 99.9,
+                      "gross_amount_formatted": "US$99.90",
+                      "statement": "One night"
+                    },
+                    {
+                      "amount": 270,
+                      "amount_formatted": "US$270.00",
+                      "code": "004",
+                      "currency_id": 4,
+                      "due_on": "2025-11-07",
+                      "due_on_formatted": "Friday, 7 Nov 2025, 14:00",
+                      "gross_amount": 299.7,
+                      "gross_amount_formatted": "US$299.70",
+                      "statement": "100% of the total price"
+                    }
+                  ],
+                  "combined_statement": "No penalty if cancelled before Sunday, 2 Nov 2025, 14:00. US$99.90 if cancelled between Sunday, 2 Nov 2025, 14:00 and Friday, 7 Nov 2025, 14:00. US$299.70 if cancelled later or in case of no show.",
+                  "type": "cancelation"
+                },
+                {
+                  "brackets": [
+                    {
+                      "amount": 90,
+                      "amount_formatted": "US$90.00",
+                      "code": "001",
+                      "currency_id": 4,
+                      "due_on": "2025-10-01",
+                      "due_on_formatted": null,
+                      "gross_amount": 99.9,
+                      "gross_amount_formatted": "US$99.90",
+                      "statement": "First night from your booking will be charged."
+                    }
+                  ],
+                  "combined_statement": "First night from your booking will be charged.",
+                  "type": "guarantee"
+                }
+              ],
+              "bed_preference_code": "001",
+              "child_nbr": 0,
+              "discount_pct": 0,
+              "discounted_amount": 270,
+              "discounted_gross_amount": 299.7,
+              "extra_bed_free_nbr": 0,
+              "extra_bed_nbr": 0,
+              "extra_bed_rate_per_night": 0,
+              "food_nbr_upsell": 0,
+              "infant_nbr": null,
+              "is_lmd": null,
+              "nights": [
+                {
+                  "amount": 90,
+                  "applied_promotion": null,
+                  "discounted_amount": 90,
+                  "discounted_gross_amount": 99.9,
+                  "extra_bed_nbr": 0,
+                  "extra_bed_nbr_child": 0,
+                  "extra_bed_nbr_child_addi": 0,
+                  "extra_bed_rate_per_night": 0,
+                  "extra_bed_rate_per_night_child": 0,
+                  "extra_bed_rate_per_night_child_addi": 0,
+                  "gross_amount": 99.9,
+                  "night": "2025-11-17",
+                  "night_index": 1
+                },
+                {
+                  "amount": 90,
+                  "applied_promotion": null,
+                  "discounted_amount": 90,
+                  "discounted_gross_amount": 99.9,
+                  "extra_bed_nbr": 0,
+                  "extra_bed_nbr_child": 0,
+                  "extra_bed_nbr_child_addi": 0,
+                  "extra_bed_rate_per_night": 0,
+                  "extra_bed_rate_per_night_child": 0,
+                  "extra_bed_rate_per_night_child_addi": 0,
+                  "gross_amount": 99.9,
+                  "night": "2025-11-18",
+                  "night_index": 2
+                },
+                {
+                  "amount": 90,
+                  "applied_promotion": null,
+                  "discounted_amount": 90,
+                  "discounted_gross_amount": 99.9,
+                  "extra_bed_nbr": 0,
+                  "extra_bed_nbr_child": 0,
+                  "extra_bed_nbr_child_addi": 0,
+                  "extra_bed_rate_per_night": 0,
+                  "extra_bed_rate_per_night_child": 0,
+                  "extra_bed_rate_per_night_child_addi": 0,
+                  "gross_amount": 99.9,
+                  "night": "2025-11-19",
+                  "night_index": 3
+                }
+              ],
+              "nights_nbr": 3,
+              "prepayment_amount": 90,
+              "prepayment_amount_gross": 99.9,
+              "rate_plan_id": 123,
+              "smoking_code": "001",
+              "total_before_discount": null
             },
             {
-              "adult_child_offering": "1 adult",
-              "adult_nbr": 1,
-              "amount": null,
-              "child_nbr": 0,
-              "amount_per_night": "0",
-              "discount_pct": 0,
-              "is_lmd": null,
-              "nights_nbr": 1,
-              "total_before_discount": 0,
-              "is_calculated": false,
+              "IS_MLS_VIOLATED": false,
               "MLS_ALERT": null,
-              "IS_MLS_VIOLATED": false
+              "MLS_ALERT_VALUE": null,
+              "adult_child_offering": null,
+              "adult_nbr": 2,
+              "amount": 270,
+              "amount_gross": 299.7,
+              "amount_per_night": 90,
+              "amount_per_night_gross": 99.9,
+              "applicable_policies": [
+                {
+                  "brackets": [
+                    {
+                      "amount": 0,
+                      "amount_formatted": "US$0.00",
+                      "code": "000",
+                      "currency_id": 4,
+                      "due_on": "2025-10-01",
+                      "due_on_formatted": "Wednesday, 1 Oct 2025, 14:00",
+                      "gross_amount": 0,
+                      "gross_amount_formatted": "US$0.00",
+                      "statement": "Do not use"
+                    },
+                    {
+                      "amount": 90,
+                      "amount_formatted": "US$90.00",
+                      "code": "001",
+                      "currency_id": 4,
+                      "due_on": "2025-11-02",
+                      "due_on_formatted": "Sunday, 2 Nov 2025, 14:00",
+                      "gross_amount": 99.9,
+                      "gross_amount_formatted": "US$99.90",
+                      "statement": "One night"
+                    },
+                    {
+                      "amount": 270,
+                      "amount_formatted": "US$270.00",
+                      "code": "004",
+                      "currency_id": 4,
+                      "due_on": "2025-11-07",
+                      "due_on_formatted": "Friday, 7 Nov 2025, 14:00",
+                      "gross_amount": 299.7,
+                      "gross_amount_formatted": "US$299.70",
+                      "statement": "100% of the total price"
+                    }
+                  ],
+                  "combined_statement": "No penalty if cancelled before Sunday, 2 Nov 2025, 14:00. US$99.90 if cancelled between Sunday, 2 Nov 2025, 14:00 and Friday, 7 Nov 2025, 14:00. US$299.70 if cancelled later or in case of no show.",
+                  "type": "cancelation"
+                },
+                {
+                  "brackets": [
+                    {
+                      "amount": 90,
+                      "amount_formatted": "US$90.00",
+                      "code": "001",
+                      "currency_id": 4,
+                      "due_on": "2025-10-01",
+                      "due_on_formatted": null,
+                      "gross_amount": 99.9,
+                      "gross_amount_formatted": "US$99.90",
+                      "statement": "First night from your booking will be charged."
+                    }
+                  ],
+                  "combined_statement": "First night from your booking will be charged.",
+                  "type": "guarantee"
+                }
+              ],
+              "bed_preference_code": "001",
+              "child_nbr": 0,
+              "discount_pct": 0,
+              "discounted_amount": 270,
+              "discounted_gross_amount": 299.7,
+              "extra_bed_free_nbr": 0,
+              "extra_bed_nbr": 0,
+              "extra_bed_rate_per_night": 0,
+              "food_nbr_upsell": 0,
+              "infant_nbr": null,
+              "is_lmd": null,
+              "nights": [
+                {
+                  "amount": 90,
+                  "applied_promotion": null,
+                  "discounted_amount": 90,
+                  "discounted_gross_amount": 99.9,
+                  "extra_bed_nbr": 0,
+                  "extra_bed_nbr_child": 0,
+                  "extra_bed_nbr_child_addi": 0,
+                  "extra_bed_rate_per_night": 0,
+                  "extra_bed_rate_per_night_child": 0,
+                  "extra_bed_rate_per_night_child_addi": 0,
+                  "gross_amount": 99.9,
+                  "night": "2025-11-17",
+                  "night_index": 1
+                },
+                {
+                  "amount": 90,
+                  "applied_promotion": null,
+                  "discounted_amount": 90,
+                  "discounted_gross_amount": 99.9,
+                  "extra_bed_nbr": 0,
+                  "extra_bed_nbr_child": 0,
+                  "extra_bed_nbr_child_addi": 0,
+                  "extra_bed_rate_per_night": 0,
+                  "extra_bed_rate_per_night_child": 0,
+                  "extra_bed_rate_per_night_child_addi": 0,
+                  "gross_amount": 99.9,
+                  "night": "2025-11-18",
+                  "night_index": 2
+                },
+                {
+                  "amount": 90,
+                  "applied_promotion": null,
+                  "discounted_amount": 90,
+                  "discounted_gross_amount": 99.9,
+                  "extra_bed_nbr": 0,
+                  "extra_bed_nbr_child": 0,
+                  "extra_bed_nbr_child_addi": 0,
+                  "extra_bed_rate_per_night": 0,
+                  "extra_bed_rate_per_night_child": 0,
+                  "extra_bed_rate_per_night_child_addi": 0,
+                  "gross_amount": 99.9,
+                  "night": "2025-11-19",
+                  "night_index": 3
+                }
+              ],
+              "nights_nbr": 3,
+              "prepayment_amount": 90,
+              "prepayment_amount_gross": 99.9,
+              "rate_plan_id": 123,
+              "smoking_code": "001",
+              "total_before_discount": null
             }
           ]
         },
+        "prepayment_amount_gross": 99.9,
         "unit": null,
+        "smoking_option": null,
         "occupancy": {
           "adult_nbr": 2,
           "children_nbr": 0,
-          "infant_nbr": null
+          "infant_nbr": 0
         },
         "bed_preference": null,
-        "from_date": "2024-07-25",
-        "to_date": "2024-07-26",
+        "from_date": "2025-11-17",
+        "to_date": "2025-11-20",
         "notes": null,
         "days": [
           {
-            "date": "2024-07-25",
-            "amount": 102,
+            "date": "2025-11-17",
+            "amount": 90,
+            "cost": null
+          },
+          {
+            "date": "2025-11-18",
+            "amount": 90,
+            "cost": null
+          },
+          {
+            "date": "2025-11-19",
+            "amount": 90,
             "cost": null
           }
         ],
         "guest": {
           "email": null,
           "first_name": "test",
-          "last_name": "test2",
+          "last_name": "test",
           "country_id": null,
           "city": null,
           "mobile": null,
@@ -259,8 +913,48 @@
     },
     {
       "key": "prepayment_amount",
-      "value": 102
+      "value": 99.9
+    },
+    {
+      "key": "selected_currency",
+      "value": "USD"
     }
   ],
-  "pickup_info": null
+  "pickup_info": {
+    "booking_nbr": null,
+    "is_remove": false,
+    "currency": {
+      "code": "ARS",
+      "id": 32,
+      "symbol": "ARS"
+    },
+    "date": "2025-11-17",
+    "details": "test",
+    "hour": 12,
+    "minute": 22,
+    "nbr_of_units": 1,
+    "selected_option": {
+      "amount": 50,
+      "currency": {
+        "code": "USD",
+        "id": 4,
+        "symbol": "US$"
+      },
+      "id": 19,
+      "location": {
+        "description": "Beirut International Airport",
+        "id": 1
+      },
+      "pricing_model": {
+        "code": "002",
+        "description": "Person"
+      },
+      "vehicle": {
+        "capacity": 4,
+        "code": "002",
+        "description": "Sedan car (2 large & 3 small suitcases)"
+      }
+    },
+    "total": 100
+  }
 }

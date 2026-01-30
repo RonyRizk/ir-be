@@ -14,6 +14,7 @@ setPluginConfigurationDefaults({
 });
 export const config: Config = {
   namespace: 'iglooroom',
+  globalStyle: 'src/styles/tailwind.css',
   outputTargets: [
     {
       type: 'dist',

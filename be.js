@@ -8,7 +8,6 @@ function insertIrLibScript() {
         script.src = 'https://david1chowaifaty.github.io/igloo-calendar-main-web/be-dist/iglooroom/iglooroom.esm.js';
         document.head.appendChild(script);
         injected = true;
-        console.log("injection ")
     }
 }
 insertIrLibScript();

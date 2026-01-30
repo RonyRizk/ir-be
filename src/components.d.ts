@@ -17,6 +17,7 @@ import { TCarouselSlides } from "./components/ui/ir-carousel/carousel";
 import { CombinedLevel2Properties } from "./components/ir-booking-widget/ir-booking-widget";
 import { ZodIssue } from "zod";
 import { Placement } from "@popperjs/core";
+import { Placement as Placement1, Strategy } from "@floating-ui/dom";
 import { IRatePlanSelection } from "./stores/booking";
 import { TAuthNavigation } from "./components/ir-booking-engine/ir-nav/ir-auth/auth.types";
 import { TSignInAuthTrigger, TSignUpAuthTrigger } from "./validators/auth.validator";
@@ -33,6 +34,7 @@ export { TCarouselSlides } from "./components/ui/ir-carousel/carousel";
 export { CombinedLevel2Properties } from "./components/ir-booking-widget/ir-booking-widget";
 export { ZodIssue } from "zod";
 export { Placement } from "@popperjs/core";
+export { Placement as Placement1, Strategy } from "@floating-ui/dom";
 export { IRatePlanSelection } from "./stores/booking";
 export { TAuthNavigation } from "./components/ir-booking-engine/ir-nav/ir-auth/auth.types";
 export { TSignInAuthTrigger, TSignUpAuthTrigger } from "./validators/auth.validator";
@@ -472,7 +474,7 @@ export namespace Components {
         /**
           * Popper placement, e.g. "bottom-start".
          */
-        "placement": Placement;
+        "placement": Placement1;
         /**
           * Positioning strategy ("absolute" or "fixed").
          */
@@ -2526,7 +2528,7 @@ declare namespace LocalJSX {
         /**
           * Popper placement, e.g. "bottom-start".
          */
-        "placement"?: Placement;
+        "placement"?: Placement1;
         /**
           * Positioning strategy ("absolute" or "fixed").
          */
