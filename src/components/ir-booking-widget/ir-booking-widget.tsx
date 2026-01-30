@@ -190,7 +190,7 @@ export class IrBookingWidget {
     return (
       value
         ?.split(',')
-        .map(v => v.trim())
+        .map(v => v.trim().toLowerCase())
         .filter(Boolean) ?? []
     );
   }

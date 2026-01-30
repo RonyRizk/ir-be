@@ -28,7 +28,10 @@ export class IrMultiPropertyWidget {
   @Event() dateChange: EventEmitter<{ from_date: Date | null; to_date: Date | null }>;
   @Event() guestsChange: EventEmitter<{ adultCount: number; childrenCount: number; infants: number; childrenAges: string[] }>;
   @Event() bookNow: EventEmitter<void>;
-
+  private capitalize(word) {
+    if (!word) return '';
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  }
   render() {
     const noPropertiesFound = this.level2Properties.properties.get(this.selectedCity).length === 0;
     return (
@@ -41,7 +44,7 @@ export class IrMultiPropertyWidget {
             onValueChange={e => this.cityChange.emit(e.detail.toString())}
             data={this.level2Properties?.cities?.map(city => ({
               id: city,
-              value: city,
+              value: this.capitalize(city),
             }))}
             icon
           >
