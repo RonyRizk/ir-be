@@ -157,7 +157,7 @@ export class IrBookingEngine {
       this.commonService.getExposedLanguage(),
       this.propertyService.getExposedProperty({ id: this.propertyId, language: app_store.userPreferences?.language_id || 'en', aname: this.p, perma_link: this.perma_link }),
       this.propertyService.getExposedNonBookableNights({
-        porperty_id: this.propertyId,
+        porperty_id: this.perma_link ? null : this.propertyId,
         from_date: format(new Date(), 'yyyy-MM-dd'),
         to_date: format(addYears(new Date(), 1), 'yyyy-MM-dd'),
         perma_link: this.perma_link,
