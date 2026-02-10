@@ -61,12 +61,12 @@ export class IrRateplan {
     this.cancellationMessage = this.paymentService.getCancellationMessage(this.visibleInventory.selected_variation?.applicable_policies, true)?.message;
   }
   render() {
-    if (!this.ratePlan.is_targeting_travel_agency && booking_store.bookingAvailabilityParams.agent) {
-      return null;
-    }
-    if (this.ratePlan.is_targeting_travel_agency && !app_store.app_data.isAgentMode) {
-      return null;
-    }
+    // if (!this.ratePlan.is_targeting_travel_agency && booking_store.bookingAvailabilityParams.agent) {
+    //   return null;
+    // }
+    // if (this.ratePlan.is_targeting_travel_agency && !app_store.app_data.isAgentMode) {
+    //   return null;
+    // }
 
     const isInFreeCancellationZone = this.paymentService.checkFreeCancellationZone(this.visibleInventory?.selected_variation?.applicable_policies);
     const isInventoryFull =

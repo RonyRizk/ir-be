@@ -135,8 +135,8 @@ export class IrBookingPage {
                 if (
                   !roomType.is_active ||
                   (app_store.app_data.roomtype_id && roomType.id !== app_store.app_data.roomtype_id) ||
-                  !roomType.rateplans.some(rp => rp.is_booking_engine_enabled) ||
-                  (!!booking_store.bookingAvailabilityParams.agent && roomType.rateplans.filter(rp => rp.is_targeting_travel_agency).length === 0)
+                  !roomType.rateplans.some(rp => rp.is_booking_engine_enabled)
+                  // ||(!!booking_store.bookingAvailabilityParams.agent && roomType.rateplans.filter(rp => rp.is_targeting_travel_agency).length === 0)
                 ) {
                   return null;
                 }
