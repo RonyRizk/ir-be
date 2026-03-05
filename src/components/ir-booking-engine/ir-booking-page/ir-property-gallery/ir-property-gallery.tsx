@@ -204,7 +204,7 @@ export class IrPropertyGallery {
   }
 
   render() {
-    const images = this.property_state === 'carousel' ? this.roomType.images?.slice(0, 16) : app_store.property?.images?.slice(0, 24);
+    const images = (this.property_state === 'carousel' ? this.roomType.images?.slice(0, 16) : app_store.property?.images?.slice(0, 24)) ?? [];
     return (
       <div>
         {this.property_state === 'gallery' ? (
@@ -246,7 +246,7 @@ export class IrPropertyGallery {
               ></ir-button>
             </div>
             <section class="max-h-[80vh]">
-              {images.length > 0 && (
+              {images?.length > 0 && (
                 <div class="carousel_gallery_container hidden sm:block">
                   <ir-carousel
                     enableCarouselSwipe

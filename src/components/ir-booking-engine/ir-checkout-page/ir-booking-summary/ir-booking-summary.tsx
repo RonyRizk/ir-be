@@ -33,16 +33,17 @@ export class IrBookingSummary {
     if (isRequestPending('/Get_Setup_Entries_By_TBL_NAME_MULTI')) {
       return <div></div>;
     }
+    const propertyImages = app_store.property?.images ?? [];
     return (
       <Host>
         <div class="w-full rounded-md bg-gray-100  text-sm md:max-w-sm">
-          {app_store.property?.space_theme.background_image && (
+          {app_store.property?.space_theme?.background_image && (
             <div class="aspect-[1/1] max-h-32 w-full lg:aspect-[16/9]">
               <img
                 loading="lazy"
                 class="h-full w-full rounded-t-md object-cover"
-                src={app_store.property?.images.length === 0 ? app_store.property.space_theme.background_image : app_store.property?.images[0].url}
-                alt={app_store.property?.images.length === 0 ? app_store.property.name : app_store.property.images[0].tooltip}
+                src={propertyImages?.length === 0 ? app_store.property.space_theme.background_image : propertyImages[0]?.url}
+                alt={propertyImages?.length === 0 ? app_store.property.name : propertyImages[0]?.tooltip}
               />
             </div>
           )}
