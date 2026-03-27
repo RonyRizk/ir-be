@@ -3,6 +3,7 @@ import { ICurrency } from './common';
 export interface IExposedProperty {
   adult_child_constraints: AdultChildConstraints;
   affiliates: Affiliate[];
+  is_upon_request: boolean;
   agents: Agent[];
   allowed_booking_sources: AllowedBookingSource[];
   allowed_cards: AllowedCard[];

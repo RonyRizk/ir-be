@@ -25,7 +25,7 @@
 .placeholder[title] {
   cursor: pointer;
 }
-input {
+.ir-input-field {
   width: 100%;
   border-radius: 0.5rem;
   padding: 0.625rem 0.875rem;
@@ -34,7 +34,7 @@ input {
 }
 
 :host([placeholder]) .placeholder,
-input:focus + .placeholder,
+.ir-input-field:focus + .placeholder,
 .input-container.has-value .placeholder {
   transform: translateY(-1.4rem);
   background: linear-gradient(180deg, var(--label-background, #ffffff) 0%, #ffffff 100%);
@@ -63,7 +63,7 @@ input:focus + .placeholder,
   color: var(--error-500, #f04438);
 }
 .disabled,
-.disabled input {
+.disabled .ir-input-field {
   background: var(--gray-50, #f9fafb);
   color: var(--gray-300, #d0d5dd);
   pointer-events: none;
@@ -90,13 +90,13 @@ label {
   left: calc(0.875rem - 0.3rem);
 }
 
-.input-container[data-context='icon']:dir(ltr) input {
+.input-container[data-context='icon']:dir(ltr) .ir-input-field {
   padding-left: 2.3rem;
 }
 .input-container[data-context='icon']:dir(ltr) .placeholder {
   left: 2rem;
 }
-.input-container[data-context='icon']:dir(rtl) input {
+.input-container[data-context='icon']:dir(rtl) .ir-input-field {
   padding-right: 2.3rem;
 }
 .input-container[data-context='icon']:dir(rtl) .placeholder {

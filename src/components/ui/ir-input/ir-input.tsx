@@ -164,7 +164,7 @@ export class IrInput {
           name={this.name}
           placeholder={this.placeholder}
           id={this.inputId}
-          class={this.class}
+          class={`ir-input-field${this.class ? ` ${this.class}` : ''}`}
           required={this.required}
           disabled={this.disabled}
           readonly={this.readonly}

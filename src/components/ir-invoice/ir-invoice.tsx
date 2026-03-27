@@ -250,7 +250,9 @@ export class IrInvoice {
       });
     }
   }
-
+  private get isBookingRequestingConfirmation() {
+    return app_store.property.is_upon_request && this.booking.status.code === '001';
+  }
   render() {
     if (!this.booking && !this.isLoading) {
       return null;
@@ -281,7 +283,11 @@ export class IrInvoice {
             </section>
           )}
           <section class={`flex-1 ${this.be ? '' : 'invoice-container mx-auto w-full max-w-6xl'}`}>
-            {this.booking.is_requested_to_cancel ? (
+            {this.isBookingRequestingConfirmation ? (
+              <div class={'invoice-container'}>
+                <p class={'text-xl font-medium'}>{localizedWords.entries.Lcz_YourBookingHasBeenRequested}</p>
+              </div>
+            ) : this.booking.is_requested_to_cancel ? (
               <div class={'invoice-container'}>
                 <p class={'text-xl font-medium'}>{localizedWords.entries.Lcz_ThisBookingIs.replace('%1', localizedWords.entries?.Lcz_Cancelled)}</p>
               </div>
@@ -298,6 +304,7 @@ export class IrInvoice {
                 <p class={'text-xl font-medium '}>{localizedWords.entries.Lcz_ThisBookingIs.replace('%1', this.booking.status.description)}</p>
               </div>
             )}
+            {this.isBookingRequestingConfirmation && <p class="room-info-text pb-4 pt-2">{localizedWords.entries.Lcz_YourBookingIsNotGuaranteed}</p>}
             <div class={`flex  ${this.locationShown ? 'w-full' : 'w-full'} gap-16 `}>
               <div class={`invoice-container ${this.locationShown ? 'w-full' : 'w-full'}`}>
                 <section class="flex flex-col gap-4 md:flex-row md:items-center">

@@ -79,8 +79,7 @@ export const formatAmount = (amount: any, currency: string = 'USD', decimals = 2
   return numberFormatter.format(amount);
 };
 export function getDateDifference(date1: Moment, date2: Moment) {
-  // return differenceInCalendarDays(date2, date1);
-  return date2.diff(date1, 'days');
+  return moment.utc(date2.format('YYYY-MM-DD')).diff(moment.utc(date1.format('YYYY-MM-DD')), 'days');
 }
 export function renderTime(time: number) {
   return time < 10 ? time.toString().padStart(2, '0') : time.toString();

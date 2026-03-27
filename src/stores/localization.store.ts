@@ -12,6 +12,7 @@ export type TLocaleLocalizedWordsEntries = {
   Lcz_AcceptedCreditCards: string;
   Lcz_No: string;
   Lcz_AnyInfant: string;
+  Lcz_YourBookingHasBeenRequested: string;
   Lcz_Activities: string;
   Lcz_Address: string;
   Lcz_Infants: string;
