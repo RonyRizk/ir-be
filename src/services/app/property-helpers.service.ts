@@ -50,6 +50,7 @@ export class PropertyHelpers {
       nbr_of_units: pickup.number_of_vehicles,
       selected_option,
       total,
+      agent: booking_store.bookingAvailabilityParams.agent ? { id: booking_store.bookingAvailabilityParams.agent?.id } : null,
     };
     return res;
   }

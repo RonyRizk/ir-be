@@ -315,6 +315,7 @@ export class PropertyService {
 
           rooms.push({
             identifier: null,
+            agent: booking_store.bookingAvailabilityParams.agent ? { id: booking_store.bookingAvailabilityParams.agent?.id } : null,
             roomtype: selectedRoomType ?? rp.roomtype,
             rateplan: selectedRatePlan,
             prepayment_amount_gross: hasDifferentCurrency

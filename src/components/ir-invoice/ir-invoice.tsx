@@ -486,8 +486,8 @@ export class IrInvoice {
                       <img
                         loading="lazy"
                         class="property_img h-full w-full object-cover"
-                        src={app_store.property?.images.length === 0 ? app_store.property.space_theme.background_image : app_store.property?.images[0].url}
-                        alt={app_store.property?.images.length === 0 ? app_store.property.name : app_store.property.images[0].tooltip}
+                        src={(app_store.property?.images ?? [])?.length === 0 ? app_store.property.space_theme.background_image : app_store.property?.images[0].url}
+                        alt={(app_store.property?.images ?? [])?.length === 0 ? app_store.property.name : app_store.property.images[0].tooltip}
                       />
                     </div>
                   )}
