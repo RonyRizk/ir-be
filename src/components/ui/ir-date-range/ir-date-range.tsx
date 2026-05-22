@@ -34,6 +34,7 @@ export class IrDateRange {
     if (newValue !== oldLocale) {
       moment.locale(newValue);
       this.weekdays = getAbbreviatedWeekdays(newValue);
+      this.displayedDaysArr = this.displayedDaysArr.map(({ month }) => this.getMonthDays(month));
     }
   }
   @Watch('fromDate')
@@ -50,8 +51,13 @@ export class IrDateRange {
   }
 
   getMonthDays(month: Moment) {
-    const startDate = moment(month).startOf('month').startOf('week');
-    const endDate = moment(month).endOf('month').endOf('week');
+    const startOfMonth = month.clone().startOf('month');
+    // .day() is locale-independent (0 = Sunday); pad back to Sunday
+    const startDate = startOfMonth.clone().subtract(startOfMonth.day(), 'days');
+
+    const endOfMonth = month.clone().endOf('month');
+    // pad forward to Saturday
+    const endDate = endOfMonth.clone().add(6 - endOfMonth.day(), 'days');
 
     const days = [];
     let day = startDate.clone();
